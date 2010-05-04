@@ -199,9 +199,11 @@ class XMLStream(object):
 					traceback.print_exc()
 					self.disconnect(reconnect=True)
 			if self.state['reconnect']:
+				self.state.set('connected', False)
+				self.state.set('processing', False)
 				self.reconnect()
-			self.state.set('processing', False)
-			self.eventqueue.put(('quit', None, None))
+			else:
+				self.eventqueue.put(('quit', None, None))
 		#self.__thread['readXML'] = threading.Thread(name='readXML', target=self.__readXML)
 		#self.__thread['readXML'].start()
 		#self.__thread['spawnEvents'] = threading.Thread(name='spawnEvents', target=self.__spawnEvents)
