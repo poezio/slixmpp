@@ -96,7 +96,7 @@ class ClientXMPP(basexmpp, XMLStream):
 			else:
 				logging.debug("Since no address is supplied, attempting SRV lookup.")
 				try:
-					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.server, "SRV")
+					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.server)
 				except dns.resolver.NXDOMAIN:
 					logging.debug("No appropriate SRV record found.  Using JID server name.")
 				else:
@@ -131,10 +131,14 @@ class ClientXMPP(basexmpp, XMLStream):
 	def reconnect(self):
 		logging.info("Reconnecting")
 		self.event("disconnected")
+		self.authenticated = False
+		self.sessionstarted = False
 		XMLStream.reconnect(self)
 	
 	def disconnect(self, init=True, close=False, reconnect=False):
 		self.event("disconnected")
+		self.authenticated = False
+		self.sessionstarted = False
 		XMLStream.disconnect(self, reconnect)
 	
 	def registerFeature(self, mask, pointer, breaker = False):
