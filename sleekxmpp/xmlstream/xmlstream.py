@@ -146,13 +146,19 @@ class XMLStream(object):
 	
 	def process(self, threaded=True):
 		for t in range(0, HANDLER_THREADS):
-			self.__thread['eventhandle%s' % t] = threading.Thread(name='eventhandle%s' % t, target=self._eventRunner)
-			self.__thread['eventhandle%s' % t].start()
-		self.__thread['sendthread'] = threading.Thread(name='sendthread', target=self._sendThread)
-		self.__thread['sendthread'].start()
+			th = threading.Thread(name='eventhandle%s' % t, target=self._eventRunner)
+			th.setDaemon(True)
+			self.__thread['eventhandle%s' % t] = th
+			th.start()
+		th = threading.Thread(name='sendthread', target=self._sendThread)
+		th.setDaemon(True)
+		self.__thread['sendthread'] = th
+		th.start()
 		if threaded:
-			self.__thread['process'] = threading.Thread(name='process', target=self._process)
-			self.__thread['process'].start()
+			th = threading.Thread(name='process', target=self._process)
+			th.setDaemon(True)
+			self.__thread['process'] = th
+			th.start()
 		else:
 			self._process()
 	
@@ -286,7 +292,7 @@ class XMLStream(object):
 		self.state.set('tls',False)
 		self.state.set('ssl',False)
 		time.sleep(1)
-		self.connect()
+		self.connect(self.server,self.port)
 	
 	def incoming_filter(self, xmlobj):
 		return xmlobj
