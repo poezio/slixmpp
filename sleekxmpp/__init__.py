@@ -31,6 +31,7 @@ from . import plugins
 srvsupport = True
 try:
 	import dns.resolver
+	import dns.rdatatype
 except ImportError:
 	srvsupport = False
 
@@ -102,7 +103,8 @@ class ClientXMPP(basexmpp, XMLStream):
 			else:
 				logging.debug("Since no address is supplied, attempting SRV lookup.")
 				try:
-					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.server)
+					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.domain, 
+					        dns.rdatatype.SRV )
 				except dns.resolver.NXDOMAIN:
 					logging.debug("No appropriate SRV record found.  Using JID server name.")
 				else:
