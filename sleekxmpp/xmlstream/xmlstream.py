@@ -69,6 +69,7 @@ class XMLStream(object):
 		self.filesocket = None
 		self.use_ssl = False
 		self.use_tls = False
+		self.ca_certs=None
 
 		self.stream_header = "<stream>"
 		self.stream_footer = "</stream>"
@@ -112,7 +113,7 @@ class XMLStream(object):
 			self.socket.settimeout(None)
 			if self.use_ssl and self.ssl_support:
 				logging.debug("Socket Wrapped for SSL")
-				self.socket = ssl.wrap_socket(self.socket)
+				self.socket = ssl.wrap_socket(self.socket,ca_certs=self.ca_certs)
 			try:
 				self.socket.connect(self.address)
 				#self.filesocket = self.socket.makefile('rb', 0)
@@ -131,8 +132,13 @@ class XMLStream(object):
 		if self.ssl_support:
 			logging.info("Negotiating TLS")
 			self.realsocket = self.socket
-			self.socket = ssl.wrap_socket(self.socket, ssl_version=ssl.PROTOCOL_TLSv1, do_handshake_on_connect=False)
+			self.socket = ssl.wrap_socket(self.socket, 
+			        ssl_version=ssl.PROTOCOL_TLSv1, 
+			        do_handshake_on_connect=False, 
+			        ca_certs=self.ca_certs)
+			print "doing handshake..."
 			self.socket.do_handshake()
+			print "got handshake..."
 			if sys.version_info < (3,0):
 				from . filesocket import filesocket
 				self.filesocket = filesocket(self.socket)
@@ -146,13 +152,19 @@ class XMLStream(object):
 	
 	def process(self, threaded=True):
 		for t in range(0, HANDLER_THREADS):
-			self.__thread['eventhandle%s' % t] = threading.Thread(name='eventhandle%s' % t, target=self._eventRunner)
-			self.__thread['eventhandle%s' % t].start()
-		self.__thread['sendthread'] = threading.Thread(name='sendthread', target=self._sendThread)
-		self.__thread['sendthread'].start()
+			th = threading.Thread(name='eventhandle%s' % t, target=self._eventRunner)
+			th.setDaemon(True)
+			self.__thread['eventhandle%s' % t] = th
+			th.start()
+		th = threading.Thread(name='sendthread', target=self._sendThread)
+		th.setDaemon(True)
+		self.__thread['sendthread'] = th
+		th.start()
 		if threaded:
-			self.__thread['process'] = threading.Thread(name='process', target=self._process)
-			self.__thread['process'].start()
+			th = threading.Thread(name='process', target=self._process)
+			th.setDaemon(True)
+			self.__thread['process'] = th
+			th.start()
 		else:
 			self._process()
 	
@@ -288,7 +300,7 @@ class XMLStream(object):
 		self.state.set('tls',False)
 		self.state.set('ssl',False)
 		time.sleep(1)
-		self.connect()
+		self.connect(self.server,self.port)
 	
 	def incoming_filter(self, xmlobj):
 		return xmlobj

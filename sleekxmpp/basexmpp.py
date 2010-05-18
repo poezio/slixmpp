@@ -49,7 +49,7 @@ class basexmpp(object):
 		self.resource = ''
 		self.jid = ''
 		self.username = ''
-		self.server = ''
+		self.domain = ''
 		self.plugin = {}
 		self.auto_authorize = True
 		self.auto_subscribe = True
@@ -84,7 +84,7 @@ class basexmpp(object):
 		self.resource = self.getjidresource(jid)
 		self.jid = self.getjidbare(jid)
 		self.username = jid.split('@', 1)[0]
-		self.server = jid.split('@',1)[-1].split('/', 1)[0]
+		self.domain = jid.split('@',1)[-1].split('/', 1)[0]
 		
 	def registerPlugin(self, plugin, pconfig = {}):
 		"""Register a plugin not in plugins.__init__.__all__ but in the plugins

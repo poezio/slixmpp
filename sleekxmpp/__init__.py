@@ -1,11 +1,11 @@
 #!/usr/bin/python2.5
 
 """
-    SleekXMPP: The Sleek XMPP Library
-    Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+	SleekXMPP: The Sleek XMPP Library
+	Copyright (C) 2010  Nathanael C. Fritz
+	This file is part of SleekXMPP.
 
-    See the file license.txt for copying permission.
+	See the file license.txt for copying permission.
 """
 from __future__ import absolute_import, unicode_literals
 from . basexmpp import basexmpp
@@ -54,12 +54,14 @@ class ClientXMPP(basexmpp, XMLStream):
 		self.plugin_config = plugin_config
 		self.escape_quotes = escape_quotes
 		self.set_jid(jid)
+		self.server = None
+		self.port = 5222 # not used if DNS SRV is used
 		self.plugin_whitelist = plugin_whitelist
 		self.auto_reconnect = True
 		self.srvsupport = srvsupport
 		self.password = password
 		self.registered_features = []
-		self.stream_header = """<stream:stream to='%s' xmlns:stream='http://etherx.jabber.org/streams' xmlns='%s' version='1.0'>""" % (self.server,self.default_ns)
+		self.stream_header = """<stream:stream to='%s' xmlns:stream='http://etherx.jabber.org/streams' xmlns='%s' version='1.0'>""" % (self.domain,self.default_ns)
 		self.stream_footer = "</stream:stream>"
 		#self.map_namespace('http://etherx.jabber.org/streams', 'stream')
 		#self.map_namespace('jabber:client', '')
@@ -88,12 +90,16 @@ class ClientXMPP(basexmpp, XMLStream):
 	def get(self, key, default):
 		return self.plugin.get(key, default)
 
-	def connect(self, address=tuple()):
+	def connect(self, host=None, port=None):
 		"""Connect to the Jabber Server.  Attempts SRV lookup, and if it fails, uses
 		the JID server."""
-		if not address or len(address) < 2:
+
+		if host:
+			self.server = host
+			if port is None: port = self.port
+		else:
 			if not self.srvsupport:
-				logging.debug("Did not supply (address, port) to connect to and no SRV support is installed (http://www.dnspython.org).  Continuing to attempt connection, using server hostname from JID.")
+				logging.debug("Did not supply (address, port) to connect to and no SRV support is installed (http://www.dnspython.org).  Continuing to attempt connection, using domain from JID.")
 			else:
 				logging.debug("Since no address is supplied, attempting SRV lookup.")
 				try:
@@ -115,12 +121,19 @@ class ClientXMPP(basexmpp, XMLStream):
 					picked = random.randint(0, intmax)
 					for priority in priorities:
 						if picked <= priority:
-							address = addresses[priority]
+							(host,port) = addresses[priority]
 							break
-		if not address:
+					# if SRV lookup was successful, we aren't using a particular server.
+					self.server = None 
+
+		if not host:
 			# if all else fails take server from JID.
-			address = (self.server, 5222)
-		result = XMLStream.connect(self, address[0], address[1], use_tls=True)
+			(host,port) = (self.domain, self.port)
+			self.server = None
+
+		logging.debug('Attempting connection to %s:%d', host, port )
+		#TODO option to not use TLS?
+		result = XMLStream.connect(self, host, port, use_tls=True)
 		if result:
 			self.event("connected")
 		else:
