@@ -1,4 +1,4 @@
-#!/usr/bin/python2.5
+#!/usr/bin/python2.6
 
 """
     SleekXMPP: The Sleek XMPP Library
@@ -53,6 +53,16 @@ class ComponentXMPP(basexmpp, XMLStream):
 		self.set_jid(jid)
 		self.secret = secret
 		self.registerHandler(Callback('Handshake', MatchXPath('{jabber:component:accept}handshake'), self._handleHandshake))
+	
+	def __getitem__(self, key):
+		if key in self.plugin:
+			return self.plugin[key]
+		else:
+			logging.warning("""Plugin "%s" is not loaded.""" % key)
+			return False
+	
+	def get(self, key, default):
+		return self.plugin.get(key, default)
 	
 	def incoming_filter(self, xmlobj):
 		if xmlobj.tag.startswith('{jabber:client}'):
