@@ -84,7 +84,12 @@ class basexmpp(object):
 		self.resource = self.getjidresource(jid)
 		self.jid = self.getjidbare(jid)
 		self.username = jid.split('@', 1)[0]
-		self.domain = jid.split('@',1)[-1].split('/', 1)[0]
+		self.server = jid.split('@',1)[-1].split('/', 1)[0]
+	
+	def process(self, *args, **kwargs):
+		for idx in self.plugin:
+			if not self.plugin[idx].post_inited: self.plugin[idx].post_init()
+		return super(basexmpp, self).process(*args, **kwargs)
 		
 	def registerPlugin(self, plugin, pconfig = {}):
 		"""Register a plugin not in plugins.__init__.__all__ but in the plugins
@@ -109,7 +114,7 @@ class basexmpp(object):
 			plugin_list = plugins.__all__
 		for plugin in plugin_list:
 			if plugin in plugins.__all__:
-				self.registerPlugin(plugin, self.plugin_config.get(plugin, {}))
+				self.registerPlugin(plugin, self.plugin_config.get(plugin, {}), False)
 			else:
 				raise NameError("No plugin by the name of %s listed in plugins.__all__." % plugin)
 		# run post_init() for cross-plugin interaction
@@ -184,6 +189,19 @@ class basexmpp(object):
 		if not name in self.event_handlers:
 			self.event_handlers[name] = []
 		self.event_handlers[name].append((pointer, threaded, disposable))
+
+	def del_event_handler(self, name, pointer):
+		"""Remove a handler for an event."""
+		if not name in self.event_handlers:
+			return
+		
+		# Need to keep handlers that do not use
+		# the given function pointer
+		def filter_pointers(handler):
+			return handler[0] != pointer
+
+		self.event_handlers[name] = filter(filter_pointers, 
+						   self.event_handlers[name])
 
 	def event(self, name, eventdata = {}): # called on an event
 		for handler in self.event_handlers.get(name, []):
