@@ -1,11 +1,11 @@
 #!/usr/bin/python2.5
 
 """
-    SleekXMPP: The Sleek XMPP Library
-    Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+	SleekXMPP: The Sleek XMPP Library
+	Copyright (C) 2010  Nathanael C. Fritz
+	This file is part of SleekXMPP.
 
-    See the file license.txt for copying permission.
+	See the file license.txt for copying permission.
 """
 from __future__ import absolute_import, unicode_literals
 from . basexmpp import basexmpp
@@ -31,6 +31,7 @@ from . import plugins
 srvsupport = True
 try:
 	import dns.resolver
+	import dns.rdatatype
 except ImportError:
 	srvsupport = False
 
@@ -53,12 +54,14 @@ class ClientXMPP(basexmpp, XMLStream):
 		self.plugin_config = plugin_config
 		self.escape_quotes = escape_quotes
 		self.set_jid(jid)
+		self.server = None
+		self.port = 5222 # not used if DNS SRV is used
 		self.plugin_whitelist = plugin_whitelist
 		self.auto_reconnect = True
 		self.srvsupport = srvsupport
 		self.password = password
 		self.registered_features = []
-		self.stream_header = """<stream:stream to='%s' xmlns:stream='http://etherx.jabber.org/streams' xmlns='%s' version='1.0'>""" % (self.server,self.default_ns)
+		self.stream_header = """<stream:stream to='%s' xmlns:stream='http://etherx.jabber.org/streams' xmlns='%s' version='1.0'>""" % (self.domain,self.default_ns)
 		self.stream_footer = "</stream:stream>"
 		#self.map_namespace('http://etherx.jabber.org/streams', 'stream')
 		#self.map_namespace('jabber:client', '')
@@ -87,16 +90,23 @@ class ClientXMPP(basexmpp, XMLStream):
 	def get(self, key, default):
 		return self.plugin.get(key, default)
 
-	def connect(self, address=tuple()):
+	def connect(self, host=None, port=None):
 		"""Connect to the Jabber Server.  Attempts SRV lookup, and if it fails, uses
 		the JID server."""
-		if not address or len(address) < 2:
+
+		if self.state['connected']: return True
+
+		if host:
+			self.server = host
+			if port is None: port = self.port
+		else:
 			if not self.srvsupport:
-				logging.debug("Did not supply (address, port) to connect to and no SRV support is installed (http://www.dnspython.org).  Continuing to attempt connection, using server hostname from JID.")
+				logging.debug("Did not supply (address, port) to connect to and no SRV support is installed (http://www.dnspython.org).  Continuing to attempt connection, using domain from JID.")
 			else:
 				logging.debug("Since no address is supplied, attempting SRV lookup.")
 				try:
-					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.server)
+					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.domain, 
+					        dns.rdatatype.SRV )
 				except dns.resolver.NXDOMAIN:
 					logging.debug("No appropriate SRV record found.  Using JID server name.")
 				else:
@@ -113,12 +123,19 @@ class ClientXMPP(basexmpp, XMLStream):
 					picked = random.randint(0, intmax)
 					for priority in priorities:
 						if picked <= priority:
-							address = addresses[priority]
+							(host,port) = addresses[priority]
 							break
-		if not address:
+					# if SRV lookup was successful, we aren't using a particular server.
+					self.server = None 
+
+		if not host:
 			# if all else fails take server from JID.
-			address = (self.server, 5222)
-		result = XMLStream.connect(self, address[0], address[1], use_tls=True)
+			(host,port) = (self.domain, self.port)
+			self.server = None
+
+		logging.debug('Attempting connection to %s:%d', host, port )
+		#TODO option to not use TLS?
+		result = XMLStream.connect(self, host, port, use_tls=True)
 		if result:
 			self.event("connected")
 		else:
@@ -159,6 +176,7 @@ class ClientXMPP(basexmpp, XMLStream):
 		self._handleRoster(iq, request=True)
 	
 	def _handleStreamFeatures(self, features):
+		logging.debug('handling stream features')
 		self.features = []
 		for sub in features.xml:
 			self.features.append(sub.tag)
@@ -166,12 +184,16 @@ class ClientXMPP(basexmpp, XMLStream):
 			for feature in self.registered_features:
 				if feature[0].match(subelement):
 				#if self.maskcmp(subelement, feature[0], True):
+					# This calls the feature handler & optionally breaks
 					if feature[1](subelement) and feature[2]: #if breaker, don't continue
 						return True
 	
 	def handler_starttls(self, xml):
+		logging.debug( 'TLS start handler; SSL support: %s', self.ssl_support )
 		if not self.authenticated and self.ssl_support:
-			self.add_handler("<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />", self.handler_tls_start, instream=True)
+			_stanza = "<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />"
+			if not self.event_handlers.get(_stanza,None): # don't add handler > once
+				self.add_handler( _stanza, self.handler_tls_start, instream=True )
 			self.sendXML(xml)
 			return True
 		else:
@@ -206,12 +228,13 @@ class ClientXMPP(basexmpp, XMLStream):
 		return True
 	
 	def handler_auth_success(self, xml):
+		logging.debug("Authentication successful.")
 		self.authenticated = True
 		self.features = []
 		raise RestartStream()
 
 	def handler_auth_fail(self, xml):
-		logging.info("Authentication failed.")
+		logging.warning("Authentication failed.")
 		self.disconnect()
 		self.event("failed_auth")
 	

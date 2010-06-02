@@ -78,6 +78,9 @@ class ElementBase(tostring.ToString):
 	def __iter__(self):
 		self.idx = 0
 		return self
+
+	def __bool__(self):
+		return True
 	
 	def __next__(self):
 		self.idx += 1
@@ -319,6 +322,8 @@ class StanzaBase(ElementBase):
 
 	def __init__(self, stream=None, xml=None, stype=None, sto=None, sfrom=None, sid=None):
 		self.stream = stream
+		if stream is not None:
+			self.namespace = stream.default_ns
 		ElementBase.__init__(self, xml)
 		if stype is not None:
 			self['type'] = stype
@@ -326,13 +331,11 @@ class StanzaBase(ElementBase):
 			self['to'] = sto
 		if sfrom is not None:
 			self['from'] = sfrom
-		if stream is not None:
-			self.namespace = stream.default_ns
 		self.tag = "{%s}%s" % (self.namespace, self.name)
 	
 	def setType(self, value):
 		if value in self.types:
-				self.xml.attrib['type'] = value
+			self.xml.attrib['type'] = value
 		return self
 
 	def getPayload(self):
@@ -340,15 +343,18 @@ class StanzaBase(ElementBase):
 	
 	def setPayload(self, value):
 		self.xml.append(value)
+		return self
 	
 	def delPayload(self):
 		self.clear()
+		return self
 	
 	def clear(self):
 		for child in self.xml.getchildren():
 			self.xml.remove(child)
 		for plugin in list(self.plugins.keys()):
 			del self.plugins[plugin]
+		return self
 	
 	def reply(self):
 		self['from'], self['to'] = self['to'], self['from']
@@ -357,6 +363,7 @@ class StanzaBase(ElementBase):
 	
 	def error(self):
 		self['type'] = 'error'
+		return self
 	
 	def getTo(self):
 		return JID(self._getAttr('to'))
