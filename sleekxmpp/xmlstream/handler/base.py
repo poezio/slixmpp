@@ -18,7 +18,7 @@ class BaseHandler(object):
 	def match(self, xml):
 		return self._matcher.match(xml)
 	
-	def prerun(self, payload):
+	def prerun(self, payload): # what's the point of this if the payload is called again in run??
 		self._payload = payload
 
 	def run(self, payload):

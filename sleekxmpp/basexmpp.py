@@ -84,7 +84,7 @@ class basexmpp(object):
 		self.resource = self.getjidresource(jid)
 		self.jid = self.getjidbare(jid)
 		self.username = jid.split('@', 1)[0]
-		self.server = jid.split('@',1)[-1].split('/', 1)[0]
+		self.domain = jid.split('@',1)[-1].split('/', 1)[0]
 	
 	def process(self, *args, **kwargs):
 		for idx in self.plugin:
