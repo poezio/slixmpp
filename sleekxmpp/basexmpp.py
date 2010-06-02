@@ -1,9 +1,9 @@
 """
-    SleekXMPP: The Sleek XMPP Library
-    Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+	SleekXMPP: The Sleek XMPP Library
+	Copyright (C) 2010  Nathanael C. Fritz
+	This file is part of SleekXMPP.
 
-    See the file license.txt for copying permission.
+	See the file license.txt for copying permission.
 """
 from __future__ import with_statement, unicode_literals
 
@@ -91,15 +91,18 @@ class basexmpp(object):
 			if not self.plugin[idx].post_inited: self.plugin[idx].post_init()
 		return super(basexmpp, self).process(*args, **kwargs)
 		
-	def registerPlugin(self, plugin, pconfig = {}):
+	def registerPlugin(self, plugin, pconfig = {}, pluginModule = None):
 		"""Register a plugin not in plugins.__init__.__all__ but in the plugins
 		directory."""
 		# discover relative "path" to the plugins module from the main app, and import it.
 		# TODO:
 		# gross, this probably isn't necessary anymore, especially for an installed module
-		__import__("%s.%s" % (globals()['plugins'].__name__, plugin))
+		if pluginModule:
+			module = __import__("%s.%s" % (pluginModule, plugin), globals(), locals(), [plugin])
+		else:
+			module = __import__("%s.%s" % (globals()['plugins'].__name__, plugin), globals(), locals(), [plugin])
 		# init the plugin class
-		self.plugin[plugin] = getattr(getattr(plugins, plugin), plugin)(self, pconfig) # eek
+		self.plugin[plugin] = getattr(module, plugin)(self, pconfig) # eek
 		# all of this for a nice debug? sure.
 		xep = ''
 		if hasattr(self.plugin[plugin], 'xep'):
