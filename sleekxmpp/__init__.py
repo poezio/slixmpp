@@ -146,13 +146,9 @@ class ClientXMPP(basexmpp, XMLStream):
 	# overriding reconnect and disconnect so that we can get some events
 	# should events be part of or required by xmlstream?  Maybe that would be cleaner
 	def reconnect(self):
-		logging.info("Reconnecting")
-		self.event("disconnected")
-		self.authenticated = False
-		self.sessionstarted = False
-		XMLStream.reconnect(self)
+		self.disconnect(reconnect=True)
 	
-	def disconnect(self, init=True, close=False, reconnect=False):
+	def disconnect(self, reconnect=False):
 		self.event("disconnected")
 		self.authenticated = False
 		self.sessionstarted = False
