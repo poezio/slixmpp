@@ -53,8 +53,9 @@ class XMLStream(object):
 		global ssl_support
 		self.ssl_support = ssl_support
 		self.escape_quotes = escape_quotes
-		self.state = statemachine.StateMachine()
-		self.state.addStates({'connected':False, 'is client':False, 'ssl':False, 'tls':False, 'reconnect':True, 'processing':False}) #set initial states
+		self.state = statemachine.StateMachine(('disconnected','connecting',
+		    'connected'))
+		self.should_reconnect = True
 
 		self.setSocket(socket)
 		self.address = (host, int(port))
@@ -86,21 +87,21 @@ class XMLStream(object):
 	def setSocket(self, socket):
 		"Set the socket"
 		self.socket = socket
-		if socket is not None:
+		if socket is not None and self.state.transition('disconnected','connecting'):
 			self.filesocket = socket.makefile('rb', 0) # ElementTree.iterparse requires a file.  0 buffer files have to be binary
-			self.state.set('connected', True)
-
+		self.state.transition('connecting','connected')
 	
 	def setFileSocket(self, filesocket):
 		self.filesocket = filesocket
 	
-	def connect(self, host='', port=0, use_ssl=False, use_tls=True):
+	def connect(self, host='', port=0, use_ssl=None, use_tls=None):
 		"Link to connectTCP"
-		return self.connectTCP(host, port, use_ssl, use_tls)
+		if self.state.transition('disconnected', 'connecting'):
+			return self.connectTCP(host, port, use_ssl, use_tls)
 
 	def connectTCP(self, host='', port=0, use_ssl=None, use_tls=None, reattempt=True):
 		"Connect and create socket"
-		while reattempt and not self.state['connected']:
+		while reattempt and not self.state['connected']: # the self.state part is redundant.
 			logging.debug('connecting....')
 			try:
 				if host and port:
@@ -122,7 +123,8 @@ class XMLStream(object):
 			try:
 				self.socket.connect(self.address)
 				self.filesocket = self.socket.makefile('rb', 0)
-				self.state.set('connected', True)
+				if not self.state.transition('connecting','connected'):
+					logging.error( "State transition error!!!!  Shouldn't have happened" )
 				logging.debug('connect complete.')
 				return True
 			except socket.error as serr:
@@ -182,7 +184,7 @@ class XMLStream(object):
 		"Start processing the socket."
 		logging.debug('Process thread starting...')
 		while self.run:
-			self.state.set('processing', True)
+			if not self.state.ensure('connected',wait=2): continue
 			try:
 				self.sendRaw(self.stream_header)
 				while self.run and self.__readXML(): pass
@@ -196,38 +198,16 @@ class XMLStream(object):
 				logging.debug("Restarting stream...")
 				continue # DON'T re-initialize the stream -- this exception is sent 
 				# specifically when we've initialized TLS and need to re-send the <stream> header.
-			except KeyboardInterrupt:
-				logging.debug("Keyboard Escape Detected")
-				self.state.set('processing', False)
-				self.state.set('reconnect', False)
-				self.disconnect()
-				# TODO this is probably not necessary...
+			except (KeyboardInterrupt, SystemExit):
+				logging.debug("System interrupt detected")
+				self.shutdown()
 				self.eventqueue.put(('quit', None, None))
-				return
-			except SystemExit:
-				# TODO shouldn't this be the same as KeyboardInterrupt????
-				self.eventqueue.put(('quit', None, None))
-				return
 			except:
 				logging.exception('Unexpected error in RCV thread')
-				if not self.state.reconnect:
-					return
-				else:
-					logging.debug('reconnecting...')
-					self.state.set('processing', False)
+				if self.should_reconnect:
 					self.disconnect(reconnect=True)
-			# TODO the individual exception handlers above already handle reconnect!  
-			# Why are we attempting to do it again down here???
-#			if self.state['reconnect']:
-#				self.state.set('connected', False)
-			self.state.set('processing', False)
-#				self.reconnect()
-#			else:
-# TODO I think this is getting queued, and when the eventRunner comes back online after 
-# reconnect, it immediately processes a 'quit' event and exits again, meanwhile the 
-# rest of the client is just starting to connect and process the incoming event stream!!!
-#			self.eventqueue.put(('quit', None, None))
-		logging.debug('Quitting Process thread')
+
+        logging.debug('Quitting Process thread')
 	
 	def __readXML(self):
 		"Parses the incoming stream, adding to xmlin queue as it goes"
@@ -246,7 +226,6 @@ class XMLStream(object):
 				edepth += -1
 				if edepth == 0 and event == b'end':
 					# what is this case exactly?  Premature EOF?
-					#self.disconnect(reconnect=self.state['reconnect'])
 					logging.debug("Ending readXML loop")
 					return False
 				elif edepth == 1:
@@ -261,9 +240,8 @@ class XMLStream(object):
 	def _sendThread(self):
 		logging.debug('send thread starting...')
 		while self.run:
-			if not self.state['connected']:
-				logging.warning("Not connected yet...")
-				time.sleep(1)
+			if not self.state.ensure('connected',wait=2): continue
+			
 			data = None
 			try:
 				data = self.sendqueue.get(True,10)
@@ -272,7 +250,7 @@ class XMLStream(object):
 			except queue.Empty:
 				logging.debug('nothing on send queue')
 			except socket.timeout:
-				# this is to prevent hanging
+				# this is to prevent a thread blocked indefinitely
 				logging.debug('timeout sending packet data')
 			except:
 				logging.warning("Failed to send %s" % data)
@@ -282,9 +260,7 @@ class XMLStream(object):
 				# the same thing concurrently.  Oops!  The safer option would be to throw 
 				# some sort of event that could be handled by a common thread or the reader 
 				# thread to perform reconnect and then re-initialize the handler threads as well.
-				if self.state.reconnect:
-					logging.debug('Reconnecting...')
-					traceback.print_exc()
+				if self.should_reconnect:
 					self.disconnect(reconnect=True)
 	
 	def sendRaw(self, data):
@@ -292,8 +268,7 @@ class XMLStream(object):
 		return True
 	
 	def disconnect(self, reconnect=False):
-		self.state.set('reconnect', reconnect)
-		if not self.state['connected']:
+		if not self.state.transition('connected','disconnected'):
 			logging.warning("Already disconnected.")
 			return
 		logging.debug("Disconnecting...")
@@ -301,10 +276,7 @@ class XMLStream(object):
 		time.sleep(5)
 		#send end of stream
 		#wait for end of stream back
-		self.run = False
-		self.scheduler.run = False
 		try:
-			self.state.set('connected',False)
 #			self.socket.shutdown(socket.SHUT_RDWR)
 			self.socket.close()
 		except socket.error as (errno,strerror):
@@ -312,13 +284,17 @@ class XMLStream(object):
 		try:
 			self.filesocket.close()
 		except socket.error as (errno,strerror):
-			logging.exception("Error closing filesocket.") 
+			logging.exception("Error closing filesocket.")
+
+		if reconnect: self.connect()
 	
-	def reconnect(self):
-		self.state.set('tls',False)
-		self.state.set('ssl',False)
-		time.sleep(1)
-		self.connect()
+	def shutdown(self):
+		'''
+		Disconnects and shuts down all event threads.
+		'''
+		self.disconnect()
+		self.run = False
+		self.scheduler.run = False
 
 	def incoming_filter(self, xmlobj):
 		return xmlobj
