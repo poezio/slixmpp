@@ -97,18 +97,21 @@ class basexmpp(object):
 		# discover relative "path" to the plugins module from the main app, and import it.
 		# TODO:
 		# gross, this probably isn't necessary anymore, especially for an installed module
-		if pluginModule:
-			module = __import__("%s.%s" % (pluginModule, plugin), globals(), locals(), [plugin])
-		else:
-			module = __import__("%s.%s" % (globals()['plugins'].__name__, plugin), globals(), locals(), [plugin])
-		# init the plugin class
-		self.plugin[plugin] = getattr(module, plugin)(self, pconfig) # eek
-		# all of this for a nice debug? sure.
-		xep = ''
-		if hasattr(self.plugin[plugin], 'xep'):
-			xep = "(XEP-%s) " % self.plugin[plugin].xep
-		logging.debug("Loaded Plugin %s%s" % (xep, self.plugin[plugin].description))
-	
+		try: 
+			if pluginModule:
+				module = __import__(pluginModule, globals(), locals(), [plugin])
+			else:
+				module = __import__("%s.%s" % (globals()['plugins'].__name__, plugin), globals(), locals(), [plugin])
+			# init the plugin class
+			self.plugin[plugin] = getattr(module, plugin)(self, pconfig) # eek
+			# all of this for a nice debug? sure.
+			xep = ''
+			if hasattr(self.plugin[plugin], 'xep'):
+				xep = "(XEP-%s) " % self.plugin[plugin].xep
+			logging.debug("Loaded Plugin %s%s" % (xep, self.plugin[plugin].description))
+		except:
+			logging.error("Unable to load plugin: %s" %(plugin) )
+            
 	def register_plugins(self):
 		"""Initiates all plugins in the plugins/__init__.__all__"""
 		if self.plugin_whitelist:
