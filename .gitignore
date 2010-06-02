@@ -2,3 +2,4 @@
 .project
 build/
 *.swp
+.pydevproject
