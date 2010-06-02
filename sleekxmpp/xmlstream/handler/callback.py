@@ -17,13 +17,15 @@ class Callback(base.BaseHandler):
 		self._once = once
 		self._instream = instream
 
-	def prerun(self, payload):
+	def prerun(self, payload): # prerun actually calls run?!?  WTF!  Then it gets run AGAIN!
 		base.BaseHandler.prerun(self, payload)
 		if self._instream:
+			logging.debug('callback "%s" prerun', self.name)
 			self.run(payload, True)
 	
 	def run(self, payload, instream=False):
 		if not self._instream or instream:
+			logging.debug('callback "%s" run', self.name)
 			base.BaseHandler.run(self, payload)
 			#if self._thread:
 			#	x = threading.Thread(name="Callback_%s" % self.name, target=self._pointer, args=(payload,))

@@ -94,6 +94,8 @@ class ClientXMPP(basexmpp, XMLStream):
 		"""Connect to the Jabber Server.  Attempts SRV lookup, and if it fails, uses
 		the JID server."""
 
+		if self.state['connected']: return True
+
 		if host:
 			self.server = host
 			if port is None: port = self.port
@@ -174,6 +176,7 @@ class ClientXMPP(basexmpp, XMLStream):
 		self._handleRoster(iq, request=True)
 	
 	def _handleStreamFeatures(self, features):
+		logging.debug('handling stream features')
 		self.features = []
 		for sub in features.xml:
 			self.features.append(sub.tag)
@@ -181,12 +184,16 @@ class ClientXMPP(basexmpp, XMLStream):
 			for feature in self.registered_features:
 				if feature[0].match(subelement):
 				#if self.maskcmp(subelement, feature[0], True):
+					# This calls the feature handler & optionally breaks
 					if feature[1](subelement) and feature[2]: #if breaker, don't continue
 						return True
 	
 	def handler_starttls(self, xml):
+		logging.debug( 'TLS start handler; SSL support: %s', self.ssl_support )
 		if not self.authenticated and self.ssl_support:
-			self.add_handler("<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />", self.handler_tls_start, instream=True)
+			_stanza = "<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />"
+			if not self.event_handlers.get(_stanza,None): # don't add handler > once
+				self.add_handler( _stanza, self.handler_tls_start, instream=True )
 			self.sendXML(xml)
 			return True
 		else:
@@ -221,12 +228,13 @@ class ClientXMPP(basexmpp, XMLStream):
 		return True
 	
 	def handler_auth_success(self, xml):
+		logging.debug("Authentication successful.")
 		self.authenticated = True
 		self.features = []
 		raise RestartStream()
 
 	def handler_auth_fail(self, xml):
-		logging.info("Authentication failed.")
+		logging.warning("Authentication failed.")
 		self.disconnect()
 		self.event("failed_auth")
 	
