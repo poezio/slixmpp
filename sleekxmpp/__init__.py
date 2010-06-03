@@ -69,6 +69,8 @@ class ClientXMPP(basexmpp, XMLStream):
 		#TODO: Use stream state here
 		self.authenticated = False
 		self.sessionstarted = False
+		self.bound = False
+		self.bindfail = False
 		self.registerHandler(Callback('Stream Features', MatchXPath('{http://etherx.jabber.org/streams}features'), self._handleStreamFeatures, thread=True))
 		self.registerHandler(Callback('Roster Update', MatchXPath('{%s}iq/{jabber:iq:roster}query' % self.default_ns), self._handleRoster, thread=True))
 		#self.registerHandler(Callback('Roster Update', MatchXMLMask("<presence xmlns='%s' type='subscribe' />" % self.default_ns), self._handlePresenceSubscribe, thread=True))
@@ -146,13 +148,9 @@ class ClientXMPP(basexmpp, XMLStream):
 	# overriding reconnect and disconnect so that we can get some events
 	# should events be part of or required by xmlstream?  Maybe that would be cleaner
 	def reconnect(self):
-		logging.info("Reconnecting")
-		self.event("disconnected")
-		self.authenticated = False
-		self.sessionstarted = False
-		XMLStream.reconnect(self)
+		self.disconnect(reconnect=True)
 	
-	def disconnect(self, init=True, close=False, reconnect=False):
+	def disconnect(self, reconnect=False):
 		self.event("disconnected")
 		self.authenticated = False
 		self.sessionstarted = False
@@ -248,19 +246,23 @@ class ClientXMPP(basexmpp, XMLStream):
 		response = iq.send()
 		#response = self.send(iq, self.Iq(sid=iq['id']))
 		self.set_jid(response.xml.find('{urn:ietf:params:xml:ns:xmpp-bind}bind/{urn:ietf:params:xml:ns:xmpp-bind}jid').text)
+		self.bound = True
 		logging.info("Node set to: %s" % self.fulljid)
-		if "{urn:ietf:params:xml:ns:xmpp-session}session" not in self.features:
+		if "{urn:ietf:params:xml:ns:xmpp-session}session" not in self.features or self.bindfail:
 			logging.debug("Established Session")
 			self.sessionstarted = True
 			self.event("session_start")
 	
 	def handler_start_session(self, xml):
-		if self.authenticated:
+		if self.authenticated and self.bound:
 			iq = self.makeIqSet(xml)
 			response = iq.send()
 			logging.debug("Established Session")
 			self.sessionstarted = True
 			self.event("session_start")
+		else:
+			#bind probably hasn't happened yet
+			self.bindfail = True
 	
 	def _handleRoster(self, iq, request=False):
 		if iq['type'] == 'set' or (iq['type'] == 'result' and request):

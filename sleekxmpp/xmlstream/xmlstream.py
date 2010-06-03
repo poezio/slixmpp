@@ -16,6 +16,7 @@ from . stanzabase import StanzaBase
 from xml.etree import cElementTree
 from xml.parsers import expat
 import logging
+import random
 import socket
 import threading
 import time
@@ -45,6 +46,10 @@ class CloseStream(Exception):
 	pass
 
 stanza_extensions = {}
+
+RECONNECT_MAX_DELAY = 3600
+RECONNECT_QUIESCE_FACTOR = 1.6180339887498948 # Phi
+RECONNECT_QUIESCE_JITTER = 0.11962656472 # molar Planck constant times c, joule meter/mole
 
 class XMLStream(object):
 	"A connection manager with XML events."
@@ -96,12 +101,29 @@ class XMLStream(object):
 	
 	def connect(self, host='', port=0, use_ssl=None, use_tls=None):
 		"Link to connectTCP"
-		if self.state.transition('disconnected', 'connecting'):
-			return self.connectTCP(host, port, use_ssl, use_tls)
+		if not self.state.transition('disconnected','connecting'):
+			logging.warning("Can't connect now; Already in state %s", self.state.current_state())
+			return False
+
+		if not self.connectTCP(host, port, use_ssl, use_tls):
+			# return to the 'disconnected' state if connect failed:
+			# otherwise the connect method is not reentrant
+			if not self.state.transition('connecting','disconnected'):
+				logging.error("Couldn't transition to the 'disconnected' state!")
+			return False
+		return True
+
+		# TODO currently a caller can't distinguish between "connection failed" and
+		# "we're already trying to connect from another thread"
 
 	def connectTCP(self, host='', port=0, use_ssl=None, use_tls=None, reattempt=True):
 		"Connect and create socket"
-		while reattempt and not self.state['connected']: # the self.state part is redundant.
+
+		# Note that this is thread-safe by merit of being called solely from connect() which
+		# holds the state lock.
+		
+		delay = 1.0 # reconnection delay
+		while self.run:
 			logging.debug('connecting....')
 			try:
 				if host and port:
@@ -109,27 +131,42 @@ class XMLStream(object):
 				if use_ssl is not None:
 					self.use_ssl = use_ssl
 				if use_tls is not None:
+					# TODO this variable doesn't seem to be used for anything!
 					self.use_tls = use_tls
 				if sys.version_info < (3, 0):
 					self.socket = filesocket.Socket26(socket.AF_INET, socket.SOCK_STREAM)
 				else:
 					self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				self.socket.settimeout(None) #10)
+
 				if self.use_ssl and self.ssl_support:
 					logging.debug("Socket Wrapped for SSL")
 					self.socket = ssl.wrap_socket(self.socket,ca_certs=self.ca_certs)
-			except:
-				logging.exception("Connection error")
-			try:
+				
 				self.socket.connect(self.address)
 				self.filesocket = self.socket.makefile('rb', 0)
+				
 				if not self.state.transition('connecting','connected'):
 					logging.error( "State transition error!!!!  Shouldn't have happened" )
 				logging.debug('connect complete.')
 				return True
+
 			except socket.error as serr:
-				logging.error("Could not connect. Socket Error #%s: %s" % (serr.errno, serr.strerror))
-				time.sleep(1) # TODO proper quiesce if connection attempt fails
+				logging.exception("Socket Error #%s: %s", serr.errno, serr.strerror)
+				if not reattempt: return False
+			except:
+				logging.exception("Connection error")
+				if not reattempt: return False
+			
+			# quiesce if rconnection fails:
+			# This algorithm based loosely on Twisted internet.protocol
+			# http://twistedmatrix.com/trac/browser/trunk/twisted/internet/protocol.py#L310
+			delay = min(delay * RECONNECT_QUIESCE_FACTOR, RECONNECT_MAX_DELAY)
+			delay = random.normalvariate(delay, delay * RECONNECT_QUIESCE_JITTER)
+			logging.debug('Waiting %fs until next reconnect attempt...', delay)
+			time.sleep(delay)
+
+
 	
 	def connectUnix(self, filepath):
 		"Connect to Unix file and create socket"

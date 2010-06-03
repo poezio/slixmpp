@@ -76,7 +76,7 @@ class Scheduler(object):
 					if updated: self.schedule = sorted(self.schedule, key=lambda task: task.next)
 			except KeyboardInterrupt:
 				self.run = False
-		logging.debug("Qutting Scheduler thread")
+		logging.debug("Quitting Scheduler thread")
 		if self.parentqueue is not None:
 			self.parentqueue.put(('quit', None, None))
 
