@@ -281,7 +281,7 @@ class XMLStream(object):
 			
 			data = None
 			try:
-				data = self.sendqueue.get(True,10)
+				data = self.sendqueue.get(True,5)
 				logging.debug("SEND: %s" % data)
 				self.socket.sendall(data.encode('utf-8'))
 			except queue.Empty:
@@ -372,6 +372,7 @@ class XMLStream(object):
 			try:
 				event = self.eventqueue.get(True, timeout=5)
 			except queue.Empty:
+				logging.debug('Nothing on event queue')
 				event = None
 			if event is not None:
 				etype = event[0]
