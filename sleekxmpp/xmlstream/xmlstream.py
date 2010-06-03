@@ -101,6 +101,10 @@ class XMLStream(object):
 	
 	def connect(self, host='', port=0, use_ssl=None, use_tls=None):
 		"Link to connectTCP"
+		if not self.state.transition('disconnected','connecting'):
+			logging.warning("Can't connect now; Already in state %s", self.state.current_state())
+			return False
+
 		if not self.connectTCP(host, port, use_ssl, use_tls):
 			# return to the 'disconnected' state if connect failed:
 			# otherwise the connect method is not reentrant
