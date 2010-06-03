@@ -101,8 +101,16 @@ class XMLStream(object):
 	
 	def connect(self, host='', port=0, use_ssl=None, use_tls=None):
 		"Link to connectTCP"
-		if self.state.transition('disconnected', 'connecting'):
-			return self.connectTCP(host, port, use_ssl, use_tls)
+		if not self.connectTCP(host, port, use_ssl, use_tls):
+			# return to the 'disconnected' state if connect failed:
+			# otherwise the connect method is not reentrant
+			if not self.state.transition('connecting','disconnected'):
+				logging.error("Couldn't transition to the 'disconnected' state!")
+			return False
+		return True
+
+		# TODO currently a caller can't distinguish between "connection failed" and
+		# "we're already trying to connect from another thread"
 
 	def connectTCP(self, host='', port=0, use_ssl=None, use_tls=None, reattempt=True):
 		"Connect and create socket"
@@ -119,6 +127,7 @@ class XMLStream(object):
 				if use_ssl is not None:
 					self.use_ssl = use_ssl
 				if use_tls is not None:
+					# TODO this variable doesn't seem to be used for anything!
 					self.use_tls = use_tls
 				if sys.version_info < (3, 0):
 					self.socket = filesocket.Socket26(socket.AF_INET, socket.SOCK_STREAM)
@@ -146,9 +155,9 @@ class XMLStream(object):
 				if not reattempt: return False
 			
 			# quiesce if rconnection fails:
-			# This code based loosely on Twisted internet.protocol
+			# This algorithm based loosely on Twisted internet.protocol
 			# http://twistedmatrix.com/trac/browser/trunk/twisted/internet/protocol.py#L310
-			delay = min(delay * RECONNECT_QUIESCE_JITTER, RECONNECT_MAX_DELAY)
+			delay = min(delay * RECONNECT_QUIESCE_FACTOR, RECONNECT_MAX_DELAY)
 			delay = random.normalvariate(delay, delay * RECONNECT_QUIESCE_JITTER)
 			logging.debug('Waiting %fs until next reconnect attempt...', delay)
 			time.sleep(delay)
