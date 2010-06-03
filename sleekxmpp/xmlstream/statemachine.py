@@ -110,7 +110,14 @@ class StateMachine(object):
 	def reset(self):
 		# TODO need to lock before calling this? 
 		self.transition(self.__current_state, self._default_state)
-	
+
+
+	def current_state(self):
+		'''
+		Return the current state name.
+		'''
+		return self.__current_state
+
 
 	def __getitem__(self, state):
 		'''
