@@ -100,18 +100,20 @@ class XMLStream(object):
 		self.filesocket = filesocket
 	
 	def connect(self, host='', port=0, use_ssl=None, use_tls=None):
-		"Link to connectTCP"
+		"Establish a socket connection to the given XMPP server."
 		if not self.state.transition('disconnected','connecting'):
 			logging.warning("Can't connect now; Already in state %s", self.state.current_state())
 			return False
 
-		if not self.connectTCP(host, port, use_ssl, use_tls):
-			# return to the 'disconnected' state if connect failed:
-			# otherwise the connect method is not reentrant
-			if not self.state.transition('connecting','disconnected'):
-				logging.error("Couldn't transition to the 'disconnected' state!")
-			return False
-		return True
+		try:
+			return self.connectTCP(host, port, use_ssl, use_tls)
+		finally:
+			# attempt to ensure once a connection attempt starts, we leave either in the 
+			# 'connected' or 'disconnected' state.  Otherwise the connect method is not reentrant
+			if self.state['connecting']:
+				if not self.state.transition('connecting','disconnected'):
+					logging.error("Couldn't return to the 'disconnected' state after connection failure!")
+
 
 		# TODO currently a caller can't distinguish between "connection failed" and
 		# "we're already trying to connect from another thread"
@@ -285,7 +287,8 @@ class XMLStream(object):
 				logging.debug("SEND: %s" % data)
 				self.socket.sendall(data.encode('utf-8'))
 			except queue.Empty:
-				logging.debug('nothing on send queue')
+#				logging.debug('Nothing on send queue')
+				pass
 			except socket.timeout:
 				# this is to prevent a thread blocked indefinitely
 				logging.debug('timeout sending packet data')
@@ -372,7 +375,7 @@ class XMLStream(object):
 			try:
 				event = self.eventqueue.get(True, timeout=5)
 			except queue.Empty:
-				logging.debug('Nothing on event queue')
+#				logging.debug('Nothing on event queue')
 				event = None
 			if event is not None:
 				etype = event[0]
