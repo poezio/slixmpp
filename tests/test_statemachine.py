@@ -1,5 +1,5 @@
 import unittest
-import time, threading
+import time, threading, random, functools
 
 if __name__ == '__main__': 
 	import sys, os
@@ -83,12 +83,12 @@ class testStateMachine(unittest.TestCase):
 
 		thread_state = {'ready': False, 'transitioned': False}
 		def t1():
-			# this will block until the main thread transitions to 'two'
 			if s['two']:
 				print 'thread has already transitioned!'
 				self.fail()
 			thread_state['ready'] = True
 			print 'Thread is ready'
+			# this will block until the main thread transitions to 'two'
 			self.assertTrue( s.transition('two','three', wait=20) )
 			print 'transitioned to three!'
 			thread_state['transitioned'] = True
@@ -108,6 +108,93 @@ class testStateMachine(unittest.TestCase):
 		time.sleep(0.2) # second thread should have transitioned now:
 		self.assertTrue( thread_state['transitioned'] )
 		
+
+	def testForRaceCondition(self):
+		"""Attempt to allow two threads to perform the same transition; 
+		only one should ever make it."""
+
+		s = sm.StateMachine(('one','two','three'))
+
+		def t1(num):
+			while True:
+				if not trigger['go'] or thread_state[num] in (True,False):
+					time.sleep( random.random()/100 ) # < .01s
+					if thread_state[num] == 'quit': break
+					continue
+
+				thread_state[num] = s.transition('one','two' )
+#				print '-',
+
+		thread_count = 20
+		threads = []
+		thread_state = {}
+		def reset(): 
+			for c in range(thread_count): thread_state[c] = "reset"
+		trigger = {'go':False} # use of a plain boolean seems to be non-volatile between threads.
+
+		for c in range(thread_count):
+			thread_state[c] = "reset"
+			thread = threading.Thread( target= functools.partial(t1,c) )
+			threads.append( thread )
+			thread.daemon = True
+			thread.start()
+
+		for x in range(100): # this will take 10s to execute
+#			print "+",
+			trigger['go'] = True
+			time.sleep(.1)
+			trigger['go'] = False
+			winners = 0
+			for (num, state) in thread_state.items():
+				if state == True: winners = winners +1
+				elif state != False: raise Exception( "!%d!%s!" % (num,state) )
+			
+			self.assertEqual( 1, winners, "Expected one winner! %d" % winners )
+			self.assertTrue( s.ensure('two') )
+			self.assertTrue( s.transition('two','one') ) # return to the first state.
+			reset()
+
+		# now let the threads quit gracefully:
+		for c in range(thread_count): thread_state[c] = 'quit'
+		time.sleep(2)
+
+
+	def testTransitionFunctions(self):
+		"test that a `func` argument allows or blocks the transition correctly."
+
+		s = sm.StateMachine(('one','two','three'))
+		
+		def alwaysFalse(): return False
+		def alwaysTrue(): return True
+
+		self.failIf( s.transition('one','two', func=alwaysFalse) )
+		self.assertTrue(s['one'])
+		self.failIf(s['two'])
+
+		self.assertTrue( s.transition('one','two', func=alwaysTrue) )
+		self.failIf(s['one'])
+		self.assertTrue(s['two'])
+
+
+	def testTransitionFuncException(self):
+		"if a transition function throws an exeption, ensure we're in a sane state"
+
+		s = sm.StateMachine(('one','two','three'))
+		
+		def alwaysException(): raise Exception('whups!')
+
+		try:
+			self.failIf( s.transition('one','two', func=alwaysException) )
+			self.fail("exception should have been thrown")
+		except: pass #expected exception
+
+		self.assertTrue(s['one'])
+		self.failIf(s['two'])
+
+		# ensure a subsequent attempt completes normally:
+		self.assertTrue( s.transition('one','two') )
+		self.failIf(s['one'])
+		self.assertTrue(s['two'])
 
 
 

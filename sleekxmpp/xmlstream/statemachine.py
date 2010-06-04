@@ -10,6 +10,7 @@ import threading
 import time
 import logging
 
+
 class StateMachine(object):
 
 	def __init__(self, states=[]):
@@ -27,7 +28,7 @@ class StateMachine(object):
 				self.__states.append( state )
 	
 	
-	def transition(self, from_state, to_state, wait=0.0):
+	def transition(self, from_state, to_state, wait=0.0, func=None, args=[], kwargs={} ):
 		'''
 		Transition from the given `from_state` to the given `to_state`.  
 		This method will return `True` if the state machine is now in `to_state`.  It
@@ -47,12 +48,22 @@ class StateMachine(object):
 			if thread_should_exit: return
 			# perform actions here after successful transition
 
-		This allows the thread to be interrupted by setting `thread_should_exit=True`
+		This allows the thread to be responsive by setting `thread_should_exit=True`.
+
+		The optional `func` argument allows the user to pass a callable operation which occurs
+		within the context of the state transition (e.g. while the state machine is locked.)
+		If `func` returns a True value, the transition will occur.  If `func` returns a non-
+		True value or if an exception is thrown, the transition will not occur.  Any thrown
+		exception is not caught by the state machine and is the caller's responsibility to handle.
+		If `func` completes normally, this method will return the value returned by `func.`  If
+		values for `args` and `kwargs` are provided, they are expanded and passed like so:  
+		`func( *args, **kwargs )`.
 		'''
 
-		return self.transition_any( (from_state,), to_state, wait=wait )
+		return self.transition_any( (from_state,), to_state, wait=wait, 
+		                            func=func, args=args, kwargs=kwargs )
 	
-	def transition_any(self, from_states, to_state, wait=0.0):
+	def transition_any(self, from_states, to_state, wait=0.0, func=None, args=[], kwargs={} ):
 		'''
 		Transition from any of the given `from_states` to the given `to_state`.
 		'''
@@ -73,10 +84,19 @@ class StateMachine(object):
 				self.lock.wait(wait)
 			
 			if self.__current_state in from_states: # should always be True due to lock
+				
+				return_val = True
+				# Note that func might throw an exception, but that's OK, it aborts the transition
+				if func is not None: return_val = func(*args,**kwargs)
+
+				# some 'false' value returned from func, 
+				# indicating that transition should not occur:
+				if not return_val: return return_val 
+
 				logging.debug(' ==== TRANSITION %s -> %s', self.__current_state, to_state)
 				self.__current_state = to_state
 				self.lock.notifyAll()
-				return True
+				return return_val  # some 'true' value returned by func or True if func was None
 			else:
 				logging.error( "StateMachine bug!!  The lock should ensure this doesn't happen!" )
 				return False
