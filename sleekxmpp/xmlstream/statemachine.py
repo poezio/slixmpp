@@ -63,20 +63,22 @@ class StateMachine(object):
 		return self.transition_any( (from_state,), to_state, wait=wait, 
 		                            func=func, args=args, kwargs=kwargs )
 	
+	
 	def transition_any(self, from_states, to_state, wait=0.0, func=None, args=[], kwargs={} ):
 		'''
 		Transition from any of the given `from_states` to the given `to_state`.
 		'''
 
-		with self.lock:
-			for state in from_states:
-				if isinstance(state,tuple) or isinstance(state,list): 
-					raise ValueError( "State %s should be a string.  Did you mean to call 'StateMachine.transition_any()?" % str(state) )
-				if not state in self.__states: 
-					raise ValueError( "StateMachine does not contain from_state %s." % state )
-			if not to_state in self.__states: 
-				raise ValueError( "StateMachine does not contain to_state %s." % to_state )
+		if not (isinstance(from_states,tuple) or isinstance(from_states,list)): 
+				raise ValueError( "from_states should be a list or tuple" )
 
+		for state in from_states:
+			if not state in self.__states: 
+				raise ValueError( "StateMachine does not contain from_state %s." % state )
+		if not to_state in self.__states: 
+			raise ValueError( "StateMachine does not contain to_state %s." % to_state )
+
+		with self.lock:
 			start = time.time()
 			while not self.__current_state in from_states: 
 				# detect timeout:
@@ -102,23 +104,34 @@ class StateMachine(object):
 				return False
 
 
+	def transition_ctx(self, from_state, to_state, wait=0.0):
+		if not from_state in self.__states: 
+			raise ValueError( "StateMachine does not contain from_state %s." % state )
+		if not to_state in self.__states: 
+			raise ValueError( "StateMachine does not contain to_state %s." % to_state )
+
+		return _StateCtx(self, from_state, to_state, wait)
+
+	
 	def ensure(self, state, wait=0.0):
 		'''
 		Ensure the state machine is currently in `state`, or wait until it enters `state`.
 		'''
 		return self.ensure_any( (state,), wait=wait )
 
+
 	def ensure_any(self, states, wait=0.0):
 		'''
 		Ensure we are currently in one of the given `states`
 		'''
-		with self.lock:
-			for state in states:
-				if isinstance(state,tuple) or isinstance(state,list): 
-					raise ValueError( "State %s should be a string.  Did you mean to call 'StateMachine.transition_any()?" % str(state) )
-				if not state in self.__states: 
-					raise ValueError( "StateMachine does not contain state %s." % state )
+		if not (isinstance(states,tuple) or isinstance(states,list)): 
+			raise ValueError('states arg should be a tuple or list')
 
+		for state in states:
+			if not state in self.__states: 
+				raise ValueError( "StateMachine does not contain state '%s'" % state )
+
+		with self.lock:
 			start = time.time()
 			while not self.__current_state in states: 
 				# detect timeout:
@@ -130,6 +143,11 @@ class StateMachine(object):
 	def reset(self):
 		# TODO need to lock before calling this? 
 		self.transition(self.__current_state, self._default_state)
+
+
+	def _set_state(self, state): #unsynchronized, only call internally after lock is acquired
+		self.__current_state = state
+		return state
 
 
 	def current_state(self):
@@ -146,12 +164,41 @@ class StateMachine(object):
 		'''
 		return self.__current_state == state
 	
+
+class _StateCtx:
+
+	def __init__( self, state_machine, from_state, to_state, wait ):
+		self.state_machine = state_machine
+		self.from_state = from_state
+		self.to_state = to_state
+		self.wait = wait
+		self._timeout = False
+
 	def __enter__(self):
-		self.lock.acquire()
-		return self
+		self.state_machine.lock.acquire()
+		start = time.time()
+		while not self.state_machine[ self.from_state ]: 
+			# detect timeout:
+			if time.time() >= start + self.wait: 
+				logging.debug('StateMachine timeout while waiting for state: %s', self.from_state )
+				self._timeout = True # to indicate we should not transition
+				break
+			self.state_machine.lock.wait(self.wait)
+
+		logging.debug('StateMachine entered context in state: %s', 
+				self.state_machine.current_state() )
+		return self.state_machine
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
-		self.lock.nofityAll()
-		self.lock.release()
+		if exc_val is not None:
+			logging.exception( "StateMachine exception in context, remaining in state: %s\n%s:%s", 
+				self.state_machine.current_state(), exc_type.__name__, exc_val )			
+		elif not self._timeout:
+			logging.debug(' ==== TRANSITION %s -> %s', 
+					self.state_machine.current_state(), self.to_state)
+			self.state_machine._set_state( self.to_state )
+
+		self.state_machine.lock.notifyAll()
+		self.state_machine.lock.release()
 		return False # re-raise any exception
 
