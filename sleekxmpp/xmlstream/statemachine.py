@@ -163,6 +163,10 @@ class StateMachine(object):
 		Use `StateMachine.ensure(state)` to wait until the machine enters a certain state.
 		'''
 		return self.__current_state == state
+
+	def __str__(self):
+		return "".join(( "StateMachine(", ','.join(self.__states), "): ", self.__current_state ))
+
 	
 
 class _StateCtx:

@@ -20,11 +20,14 @@ class testStateMachine(unittest.TestCase):
 #		self.failIf(s.two)
 		self.failIf(s['two'])
 		try:
-			s.booga
+			s['booga']
 			self.fail('s.booga is an invalid state and should throw an exception!')
 		except: pass #expected exception
 
-	
+		# just make sure __str__ works, no reason to test its exact value:
+		print str(s)
+
+
 	def testTransitions(self):
 		"Test ensure transitions occur correctly in a single thread"
 		s = sm.StateMachine(('one','two','three'))
