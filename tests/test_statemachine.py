@@ -223,11 +223,12 @@ class testStateMachine(unittest.TestCase):
 
 		s = sm.StateMachine(('one','two','three'))
 
-		with s.transition_ctx('two','three') as _s:
-			self.assertTrue( _s['one'] )
-			self.failIf( _s.current_state in ('two','three') )
+		with s.transition_ctx('two','three') as result:
+			self.failIf( result )
+			self.assertTrue( s['one'] )
+			self.failIf( s.current_state in ('two','three') )
 
-		self.assertTrue( _s['one'] )
+		self.assertTrue( s['one'] )
 		
 		def r1():
 			print 'thread 1 started'
@@ -237,10 +238,12 @@ class testStateMachine(unittest.TestCase):
 		def r2():
 			print 'thread 2 started'
 			self.failIf( s['two'] )
-			with s.transition_ctx('two','three', 10) as _s:
-				self.assertTrue( _s['two'] )
+			with s.transition_ctx('two','three', 10) as result:
+				self.assertTrue( result )
+				self.assertTrue( s['two'] )
 				print 'thread 2 will transition on exit from the context manager...'
 			self.assertTrue( s['three'] )
+			print 'transitioned to %s' % s.current_state()
 
 		t1 = threading.Thread(target=r1)
 		t2 = threading.Thread(target=r2)

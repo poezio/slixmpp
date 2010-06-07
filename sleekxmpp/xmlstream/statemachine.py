@@ -182,12 +182,12 @@ class _StateCtx:
 			if time.time() >= start + self.wait: 
 				logging.debug('StateMachine timeout while waiting for state: %s', self.from_state )
 				self._timeout = True # to indicate we should not transition
-				break
+				return False
 			self.state_machine.lock.wait(self.wait)
 
 		logging.debug('StateMachine entered context in state: %s', 
 				self.state_machine.current_state() )
-		return self.state_machine
+		return True
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
 		if exc_val is not None:
