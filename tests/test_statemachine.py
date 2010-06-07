@@ -15,9 +15,7 @@ class testStateMachine(unittest.TestCase):
 	def testDefaults(self):
 		"Test ensure transitions occur correctly in a single thread"
 		s = sm.StateMachine(('one','two','three'))
-#		self.assertTrue(s.one)
 		self.assertTrue(s['one'])
-#		self.failIf(s.two)
 		self.failIf(s['two'])
 		try:
 			s['booga']
@@ -31,12 +29,9 @@ class testStateMachine(unittest.TestCase):
 	def testTransitions(self):
 		"Test ensure transitions occur correctly in a single thread"
 		s = sm.StateMachine(('one','two','three'))
-#		self.assertTrue(s.one)
 
 		self.assertTrue( s.transition('one', 'two') )
-#		self.assertTrue( s.two )
 		self.assertTrue( s['two'] )
-#		self.failIf( s.one )
 		self.failIf( s['one'] )
 
 		self.assertTrue( s.transition('two', 'three') )

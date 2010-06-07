@@ -105,6 +105,32 @@ class StateMachine(object):
 
 
 	def transition_ctx(self, from_state, to_state, wait=0.0):
+		'''
+		Use the state machine as a context manager.  The transition occurs on /exit/ from
+		the `with` context, so long as no exception is thrown.  For example:
+		
+		::
+
+			with state_machine.transition_ctx('one','two', wait=5) as locked:
+				if locked:
+					# the state machine is currently locked in state 'one', and will 
+					# transition to 'two' when the 'with' statement ends, so long as 
+					# no exception is thrown.
+					print 'Currently locked in state one: %s' % state_machine['one']
+
+				else:
+					# The 'wait' timed out, and no lock has been acquired
+					print 'Timed out before entering state "one"'
+
+			print 'Since no exception was thrown, we are now in state "two": %s' % state_machine['two']
+
+
+		The other main difference between this method and `transition()` is that the 
+		state machine is locked for the duration of the `with` statement (normally, 
+		after a `transition() occurs, the state machine is immediately unlocked and 
+		available to another thread to call `transition()` again.
+		'''
+
 		if not from_state in self.__states: 
 			raise ValueError( "StateMachine does not contain from_state %s." % state )
 		if not to_state in self.__states: 
