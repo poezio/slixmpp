@@ -15,25 +15,23 @@ class testStateMachine(unittest.TestCase):
 	def testDefaults(self):
 		"Test ensure transitions occur correctly in a single thread"
 		s = sm.StateMachine(('one','two','three'))
-#		self.assertTrue(s.one)
 		self.assertTrue(s['one'])
-#		self.failIf(s.two)
 		self.failIf(s['two'])
 		try:
-			s.booga
+			s['booga']
 			self.fail('s.booga is an invalid state and should throw an exception!')
 		except: pass #expected exception
 
-	
+		# just make sure __str__ works, no reason to test its exact value:
+		print str(s)
+
+
 	def testTransitions(self):
 		"Test ensure transitions occur correctly in a single thread"
 		s = sm.StateMachine(('one','two','three'))
-#		self.assertTrue(s.one)
 
 		self.assertTrue( s.transition('one', 'two') )
-#		self.assertTrue( s.two )
 		self.assertTrue( s['two'] )
-#		self.failIf( s.one )
 		self.failIf( s['one'] )
 
 		self.assertTrue( s.transition('two', 'three') )
@@ -196,6 +194,66 @@ class testStateMachine(unittest.TestCase):
 		self.failIf(s['one'])
 		self.assertTrue(s['two'])
 
+
+	def testContextManager(self):
+
+		s = sm.StateMachine(('one','two','three'))
+
+		with s.transition_ctx('one','two'):
+			self.assertTrue( s['one'] )
+			self.failIf( s['two'] )
+
+		#successful transition b/c no exception was thrown
+		self.assertTrue( s['two'] )
+		self.failIf( s['one'] )
+
+		# failed transition because exception is thrown:
+		try:
+			with s.transition_ctx('two','three'):
+				raise Exception("boom!")
+			self.fail('exception expected')
+		except: pass
+
+		self.failIf( s.current_state() in ('one','three') )
+		self.assertTrue( s['two'] )
+
+	def testCtxManagerTransitionFailure(self):
+
+		s = sm.StateMachine(('one','two','three'))
+
+		with s.transition_ctx('two','three') as result:
+			self.failIf( result )
+			self.assertTrue( s['one'] )
+			self.failIf( s.current_state in ('two','three') )
+
+		self.assertTrue( s['one'] )
+		
+		def r1():
+			print 'thread 1 started'
+			self.assertTrue( s.transition('one','two') )
+			print 'thread 1 transitioned'
+
+		def r2():
+			print 'thread 2 started'
+			self.failIf( s['two'] )
+			with s.transition_ctx('two','three', 10) as result:
+				self.assertTrue( result )
+				self.assertTrue( s['two'] )
+				print 'thread 2 will transition on exit from the context manager...'
+			self.assertTrue( s['three'] )
+			print 'transitioned to %s' % s.current_state()
+
+		t1 = threading.Thread(target=r1)
+		t2 = threading.Thread(target=r2)
+
+		t2.start() # this should block until r1 goes
+		time.sleep(1)
+		t1.start()
+
+		t1.join()
+		t2.join()
+
+		self.assertTrue( s['three'] )
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(testStateMachine)

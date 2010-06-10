@@ -101,19 +101,16 @@ class XMLStream(object):
 	
 	def connect(self, host='', port=0, use_ssl=None, use_tls=None):
 		"Establish a socket connection to the given XMPP server."
-		if not self.state.transition('disconnected','connecting'):
-			logging.warning("Can't connect now; Already in state %s", self.state.current_state())
+		
+		if not self.state.transition('disconnected','connected',
+				func=self.connectTCP, args=[host, port, use_ssl, use_tls] ):
+			
+			if self.state['connected']: logging.debug('Already connected')
+			else: logging.warning("Connection failed" )
 			return False
 
-		try:
-			return self.connectTCP(host, port, use_ssl, use_tls)
-		finally:
-			# attempt to ensure once a connection attempt starts, we leave either in the 
-			# 'connected' or 'disconnected' state.  Otherwise the connect method is not reentrant
-			if self.state['connecting']:
-				if not self.state.transition('connecting','disconnected'):
-					logging.error("Couldn't return to the 'disconnected' state after connection failure!")
-
+		logging.debug('Connection complete.')
+		return True
 
 		# TODO currently a caller can't distinguish between "connection failed" and
 		# "we're already trying to connect from another thread"
@@ -148,9 +145,6 @@ class XMLStream(object):
 				self.socket.connect(self.address)
 				self.filesocket = self.socket.makefile('rb', 0)
 				
-				if not self.state.transition('connecting','connected'):
-					logging.error( "State transition error!!!!  Shouldn't have happened" )
-				logging.debug('connect complete.')
 				return True
 
 			except socket.error as serr:
