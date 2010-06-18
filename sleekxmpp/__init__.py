@@ -27,6 +27,12 @@ import sys
 import random
 import copy
 from . import plugins
+from xml.etree.cElementTree import tostring
+from xml.etree.cElementTree import Element
+from cStringIO import StringIO
+import hashlib
+from binascii import hexlify
+
 #from . import stanza
 srvsupport = True
 try:
@@ -71,8 +77,9 @@ class ClientXMPP(basexmpp, XMLStream):
 		self.sessionstarted = False
 		self.bound = False
 		self.bindfail = False
-		self.registerHandler(Callback('Stream Features', MatchXPath('{http://etherx.jabber.org/streams}features'), self._handleStreamFeatures, thread=True))
-		self.registerHandler(Callback('Roster Update', MatchXPath('{%s}iq/{jabber:iq:roster}query' % self.default_ns), self._handleRoster, thread=True))
+		self.digest_auth_started = False
+		XMLStream.registerHandler(self, Callback('Stream Features', MatchXPath('{http://etherx.jabber.org/streams}features'), self._handleStreamFeatures, thread=True))
+		XMLStream.registerHandler(self, Callback('Roster Update', MatchXPath('{%s}iq/{jabber:iq:roster}query' % self.default_ns), self._handleRoster, thread=True))
 		#self.registerHandler(Callback('Roster Update', MatchXMLMask("<presence xmlns='%s' type='subscribe' />" % self.default_ns), self._handlePresenceSubscribe, thread=True))
 		self.registerFeature("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls' />", self.handler_starttls, True)
 		self.registerFeature("<mechanisms xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_sasl_auth, True)
@@ -192,7 +199,7 @@ class ClientXMPP(basexmpp, XMLStream):
 			_stanza = "<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />"
 			if not self.event_handlers.get(_stanza,None): # don't add handler > once
 				self.add_handler( _stanza, self.handler_tls_start, instream=True )
-			self.sendXML(xml)
+			self.sendPriorityRaw(self.tostring(xml))
 			return True
 		else:
 			logging.warning("The module tlslite is required in to some servers, and has not been found.")
@@ -213,17 +220,81 @@ class ClientXMPP(basexmpp, XMLStream):
 		if len(sasl_mechs):
 			for sasl_mech in sasl_mechs:
 				self.features.append("sasl:%s" % sasl_mech.text)
-			if 'sasl:PLAIN' in self.features:
+			if 'sasl:DIGEST-MD5' in self.features:
+				self.add_handler("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_sasl_digest_md5_auth, instream=True)
+				self.add_handler("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>", self.handler_sasl_digest_md5_auth_fail, instream=True)
+				self.sendPriorityRaw("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>""")
+			elif 'sasl:PLAIN' in self.features:
 				if sys.version_info < (3,0):
-					self.send("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>%s</auth>""" % base64.b64encode(b'\x00' + bytes(self.username) + b'\x00' + bytes(self.password)).decode('utf-8'))
+					self.sendPriorityRaw("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>%s</auth>""" % base64.b64encode(b'\x00' + bytes(self.username) + b'\x00' + bytes(self.password)).decode('utf-8'))
 				else:
-					self.send("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>%s</auth>""" % base64.b64encode(b'\x00' + bytes(self.username, 'utf-8') + b'\x00' + bytes(self.password, 'utf-8')).decode('utf-8'))
+					self.sendPriorityRaw("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>%s</auth>""" % base64.b64encode(b'\x00' + bytes(self.username, 'utf-8') + b'\x00' + bytes(self.password, 'utf-8')).decode('utf-8'))
 			else:
 				logging.error("No appropriate login method.")
 				self.disconnect()
 				#if 'sasl:DIGEST-MD5' in self.features:
 				#	self._auth_digestmd5()
 		return True
+	
+	def handler_sasl_digest_md5_auth(self, xml):
+		logging.debug(tostring(xml))
+		logging.debug(xml)
+		logging.debug(type(xml).__name__)
+		
+		if self.digest_auth_started == False:
+			logging.debug(base64.b64decode(xml.text).split(',', 6))
+			
+			challenge = [item.split('=', 1) for item in base64.b64decode(xml.text).replace("\"", "").split(',', 6) ]
+			challenge = dict(challenge)
+			logging.debug(challenge)
+			
+			#TODO: check for abort states
+			#Realm, nonce, qop should all be present
+			#charset can be either UTF-8 or if not present use ISO 8859-1
+			
+			#x = bytes(self.username) + b":" + bytes(self.domain) + b":" + bytes(self.password)
+			#ha1_1 = hashlib.md5(x).hexdigest()
+			#ha1_2 = b":" + bytes(challenge["nonce"]) + b":" + b"C6gVvo6BQKn7Hwvah99SqNQFgmLxtsHYeOs8etcU" #+ b":" + bytes(self.fulljid)
+			#ha1 = hashlib.md5(ha1_1 + ha1_2).hexdigest()
+			#
+			#ha2 = hashlib.md5(b"AUTHENTICATE:" + b"xmpp/" + bytes(self.server)).hexdigest()
+			#b = base64.b16encode(ha1) + b":" + bytes(challenge["nonce"]) + b":" + b"""00000001""" + b":" + b"C6gVvo6BQKn7Hwvah99SqNQFgmLxtsHYeOs8etcU" + b":" + bytes(challenge["qop"]) + b":" + base64.b16encode(ha2)
+			#hash = base64.b16encode(hashlib.md5(b).hexdigest())
+			
+			
+			#a1 = y + b":" + bytes(challenge["nonce"]) + b":" + b"C6gVvo6BQKn7Hwvah99SqNQFgmLxtsHYeOs8etcU" + b":" + bytes(self.jid) 
+			#a2 = b"AUTHENTICATE:" + b"xmpp/" + bytes(self.server)
+			#ha1 = hashlib.md5(a1).hexdigest()
+			#ha2 = hashlib.md5(a2).hexdigest()
+			#kd = ha1 + b":" + bytes(challenge["nonce"]) + b":" + b"""00000001""" + b":" + b"C6gVvo6BQKn7Hwvah99SqNQFgmLxtsHYeOs8etcU" + b":" + bytes(challenge["qop"]) + b":" + ha2
+			#z = hashlib.md5(kd).hexdigest()
+			
+			#take 3
+			cnonce = "dfajoiqewoivnoeiw"
+			for i in range(12):
+				cnonce = cnonce + chr(random.randint(0,0xff)).decode("utf-8", "replace")
+			cnonce = base64.encodestring(cnonce)[0:-1]
+			urp = hashlib.md5("%s:%s:%s" % (self.username, challenge["realm"], self.password) ).digest()
+			a1 = "%s:%s:%s" % (urp.decode("utf-8", "replace"), challenge["nonce"], cnonce)
+			a2 = "AUTHENTICATE:xmpp/%s" % self.domain
+			responseHash = hexlify(md5("%s:%s:00000001:%s:%s:%s" 
+											% (hexlify(md5(a1)), challenge["nonce"], cnonce, challenge["qop"], hexlify(md5(a2))) ))
+			print responseHash
+			responseHash1 = resp(self.username, challenge["realm"], self.password, challenge["nonce"], cnonce, "AUTHENTICATE:xmpp/%s" % self.domain)
+			responseHash2 = resp(self.username, challenge["realm"], self.password, challenge["nonce"], cnonce, "AUTHENTICATE:xmpp/%s" % self.domain)
+			print responseHash1
+			print responseHash2
+			response1 = 'username="%s"%s,nonce="%s",cnonce="%s",nc=00000001,qop=auth,digest-uri="%s",response=%s' %(self.username, ',realm="%s"' % challenge['realm'], challenge["nonce"], cnonce, 'AUTHENTICATE:xmpp/%s' % self.domain, responseHash1)
+			response = '''username="%s",realm="%s",nonce="%s",cnonce="%s",nc=00000001,qop=%s,digest-uri="%s",response=%s'''  %(self.username, challenge["realm"], challenge["nonce"], cnonce, challenge["qop"], "AUTHENTICATE:xmpp/%s" % self.domain, responseHash1)
+			print response
+			print response1
+			self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>""" %base64.encodestring(response1)[:-1])
+		else:
+			pass
+	
+	def handler_sasl_digest_md5_auth_fail(self, xml):
+		self.digest_auth_started = False
+		self.handler_auth_fail(xml)
 	
 	def handler_auth_success(self, xml):
 		logging.debug("Authentication successful.")
@@ -233,6 +304,7 @@ class ClientXMPP(basexmpp, XMLStream):
 
 	def handler_auth_fail(self, xml):
 		logging.warning("Authentication failed.")
+		logging.debug(tostring(xml, 'utf-8'))
 		self.disconnect()
 		self.event("failed_auth")
 	
@@ -273,3 +345,20 @@ class ClientXMPP(basexmpp, XMLStream):
 			if iq['type'] == 'set':
 				self.send(self.Iq().setValues({'type': 'result', 'id': iq['id']}).enable('roster'))
 		self.event("roster_update", iq)
+
+def md5(indata):
+	try:
+		import hashlib
+		md5 = hashlib.md5(indata)
+	except ImportError:
+		import md5
+		md5 = md5.new(indata)
+	return md5.digest()
+
+def resp(username, realm, password, nonce, cnonce, digest_uri):
+	"constructs a response string as defined in 2.1.2.1"
+	urp = md5("%s:%s:%s" % (username,realm,password))
+	a1 = "%s:%s:%s" % (urp.decode("utf-8", "replace"), nonce, cnonce)
+	a2 = "AUTHENTICATE:%s" % digest_uri
+	return hexlify(md5("%s:%s:00000001:%s:auth:%s"
+		 % (hexlify(md5(a1)), nonce, cnonce, hexlify(md5(a2)))))
