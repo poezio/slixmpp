@@ -270,22 +270,22 @@ class ClientXMPP(basexmpp, XMLStream):
 			#z = hashlib.md5(kd).hexdigest()
 			
 			#take 3
-			cnonce = "dfajoiqewoivnoeiw"
+			cnonce = ""
 			for i in range(12):
 				cnonce = cnonce + chr(random.randint(0,0xff)).decode("utf-8", "replace")
 			cnonce = base64.encodestring(cnonce)[0:-1]
-			urp = hashlib.md5("%s:%s:%s" % (self.username, challenge["realm"], self.password) ).digest()
-			a1 = "%s:%s:%s" % (urp.decode("utf-8", "replace"), challenge["nonce"], cnonce)
+			urp = md5("%s:%s:%s" % (self.username, self.domain, self.password) )
+			a1 = "%s:%s:%s" % (urp.encode, challenge["nonce"].encode(), cnonce.encode())
 			a2 = "AUTHENTICATE:xmpp/%s" % self.domain
 			responseHash = hexlify(md5("%s:%s:00000001:%s:%s:%s" 
 											% (hexlify(md5(a1)), challenge["nonce"], cnonce, challenge["qop"], hexlify(md5(a2))) ))
 			print responseHash
-			responseHash1 = resp(self.username, challenge["realm"], self.password, challenge["nonce"], cnonce, "AUTHENTICATE:xmpp/%s" % self.domain)
-			responseHash2 = resp(self.username, challenge["realm"], self.password, challenge["nonce"], cnonce, "AUTHENTICATE:xmpp/%s" % self.domain)
+			responseHash1 = resp(self.username, self.domain, self.password, challenge["nonce"], cnonce, "AUTHENTICATE:xmpp/%s" % self.domain)
+			responseHash2 = resp(self.username, self.domain, self.password, challenge["nonce"], cnonce, "AUTHENTICATE:xmpp/%s" % self.domain)
 			print responseHash1
 			print responseHash2
-			response1 = 'username="%s"%s,nonce="%s",cnonce="%s",nc=00000001,qop=auth,digest-uri="%s",response=%s' %(self.username, ',realm="%s"' % challenge['realm'], challenge["nonce"], cnonce, 'AUTHENTICATE:xmpp/%s' % self.domain, responseHash1)
-			response = '''username="%s",realm="%s",nonce="%s",cnonce="%s",nc=00000001,qop=%s,digest-uri="%s",response=%s'''  %(self.username, challenge["realm"], challenge["nonce"], cnonce, challenge["qop"], "AUTHENTICATE:xmpp/%s" % self.domain, responseHash1)
+			response1 = 'username="%s"%s,nonce="%s",cnonce="%s",nc=00000001,qop=auth,digest-uri="%s",response=%s' %(self.username, ',realm="%s"' % self.domain, challenge["nonce"], cnonce, 'AUTHENTICATE:xmpp/%s' % self.domain, responseHash1)
+			response = '''username="%s",realm="%s",nonce="%s",cnonce="%s",nc=00000001,qop=%s,digest-uri="%s",response=%s'''  %(self.username, self.domain, challenge["nonce"], cnonce, challenge["qop"], "AUTHENTICATE:xmpp/%s" % self.domain, responseHash1)
 			print response
 			print response1
 			self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>""" %base64.encodestring(response1)[:-1])
