@@ -97,7 +97,7 @@ class StateMachine(object):
 
 				logging.debug(' ==== TRANSITION %s -> %s', self.__current_state, to_state)
 				self.__current_state = to_state
-				self.lock.notifyAll()
+				self.lock.notify_all()
 				return return_val  # some 'true' value returned by func or True if func was None
 			else:
 				logging.error( "StateMachine bug!!  The lock should ensure this doesn't happen!" )
@@ -126,13 +126,13 @@ class StateMachine(object):
 
 
 		The other main difference between this method and `transition()` is that the 
-		state machine is locked for the duration of the `with` statement (normally, 
-		after a `transition() occurs, the state machine is immediately unlocked and 
+		state machine is locked for the duration of the `with` statement.  Normally, 
+		after a `transition()` occurs, the state machine is immediately unlocked and 
 		available to another thread to call `transition()` again.
 		'''
 
 		if not from_state in self.__states: 
-			raise ValueError( "StateMachine does not contain from_state %s." % state )
+			raise ValueError( "StateMachine does not contain from_state %s." % from_state )
 		if not to_state in self.__states: 
 			raise ValueError( "StateMachine does not contain to_state %s." % to_state )
 
@@ -228,7 +228,7 @@ class _StateCtx:
 					self.state_machine.current_state(), self.to_state)
 			self.state_machine._set_state( self.to_state )
 
-		self.state_machine.lock.notifyAll()
+		self.state_machine.lock.notify_all()
 		self.state_machine.lock.release()
 		return False # re-raise any exception
 
