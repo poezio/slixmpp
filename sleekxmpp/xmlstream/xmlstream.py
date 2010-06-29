@@ -59,7 +59,7 @@ class XMLStream(object):
 		self.ssl_support = ssl_support
 		self.escape_quotes = escape_quotes
 		self.state = statemachine.StateMachine(('disconnected','connecting',
-		    'connected'))
+			'connected'))
 		self.should_reconnect = True
 
 		self.setSocket(socket)
@@ -240,7 +240,7 @@ class XMLStream(object):
 				if self.should_reconnect:
 					self.disconnect(reconnect=True)
 
-        logging.debug('Quitting Process thread')
+		logging.debug('Quitting Process thread')
 	
 	def __readXML(self):
 		"Parses the incoming stream, adding to xmlin queue as it goes"
@@ -302,23 +302,24 @@ class XMLStream(object):
 		return True
 	
 	def disconnect(self, reconnect=False):
-		if not self.state.transition('connected','disconnected'):
-			logging.warning("Already disconnected.")
-			return
-		logging.debug("Disconnecting...")
-		self.sendRaw(self.stream_footer)
-		time.sleep(5)
-		#send end of stream
-		#wait for end of stream back
-		try:
-#			self.socket.shutdown(socket.SHUT_RDWR)
-			self.socket.close()
-		except socket.error as (errno,strerror):
-			logging.exception("Error while disconnecting. Socket Error #%s: %s" % (errno, strerror))		
-		try:
-			self.filesocket.close()
-		except socket.error as (errno,strerror):
-			logging.exception("Error closing filesocket.")
+		with self.state.transition_ctx('connected','disconnected') as locked:
+			if not locked:
+				logging.warning("Already disconnected.")
+				return
+			logging.debug("Disconnecting...")
+			self.sendRaw(self.stream_footer)
+			time.sleep(5)
+			#send end of stream
+			#wait for end of stream back
+			try:
+#				self.socket.shutdown(socket.SHUT_RDWR)
+				self.socket.close()
+			except socket.error as (errno,strerror):
+				logging.exception("Error while disconnecting. Socket Error #%s: %s" % (errno, strerror))
+			try:
+				self.filesocket.close()
+			except socket.error as (errno,strerror):
+				logging.exception("Error closing filesocket.")
 
 		if reconnect: self.connect()
 	
