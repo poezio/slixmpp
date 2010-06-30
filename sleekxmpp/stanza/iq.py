@@ -1,9 +1,9 @@
 """
-    SleekXMPP: The Sleek XMPP Library
-    Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+	SleekXMPP: The Sleek XMPP Library
+	Copyright (C) 2010  Nathanael C. Fritz
+	This file is part of SleekXMPP.
 
-    See the file license.txt for copying permission.
+	See the file license.txt for copying permission.
 """
 from .. xmlstream.stanzabase import StanzaBase
 from xml.etree import cElementTree as ET
@@ -67,11 +67,11 @@ class Iq(RootStanza):
 				self.xml.remove(child)
 		return self
 	
-	def send(self, block=True, timeout=10):
+	def send(self, block=True, timeout=10, priority=False):
 		if block and self['type'] in ('get', 'set'):
 			waitfor = Waiter('IqWait_%s' % self['id'], MatcherId(self['id']))
 			self.stream.registerHandler(waitfor)
-			StanzaBase.send(self)
+			StanzaBase.send(self, priority)
 			return waitfor.wait(timeout)
 		else:
-			return StanzaBase.send(self)
+			return StanzaBase.send(self, priority)

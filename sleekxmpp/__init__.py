@@ -7,7 +7,6 @@
 
 	See the file license.txt for copying permission.
 """
-from __future__ import absolute_import, unicode_literals
 from . basexmpp import basexmpp
 from xml.etree import cElementTree as ET
 from . xmlstream.xmlstream import XMLStream
@@ -30,8 +29,6 @@ from . import plugins
 from xml.etree.cElementTree import tostring
 from xml.etree.cElementTree import Element
 from cStringIO import StringIO
-import hashlib
-from binascii import hexlify
 
 #from . import stanza
 srvsupport = True
@@ -115,7 +112,7 @@ class ClientXMPP(basexmpp, XMLStream):
 				logging.debug("Since no address is supplied, attempting SRV lookup.")
 				try:
 					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.domain, 
-					        dns.rdatatype.SRV )
+							dns.rdatatype.SRV )
 				except dns.resolver.NXDOMAIN:
 					logging.debug("No appropriate SRV record found.  Using JID server name.")
 				else:
@@ -252,43 +249,17 @@ class ClientXMPP(basexmpp, XMLStream):
 			#Realm, nonce, qop should all be present
 			#charset can be either UTF-8 or if not present use ISO 8859-1
 			
-			#x = bytes(self.username) + b":" + bytes(self.domain) + b":" + bytes(self.password)
-			#ha1_1 = hashlib.md5(x).hexdigest()
-			#ha1_2 = b":" + bytes(challenge["nonce"]) + b":" + b"C6gVvo6BQKn7Hwvah99SqNQFgmLxtsHYeOs8etcU" #+ b":" + bytes(self.fulljid)
-			#ha1 = hashlib.md5(ha1_1 + ha1_2).hexdigest()
-			#
-			#ha2 = hashlib.md5(b"AUTHENTICATE:" + b"xmpp/" + bytes(self.server)).hexdigest()
-			#b = base64.b16encode(ha1) + b":" + bytes(challenge["nonce"]) + b":" + b"""00000001""" + b":" + b"C6gVvo6BQKn7Hwvah99SqNQFgmLxtsHYeOs8etcU" + b":" + bytes(challenge["qop"]) + b":" + base64.b16encode(ha2)
-			#hash = base64.b16encode(hashlib.md5(b).hexdigest())
-			
-			
-			#a1 = y + b":" + bytes(challenge["nonce"]) + b":" + b"C6gVvo6BQKn7Hwvah99SqNQFgmLxtsHYeOs8etcU" + b":" + bytes(self.jid) 
-			#a2 = b"AUTHENTICATE:" + b"xmpp/" + bytes(self.server)
-			#ha1 = hashlib.md5(a1).hexdigest()
-			#ha2 = hashlib.md5(a2).hexdigest()
-			#kd = ha1 + b":" + bytes(challenge["nonce"]) + b":" + b"""00000001""" + b":" + b"C6gVvo6BQKn7Hwvah99SqNQFgmLxtsHYeOs8etcU" + b":" + bytes(challenge["qop"]) + b":" + ha2
-			#z = hashlib.md5(kd).hexdigest()
-			
-			#take 3
+			#Compute the cnonce - a unique hex string only used in this request
 			cnonce = ""
-			for i in range(12):
-				cnonce = cnonce + chr(random.randint(0,0xff)).decode("utf-8", "replace")
+			for i in range(7):
+				cnonce+=hex(int(random.random()*65536*4096))[2:]
 			cnonce = base64.encodestring(cnonce)[0:-1]
-			urp = md5("%s:%s:%s" % (self.username, self.domain, self.password) )
-			a1 = "%s:%s:%s" % (urp.encode, challenge["nonce"].encode(), cnonce.encode())
-			a2 = "AUTHENTICATE:xmpp/%s" % self.domain
-			responseHash = hexlify(md5("%s:%s:00000001:%s:%s:%s" 
-											% (hexlify(md5(a1)), challenge["nonce"], cnonce, challenge["qop"], hexlify(md5(a2))) ))
-			print responseHash
-			responseHash1 = resp(self.username, self.domain, self.password, challenge["nonce"], cnonce, "AUTHENTICATE:xmpp/%s" % self.domain)
-			responseHash2 = resp(self.username, self.domain, self.password, challenge["nonce"], cnonce, "AUTHENTICATE:xmpp/%s" % self.domain)
-			print responseHash1
-			print responseHash2
-			response1 = 'username="%s"%s,nonce="%s",cnonce="%s",nc=00000001,qop=auth,digest-uri="%s",response=%s' %(self.username, ',realm="%s"' % self.domain, challenge["nonce"], cnonce, 'AUTHENTICATE:xmpp/%s' % self.domain, responseHash1)
-			response = '''username="%s",realm="%s",nonce="%s",cnonce="%s",nc=00000001,qop=%s,digest-uri="%s",response=%s'''  %(self.username, self.domain, challenge["nonce"], cnonce, challenge["qop"], "AUTHENTICATE:xmpp/%s" % self.domain, responseHash1)
-			print response
-			print response1
-			self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>""" %base64.encodestring(response1)[:-1])
+			
+			a1 = "%s:%s:%s" %(md5("%s:%s:%s" % (self.username, self.domain, self.password)), challenge["nonce"], cnonce )
+			a2 = "AUTHENTICATE:xmpp/%s" %self.domain
+			responseHash = md5digest("%s:%s:00000001:%s:auth:%s" %(md5digest(a1), challenge["nonce"], cnonce, md5digest(a2) ) )
+			response = '''charset=utf-8,username="%s",realm="%s",nonce="%s",nc=00000001,cnonce="%s",digest-uri="%s",response=%s,qop=%s,'''  %(self.username, self.domain, challenge["nonce"], cnonce, "xmpp/%s" % self.domain, responseHash, challenge["qop"])
+			self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>""" %base64.encodestring(response)[:-1])
 		else:
 			pass
 	
@@ -346,19 +317,20 @@ class ClientXMPP(basexmpp, XMLStream):
 				self.send(self.Iq().setValues({'type': 'result', 'id': iq['id']}).enable('roster'))
 		self.event("roster_update", iq)
 
-def md5(indata):
+def md5(data):
 	try:
 		import hashlib
-		md5 = hashlib.md5(indata)
+		md5 = hashlib.md5(data)
 	except ImportError:
 		import md5
-		md5 = md5.new(indata)
+		md5 = md5.new(data)
 	return md5.digest()
 
-def resp(username, realm, password, nonce, cnonce, digest_uri):
-	"constructs a response string as defined in 2.1.2.1"
-	urp = md5("%s:%s:%s" % (username,realm,password))
-	a1 = "%s:%s:%s" % (urp.decode("utf-8", "replace"), nonce, cnonce)
-	a2 = "AUTHENTICATE:%s" % digest_uri
-	return hexlify(md5("%s:%s:00000001:%s:auth:%s"
-		 % (hexlify(md5(a1)), nonce, cnonce, hexlify(md5(a2)))))
+def md5digest(data):
+	try:
+		import hashlib
+		md5 = hashlib.md5(data)
+	except ImportError:
+		import md5
+		md5 = md5.new(data)
+	return md5.hexdigest()
