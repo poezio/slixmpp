@@ -241,16 +241,17 @@ class ClientXMPP(basexmpp, XMLStream):
 		logging.debug(type(xml).__name__)
 		
 		if self.digest_auth_started == False:
-			logging.debug(base64.b64decode(xml.text).split(',', 6))
-			
 			challenge = [item.split('=', 1) for item in base64.b64decode(xml.text).replace("\"", "").split(',', 6) ]
 			challenge = dict(challenge)
 			logging.debug(challenge)
 			
-			#TODO: check for abort states
 			#Realm, nonce, qop should all be present
-			#charset can be either UTF-8 or if not present use ISO 8859-1
-			
+			if not challenge['realm'] or not challenge['qop'] or not challenge['nonce']:
+				logging.error("Error during digest-md5 authentication. Challenge missing critical information. Challenge: %s" %base64.b64decode(xml.text))
+				self.disconnect()
+				self.event("failed_auth")
+				return
+			#TODO: charset can be either UTF-8 or if not present use ISO 8859-1 defaulting for UTF-8 for now
 			#Compute the cnonce - a unique hex string only used in this request
 			cnonce = ""
 			for i in range(7):
@@ -263,7 +264,7 @@ class ClientXMPP(basexmpp, XMLStream):
 			response = '''charset=utf-8,username="%s",realm="%s",nonce="%s",nc=00000001,cnonce="%s",digest-uri="%s",response=%s,qop=%s,'''  %(self.username, self.domain, challenge["nonce"], cnonce, "xmpp/%s" % self.domain, responseHash, challenge["qop"])
 			self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>""" %base64.encodestring(response)[:-1])
 		else:
-			pass
+			logging.warn("handler_sasl_digest_md5_auth called while digest_auth_started is false")
 	
 	def handler_sasl_digest_md5_auth_fail(self, xml):
 		self.digest_auth_started = False
