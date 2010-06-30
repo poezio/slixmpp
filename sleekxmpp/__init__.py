@@ -7,6 +7,7 @@
 
 	See the file license.txt for copying permission.
 """
+from __future__ import absolute_import
 from . basexmpp import basexmpp
 from xml.etree import cElementTree as ET
 from . xmlstream.xmlstream import XMLStream
@@ -77,6 +78,11 @@ class ClientXMPP(basexmpp, XMLStream):
 		self.digest_auth_started = False
 		XMLStream.registerHandler(self, Callback('Stream Features', MatchXPath('{http://etherx.jabber.org/streams}features'), self._handleStreamFeatures, thread=True))
 		XMLStream.registerHandler(self, Callback('Roster Update', MatchXPath('{%s}iq/{jabber:iq:roster}query' % self.default_ns), self._handleRoster, thread=True))
+		#SASL Auth handlers
+		basexmpp.add_handler(self, "<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_sasl_digest_md5_auth, instream=True)
+		basexmpp.add_handler(self, "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>", self.handler_sasl_digest_md5_auth_fail, instream=True)
+		basexmpp.add_handler(self, "<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_auth_success, instream=True)
+		basexmpp.add_handler(self, "<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_auth_fail, instream=True)
 		#self.registerHandler(Callback('Roster Update', MatchXMLMask("<presence xmlns='%s' type='subscribe' />" % self.default_ns), self._handlePresenceSubscribe, thread=True))
 		self.registerFeature("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls' />", self.handler_starttls, True)
 		self.registerFeature("<mechanisms xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_sasl_auth, True)
@@ -211,15 +217,11 @@ class ClientXMPP(basexmpp, XMLStream):
 		if '{urn:ietf:params:xml:ns:xmpp-tls}starttls' in self.features:
 			return False
 		logging.debug("Starting SASL Auth")
-		self.add_handler("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_auth_success, instream=True)
-		self.add_handler("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_auth_fail, instream=True)
 		sasl_mechs = xml.findall('{urn:ietf:params:xml:ns:xmpp-sasl}mechanism')
 		if len(sasl_mechs):
 			for sasl_mech in sasl_mechs:
 				self.features.append("sasl:%s" % sasl_mech.text)
 			if 'sasl:DIGEST-MD5' in self.features:
-				self.add_handler("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />", self.handler_sasl_digest_md5_auth, instream=True)
-				self.add_handler("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>", self.handler_sasl_digest_md5_auth_fail, instream=True)
 				self.sendPriorityRaw("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>""")
 			elif 'sasl:PLAIN' in self.features:
 				if sys.version_info < (3,0):
