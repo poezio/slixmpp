@@ -264,7 +264,7 @@ class ClientXMPP(basexmpp, XMLStream):
 			response = '''charset=utf-8,username="%s",realm="%s",nonce="%s",nc=00000001,cnonce="%s",digest-uri="%s",response=%s,qop=%s,'''  %(self.username, self.domain, challenge["nonce"], cnonce, "xmpp/%s" % self.domain, responseHash, challenge["qop"])
 			self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>""" %base64.encodestring(response)[:-1])
 		else:
-			logging.warn("handler_sasl_digest_md5_auth called while digest_auth_started is false")
+			logging.warn("handler_sasl_digest_md5_auth called while digest_auth_started is True (has already begun)")
 	
 	def handler_sasl_digest_md5_auth_fail(self, xml):
 		self.digest_auth_started = False
