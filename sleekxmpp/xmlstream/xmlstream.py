@@ -352,11 +352,11 @@ class XMLStream(object):
 		# TODO inefficient linear search; performance might be improved by hashtable lookup
 		for handler in self.__handlers:
 			if handler.match(stanza):
-				logging.debug('matched stanza to handler %s', handler.name)
+#				logging.debug('matched stanza to handler %s', handler.name)
 				handler.prerun(stanza)
 				self.eventqueue.put(('stanza', handler, stanza))
 				if handler.checkDelete():
-					logging.debug('deleting callback %s', handler.name)
+#					logging.debug('deleting callback %s', handler.name)
 					self.__handlers.pop(self.__handlers.index(handler))
 				unhandled = False
 		if unhandled:
