@@ -7,6 +7,7 @@
 
 	See the file license.txt for copying permission.
 """
+from __future__ import absolute_import, unicode_literals
 from . basexmpp import basexmpp
 from xml.etree import cElementTree as ET
 from . xmlstream.xmlstream import XMLStream
@@ -255,8 +256,7 @@ class ClientXMPP(basexmpp, XMLStream):
 			for i in range(7):
 				cnonce+=hex(int(random.random()*65536*4096))[2:]
 			cnonce = base64.encodestring(cnonce)[0:-1]
-			a1 = md5("%s:%s:%s" % (self.username, self.domain, self.password)) 
-			a1 = "%s:%s:%s" %(a1, challenge["nonce"], cnonce )
+			a1 = b"%s:%s:%s" %(md5("%s:%s:%s" % (self.username, self.domain, self.password)), challenge["nonce"].encode("UTF-8"), cnonce.encode("UTF-8") )
 			a2 = "AUTHENTICATE:xmpp/%s" %self.domain
 			responseHash = md5digest("%s:%s:00000001:%s:auth:%s" %(md5digest(a1), challenge["nonce"], cnonce, md5digest(a2) ) )
 			response = '''charset=utf-8,username="%s",realm="%s",nonce="%s",nc=00000001,cnonce="%s",digest-uri="%s",response=%s,qop=%s,'''  %(self.username, self.domain, challenge["nonce"], cnonce, "xmpp/%s" % self.domain, responseHash, challenge["qop"])
