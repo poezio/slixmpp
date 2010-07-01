@@ -111,6 +111,7 @@ class basexmpp(object):
 			logging.debug("Loaded Plugin %s%s" % (xep, self.plugin[plugin].description))
 		except:
 			logging.exception("Unable to load plugin: %s", plugin )
+
             
 	def register_plugins(self):
 		"""Initiates all plugins in the plugins/__init__.__all__"""

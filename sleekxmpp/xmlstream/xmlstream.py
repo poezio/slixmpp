@@ -81,7 +81,7 @@ class XMLStream(object):
 		self.stream_footer = "</stream>"
 
 		self.eventqueue = queue.Queue()
-		self.sendqueue = queue.Queue()
+		self.sendqueue = queue.PriorityQueue()
 		self.scheduler = scheduler.Scheduler(self.eventqueue)
 
 		self.namespace_map = {}
@@ -220,7 +220,7 @@ class XMLStream(object):
 		while self.run:
 			if not self.state.ensure('connected',wait=2): continue
 			try:
-				self.sendRaw(self.stream_header)
+				self.sendPriorityRaw(self.stream_header)
 				while self.run and self.__readXML(): pass
 			except socket.timeout:
 				logging.debug('socket rcv timeout')
@@ -281,7 +281,7 @@ class XMLStream(object):
 			
 			data = None
 			try:
-				data = self.sendqueue.get(True,5)
+				data = self.sendqueue.get(True,5)[1]
 				logging.debug("SEND: %s" % data)
 				self.socket.sendall(data.encode('utf-8'))
 			except queue.Empty:
@@ -302,7 +302,11 @@ class XMLStream(object):
 					self.disconnect(reconnect=True)
 	
 	def sendRaw(self, data):
-		self.sendqueue.put(data)
+		self.sendqueue.put((1, data))
+		return True
+	
+	def sendPriorityRaw(self, data):
+		self.sendqueue.put((0, data))
 		return True
 	
 	def disconnect(self, reconnect=False):

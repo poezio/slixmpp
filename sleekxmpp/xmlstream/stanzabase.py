@@ -1,9 +1,9 @@
 """
-    SleekXMPP: The Sleek XMPP Library
-    Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+	SleekXMPP: The Sleek XMPP Library
+	Copyright (C) 2010  Nathanael C. Fritz
+	This file is part of SleekXMPP.
 
-    See the file license.txt for copying permission.
+	See the file license.txt for copying permission.
 """
 from xml.etree import cElementTree as ET
 import logging
@@ -383,6 +383,7 @@ class StanzaBase(ElementBase):
 	def exception(self, e):
 		logging.error(traceback.format_tb(e))
 	
-	def send(self):
-		self.stream.sendRaw(self.__str__())
-
+	def send(self, priority=False):
+		if priority: self.stream.sendPriorityRaw(self.__str__()) 
+		else: self.stream.sendRaw(self.__str__())
+		
