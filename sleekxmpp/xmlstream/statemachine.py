@@ -9,6 +9,8 @@ import threading
 import time
 import logging
 
+log = logging.getLogger(__name__)
+
 
 class StateMachine(object):
 
@@ -98,11 +100,11 @@ class StateMachine(object):
 				# indicating that transition should not occur:
 				if not return_val: return return_val 
 
-				logging.debug(' ==== TRANSITION %s -> %s', self.__current_state, to_state)
+				log.debug(' ==== TRANSITION %s -> %s', self.__current_state, to_state)
 				self._set_state( to_state )
 				return return_val  # some 'true' value returned by func or True if func was None
 			else:
-				logging.error( "StateMachine bug!!  The lock should ensure this doesn't happen!" )
+				log.error( "StateMachine bug!!  The lock should ensure this doesn't happen!" )
 				return False
 		finally: 
 			self.notifier.set()
@@ -226,24 +228,24 @@ class _StateCtx:
 		while not self.state_machine[ self.from_state ] or not self.state_machine.lock.acquire(False): 
 			# detect timeout:
 			if time.time() >= start + self.wait: 
-				logging.debug('StateMachine timeout while waiting for state: %s', self.from_state )
+				log.debug('StateMachine timeout while waiting for state: %s', self.from_state )
 				return False
 			self.state_machine.notifier.wait(self.wait)
 
 		self._locked = True # lock has been acquired at this point
 		self.state_machine.notifier.clear()
-		logging.debug('StateMachine entered context in state: %s', 
+		log.debug('StateMachine entered context in state: %s', 
 				self.state_machine.current_state() )
 		return True
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
 		if exc_val is not None:
-			logging.exception( "StateMachine exception in context, remaining in state: %s\n%s:%s", 
+			log.exception( "StateMachine exception in context, remaining in state: %s\n%s:%s", 
 				self.state_machine.current_state(), exc_type.__name__, exc_val )
 
 		if self._locked:
 			if exc_val is None:
-				logging.debug(' ==== TRANSITION %s -> %s', 
+				log.debug(' ==== TRANSITION %s -> %s', 
 						self.state_machine.current_state(), self.to_state)
 				self.state_machine._set_state( self.to_state )
 
