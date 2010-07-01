@@ -58,8 +58,7 @@ class XMLStream(object):
 		global ssl_support
 		self.ssl_support = ssl_support
 		self.escape_quotes = escape_quotes
-		self.state = statemachine.StateMachine(('disconnected','connecting',
-			'connected'))
+		self.state = statemachine.StateMachine(('disconnected','connected'))
 		self.should_reconnect = True
 
 		self.setSocket(socket)
@@ -92,9 +91,11 @@ class XMLStream(object):
 	def setSocket(self, socket):
 		"Set the socket"
 		self.socket = socket
-		if socket is not None and self.state.transition('disconnected','connecting'):
-			self.filesocket = socket.makefile('rb', 0) # ElementTree.iterparse requires a file.  0 buffer files have to be binary
-		self.state.transition('connecting','connected')
+		if socket is not None:
+			with self.state.transition_ctx('disconnected','connected') as locked:
+				if not locked: raise Exception('Already connected')
+				# ElementTree.iterparse requires a file.  0 buffer files have to be binary
+				self.filesocket = socket.makefile('rb', 0) 
 	
 	def setFileSocket(self, filesocket):
 		self.filesocket = filesocket
@@ -235,6 +236,9 @@ class XMLStream(object):
 				logging.debug("System interrupt detected")
 				self.shutdown()
 				self.eventqueue.put(('quit', None, None))
+			except cElementTree.XMLParserError:
+				logging.warn('XML RCV parsing error!', exc_info=1)
+				# don't restart the stream on an XML parse error.
 			except:
 				logging.exception('Unexpected error in RCV thread')
 				if self.should_reconnect:
