@@ -147,11 +147,11 @@ class StateMachine(object):
 		return _StateCtx(self, from_state, to_state, wait)
 
 	
-	def ensure(self, state, wait=0.0):
+	def ensure(self, state, wait=0.0, block_on_transition=False ):
 		'''
 		Ensure the state machine is currently in `state`, or wait until it enters `state`.
 		'''
-		return self.ensure_any( (state,), wait=wait )
+		return self.ensure_any( (state,), wait=wait, block_on_transition=block_on_transition )
 
 
 	def ensure_any(self, states, wait=0.0, block_on_transition=False):
@@ -180,7 +180,11 @@ class StateMachine(object):
 		# threads to indicate they want to remain in a particular state.
 
 		# will return immediately if no transition is in process.
-		if block_on_transition: self.notifier.wait()
+		if block_on_transition:
+			# we're not in the middle of a transition; don't hold the lock
+			if self.lock.acquire(False): self.lock.release()
+			# wait for the transition to complete
+			else: self.notifier.wait()
 
 		start = time.time()
 		while not self.__current_state in states: 
