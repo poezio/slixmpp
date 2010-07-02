@@ -219,7 +219,6 @@ class XMLStream(object):
 		while not self.quit.is_set():
 			if not self.state.ensure('connected',wait=2, block_on_transition=True): continue
 			try:
-				logging.debug(' ------------------------------- starting process loop...')
 				self.sendPriorityRaw(self.stream_header)
 				self.__readXML() # this loops until the stream is terminated.
 			except socket.timeout:
@@ -239,15 +238,9 @@ class XMLStream(object):
 
 			# if the RCV socket is terminated for whatever reason (e.g. we reach this point of
 			# code,) our only sane choice of action is an attempt to re-establish the connection.
-			if not self.quit.is_set():
-				logging.info( 'about to reconnect..........' )
-				try:
-					self.disconnect(reconnect=self.should_reconnect, error=True)
-				except: 
-					logging.exception( "WTF disconnect!" )
-				logging.info( 'reconnect complete!' )
-				logging.info( 'reconnect complete!' )
-
+			reconnect = (self.should_reconnect and not self.quit.is_set())
+			self.disconnect(reconnect=reconnect, error=True)
+				
 		logging.debug('Quitting Process thread')
 	
 	def __readXML(self):
@@ -303,8 +296,8 @@ class XMLStream(object):
 				# the same thing concurrently.  Oops!  The safer option would be to throw 
 				# some sort of event that could be handled by a common thread or the reader 
 				# thread to perform reconnect and then re-initialize the handler threads as well.
-				if self.should_reconnect:
-					self.disconnect(reconnect=True, error=True)
+				reconnect = (self.should_reconnect and not self.quit.is_set())
+				self.disconnect(reconnect=reconnect, error=True)
 	
 	def sendRaw(self, data):
 		self.sendqueue.put((1, data))
