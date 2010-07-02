@@ -159,11 +159,11 @@ class ClientXMPP(basexmpp, XMLStream):
 	def reconnect(self):
 		self.disconnect(reconnect=True)
 	
-	def disconnect(self, reconnect=False):
+	def disconnect(self, reconnect=False, error=False):
 		self.event("disconnected")
 		self.authenticated = False
 		self.sessionstarted = False
-		XMLStream.disconnect(self, reconnect)
+		XMLStream.disconnect(self, reconnect, error)
 	
 	def registerFeature(self, mask, pointer, breaker = False):
 		"""Register a stream feature."""
