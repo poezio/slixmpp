@@ -226,7 +226,6 @@ class XMLStream(object):
 				# TODO currently this will re-send a stream header if this exception occurs.  
 				# I don't think that's intended behavior.
 				logging.warn('socket rcv timeout')
-				pass
 			except RestartStream:
 				logging.debug("Restarting stream...")
 				continue # DON'T re-initialize the stream -- this exception is sent 
@@ -238,20 +237,14 @@ class XMLStream(object):
 			except:
 				logging.exception('Unexpected error in RCV thread')
 
-			# if the RCV socket is terminated for whatever reason, our only sane choice of action is an attempt 
-			# to re-establish the connection.
+			# if the RCV socket is terminated for whatever reason (e.g. we reach this point of
+			# code,) our only sane choice of action is an attempt to re-establish the connection.
 			if not self.quit.is_set():
-				logging.info( 'about to reconnect..........' )
-				logging.info( 'about to reconnect..........' )
-				logging.info( 'about to reconnect..........' )
 				logging.info( 'about to reconnect..........' )
 				try:
 					self.disconnect(reconnect=self.should_reconnect, error=True)
 				except: 
 					logging.exception( "WTF disconnect!" )
-				logging.info( 'reconnect complete!' )
-				logging.info( 'reconnect complete!' )
-				logging.info( 'reconnect complete!' )
 				logging.info( 'reconnect complete!' )
 				logging.info( 'reconnect complete!' )
 
@@ -322,9 +315,7 @@ class XMLStream(object):
 		return True
 	
 	def disconnect(self, reconnect=False, error=False):
-		logging.info('AAAAAAAAAAAAAAAAAAAAAAAA')
 		with self.state.transition_ctx('connected','disconnected') as locked:
-			logging.info('BBBBBBBBBBBBBBBBBBBBBBBBBB')	
 			if not locked:
 				logging.warning("Already disconnected.")
 				return
