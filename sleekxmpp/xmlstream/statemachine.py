@@ -91,7 +91,6 @@ class StateMachine(object):
 			else: return False
 
 		try: # lock is acquired; all other threads will return false or wait until notify/timeout
-			self.notifier.clear()
 			if self.__current_state in from_states: # should always be True due to lock
 
 				# Note that func might throw an exception, but that's OK, it aborts the transition
@@ -108,7 +107,8 @@ class StateMachine(object):
 				log.error( "StateMachine bug!!  The lock should ensure this doesn't happen!" )
 				return False
 		finally: 
-			self.notifier.set()
+			self.notifier.set() # notify any waiting threads that the state has changed.
+			self.notifier.clear()
 			self.lock.release()
 
 
@@ -154,7 +154,7 @@ class StateMachine(object):
 		return self.ensure_any( (state,), wait=wait )
 
 
-	def ensure_any(self, states, wait=0.0):
+	def ensure_any(self, states, wait=0.0, block_on_transition=False):
 		'''
 		Ensure we are currently in one of the given `states` or wait until
 		we enter one of those states.
@@ -173,11 +173,15 @@ class StateMachine(object):
 			if not state in self.__states: 
 				raise ValueError( "StateMachine does not contain state '%s'" % state )
 
-		# Locking never really gained us anything here, since the lock was released
-		# before the function returned anyways.  The only thing it _did_ do was 
-		# increase the probability that this function would block for longer than 
-		# intended if a `transition` function or context was running while holding
-		# the lock.  
+		# if we're in the middle of a transition, determine whether we should 
+		# 'fall back' to the 'current' state, or wait for the new state, in order to 
+		# avoid an operation occurring in the wrong state.
+		# TODO another option would be an ensure_ctx that uses a semaphore to allow 
+		# threads to indicate they want to remain in a particular state.
+
+		# will return immediately if no transition is in process.
+		if block_on_transition: self.notifier.wait()
+
 		start = time.time()
 		while not self.__current_state in states: 
 			# detect timeout:
