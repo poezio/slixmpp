@@ -86,8 +86,9 @@ class StateMachine(object):
 		start = time.time()
 		while not self.__current_state in from_states or not self.lock.acquire(False):
 			# detect timeout:
-			if time.time() >= start + wait: return False
-			self.notifier.wait(wait)
+			remainder = start + wait - time.time()
+			if remainder > 0: self.notifier.wait(remainder)
+			else: return False
 
 		try: # lock is acquired; all other threads will return false or wait until notify/timeout
 			self.notifier.clear()
@@ -180,8 +181,9 @@ class StateMachine(object):
 		start = time.time()
 		while not self.__current_state in states: 
 			# detect timeout:
-			if time.time() >= start + wait: return False
-			self.notifier.wait(wait)
+			remainder = start + wait - time.time()
+			if remainder > 0: self.notifier.wait(remainder)
+			else: return False
 		return True
 
 	
@@ -227,10 +229,11 @@ class _StateCtx:
 		start = time.time()
 		while not self.state_machine[ self.from_state ] or not self.state_machine.lock.acquire(False): 
 			# detect timeout:
-			if time.time() >= start + self.wait: 
+			remainder = start + self.wait - time.time()
+			if remainder > 0: self.state_machine.notifier.wait(remainder)
+			else: 
 				log.debug('StateMachine timeout while waiting for state: %s', self.from_state )
 				return False
-			self.state_machine.notifier.wait(self.wait)
 
 		self._locked = True # lock has been acquired at this point
 		self.state_machine.notifier.clear()
