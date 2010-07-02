@@ -42,9 +42,6 @@ if sys.version_info < (3, 0):
 class RestartStream(Exception):
 	pass
 
-class CloseStream(Exception):
-	pass
-
 stanza_extensions = {}
 
 RECONNECT_MAX_DELAY = 3600
@@ -225,9 +222,6 @@ class XMLStream(object):
 			except socket.timeout:
 				logging.debug('socket rcv timeout')
 				pass
-			except CloseStream:
-				# TODO warn that the listener thread is exiting!!!
-				pass
 			except RestartStream:
 				logging.debug("Restarting stream...")
 				continue # DON'T re-initialize the stream -- this exception is sent 
@@ -236,13 +230,14 @@ class XMLStream(object):
 				logging.debug("System interrupt detected")
 				self.shutdown()
 				self.eventqueue.put(('quit', None, None))
-			except cElementTree.XMLParserError:
+			except cElementTree.XMLParserError: #if there is an xml parsing exception, assume stream needs to be restarted
 				logging.warn('XML RCV parsing error!', exc_info=1)
-				# don't restart the stream on an XML parse error.
+				if self.should_reconnect: self.disconnect(reconnect=True)
+				else: self.disconnect()
 			except:
 				logging.exception('Unexpected error in RCV thread')
-				if self.should_reconnect:
-					self.disconnect(reconnect=True)
+				if self.should_reconnect: self.disconnect(reconnect=True)
+				else: self.disconnect()
 
 		logging.debug('Quitting Process thread')
 	
