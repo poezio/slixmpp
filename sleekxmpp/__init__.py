@@ -250,8 +250,13 @@ class ClientXMPP(basexmpp, XMLStream):
 			challenge = dict(challenge)
 			logging.debug("MD5 auth challenge: %s", challenge)
 			
+			if challenge.get('rspauth'): #authenticated success... send response
+				self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>""")
+				return
+			
+			#TODO: use realm is supplied by server, use default qop unless supplied by server
 			#Realm, nonce, qop should all be present
-			if not challenge['realm'] or not challenge['qop'] or not challenge['nonce']:
+			if not challenge.get('qop') or not challenge.get('nonce'):
 				logging.error("Error during digest-md5 authentication. Challenge missing critical information. Challenge: %s" %base64.b64decode(xml.text))
 				self.disconnect()
 				self.event("failed_auth")
