@@ -140,7 +140,9 @@ class XMLStream(object):
 
 				if self.use_ssl and self.ssl_support:
 					logging.debug("Socket Wrapped for SSL")
-					self.socket = ssl.wrap_socket(self.socket,ca_certs=self.ca_certs)
+					cert_policy = ssl.CERT_NONE if self.ca_certs is None else ssl.CERT_REQUIRED
+					self.socket = ssl.wrap_socket(self.socket,
+					        ca_certs=self.ca_certs, cert_reqs=cert_policy)
 				
 				self.socket.connect(self.address)
 				self.filesocket = self.socket.makefile('rb', 0)
