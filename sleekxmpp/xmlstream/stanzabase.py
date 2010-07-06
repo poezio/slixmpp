@@ -383,7 +383,7 @@ class StanzaBase(ElementBase):
 	def exception(self, e):
 		logging.error(traceback.format_tb(e))
 	
-	def send(self, priority=False):
-		if priority: self.stream.sendPriorityRaw(self.__str__()) 
-		else: self.stream.sendRaw(self.__str__())
+	def send(self, priority=5, init=False):
+		self.stream.sendRaw(self.__str__(), priority, init) 
+		
 		

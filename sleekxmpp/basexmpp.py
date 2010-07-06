@@ -112,7 +112,7 @@ class basexmpp(object):
 		except:
 			logging.exception("Unable to load plugin: %s", plugin )
 
-            
+
 	def register_plugins(self):
 		"""Initiates all plugins in the plugins/__init__.__all__"""
 		if self.plugin_whitelist:
@@ -138,7 +138,7 @@ class basexmpp(object):
 		self.registerHandler(XMLCallback('add_handler_%s' % self.getNewId(), MatchXMLMask(mask), pointer, threaded, disposable, instream))
 	
 	def getId(self):
-		return "%x".upper() % self.id
+		return "%X" % self.id
 
 	def sendXML(self, data, mask=None, timeout=10):
 		return self.send(self.tostring(data), mask, timeout)

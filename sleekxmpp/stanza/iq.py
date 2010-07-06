@@ -67,11 +67,11 @@ class Iq(RootStanza):
 				self.xml.remove(child)
 		return self
 	
-	def send(self, block=True, timeout=10, priority=False):
+	def send(self, block=True, timeout=10, priority=5, init=False):
 		if block and self['type'] in ('get', 'set'):
 			waitfor = Waiter('IqWait_%s' % self['id'], MatcherId(self['id']))
 			self.stream.registerHandler(waitfor)
-			StanzaBase.send(self, priority)
+			StanzaBase.send(self, priority, init)
 			return waitfor.wait(timeout)
 		else:
-			return StanzaBase.send(self, priority)
+			return StanzaBase.send(self, priority, init)

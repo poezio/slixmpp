@@ -219,7 +219,7 @@ class XMLStream(object):
 		while not self.quit.is_set():
 			if not self.state.ensure('connected',wait=2, block_on_transition=True): continue
 			try:
-				self.sendPriorityRaw(self.stream_header)
+				self.sendRaw(self.stream_header, priority=0, init=True)
 				self.__readXML() # this loops until the stream is terminated.
 			except socket.timeout:
 				# TODO currently this will re-send a stream header if this exception occurs.  
@@ -299,12 +299,9 @@ class XMLStream(object):
 				reconnect = (self.should_reconnect and not self.quit.is_set())
 				self.disconnect(reconnect=reconnect, error=True)
 	
-	def sendRaw(self, data):
-		self.sendqueue.put((1, data))
-		return True
-	
-	def sendPriorityRaw(self, data):
-		self.sendqueue.put((0, data))
+	def sendRaw( self, data, priority=5, init=False ):
+		if not self.state.ensure('connected'): return False
+		self.sendqueue.put((priority, data))
 		return True
 	
 	def disconnect(self, reconnect=False, error=False):
@@ -316,7 +313,7 @@ class XMLStream(object):
 			logging.debug("Disconnecting...")
 			# don't send a footer on error; if the stream is already closed, 
 			# this won't get sent until the stream is re-initialized!
-			if not error: self.sendRaw(self.stream_footer) #send end of stream
+			if not error: self.sendRaw(self.stream_footer,init=True) #send end of stream
 			try:
 #				self.socket.shutdown(socket.SHUT_RDWR)
 				self.socket.close()

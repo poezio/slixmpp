@@ -164,6 +164,12 @@ class ClientXMPP(basexmpp, XMLStream):
 		self.authenticated = False
 		self.sessionstarted = False
 		XMLStream.disconnect(self, reconnect, error)
+
+	def sendRaw(self, data, priority=5, init=False):
+		if not init and not self.sessionstarted:
+			logging.warn("Attempt to send stanza before session has started:\n%s", data)
+			return False
+		XMLStream.sendRaw(self, data, priority, init)
 	
 	def registerFeature(self, mask, pointer, breaker = False):
 		"""Register a stream feature."""
@@ -201,7 +207,7 @@ class ClientXMPP(basexmpp, XMLStream):
 			_stanza = "<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />"
 			if not self.event_handlers.get(_stanza,None): # don't add handler > once
 				self.add_handler( _stanza, self.handler_tls_start, instream=True )
-			self.sendPriorityRaw(self.tostring(xml))
+			self.sendRaw(self.tostring(xml), priority=1, init=True)
 			return True
 		else:
 			logging.warning("The module tlslite is required in to some servers, and has not been found.")
@@ -221,12 +227,16 @@ class ClientXMPP(basexmpp, XMLStream):
 			for sasl_mech in sasl_mechs:
 				self.features.append("sasl:%s" % sasl_mech.text)
 			if 'sasl:DIGEST-MD5' in self.features:
-				self.sendPriorityRaw("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>""")
+				self.sendRaw("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>", priority=1, init=True)
 			elif 'sasl:PLAIN' in self.features:
 				if sys.version_info < (3,0):
-					self.sendPriorityRaw("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>%s</auth>""" % base64.b64encode(b'\x00' + bytes(self.username) + b'\x00' + bytes(self.password)).decode('utf-8'))
+					self.sendRaw("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>%s</auth>" \
+							% base64.b64encode(b'\x00' + bytes(self.username) + b'\x00' + bytes(self.password)).decode('utf-8'), 
+							priority=1, init=True)
 				else:
-					self.sendPriorityRaw("""<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>%s</auth>""" % base64.b64encode(b'\x00' + bytes(self.username, 'utf-8') + b'\x00' + bytes(self.password, 'utf-8')).decode('utf-8'))
+					self.sendRaw("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>%s</auth>" \
+							% base64.b64encode(b'\x00' + bytes(self.username, 'utf-8') + b'\x00' + bytes(self.password, 'utf-8')).decode('utf-8'), 
+							priority=1, init=True)
 			else:
 				logging.error("No appropriate login method.")
 				self.disconnect()
@@ -235,14 +245,10 @@ class ClientXMPP(basexmpp, XMLStream):
 		return True
 	
 	def handler_sasl_digest_md5_auth(self, xml):
-		logging.debug(tostring(xml))
-		logging.debug(xml)
-		logging.debug(type(xml).__name__)
-		
 		if self.digest_auth_started == False:
 			challenge = [item.split('=', 1) for item in base64.b64decode(xml.text).replace("\"", "").split(',', 6) ]
 			challenge = dict(challenge)
-			logging.debug(challenge)
+            logging.debug("MD5 auth challenge: %s", challenge)
 			
 			#Realm, nonce, qop should all be present
 			if not challenge['realm'] or not challenge['qop'] or not challenge['nonce']:
@@ -259,8 +265,10 @@ class ClientXMPP(basexmpp, XMLStream):
 			a1 = b"%s:%s:%s" %(md5("%s:%s:%s" % (self.username, self.domain, self.password)), challenge["nonce"].encode("UTF-8"), cnonce.encode("UTF-8") )
 			a2 = "AUTHENTICATE:xmpp/%s" %self.domain
 			responseHash = md5digest("%s:%s:00000001:%s:auth:%s" %(md5digest(a1), challenge["nonce"], cnonce, md5digest(a2) ) )
-			response = '''charset=utf-8,username="%s",realm="%s",nonce="%s",nc=00000001,cnonce="%s",digest-uri="%s",response=%s,qop=%s,'''  %(self.username, self.domain, challenge["nonce"], cnonce, "xmpp/%s" % self.domain, responseHash, challenge["qop"])
-			self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>""" %base64.encodestring(response)[:-1])
+			response = 'charset=utf-8,username="%s",realm="%s",nonce="%s",nc=00000001,cnonce="%s",digest-uri="%s",response=%s,qop=%s,' \
+				% (self.username, self.domain, challenge["nonce"], cnonce, "xmpp/%s" % self.domain, responseHash, challenge["qop"])
+			self.sendRaw("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>" % base64.encodestring(response)[:-1],
+					priority=1, init=True )
 		else:
 			logging.warn("handler_sasl_digest_md5_auth called while digest_auth_started is True (has already begun)")
 	
@@ -287,7 +295,7 @@ class ClientXMPP(basexmpp, XMLStream):
 		res.text = self.resource
 		xml.append(res)
 		iq.append(xml)
-		response = iq.send()
+		response = iq.send(priority=2,init=True)
 		#response = self.send(iq, self.Iq(sid=iq['id']))
 		self.set_jid(response.xml.find('{urn:ietf:params:xml:ns:xmpp-bind}bind/{urn:ietf:params:xml:ns:xmpp-bind}jid').text)
 		self.bound = True
@@ -300,12 +308,12 @@ class ClientXMPP(basexmpp, XMLStream):
 	def handler_start_session(self, xml):
 		if self.authenticated and self.bound:
 			iq = self.makeIqSet(xml)
-			response = iq.send()
+			response = iq.send(priority=2,init=True)
 			logging.debug("Established Session")
 			self.sessionstarted = True
 			self.event("session_start")
 		else:
-			#bind probably hasn't happened yet
+			logging.warn("Bind has failed; not starting session!")
 			self.bindfail = True
 	
 	def _handleRoster(self, iq, request=False):
