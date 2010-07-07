@@ -158,12 +158,6 @@ class basexmpp(object):
 		if mask is not None:
 			return waitfor.wait(timeout)
 	
-	def makeIq(self, id=0, ifrom=None):
-		# FIXME this will always assign an ID of 0 instead of allowing `getNewId` 
-		# to assign a unique ID to the new IQ packet.  This method is only called
-		# from xep_0199 and should probably be deprecated.
-		return self.Iq().setValues({'id': id, 'from': ifrom})
-	
 	def makeIqGet(self, queryxmlns = None):
 		# TODO this should take a 'to' param since more often than not you set 
 		# iq['to']=whatever immediately after.
@@ -191,21 +185,6 @@ class basexmpp(object):
 		iq['error'].setValues({'type': type, 'condition': condition, 'text': text})
 		return iq
 
-	def makeIqQuery(self, iq, xmlns):
-		# FIXME this looks like it essentially duplicates the `makeIqGet`
-		# and is only used in xep_009 (in two places) and gmail_notify (once).  
-		# Probably safe to deprecate and replace with `makeIqGet.`  
-		query = ET.Element("{%s}query" % xmlns)
-		iq.append(query)
-		return iq
-	
-	def makeQueryRoster(self, iq=None):
-		# FIXME unused.  Remove; any user of this code can replace it by `makeIqGet('jabber:iq:roster')`
-		query = ET.Element("{jabber:iq:roster}query")
-		if iq:
-			iq.append(query)
-		return query
-	
 	def add_event_handler(self, name, pointer, threaded=False, disposable=False):
 		if not name in self.event_handlers:
 			self.event_handlers[name] = []

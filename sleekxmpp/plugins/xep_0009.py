@@ -226,35 +226,31 @@ class xep_0009(base.base_plugin):
 			else:
 				raise ValueError()
 
-	def makeMethodCallQuery(self,pmethod,params):
-		query = self.xmpp.makeIqQuery(iq,"jabber:iq:rpc")
+	def makeIqMethodCall(self,pto,pmethod,params):
+		query = ET.Element("{jabber:iq:rpc}query")
 		methodCall = ET.Element('methodCall')
 		methodName = ET.Element('methodName')
 		methodName.text = pmethod
 		methodCall.append(methodName)
 		methodCall.append(params)
 		query.append(methodCall)
-		return query
- 
-	def makeIqMethodCall(self,pto,pmethod,params):
-		iq = self.xmpp.makeIqSet()
+		iq = self.xmpp.makeIqSet(query)
 		iq.set('to',pto)
-		iq.append(self.makeMethodCallQuery(pmethod,params))
 		return iq
-	
+ 
 	def makeIqMethodResponse(self,pto,pid,params):
-		iq = self.xmpp.makeIqResult(pid)
-		iq.set('to',pto)
-		query = self.xmpp.makeIqQuery(iq,"jabber:iq:rpc")
+		query = ET.Element("{jabber:iq:rpc}query")
 		methodResponse = ET.Element('methodResponse')
 		methodResponse.append(params)
 		query.append(methodResponse)
+		iq = self.xmpp.makeIqResult(pid)
+		iq.set('to',pto)
+		iq.append(query)
 		return iq
 
-	def makeIqMethodError(self,pto,id,pmethod,params,condition):
-		iq = self.xmpp.makeIqError(id)
-		iq.set('to',pto)
-		iq.append(self.makeMethodCallQuery(pmethod,params))
+	def makeIqMethodError(self,pto,pid,pmethod,params,condition):
+		iq = self.self.makeMethodCallQuery(pto,pmethod,params)
+        iq.setValues({'id':pid,'type':'error'})
 		iq.append(self.xmpp['xep_0086'].makeError(condition))
 		return iq
 	

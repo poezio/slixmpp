@@ -56,17 +56,13 @@ class xep_0199(base.base_plugin):
 		Sends a ping to the specified jid, returning the time (in seconds)
 		to receive a reply, or None if no reply is received in timeout seconds.
 		"""
-		id = self.xmpp.getNewId()
-		iq = self.xmpp.makeIq(id)
-		iq.attrib['type'] = 'get'
+		iq = self.xmpp.makeIqGet()
 		iq.attrib['to'] = jid
 		ping = ET.Element('{http://www.xmpp.org/extensions/xep-0199.html#ns}ping')
 		iq.append(ping)
 		startTime = time.clock()
-		#pingresult = self.xmpp.send(iq, self.xmpp.makeIq(id), timeout)
 		pingresult = iq.send()
 		endTime = time.clock()
 		if pingresult == False:
-			#self.xmpp.disconnect(reconnect=True)
 			return False
 		return endTime - startTime

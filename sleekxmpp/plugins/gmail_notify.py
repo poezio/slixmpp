@@ -50,7 +50,7 @@ class gmail_notify(base.base_plugin):
 		iq = self.xmpp.makeIqGet()
 		iq.attrib['from'] = self.xmpp.fulljid
 		iq.attrib['to'] = self.xmpp.jid
-		self.xmpp.makeIqQuery(iq, 'google:mail:notify')
+		iq.append(ET.Element('{google:mail:notify}query'))
 		emails = iq.send()
 		mailbox = emails.find('{google:mail:notify}mailbox')
 		total = int(mailbox.get('total-matched', 0))
