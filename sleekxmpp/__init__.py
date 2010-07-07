@@ -248,7 +248,7 @@ class ClientXMPP(basexmpp, XMLStream):
 		if self.digest_auth_started == False:
 			challenge = [item.split('=', 1) for item in base64.b64decode(xml.text).replace("\"", "").split(',', 6) ]
 			challenge = dict(challenge)
-            logging.debug("MD5 auth challenge: %s", challenge)
+			logging.debug("MD5 auth challenge: %s", challenge)
 			
 			#Realm, nonce, qop should all be present
 			if not challenge['realm'] or not challenge['qop'] or not challenge['nonce']:
