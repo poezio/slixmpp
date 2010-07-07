@@ -171,12 +171,18 @@ class XMLStream(object):
 
 	def startTLS(self):
 		"Handshakes for TLS"
+		# TODO since this is not part of the 'connectTCP' method, it does not quiesce if 
+		# The TLS negotiation throws an SSLError.  It really should.  Worse yet, some 
+		# errors might be considered fatal (like certificate verification failure) in which
+		# case, should we even attempt to re-connect at all?
 		if self.ssl_support:
 			logging.info("Negotiating TLS")
 #			self.realsocket = self.socket # NOT USED
+			cert_policy = ssl.CERT_NONE if self.ca_certs is None else ssl.CERT_REQUIRED
 			self.socket = ssl.wrap_socket(self.socket, 
 					ssl_version=ssl.PROTOCOL_TLSv1, 
-					do_handshake_on_connect=False, 
+					do_handshake_on_connect=False,
+					cert_reqs=cert_policy,
 					ca_certs=self.ca_certs)
 			self.socket.do_handshake()
 			if sys.version_info < (3,0):
