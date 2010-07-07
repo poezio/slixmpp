@@ -159,34 +159,48 @@ class basexmpp(object):
 			return waitfor.wait(timeout)
 	
 	def makeIq(self, id=0, ifrom=None):
+		# FIXME this will always assign an ID of 0 instead of allowing `getNewId` 
+		# to assign a unique ID to the new IQ packet.  This method is only called
+		# from xep_0199 and should probably be deprecated.
 		return self.Iq().setValues({'id': id, 'from': ifrom})
 	
 	def makeIqGet(self, queryxmlns = None):
+		# TODO this should take a 'to' param since more often than not you set 
+		# iq['to']=whatever immediately after.
 		iq = self.Iq().setValues({'type': 'get'})
 		if queryxmlns:
 			iq.append(ET.Element("{%s}query" % queryxmlns))
 		return iq
 	
 	def makeIqResult(self, id):
+		# TODO this should take a 'to' param since more often than not you set 
+		# iq['to']=whatever immediately after.
 		return self.Iq().setValues({'id': id, 'type': 'result'})
 	
 	def makeIqSet(self, sub=None):
+		# TODO this should take a 'to' param since more often than not you set 
+		# iq['to']=whatever immediately after.
 		iq = self.Iq().setValues({'type': 'set'})
 		if sub != None:
 			iq.append(sub)
 		return iq
 
 	def makeIqError(self, id, type='cancel', condition='feature-not-implemented', text=None):
+		# TODO not used.
 		iq = self.Iq().setValues({'id': id})
 		iq['error'].setValues({'type': type, 'condition': condition, 'text': text})
 		return iq
 
 	def makeIqQuery(self, iq, xmlns):
+		# FIXME this looks like it essentially duplicates the `makeIqGet`
+		# and is only used in xep_009 (in two places) and gmail_notify (once).  
+		# Probably safe to deprecate and replace with `makeIqGet.`  
 		query = ET.Element("{%s}query" % xmlns)
 		iq.append(query)
 		return iq
 	
 	def makeQueryRoster(self, iq=None):
+		# FIXME unused.  Remove; any user of this code can replace it by `makeIqGet('jabber:iq:roster')`
 		query = ET.Element("{jabber:iq:roster}query")
 		if iq:
 			iq.append(query)
