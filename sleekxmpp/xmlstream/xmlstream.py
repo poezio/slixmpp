@@ -52,7 +52,7 @@ DEFAULT_KEEPALIVE = 300 # send a single byte every 5 minutes
 class XMLStream(object):
 	"A connection manager with XML events."
 
-	def __init__(self, socket=None, host='', port=0, escape_quotes=False):
+	def __init__(self, socket=None, host='', port=5222, escape_quotes=False):
 		global ssl_support
 		self.ssl_support = ssl_support
 		self.escape_quotes = escape_quotes
@@ -101,7 +101,7 @@ class XMLStream(object):
 	def setFileSocket(self, filesocket):
 		self.filesocket = filesocket
 	
-	def connect(self, host='', port=0, use_ssl=None):
+	def connect(self, host='', port=5222, use_ssl=None):
 		"Establish a socket connection to the given XMPP server."
 		
 		if not self.state.transition('disconnected','connected',
@@ -117,7 +117,7 @@ class XMLStream(object):
 		# TODO currently a caller can't distinguish between "connection failed" and
 		# "we're already trying to connect from another thread"
 
-	def connectTCP(self, host='', port=0, use_ssl=None, reattempt=True):
+	def connectTCP(self, host='', port=5222, use_ssl=None, reattempt=True):
 		"Connect and create socket"
 
 		# Note that this is thread-safe by merit of being called solely from connect() which
