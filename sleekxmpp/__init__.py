@@ -146,7 +146,7 @@ class ClientXMPP(basexmpp, XMLStream):
 
 		logging.debug('Attempting connection to %s:%d', host, port )
 		#TODO option to not use TLS?
-		result = XMLStream.connect(self, host, port, use_tls=True)
+		result = XMLStream.connect(self, host, port)
 		if result:
 			self.event("connected")
 		else:
