@@ -251,7 +251,7 @@ class ClientXMPP(basexmpp, XMLStream):
 			logging.debug("MD5 auth challenge: %s", challenge)
 			
 			if challenge.get('rspauth'): #authenticated success... send response
-				self.sendPriorityRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>""")
+				self.sendRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>""", priority=1, init=True )
 				return
 			
 			#TODO: use realm is supplied by server, use default qop unless supplied by server
