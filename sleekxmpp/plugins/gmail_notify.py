@@ -33,7 +33,7 @@ class gmail_notify(base.base_plugin):
 	
 	def handler_gmailcheck(self, payload):
 		#TODO XEP 30 should cache results and have getFeature
-		result = self.xmpp['xep_0030'].getInfo(self.xmpp.server)
+		result = self.xmpp['xep_0030'].getInfo(self.xmpp.domain)
 		features = []
 		for feature in result.findall('{http://jabber.org/protocol/disco#info}query/{http://jabber.org/protocol/disco#info}feature'):
 			features.append(feature.get('var'))

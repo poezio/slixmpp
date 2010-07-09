@@ -38,7 +38,7 @@ class xep_0092(base.base_plugin):
 	
 	def report_version(self, xml):
 		iq = self.xmpp.makeIqResult(xml.get('id', 'unknown'))
-		iq.attrib['to'] = xml.get('from', self.xmpp.server)
+		iq.attrib['to'] = xml.get('from', self.xmpp.domain)
 		query = ET.Element('{jabber:iq:version}query')
 		name = ET.Element('name')
 		name.text = self.name

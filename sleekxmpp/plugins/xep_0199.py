@@ -41,14 +41,14 @@ class xep_0199(base.base_plugin):
 	def handler_pingserver(self, xml):
 		if not self.running:
 			time.sleep(self.config.get('frequency', 300))
-			while self.sendPing(self.xmpp.server, self.config.get('timeout', 30)) is not False:
+			while self.sendPing(self.xmpp.domain, self.config.get('timeout', 30)) is not False:
 				time.sleep(self.config.get('frequency', 300))
 			logging.debug("Did not recieve ping back in time.  Requesting Reconnect.")
 			self.xmpp.disconnect(reconnect=True)
 	
 	def handler_ping(self, xml):
 		iq = self.xmpp.makeIqResult(xml.get('id', 'unknown'))
-		iq.attrib['to'] = xml.get('from', self.xmpp.server)
+		iq.attrib['to'] = xml.get('from', self.xmpp.domain)
 		self.xmpp.send(iq)
 
 	def sendPing(self, jid, timeout = 30):

@@ -43,7 +43,7 @@ class testps(sleekxmpp.ClientXMPP):
 		self.node = "pstestnode_%s"
 		self.pshost = pshost
 		if pshost is None:
-			self.pshost = self.server
+			self.pshost = self.domain
 		self.nodenum = int(nodenum)
 		self.leafnode = self.nodenum + 1
 		self.collectnode = self.nodenum + 2

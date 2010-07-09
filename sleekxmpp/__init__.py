@@ -41,25 +41,16 @@ except ImportError:
 	srvsupport = False
 
 
-
-#class PresenceStanzaType(object):
-#	
-#	def fromXML(self, xml):
-#		self.ptype = xml.get('type')
-
-
 class ClientXMPP(basexmpp, XMLStream):
 	"""SleekXMPP's client class.  Use only for good, not evil."""
 
 	def __init__(self, jid, password, ssl=False, plugin_config = {}, plugin_whitelist=[], escape_quotes=True):
-		global srvsupport
 		XMLStream.__init__(self)
 		self.default_ns = 'jabber:client'
 		basexmpp.__init__(self)
 		self.plugin_config = plugin_config
 		self.escape_quotes = escape_quotes
 		self.set_jid(jid)
-		self.server = None
 		self.port = 5222 # not used if DNS SRV is used
 		self.plugin_whitelist = plugin_whitelist
 		self.auto_reconnect = True
@@ -105,25 +96,25 @@ class ClientXMPP(basexmpp, XMLStream):
 
 	def connect(self, host=None, port=None):
 		"""Connect to the Jabber Server.  Attempts SRV lookup, and if it fails, uses
-		the JID server."""
+		the JID server.  You can optionally specify a host/port if you're not using 
+		DNS and want to connect to a server address that is different from the XMPP domain."""
 
 		if self.state['connected']: return True
 
-		if host:
-			self.server = host
+		if host: # if a host was specified, don't attempt a DNS lookup.
 			if port is None: port = self.port
 		else:
 			if not self.srvsupport:
-				logging.debug("Did not supply (address, port) to connect to and no SRV support is installed (http://www.dnspython.org).  Continuing to attempt connection, using domain from JID.")
+				logging.warn("Did not supply (address, port) to connect to and no SRV support is installed (http://www.dnspython.org).  Continuing to attempt connection, using domain from JID.")
 			else:
 				logging.debug("Since no address is supplied, attempting SRV lookup.")
 				try:
-					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.server, dns.rdatatype.SRV)
+					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.domain, dns.rdatatype.SRV)
 				except dns.resolver.NXDOMAIN:
-					logging.debug("No appropriate SRV record found.  Using JID server name.")
+					logging.info("No appropriate SRV record found for %s.  Using domain as server address.", self.domain)
 				except dns.exception.DNSException:
 					# this could be a timeout or other DNS error. Worth retrying?
-					logging.exception("DNS error during SRV query for %s.  Using JID server name.", self.server)
+					logging.exception("DNS error during SRV query for %s.  Using domain as server address.", self.domain)
 				else:
 					# pick a random answer, weighted by priority
 					# there are less verbose ways of doing this (random.choice() with answer * priority), but I chose this way anyway 
@@ -140,16 +131,12 @@ class ClientXMPP(basexmpp, XMLStream):
 						if picked <= priority:
 							(host,port) = addresses[priority]
 							break
-					# if SRV lookup was successful, we aren't using a particular server.
-					self.server = None 
 
 		if not host:
 			# if all else fails take server from JID.
 			(host,port) = (self.domain, self.port)
-			self.server = None
 
 		logging.debug('Attempting connection to %s:%d', host, port )
-		#TODO option to not use TLS?
 		result = XMLStream.connect(self, host, port)
 		if result:
 			self.event("connected")

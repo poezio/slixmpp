@@ -45,7 +45,7 @@ class xep_0078(base.base_plugin):
 		logging.debug("Starting jabber:iq:auth Authentication")
 		auth_request = self.xmpp.makeIqGet()
 		auth_request_query = ET.Element('{jabber:iq:auth}query')
-		auth_request.attrib['to'] = self.xmpp.server
+		auth_request.attrib['to'] = self.xmpp.domain
 		username = ET.Element('username')
 		username.text = self.xmpp.username
 		auth_request_query.append(username)
