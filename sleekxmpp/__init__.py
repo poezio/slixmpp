@@ -36,6 +36,7 @@ srvsupport = True
 try:
 	import dns.resolver
 	import dns.rdatatype
+	import dns.exception
 except ImportError:
 	srvsupport = False
 
@@ -120,6 +121,9 @@ class ClientXMPP(basexmpp, XMLStream):
 					answers = dns.resolver.query("_xmpp-client._tcp.%s" % self.server, dns.rdatatype.SRV)
 				except dns.resolver.NXDOMAIN:
 					logging.debug("No appropriate SRV record found.  Using JID server name.")
+				except dns.exception.DNSException:
+					# this could be a timeout or other DNS error. Worth retrying?
+					logging.exception("DNS error during SRV query for %s.  Using JID server name.", self.server)
 				else:
 					# pick a random answer, weighted by priority
 					# there are less verbose ways of doing this (random.choice() with answer * priority), but I chose this way anyway 
