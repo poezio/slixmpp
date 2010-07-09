@@ -47,6 +47,7 @@ stanza_extensions = {}
 RECONNECT_MAX_DELAY = 3600
 RECONNECT_QUIESCE_FACTOR = 1.6180339887498948 # Phi
 RECONNECT_QUIESCE_JITTER = 0.11962656472 # molar Planck constant times c, joule meter/mole
+DEFAULT_KEEPALIVE = 300 # send a single byte every 5 minutes 
 
 class XMLStream(object):
 	"A connection manager with XML events."
@@ -73,6 +74,9 @@ class XMLStream(object):
 		self.use_ssl = False
 		self.use_tls = False
 		self.ca_certs=None
+
+		self.keep_alive = DEFAULT_KEEPALIVE
+		self._last_sent_time = time.time()
 
 		self.stream_header = "<stream>"
 		self.stream_footer = "</stream>"
@@ -290,9 +294,12 @@ class XMLStream(object):
 				data = self.sendqueue.get(True,5)[1]
 				logging.debug("SEND: %s" % data)
 				self.socket.sendall(data.encode('utf-8'))
-			except queue.Empty:
-#				logging.debug('Nothing on send queue')
-				pass
+				self._last_sent_time = time.time()
+			except queue.Empty: # send keep-alive if necessary
+				now = time.time() 
+				if self._last_sent_time + self.keep_alive < now:
+					self.socket.sendall(' ')
+					self._last_sent_time = time.time()
 			except socket.timeout:
 				# this is to prevent a thread blocked indefinitely
 				logging.debug('timeout sending packet data')
