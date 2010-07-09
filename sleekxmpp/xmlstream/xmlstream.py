@@ -44,7 +44,7 @@ class RestartStream(Exception):
 
 stanza_extensions = {}
 
-RECONNECT_MAX_DELAY = 3600
+RECONNECT_MAX_DELAY = 360
 RECONNECT_QUIESCE_FACTOR = 1.6180339887498948 # Phi
 RECONNECT_QUIESCE_JITTER = 0.11962656472 # molar Planck constant times c, joule meter/mole
 DEFAULT_KEEPALIVE = 300 # send a single byte every 5 minutes 
