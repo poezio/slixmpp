@@ -7,7 +7,6 @@
 """
 from .. xmlstream.stanzabase import StanzaBase
 from xml.etree import cElementTree as ET
-from . error import Error
 from .. xmlstream.handler.waiter import Waiter
 from .. xmlstream.matcher.id import MatcherId
 from . rootstanza import RootStanza

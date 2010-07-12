@@ -14,24 +14,13 @@ from . xmlstream.xmlstream import XMLStream
 from . xmlstream.xmlstream import RestartStream
 from . xmlstream.matcher.xmlmask import MatchXMLMask
 from . xmlstream.matcher.xpath import MatchXPath
-from . xmlstream.matcher.many import MatchMany
 from . xmlstream.handler.callback import Callback
-from . xmlstream.stanzabase import StanzaBase
-from . xmlstream import xmlstream as xmlstreammod
-from . stanza.message import Message
-from . stanza.iq import Iq
-import time
 import logging
 import base64
 import sys
 import random
-import copy
-from . import plugins
 from xml.etree.cElementTree import tostring
-from xml.etree.cElementTree import Element
-from cStringIO import StringIO
 
-#from . import stanza
 srvsupport = True
 try:
 	import dns.resolver

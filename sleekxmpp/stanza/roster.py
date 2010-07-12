@@ -5,8 +5,7 @@
 
     See the file license.txt for copying permission.
 """
-from .. xmlstream.stanzabase import ElementBase, ET, JID
-import logging
+from .. xmlstream.stanzabase import ElementBase, ET
 
 class Roster(ElementBase):
 	namespace = 'jabber:iq:roster'

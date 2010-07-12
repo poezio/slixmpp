@@ -6,8 +6,6 @@
     See the file license.txt for copying permission.
 """
 from .. xmlstream.stanzabase import StanzaBase
-from xml.etree import cElementTree as ET
-from . error import Error
 from . rootstanza import RootStanza
 
 class Message(RootStanza):

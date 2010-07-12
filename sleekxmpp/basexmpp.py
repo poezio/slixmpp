@@ -9,11 +9,8 @@ from __future__ import with_statement, unicode_literals
 
 
 from xml.etree import cElementTree as ET
-from . xmlstream.xmlstream import XMLStream
 from . xmlstream.matcher.xmlmask import MatchXMLMask
-from . xmlstream.matcher.many import MatchMany
 from . xmlstream.handler.xmlcallback import XMLCallback
-from . xmlstream.handler.xmlwaiter import XMLWaiter
 from . xmlstream.handler.waiter import Waiter
 from . xmlstream.handler.callback import Callback
 from . import plugins
@@ -23,7 +20,6 @@ from . stanza.presence import Presence
 from . stanza.roster import Roster
 from . stanza.nick import Nick
 from . stanza.htmlim import HTMLIM
-from . stanza.error import Error
 
 import logging
 import threading

@@ -14,15 +14,12 @@ except ImportError:
 from . import statemachine
 from . stanzabase import StanzaBase
 from xml.etree import cElementTree
-from xml.parsers import expat
 import logging
 import random
 import socket
 import threading
 import time
 import traceback
-import types
-import xml.sax.saxutils
 from . import scheduler
 
 HANDLER_THREADS = 1
