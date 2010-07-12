@@ -271,8 +271,8 @@ class ClientXMPP(basexmpp, XMLStream):
 		logging.debug("Requesting resource: %s" % self.resource)
 		res = ET.Element('resource')
 		res.text = self.resource
-		iq = self.makeIqSet(res)
-		iq.append(xml)
+		xml.append(res)
+		iq = self.makeIqSet(xml)
 		response = iq.send(priority=2,init=True)
 		#response = self.send(iq, self.Iq(sid=iq['id']))
 		self.set_jid(response.xml.find('{urn:ietf:params:xml:ns:xmpp-bind}bind/{urn:ietf:params:xml:ns:xmpp-bind}jid').text)
