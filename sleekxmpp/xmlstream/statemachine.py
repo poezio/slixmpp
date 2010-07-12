@@ -197,7 +197,7 @@ class StateMachine(object):
 	
 	def reset(self):
 		# TODO need to lock before calling this? 
-		self.transition(self.__current_state, self._default_state)
+		self.transition(self.__current_state, self.__default_state)
 
 
 	def _set_state(self, state): #unsynchronized, only call internally after lock is acquired
