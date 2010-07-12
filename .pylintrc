@@ -1,0 +1,69 @@
+# Pylint configuration file.
+# run `pylint --generate-rcfile` to see the default configuration
+# run `pylint --rcfile=.pylintrc smallfoot` to perform analysis
+
+# Brain-dead errors regarding standard language features
+#   W0142 = *args and **kwargs support
+#   W0403 = Relative imports
+
+# Pointless whining
+#   R0201 = Method could be a function
+#   W0212 = Accessing protected attribute of client class
+#   W0613 = Unused argument
+#   W0232 = Class has no __init__ method
+#   R0903 = Too few public methods
+#   C0301 = Line too long
+#   R0913 = Too many arguments
+#   C0103 = Invalid name
+#   R0914 = Too many local variables
+
+# PyLint's module importation is unreliable
+#   F0401 = Unable to import module
+#   W0402 = Uses of a deprecated module
+
+# Already an error when wildcard imports are used
+#   W0614 = Unused import from wildcard
+
+# Sometimes disabled depending on how bad a module is
+#   C0111 = Missing docstring
+
+# Convention Errors related to whitespace:
+#   C0321,C0322,C0323,C0324
+
+# Comments that we've put in the code:
+#   W0511
+
+[MESSAGES CONTROL]
+
+# Disable the message(s) with the given id(s).
+disable=W0142,W0403,R0201,W0212,W0613,W0232,R0903,W0614,C0103,C0111,C0301,C0321,C0322,C0323,C0324,R0913,F0401,W0402,R0914,W0511,W0312
+
+[REPORTS]
+
+include-ids=y
+reports=y
+# Set the output format. Available formats are text, parseable, colorized, msvs
+# (visual studio) and html
+output-format=text
+# Put messages in a separate file for each module / package specified on the
+# command line instead of printing them on stdout. Reports (if any) will be
+# written in a file name "pylint_global.[txt|html]".
+files-output=no
+
+[VARIABLES]
+  
+# Tells whether we should check for unused import in __init__ files.
+init-import=yes
+
+[TYPECHECK]
+
+# List of classes names for which member attributes should not be checked
+# (useful for classes with attributes dynamically set).
+#ignored-classes=Message
+
+
+[MISCELLANEOUS]
+
+# List of note tags to take in consideration, separated by a comma.
+notes=FIXME,XXX,TODO
+
