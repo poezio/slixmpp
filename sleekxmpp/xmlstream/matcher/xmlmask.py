@@ -8,6 +8,7 @@
 from . import base
 from xml.etree import cElementTree
 from xml.parsers.expat import ExpatError
+import logging
 
 ignore_ns = False
 
@@ -38,7 +39,7 @@ class MatchXMLMask(base.MatcherBase):
 			try:
 				maskobj = cElementTree.fromstring(maskobj)
 			except ExpatError:
-				logging.log(logging.WARNING, "Expat error: %s\nIn parsing: %s" % ('', maskobj))
+                logging.exception( "Expat error parsing: %s", maskobj)
 		if not use_ns and source.tag.split('}', 1)[-1] != maskobj.tag.split('}', 1)[-1]: # strip off ns and compare
 			return False
 		if use_ns and (source.tag != maskobj.tag and "{%s}%s" % (self.default_ns, maskobj.tag) != source.tag ):
