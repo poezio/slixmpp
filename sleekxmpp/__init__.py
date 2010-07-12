@@ -56,7 +56,6 @@ class ClientXMPP(basexmpp, XMLStream):
 		self.sessionstarted = False
 		self.bound = False
 		self.bindfail = False
-		self.digest_auth_started = False
 		XMLStream.registerHandler(self, Callback('Stream Features', MatchXPath('{http://etherx.jabber.org/streams}features'), self._handleStreamFeatures, thread=True))
 		XMLStream.registerHandler(self, Callback('Roster Update', MatchXPath('{%s}iq/{jabber:iq:roster}query' % self.default_ns), self._handleRoster, thread=True))
 		#SASL Auth handlers
@@ -218,47 +217,42 @@ class ClientXMPP(basexmpp, XMLStream):
 							% base64.b64encode(b'\x00' + bytes(self.username, 'utf-8') + b'\x00' + bytes(self.password, 'utf-8')).decode('utf-8'), 
 							priority=1, init=True)
 			else:
-				logging.error("No appropriate login method.")
-				self.disconnect()
-				#if 'sasl:DIGEST-MD5' in self.features:
-				#	self._auth_digestmd5()
+				logging.error("No appropriate login method: %s", sasl_mechs)
+				self.handler_auth_fail(xml)
+				return False
 		return True
 	
 	def handler_sasl_digest_md5_auth(self, xml):
-		if self.digest_auth_started == False:
-			challenge = [item.split('=', 1) for item in base64.b64decode(xml.text).replace("\"", "").split(',', 6) ]
-			challenge = dict(challenge)
-			logging.debug("MD5 auth challenge: %s", challenge)
+		challenge = [item.split('=', 1) for item in base64.b64decode(xml.text).replace("\"", "").split(',', 6) ]
+		challenge = dict(challenge)
+		logging.debug("MD5 auth challenge: %s", challenge)
+		
+		if challenge.get('rspauth'): #authenticated success... send response
+			self.sendRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>""", priority=1, init=True )
+			return
 			
-			if challenge.get('rspauth'): #authenticated success... send response
-				self.sendRaw("""<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>""", priority=1, init=True )
-				return
-			
-			#TODO: use realm is supplied by server, use default qop unless supplied by server
-			#Realm, nonce, qop should all be present
-			if not challenge.get('qop') or not challenge.get('nonce'):
-				logging.error("Error during digest-md5 authentication. Challenge missing critical information. Challenge: %s" %base64.b64decode(xml.text))
-				self.disconnect()
-				self.event("failed_auth")
-				return
-			#TODO: charset can be either UTF-8 or if not present use ISO 8859-1 defaulting for UTF-8 for now
-			#Compute the cnonce - a unique hex string only used in this request
-			cnonce = ""
-			for i in range(7):
-				cnonce+=hex(int(random.random()*65536*4096))[2:]
-			cnonce = base64.encodestring(cnonce)[0:-1]
-			a1 = b"%s:%s:%s" %(md5("%s:%s:%s" % (self.username, self.domain, self.password)), challenge["nonce"].encode("UTF-8"), cnonce.encode("UTF-8") )
-			a2 = "AUTHENTICATE:xmpp/%s" %self.domain
-			responseHash = md5digest("%s:%s:00000001:%s:auth:%s" %(md5digest(a1), challenge["nonce"], cnonce, md5digest(a2) ) )
-			response = 'charset=utf-8,username="%s",realm="%s",nonce="%s",nc=00000001,cnonce="%s",digest-uri="%s",response=%s,qop=%s,' \
-				% (self.username, self.domain, challenge["nonce"], cnonce, "xmpp/%s" % self.domain, responseHash, challenge["qop"])
-			self.sendRaw("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>" % base64.encodestring(response)[:-1],
-					priority=1, init=True )
-		else:
-			logging.warn("handler_sasl_digest_md5_auth called while digest_auth_started is True (has already begun)")
+		#TODO: use realm if supplied by server, use default qop unless supplied by server
+		#Realm, nonce, qop should all be present
+		if not challenge.get('qop') or not challenge.get('nonce'):
+			logging.error("Error during digest-md5 authentication. Challenge missing critical information. Challenge: %s" %base64.b64decode(xml.text))
+			self.handler_auth_fail(xml)
+			return
+		#TODO: charset can be either UTF-8 or if not present use ISO 8859-1 defaulting for UTF-8 for now
+		#Compute the cnonce - a unique hex string only used in this request
+		cnonce = ""
+		for i in range(7):
+			cnonce+=hex(int(random.random()*65536*4096))[2:]
+		cnonce = base64.encodestring(cnonce)[0:-1]
+		a1 = b"%s:%s:%s" %(md5("%s:%s:%s" % (self.username, self.domain, self.password)), challenge["nonce"].encode("UTF-8"), cnonce.encode("UTF-8") )
+		a2 = "AUTHENTICATE:xmpp/%s" %self.domain
+		responseHash = md5digest("%s:%s:00000001:%s:auth:%s" %(md5digest(a1), challenge["nonce"], cnonce, md5digest(a2) ) )
+		response = 'charset=utf-8,username="%s",realm="%s",nonce="%s",nc=00000001,cnonce="%s",digest-uri="%s",response=%s,qop=%s,' \
+			% (self.username, self.domain, challenge["nonce"], cnonce, "xmpp/%s" % self.domain, responseHash, challenge["qop"])
+		self.sendRaw("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>%s</response>" % base64.encodestring(response)[:-1],
+				priority=1, init=True )
 	
 	def handler_sasl_digest_md5_auth_fail(self, xml):
-		self.digest_auth_started = False
+		self.authenticated = False
 		self.handler_auth_fail(xml)
 	
 	def handler_auth_success(self, xml):
@@ -275,10 +269,9 @@ class ClientXMPP(basexmpp, XMLStream):
 	
 	def handler_bind_resource(self, xml):
 		logging.debug("Requesting resource: %s" % self.resource)
-		iq = self.Iq(stype='set')
 		res = ET.Element('resource')
 		res.text = self.resource
-		xml.append(res)
+		iq = self.makeIqSet(res)
 		iq.append(xml)
 		response = iq.send(priority=2,init=True)
 		#response = self.send(iq, self.Iq(sid=iq['id']))
