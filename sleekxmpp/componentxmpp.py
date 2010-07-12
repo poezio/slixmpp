@@ -12,21 +12,11 @@ from . basexmpp import basexmpp
 from xml.etree import cElementTree as ET
 
 from . xmlstream.xmlstream import XMLStream
-from . xmlstream.xmlstream import RestartStream
-from . xmlstream.matcher.xmlmask import MatchXMLMask
 from . xmlstream.matcher.xpath import MatchXPath
-from . xmlstream.matcher.many import MatchMany
 from . xmlstream.handler.callback import Callback
-from . xmlstream.stanzabase import StanzaBase
 from . xmlstream import xmlstream as xmlstreammod
-import time
 import logging
-import base64
 import sys
-import random
-import copy
-from . import plugins
-from . import stanza
 import hashlib
 srvsupport = True
 try:
@@ -58,7 +48,7 @@ class ComponentXMPP(basexmpp, XMLStream):
 		if key in self.plugin:
 			return self.plugin[key]
 		else:
-			logging.warning("""Plugin "%s" is not loaded.""" % key)
+			logging.warning("Plugin '%s' is not loaded.", key)
 			return False
 	
 	def get(self, key, default):
