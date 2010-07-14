@@ -46,11 +46,9 @@ class xep_0202(base.base_plugin):
 		iq = self.xmpp.Iq( stream=self.xmpp, sto=to, stype='get',
 				xml = ET.Element(_XMLNS + 'time') )
 		resp = iq.send(iq) # wait for response
-		time_str = resp.find(_XMLNS + 'time/utc').text
-		dt_format = '%Y-%m-%dT%H:%M:%S'
-		if time_str.find('.') > -1: dt_format += '.%f' # milliseconds in format 
+		 
 		return TimeElement( 
-			datetime.strptime( time_str, dt_format + 'Z' ), 
+			resp.find(_XMLNS + 'time/utc').text,
 			xml.find(_XMLNS + 'time/tzo').text ) 
 
 	def _handle_get(self,xml):
@@ -66,7 +64,15 @@ class TimeElement:
 	"""
 
 	def __init__(self, utc=None, tzo="Z"):
-		self.utc = datetime.utcnow() if utc is None else utc
+		if utc is None:
+			self.utc = datetime.utcnow()
+		elif type(utc) is str: # parse ISO string
+			dt_format = '%Y-%m-%dT%H:%M:%S'
+			if utc.find('.') > -1: dt_format += '.%f' # milliseconds in format
+			self.utc = datetime.strptime( time_str, dt_format + 'Z' )
+		elif type(utc) is float: # parse posix timestamp
+			self.utc = datetime.utcfromtimestamp()
+		else: self.utc = utc
 		self.tzo = tzo
 
 	def to_xml(self):
@@ -78,3 +84,6 @@ class TimeElement:
 		child.text = datetime.isoformat(self.utc) + "Z"
 		time.append( child )
 		return time
+
+	def __str__(self):
+		return ET.tostring( self.to_xml() )
