@@ -250,7 +250,7 @@ class xep_0009(base.base_plugin):
 
 	def makeIqMethodError(self,pto,pid,pmethod,params,condition):
 		iq = self.self.makeMethodCallQuery(pto,pmethod,params)
-        iq.setValues({'id':pid,'type':'error'})
+		iq.setValues({'id':pid,'type':'error'})
 		iq.append(self.xmpp['xep_0086'].makeError(condition))
 		return iq
 	
