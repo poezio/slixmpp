@@ -1,9 +1,9 @@
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.xmlstream.stanzabase import ET
+from slixmpp.test import SlixTest
+from slixmpp.xmlstream.stanzabase import ET
 
 
-class TestIqStanzas(SleekTest):
+class TestIqStanzas(SlixTest):
 
     def tearDown(self):
         """Shutdown the XML stream after testing."""

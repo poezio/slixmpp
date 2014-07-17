@@ -2,11 +2,11 @@ import time
 import logging
 
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.xmlstream import ElementBase, register_stanza_plugin
+from slixmpp.test import SlixTest
+from slixmpp.xmlstream import ElementBase, register_stanza_plugin
 
 
-class TestAdHocCommands(SleekTest):
+class TestAdHocCommands(SlixTest):
 
     def setUp(self):
         self.stream_start(mode='client',

@@ -5,12 +5,12 @@ import datetime
 import time
 import threading
 
-from sleekxmpp.test import *
-from sleekxmpp.xmlstream import ElementBase
-from sleekxmpp.plugins.xep_0323.device import Device
+from slixmpp.test import *
+from slixmpp.xmlstream import ElementBase
+from slixmpp.plugins.xep_0323.device import Device
 
 
-class TestStreamSensorData(SleekTest):
+class TestStreamSensorData(SlixTest):
 
     """
     Test using the XEP-0323 plugin.

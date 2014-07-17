@@ -6,24 +6,24 @@ import logging
 import getpass
 from optparse import OptionParser
 
-import sleekxmpp
-from sleekxmpp.xmlstream import ET, tostring
-from sleekxmpp.xmlstream.matcher import StanzaPath
-from sleekxmpp.xmlstream.handler import Callback
+import slixmpp
+from slixmpp.xmlstream import ET, tostring
+from slixmpp.xmlstream.matcher import StanzaPath
+from slixmpp.xmlstream.handler import Callback
 
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
-# throughout SleekXMPP, we will set the default encoding
+# throughout Slixmpp, we will set the default encoding
 # ourselves to UTF-8.
 if sys.version_info < (3, 0):
-    from sleekxmpp.util.misc_ops import setdefaultencoding
+    from slixmpp.util.misc_ops import setdefaultencoding
     setdefaultencoding('utf8')
 else:
     raw_input = input
 
 
-class PubsubEvents(sleekxmpp.ClientXMPP):
+class PubsubEvents(slixmpp.ClientXMPP):
 
     def __init__(self, jid, password):
         super(PubsubEvents, self).__init__(jid, password)

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from sleekxmpp.test import *
-import sleekxmpp.plugins.xep_0323 as xep_0323
+from slixmpp.test import *
+import slixmpp.plugins.xep_0323 as xep_0323
 
 namespace='sn'
 
-class TestSensorDataStanzas(SleekTest):
+class TestSensorDataStanzas(SlixTest):
     
 
     def setUp(self):

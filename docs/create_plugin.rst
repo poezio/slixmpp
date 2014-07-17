@@ -1,10 +1,10 @@
 .. _create-plugin:
 
-Creating a SleekXMPP Plugin
+Creating a Slixmpp Plugin
 ===========================
 
-One of the goals of SleekXMPP is to provide support for every draft or final
-XMPP extension (`XEP <http://xmpp.org/extensions/>`_). To do this, SleekXMPP has a
+One of the goals of Slixmpp is to provide support for every draft or final
+XMPP extension (`XEP <http://xmpp.org/extensions/>`_). To do this, Slixmpp has a
 plugin mechanism for adding the functionalities required by each XEP. But even
 though plugins were made to quickly implement and prototype the official XMPP
 extensions, there is no reason you can't create your own plugin to implement
@@ -14,11 +14,11 @@ This guide will help walk you through the steps to
 implement a rudimentary version of `XEP-0077 In-band
 Registration <http://xmpp.org/extensions/xep-0077.html>`_. In-band registration
 was implemented in example 14-6 (page 223) of `XMPP: The Definitive
-Guide <http://oreilly.com/catalog/9780596521271>`_ because there was no SleekXMPP
+Guide <http://oreilly.com/catalog/9780596521271>`_ because there was no Slixmpp
 plugin for XEP-0077 at the time of writing. We will partially fix that issue
 here by turning the example implementation from *XMPP: The Definitive Guide*
 into a plugin. Again, note that this will not a complete implementation, and a
-different, more robust, official plugin for XEP-0077 may be added to SleekXMPP
+different, more robust, official plugin for XEP-0077 may be added to Slixmpp
 in the future.
 
 .. note::
@@ -29,10 +29,10 @@ in the future.
 
 First Steps
 -----------
-Every plugin inherits from the class :mod:`base_plugin <sleekxmpp.plugins.base.base_plugin>`,
+Every plugin inherits from the class :mod:`base_plugin <slixmpp.plugins.base.base_plugin>`,
 and must include a ``plugin_init`` method. While the
-plugins distributed with SleekXMPP must be placed in the plugins directory
-``sleekxmpp/plugins`` to be loaded, custom plugins may be loaded from any
+plugins distributed with Slixmpp must be placed in the plugins directory
+``slixmpp/plugins`` to be loaded, custom plugins may be loaded from any
 module. To do so, use the following form when registering the plugin:
 
 .. code-block:: python
@@ -42,7 +42,7 @@ module. To do so, use the following form when registering the plugin:
 The plugin name must be the same as the plugin's class name.
  
 Now, we can open our favorite text editors and create ``xep_0077.py`` in
-``SleekXMPP/sleekxmpp/plugins``. We want to do some basic house-keeping and
+``Slixmpp/slixmpp/plugins``. We want to do some basic house-keeping and
 declare the name and description of the XEP we are implementing. If you
 are creating your own custom plugin, you don't need to include the ``xep``
 attribute.
@@ -50,13 +50,13 @@ attribute.
 .. code-block:: python
 
     """
-    Creating a SleekXMPP Plugin
+    Creating a Slixmpp Plugin
 
     This is a minimal implementation of XEP-0077 to serve
-    as a tutorial for creating SleekXMPP plugins.
+    as a tutorial for creating Slixmpp plugins.
     """
 
-    from sleekxmpp.plugins.base import base_plugin
+    from slixmpp.plugins.base import base_plugin
 
     class xep_0077(base_plugin):
         """
@@ -68,7 +68,7 @@ attribute.
             self.xep = "0077"
 
 Now that we have a basic plugin, we need to edit
-``sleekxmpp/plugins/__init__.py`` to include our new plugin by adding
+``slixmpp/plugins/__init__.py`` to include our new plugin by adding
 ``'xep_0077'`` to the ``__all__`` declaration.
 
 Interacting with Other Plugins
@@ -83,12 +83,12 @@ finish activating the plugin.
 
 The ``post_init`` method needs to call ``base_plugin.post_init(self)``
 which will mark that ``post_init`` has been called for the plugin. Once the
-SleekXMPP object begins processing, ``post_init`` will be called on any plugins
+Slixmpp object begins processing, ``post_init`` will be called on any plugins
 that have not already run ``post_init``. This allows you to register plugins and
 their dependencies without needing to worry about the order in which you do so.
 
 **Note:** by adding this call we have introduced a dependency on the XEP-0030
-plugin. Be sure to register ``'xep_0030'`` as well as ``'xep_0077'``. SleekXMPP
+plugin. Be sure to register ``'xep_0030'`` as well as ``'xep_0077'``. Slixmpp
 does not automatically load plugin dependencies for you.
 
 .. code-block:: python
@@ -141,7 +141,7 @@ behaviour:
     **Note:** The accessor methods currently use title case, and not camel case.
     Thus if you need to access an item named ``"methodName"`` you will need to
     use ``getMethodname``. This naming convention might change to full camel
-    case in a future version of SleekXMPP.
+    case in a future version of Slixmpp.
 
 * ``sub_interfaces``
     A subset of ``interfaces``, but these keys map to the text of any
@@ -156,8 +156,8 @@ behaviour:
 
 .. code-block:: python
 
-    from sleekxmpp.xmlstream import ElementBase, ET, JID, register_stanza_plugin
-    from sleekxmpp import Iq
+    from slixmpp.xmlstream import ElementBase, ET, JID, register_stanza_plugin
+    from slixmpp import Iq
 
     class Registration(ElementBase):
         namespace = 'jabber:iq:register'
@@ -209,7 +209,7 @@ registration to our ``plugin_init`` method.
 
 Also, we need to associate our ``Registration`` class with IQ stanzas;
 that requires the use of the ``register_stanza_plugin`` function (in
-``sleekxmpp.xmlstream.stanzabase``) which takes the class of a parent stanza
+``slixmpp.xmlstream.stanzabase``) which takes the class of a parent stanza
 type followed by the substanza type. In our case, the parent stanza is an IQ
 stanza, and the substanza is our registration query.
 
@@ -484,12 +484,12 @@ and that we specified the form fields we wish to use with
 
 .. code-block:: python
 
-    import sleekxmpp.componentxmpp
+    import slixmpp.componentxmpp
 
-    class Example(sleekxmpp.componentxmpp.ComponentXMPP):
+    class Example(slixmpp.componentxmpp.ComponentXMPP):
 
         def __init__(self, jid, password):
-            sleekxmpp.componentxmpp.ComponentXMPP.__init__(self, jid, password, 'localhost', 8888)
+            slixmpp.componentxmpp.ComponentXMPP.__init__(self, jid, password, 'localhost', 8888)
 
             self.registerPlugin('xep_0030')
             self.registerPlugin('xep_0077')
@@ -517,17 +517,17 @@ with some additional registration fields implemented.
 .. code-block:: python
 
     """
-    Creating a SleekXMPP Plugin
+    Creating a Slixmpp Plugin
 
     This is a minimal implementation of XEP-0077 to serve
-    as a tutorial for creating SleekXMPP plugins.
+    as a tutorial for creating Slixmpp plugins.
     """
 
-    from sleekxmpp.plugins.base import base_plugin
-    from sleekxmpp.xmlstream.handler.callback import Callback
-    from sleekxmpp.xmlstream.matcher.xpath import MatchXPath
-    from sleekxmpp.xmlstream import ElementBase, ET, JID, register_stanza_plugin
-    from sleekxmpp import Iq
+    from slixmpp.plugins.base import base_plugin
+    from slixmpp.xmlstream.handler.callback import Callback
+    from slixmpp.xmlstream.matcher.xpath import MatchXPath
+    from slixmpp.xmlstream import ElementBase, ET, JID, register_stanza_plugin
+    from slixmpp import Iq
     import copy
 
 

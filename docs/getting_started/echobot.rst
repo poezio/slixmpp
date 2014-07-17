@@ -1,24 +1,24 @@
 .. _echobot:
 
 ===============================
-SleekXMPP Quickstart - Echo Bot
+Slixmpp Quickstart - Echo Bot
 ===============================
 
 .. note::
     
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/sleekxmpp-discussion>`_
+    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
     or join the chat room at `sleek@conference.jabber.org
     <xmpp:sleek@conference.jabber.org?join>`_.
 
-If you have not yet installed SleekXMPP, do so now by either checking out a version
-from `Github <http://github.com/fritzy/SleekXMPP>`_, or installing it using ``pip``
+If you have not yet installed Slixmpp, do so now by either checking out a version
+from `Github <http://github.com/fritzy/Slixmpp>`_, or installing it using ``pip``
 or ``easy_install``.
 
 .. code-block:: sh
 
-    pip install sleekxmpp  # Or: easy_install sleekxmpp
+    pip install slixmpp  # Or: easy_install slixmpp
 
 
 As a basic starting project, we will create an echo bot which will reply to any
@@ -48,7 +48,7 @@ To get started, here is a brief outline of the structure that the final project 
     import getpass
     from optparse import OptionParser
 
-    import sleekxmpp
+    import slixmpp
 
     '''Here we will create out echo bot class'''
 
@@ -61,7 +61,7 @@ To get started, here is a brief outline of the structure that the final project 
 
 Default Encoding
 ----------------
-XMPP requires support for UTF-8 and so SleekXMPP must use UTF-8 as well. In
+XMPP requires support for UTF-8 and so Slixmpp must use UTF-8 as well. In
 Python3 this is simple because Unicode is the default string type. For Python2.6+
 the situation is not as easy because standard strings are simply byte arrays and
 use ASCII. We can get Python to use UTF-8 as the default encoding by including:
@@ -69,13 +69,13 @@ use ASCII. We can get Python to use UTF-8 as the default encoding by including:
 .. code-block:: python
 
     if sys.version_info < (3, 0):
-        from sleekxmpp.util.misc_ops import setdefaultencoding
+        from slixmpp.util.misc_ops import setdefaultencoding
         setdefaultencoding('utf8')
 
 .. warning::
 
-    Until we are able to ensure that SleekXMPP will always use Unicode in Python2.6+, this
-    may cause issues embedding SleekXMPP into other applications which assume ASCII encoding.
+    Until we are able to ensure that Slixmpp will always use Unicode in Python2.6+, this
+    may cause issues embedding Slixmpp into other applications which assume ASCII encoding.
 
 Creating the EchoBot Class
 --------------------------
@@ -85,14 +85,14 @@ clients. Since our echo bot will only be responding to a few people, and won't n
 to remember thousands of users, we will use a client connection. A client connection
 is the same type that you use with your standard IM client such as Pidgin or Psi.
 
-SleekXMPP comes with a :class:`ClientXMPP <sleekxmpp.clientxmpp.ClientXMPP>` class
-which we can extend to add our message echoing feature. :class:`ClientXMPP <sleekxmpp.clientxmpp.ClientXMPP>`
+Slixmpp comes with a :class:`ClientXMPP <slixmpp.clientxmpp.ClientXMPP>` class
+which we can extend to add our message echoing feature. :class:`ClientXMPP <slixmpp.clientxmpp.ClientXMPP>`
 requires the parameters ``jid`` and ``password``, so we will let our ``EchoBot`` class accept those
 as well.
 
 .. code-block:: python
 
-    class EchoBot(sleekxmpp.ClientXMPP):
+    class EchoBot(slixmpp.ClientXMPP):
         
         def __init__(self, jid, password):
             super(EchoBot, self).__init__(jid, password)
@@ -132,8 +132,8 @@ Our event handler, like every event handler, accepts a single parameter which ty
 that was received that caused the event. In this case, ``event`` will just be an empty dictionary since
 there is no associated data.
 
-Our first task of sending an initial presence is done using :meth:`send_presence <sleekxmpp.basexmpp.BaseXMPP.send_presence>`.
-Calling :meth:`send_presence <sleekxmpp.basexmpp.BaseXMPP.send_presence>` without any arguments will send the simplest
+Our first task of sending an initial presence is done using :meth:`send_presence <slixmpp.basexmpp.BaseXMPP.send_presence>`.
+Calling :meth:`send_presence <slixmpp.basexmpp.BaseXMPP.send_presence>` without any arguments will send the simplest
 stanza allowed in XMPP:
 
 .. code-block:: xml
@@ -141,17 +141,17 @@ stanza allowed in XMPP:
     <presence />
 
 
-The second requirement is fulfilled using :meth:`get_roster <sleekxmpp.clientxmpp.ClientXMPP.get_roster>`, which
+The second requirement is fulfilled using :meth:`get_roster <slixmpp.clientxmpp.ClientXMPP.get_roster>`, which
 will send an IQ stanza requesting the roster to the server and then wait for the response. You may be wondering
-what :meth:`get_roster <sleekxmpp.clientxmpp.ClientXMPP.get_roster>` returns since we are not saving any return
+what :meth:`get_roster <slixmpp.clientxmpp.ClientXMPP.get_roster>` returns since we are not saving any return
 value. The roster data is saved by an internal handler to ``self.roster``, and in the case of a :class:`ClientXMPP
-<sleekxmpp.clientxmpp.ClientXMPP>` instance to ``self.client_roster``. (The difference between ``self.roster`` and
+<slixmpp.clientxmpp.ClientXMPP>` instance to ``self.client_roster``. (The difference between ``self.roster`` and
 ``self.client_roster`` is that ``self.roster`` supports storing roster information for multiple JIDs, which is useful
 for components, whereas ``self.client_roster`` stores roster data for just the client's JID.)
 
 It is possible for a timeout to occur while waiting for the server to respond, which can happen if the
 network is excessively slow or the server is no longer responding. In that case, an :class:`IQTimeout
-<sleekxmpp.exceptions.IQTimeout>` is raised. Similarly, an :class:`IQError <sleekxmpp.exceptions.IQError>` exception can
+<slixmpp.exceptions.IQTimeout>` is raised. Similarly, an :class:`IQError <slixmpp.exceptions.IQError>` exception can
 be raised if the request contained bad data or requested the roster for the wrong user. In either case, you can wrap the
 ``get_roster()`` call in a ``try``/``except`` block to retry the roster retrieval process.
 
@@ -201,7 +201,7 @@ Let's take a closer look at the ``.reply()`` method used above. For message stan
 which is then used as the value of the ``<body />`` element of the message. 
 Setting the appropriate ``to`` JID is also handled by ``.reply()``.
 
-Another way to have sent the reply message would be to use :meth:`send_message <sleekxmpp.basexmpp.BaseXMPP.send_message>`,
+Another way to have sent the reply message would be to use :meth:`send_message <slixmpp.basexmpp.BaseXMPP.send_message>`,
 which is a convenience method for generating and sending a message based on the values passed to it. If we were to use
 this method, the above code would look as so:
 
@@ -229,13 +229,13 @@ Whichever method you choose to use, the results in action will look like this:
     XMPP does not require stanzas sent by a client to include a ``from`` attribute, and
     leaves that responsibility to the XMPP server. However, if a sent stanza does
     include a ``from`` attribute, it must match the full JID of the client or some
-    servers will reject it. SleekXMPP thus leaves out the ``from`` attribute when replying
+    servers will reject it. Slixmpp thus leaves out the ``from`` attribute when replying
     using a client connection.
 
 Command Line Arguments and Logging
 ----------------------------------
 
-While this isn't part of SleekXMPP itself, we do want our echo bot program to be able
+While this isn't part of Slixmpp itself, we do want our echo bot program to be able
 to accept a JID and password from the command line instead of hard coding them. We will
 use the ``optparse`` module for this, though there are several alternative methods, including
 the newer ``argparse`` module.
@@ -305,7 +305,7 @@ the ``EchoBot.__init__`` method instead.
 
     If you are using the OpenFire server, you will need to include an additional 
     configuration step. OpenFire supports a different version of SSL than what
-    most servers and SleekXMPP support.
+    most servers and Slixmpp support.
 
     .. code-block:: python
     
@@ -313,11 +313,11 @@ the ``EchoBot.__init__`` method instead.
         xmpp.ssl_version = ssl.PROTOCOL_SSLv3
 
 Now we're ready to connect and begin echoing messages. If you have the package
-``dnspython`` installed, then the :meth:`sleekxmpp.clientxmpp.ClientXMPP` method
+``dnspython`` installed, then the :meth:`slixmpp.clientxmpp.ClientXMPP` method
 will perform a DNS query to find the appropriate server to connect to for the
-given JID. If you do not have ``dnspython``, then SleekXMPP will attempt to 
+given JID. If you do not have ``dnspython``, then Slixmpp will attempt to 
 connect to the hostname used by the JID, unless an address tuple is supplied
-to :meth:`sleekxmpp.clientxmpp.ClientXMPP`. 
+to :meth:`slixmpp.clientxmpp.ClientXMPP`. 
 
 .. code-block:: python
 
@@ -346,19 +346,19 @@ to :meth:`sleekxmpp.clientxmpp.ClientXMPP`.
             else:
                 print('Unable to connect')
 
-To begin responding to messages, you'll see we called :meth:`sleekxmpp.basexmpp.BaseXMPP.process`
+To begin responding to messages, you'll see we called :meth:`slixmpp.basexmpp.BaseXMPP.process`
 which will start the event handling, send queue, and XML reader threads. It will also call
-the :meth:`sleekxmpp.plugins.base.base_plugin.post_init` method on all registered plugins. By
-passing ``block=True`` to :meth:`sleekxmpp.basexmpp.BaseXMPP.process` we are running the 
-main processing loop in the main thread of execution. The :meth:`sleekxmpp.basexmpp.BaseXMPP.process`
-call will not return until after SleekXMPP disconnects. If you need to run the client in the background
+the :meth:`slixmpp.plugins.base.base_plugin.post_init` method on all registered plugins. By
+passing ``block=True`` to :meth:`slixmpp.basexmpp.BaseXMPP.process` we are running the 
+main processing loop in the main thread of execution. The :meth:`slixmpp.basexmpp.BaseXMPP.process`
+call will not return until after Slixmpp disconnects. If you need to run the client in the background
 for another program, use ``block=False`` to spawn the processing loop in its own thread.
 
 .. note:: 
 
-    Before 1.0, controlling the blocking behaviour of :meth:`sleekxmpp.basexmpp.BaseXMPP.process` was
+    Before 1.0, controlling the blocking behaviour of :meth:`slixmpp.basexmpp.BaseXMPP.process` was
     done via the ``threaded`` argument. This arrangement was a source of confusion because some users
-    interpreted that as controlling whether or not SleekXMPP used threads at all, instead of how
+    interpreted that as controlling whether or not Slixmpp used threads at all, instead of how
     the processing loop itself was spawned.
 
     The statements ``xmpp.process(threaded=False)`` and ``xmpp.process(block=True)`` are equivalent.
@@ -370,7 +370,7 @@ The Final Product
 -----------------
 
 Here then is what the final result should look like after working through the guide above. The code
-can also be found in the SleekXMPP `examples directory <http://github.com/fritzy/SleekXMPP/tree/master/examples>`_.
+can also be found in the Slixmpp `examples directory <http://github.com/fritzy/Slixmpp/tree/master/examples>`_.
 
 .. compound::
 

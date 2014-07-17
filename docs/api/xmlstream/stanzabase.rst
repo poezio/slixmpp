@@ -4,9 +4,9 @@
 Stanza Objects
 ==============
 
-.. module:: sleekxmpp.xmlstream.stanzabase
+.. module:: slixmpp.xmlstream.stanzabase
 
-The :mod:`~sleekmxpp.xmlstream.stanzabase` module provides a wrapper for the
+The :mod:`~slixmpp.xmlstream.stanzabase` module provides a wrapper for the
 standard :mod:`~xml.etree.ElementTree` module that makes working with XML
 less painful. Instead of having to manually move up and down an element
 tree and insert subelements and attributes, you can interact with an object
@@ -52,9 +52,9 @@ elements of the original XML chunk.
 .. seealso::
     :ref:`create-stanza-interfaces`.
 
-Because the :mod:`~sleekxmpp.xmlstream.stanzabase` module was developed
+Because the :mod:`~slixmpp.xmlstream.stanzabase` module was developed
 as part of an `XMPP <http://xmpp.org>`_ library, these chunks of XML are
-referred to as :term:`stanzas <stanza>`, and in SleekXMPP we refer to a
+referred to as :term:`stanzas <stanza>`, and in Slixmpp we refer to a
 subclass of :class:`ElementBase` which defines the interfaces needed for
 interacting with a given :term:`stanza` a :term:`stanza object`.
 
@@ -72,7 +72,7 @@ plugin stanza object. Here is an example:
 
     <iq type="result">
       <query xmlns="http://jabber.org/protocol/disco#info">
-        <identity category="client" type="bot" name="SleekXMPP Bot" />
+        <identity category="client" type="bot" name="Slixmpp Bot" />
       </query>
     </iq>
 
@@ -84,13 +84,13 @@ we can access the plugin as so::
 
     >>> iq['disco_info']
     '<query xmlns="http://jabber.org/protocol/disco#info">
-      <identity category="client" type="bot" name="SleekXMPP Bot" />
+      <identity category="client" type="bot" name="Slixmpp Bot" />
     </query>'
 
 We can then drill down through the plugin object's interfaces as desired::
 
     >>> iq['disco_info']['identities']
-    [('client', 'bot', 'SleekXMPP Bot')]
+    [('client', 'bot', 'Slixmpp Bot')]
 
 Plugins may also add new interfaces to the parent stanza object as if they
 had been defined by the parent directly, and can also override the behaviour

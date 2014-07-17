@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Implementation of xeps for Internet of Things
     http://wiki.xmpp.org/web/Tech_pages/IoT_systems
     Copyright (C) 2013 Sustainable Innovation, Joachim.lindborg@sust.se
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
@@ -14,7 +14,7 @@
 import os
 import sys
 # This can be used when you are in a test environment and need to make paths right
-sys.path=['/Users/jocke/Dropbox/06_dev/SleekXMPP']+sys.path
+sys.path=['/Users/jocke/Dropbox/06_dev/Slixmpp']+sys.path
 
 import logging
 import unittest
@@ -26,28 +26,28 @@ from os.path import splitext, basename, join as pjoin
 from optparse import OptionParser
 from urllib import urlopen
 
-import sleekxmpp
+import slixmpp
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
-# throughout SleekXMPP, we will set the default encoding
+# throughout Slixmpp, we will set the default encoding
 # ourselves to UTF-8.
 if sys.version_info < (3, 0):
-    from sleekxmpp.util.misc_ops import setdefaultencoding
+    from slixmpp.util.misc_ops import setdefaultencoding
     setdefaultencoding('utf8')
 else:
     raw_input = input
 
-from sleekxmpp.plugins.xep_0323.device import Device
+from slixmpp.plugins.xep_0323.device import Device
 
-#from sleekxmpp.exceptions import IqError, IqTimeout
+#from slixmpp.exceptions import IqError, IqTimeout
 
-class IoT_TestDevice(sleekxmpp.ClientXMPP):
+class IoT_TestDevice(slixmpp.ClientXMPP):
 
     """
     A simple IoT device that can act as server or client
     """
     def __init__(self, jid, password):
-        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        slixmpp.ClientXMPP.__init__(self, jid, password)
         self.add_event_handler("session_start", self.session_start)
         self.add_event_handler("message", self.message)
         self.device=None

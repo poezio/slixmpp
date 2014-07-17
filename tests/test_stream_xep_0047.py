@@ -2,10 +2,10 @@ import threading
 import time
 
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestInBandByteStreams(SleekTest):
+class TestInBandByteStreams(SlixTest):
 
     def setUp(self):
         self.stream_start(plugins=['xep_0047', 'xep_0030'])

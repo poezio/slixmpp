@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# SleekXMPP documentation build configuration file, created by
+# Slixmpp documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug  9 22:27:06 2011.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'SleekXMPP'
+project = u'Slixmpp'
 copyright = u'2011, Nathan Fritz, Lance Stout'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -105,7 +105,7 @@ html_theme = 'haiku'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'SleekXMPP'
+html_title = 'Slixmpp'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 html_short_title = '%s Documentation' % release
@@ -168,7 +168,7 @@ html_additional_pages = {
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'SleekXMPPdoc'
+htmlhelp_basename = 'Slixmppdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -182,7 +182,7 @@ htmlhelp_basename = 'SleekXMPPdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'SleekXMPP.tex', u'SleekXMPP Documentation',
+  ('index', 'Slixmpp.tex', u'Slixmpp Documentation',
    u'Nathan Fritz, Lance Stout', 'manual'),
 ]
 
@@ -215,7 +215,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'sleekxmpp', u'SleekXMPP Documentation',
+    ('index', 'slixmpp', u'Slixmpp Documentation',
      [u'Nathan Fritz, Lance Stout'], 1)
 ]
 

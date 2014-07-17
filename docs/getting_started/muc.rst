@@ -8,20 +8,20 @@ Mulit-User Chat (MUC) Bot
 
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/sleekxmpp-discussion>`_
+    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
     or join the chat room at `sleek@conference.jabber.org
     <xmpp:sleek@conference.jabber.org?join>`_.
 
-If you have not yet installed SleekXMPP, do so now by either checking out a version
-from `Github <http://github.com/fritzy/SleekXMPP>`_, or installing it using ``pip``
+If you have not yet installed Slixmpp, do so now by either checking out a version
+from `Github <http://github.com/fritzy/Slixmpp>`_, or installing it using ``pip``
 or ``easy_install``.
 
 .. code-block:: sh
 
-    pip install sleekxmpp  # Or: easy_install sleekxmpp
+    pip install slixmpp  # Or: easy_install slixmpp
 
 
-Now that you've got the basic gist of using SleekXMPP by following the
+Now that you've got the basic gist of using Slixmpp by following the
 echobot example (:ref:`echobot`), we can use one of the bundled plugins
 to create a very popular XMPP starter project: a `Multi-User Chat`_
 (MUC) bot. Our bot will login to an XMPP server, join an MUC chat room
@@ -36,7 +36,7 @@ Joining The Room
 
 As usual, our code will be based on the pattern explained in :ref:`echobot`.
 To start, we create an ``MUCBot`` class based on
-:class:`ClientXMPP <sleekxmpp.clientxmpp.ClientXMPP>` and which accepts
+:class:`ClientXMPP <slixmpp.clientxmpp.ClientXMPP>` and which accepts
 parameters for the JID of the MUC room to join, and the nick that the
 bot will use inside the chat room.  We also register an
 :term:`event handler` for the :term:`session_start` event.
@@ -44,12 +44,12 @@ bot will use inside the chat room.  We also register an
 
 .. code-block:: python
 
-    import sleekxmpp
+    import slixmpp
 
-    class MUCBot(sleekxmpp.ClientXMPP):
+    class MUCBot(slixmpp.ClientXMPP):
 
         def __init__(self, jid, password, room, nick):
-            sleekxmpp.ClientXMPP.__init__(self, jid, password)
+            slixmpp.ClientXMPP.__init__(self, jid, password)
 
             self.room = room
             self.nick = nick
@@ -81,7 +81,7 @@ the roster. Next, we want to join the group chat, so we call the
 
 .. note::
 
-    The :attr:`plugin <sleekxmpp.basexmpp.BaseXMPP.plugin>` attribute is
+    The :attr:`plugin <slixmpp.basexmpp.BaseXMPP.plugin>` attribute is
     dictionary that maps to instances of plugins that we have previously
     registered, by their names.
 
@@ -115,7 +115,7 @@ event inside the bot's ``__init__`` function.
 .. code-block:: python
 
     def __init__(self, jid, password, room, nick):
-        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        slixmpp.ClientXMPP.__init__(self, jid, password)
 
         self.room = room
         self.nick = nick
@@ -159,7 +159,7 @@ event so it's a good idea to register an event handler for it.
 .. code-block:: python
 
     def __init__(self, jid, password, room, nick):
-        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        slixmpp.ClientXMPP.__init__(self, jid, password)
 
         self.room = room
         self.nick = nick

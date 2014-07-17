@@ -1,16 +1,16 @@
 import logging
 
-from sleekxmpp.test import *
+from slixmpp.test import *
 
 
-class TestMultipleStreams(SleekTest):
+class TestMultipleStreams(SlixTest):
     """
     Test that we can test a live stanza stream.
     """
 
     def setUp(self):
-        self.client1 = SleekTest()
-        self.client2 = SleekTest()
+        self.client1 = SlixTest()
+        self.client2 = SlixTest()
 
     def tearDown(self):
         self.client1.stream_close()

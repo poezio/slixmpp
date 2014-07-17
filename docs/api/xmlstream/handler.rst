@@ -3,14 +3,14 @@ Stanza Handlers
 
 The Basic Handler
 -----------------
-.. module:: sleekxmpp.xmlstream.handler.base
+.. module:: slixmpp.xmlstream.handler.base
 
 .. autoclass:: BaseHandler
     :members:
 
 Callback
 --------
-.. module:: sleekxmpp.xmlstream.handler.callback
+.. module:: slixmpp.xmlstream.handler.callback
 
 .. autoclass:: Callback
     :members:
@@ -18,7 +18,7 @@ Callback
 
 Waiter
 ------
-.. module:: sleekxmpp.xmlstream.handler.waiter
+.. module:: slixmpp.xmlstream.handler.waiter
 
 .. autoclass:: Waiter
     :members:

@@ -2,12 +2,12 @@ import time
 import threading
 
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.exceptions import IqTimeout
-from sleekxmpp import Callback, MatchXPath
+from slixmpp.test import SlixTest
+from slixmpp.exceptions import IqTimeout
+from slixmpp import Callback, MatchXPath
 
 
-class TestHandlers(SleekTest):
+class TestHandlers(SlixTest):
     """
     Test using handlers and waiters.
     """
@@ -239,7 +239,7 @@ class TestHandlers(SleekTest):
           # Check that Iq was sent by waiter_handler
           iq = self.Iq()
           iq['id'] = 'test'
-          iq['to'] = 'tester@sleekxmpp.com/test'
+          iq['to'] = 'tester@slixmpp.com/test'
           iq['type'] = 'set'
           iq['query'] = 'test'
           result = iq.send()
@@ -249,12 +249,12 @@ class TestHandlers(SleekTest):
       t.start()
 
       self.recv("""
-        <iq id="test" from="evil@sleekxmpp.com/bad" type="result">
+        <iq id="test" from="evil@slixmpp.com/bad" type="result">
           <query xmlns="test" />
         </iq>
       """)
       self.recv("""
-        <iq id="test" from="evil2@sleekxmpp.com" type="result">
+        <iq id="test" from="evil2@slixmpp.com" type="result">
           <query xmlns="test" />
         </iq>
       """)
@@ -266,7 +266,7 @@ class TestHandlers(SleekTest):
 
       # Now for a good one
       self.recv("""
-        <iq id="test" from="tester@sleekxmpp.com/test" type="result">
+        <iq id="test" from="tester@slixmpp.com/test" type="result">
           <query xmlns="test" />
         </iq>
       """)
@@ -275,7 +275,7 @@ class TestHandlers(SleekTest):
 
       time.sleep(0.1)
 
-      self.assertEqual(events, ['tester@sleekxmpp.com/test'], "Did not timeout on bad sender")
+      self.assertEqual(events, ['tester@slixmpp.com/test'], "Did not timeout on bad sender")
 
 
 

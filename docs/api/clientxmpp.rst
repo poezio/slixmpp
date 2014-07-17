@@ -2,7 +2,7 @@
 ClientXMPP
 ==========
 
-.. module:: sleekxmpp.clientxmpp
+.. module:: slixmpp.clientxmpp
 
 .. autoclass:: ClientXMPP
     :members:

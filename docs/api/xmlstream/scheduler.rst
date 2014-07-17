@@ -2,7 +2,7 @@
 Scheduler
 =========
 
-.. module:: sleekxmpp.xmlstream.scheduler
+.. module:: slixmpp.xmlstream.scheduler
 
 .. autoclass:: Task
     :members:

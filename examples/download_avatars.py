@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Copyright (C) 2012  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
@@ -15,16 +15,16 @@ import getpass
 import threading
 from optparse import OptionParser
 
-import sleekxmpp
-from sleekxmpp.exceptions import XMPPError
+import slixmpp
+from slixmpp.exceptions import XMPPError
 
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
-# throughout SleekXMPP, we will set the default encoding
+# throughout Slixmpp, we will set the default encoding
 # ourselves to UTF-8.
 if sys.version_info < (3, 0):
-    from sleekxmpp.util.misc_ops import setdefaultencoding
+    from slixmpp.util.misc_ops import setdefaultencoding
     setdefaultencoding('utf8')
 else:
     raw_input = input
@@ -37,14 +37,14 @@ FILE_TYPES = {
 }
 
 
-class AvatarDownloader(sleekxmpp.ClientXMPP):
+class AvatarDownloader(slixmpp.ClientXMPP):
 
     """
     A basic script for downloading the avatars for a user's contacts.
     """
 
     def __init__(self, jid, password):
-        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        slixmpp.ClientXMPP.__init__(self, jid, password)
         self.add_event_handler("session_start", self.start, threaded=True)
         self.add_event_handler("changed_status", self.wait_for_presences)
 

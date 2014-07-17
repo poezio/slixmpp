@@ -1,13 +1,13 @@
 import unittest
-from sleekxmpp import Message
-from sleekxmpp.test import SleekTest
-from sleekxmpp.thirdparty import OrderedDict
+from slixmpp import Message
+from slixmpp.test import SlixTest
+from slixmpp.thirdparty import OrderedDict
 
-import sleekxmpp.plugins.xep_0004 as xep_0004
-from sleekxmpp.xmlstream import register_stanza_plugin
+import slixmpp.plugins.xep_0004 as xep_0004
+from slixmpp.xmlstream import register_stanza_plugin
 
 
-class TestDataForms(SleekTest):
+class TestDataForms(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Message, xep_0004.Form)

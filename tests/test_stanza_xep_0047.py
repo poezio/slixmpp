@@ -1,12 +1,12 @@
 import unittest
-from sleekxmpp.exceptions import XMPPError
-from sleekxmpp import Iq
-from sleekxmpp.test import SleekTest
-from sleekxmpp.plugins.xep_0047 import Data
-from sleekxmpp.xmlstream import register_stanza_plugin, ET
+from slixmpp.exceptions import XMPPError
+from slixmpp import Iq
+from slixmpp.test import SlixTest
+from slixmpp.plugins.xep_0047 import Data
+from slixmpp.xmlstream import register_stanza_plugin, ET
 
 
-class TestIBB(SleekTest):
+class TestIBB(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Iq, Data)
@@ -82,7 +82,7 @@ class TestIBB(SleekTest):
         iq = Iq()
         iq['type'] = 'set'
         iq['ibb_data']['seq'] = 0
-        iq['ibb_data']['data'] = 'sleekxmpp'
+        iq['ibb_data']['data'] = 'slixmpp'
 
         self.check(iq, """
           <iq type="set">

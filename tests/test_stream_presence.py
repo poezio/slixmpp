@@ -1,9 +1,9 @@
 import time
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestStreamPresence(SleekTest):
+class TestStreamPresence(SlixTest):
     """
     Test handling roster updates.
     """

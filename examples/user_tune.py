@@ -11,7 +11,7 @@ except ImportError:
     print('This demo requires the appscript package to interact with iTunes.')
     sys.exit()
 
-from sleekxmpp import ClientXMPP
+from slixmpp import ClientXMPP
 
 
 class TuneBot(ClientXMPP):

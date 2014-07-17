@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Copyright (C) 2011  Dann Martens
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
 
-from sleekxmpp.plugins.xep_0009.remote import Endpoint, remote, Remote, \
+from slixmpp.plugins.xep_0009.remote import Endpoint, remote, Remote, \
     ANY_ALL
 import threading
 

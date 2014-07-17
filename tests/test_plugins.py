@@ -1,7 +1,7 @@
 import unittest
 import logging
 
-from sleekxmpp.plugins.base import PluginManager, BasePlugin, register_plugin
+from slixmpp.plugins.base import PluginManager, BasePlugin, register_plugin
 
 
 class A(BasePlugin):

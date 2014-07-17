@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
@@ -14,28 +14,28 @@ import logging
 import getpass
 from optparse import OptionParser
 
-import sleekxmpp
+import slixmpp
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
-# throughout SleekXMPP, we will set the default encoding
+# throughout Slixmpp, we will set the default encoding
 # ourselves to UTF-8.
 if sys.version_info < (3, 0):
-    from sleekxmpp.util.misc_ops import setdefaultencoding
+    from slixmpp.util.misc_ops import setdefaultencoding
     setdefaultencoding('utf8')
 else:
     raw_input = input
 
 
-class CommandBot(sleekxmpp.ClientXMPP):
+class CommandBot(slixmpp.ClientXMPP):
 
     """
-    A simple SleekXMPP bot that provides a basic
+    A simple Slixmpp bot that provides a basic
     adhoc command.
     """
 
     def __init__(self, jid, password):
-        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        slixmpp.ClientXMPP.__init__(self, jid, password)
 
         # The session_start event will be triggered when
         # the bot establishes its connection with the server

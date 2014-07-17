@@ -1,11 +1,11 @@
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.stanza.message import Message
-from sleekxmpp.stanza.htmlim import HTMLIM
-from sleekxmpp.xmlstream import register_stanza_plugin
+from slixmpp.test import SlixTest
+from slixmpp.stanza.message import Message
+from slixmpp.stanza.htmlim import HTMLIM
+from slixmpp.xmlstream import register_stanza_plugin
 
 
-class TestMessageStanzas(SleekTest):
+class TestMessageStanzas(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Message, HTMLIM)
@@ -29,12 +29,12 @@ class TestMessageStanzas(SleekTest):
     def testHTMLPlugin(self):
         "Test message/html/body stanza"
         msg = self.Message()
-        msg['to'] = "fritzy@netflint.net/sleekxmpp"
+        msg['to'] = "fritzy@netflint.net/slixmpp"
         msg['body'] = "this is the plaintext message"
         msg['type'] = 'chat'
         msg['html']['body'] = '<p>This is the htmlim message</p>'
         self.check(msg, """
-          <message to="fritzy@netflint.net/sleekxmpp" type="chat">
+          <message to="fritzy@netflint.net/slixmpp" type="chat">
             <body>this is the plaintext message</body>
             <html xmlns="http://jabber.org/protocol/xhtml-im">
               <body xmlns="http://www.w3.org/1999/xhtml">

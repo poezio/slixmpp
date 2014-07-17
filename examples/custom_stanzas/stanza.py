@@ -1,11 +1,11 @@
-from sleekxmpp.xmlstream import ElementBase
+from slixmpp.xmlstream import ElementBase
 
 class Action(ElementBase):
 
     """
     A stanza class for XML content of the form:
 
-    <action xmlns="sleekxmpp:custom:actions">
+    <action xmlns="slixmpp:custom:actions">
       <method>X</method>
       <param>X</param>
       <status>X</status>
@@ -17,7 +17,7 @@ class Action(ElementBase):
     name = 'action'
 
     #: The namespace of the main XML tag.
-    namespace = 'sleekxmpp:custom:actions'
+    namespace = 'slixmpp:custom:actions'
 
     #: The `plugin_attrib` value is the name that can be used
     #: with a parent stanza to access this stanza. For example
@@ -50,7 +50,7 @@ class Action(ElementBase):
     #: are marked as sub_interfaces, and so the XML produced will
     #: look like:
     #: 
-    #:     <action xmlns="sleekxmpp:custom:actions">
+    #:     <action xmlns="slixmpp:custom:actions">
     #:       <method>foo</method>
     #:     </action>
     sub_interfaces = interfaces

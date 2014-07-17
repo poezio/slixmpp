@@ -1,8 +1,8 @@
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestErrorStanzas(SleekTest):
+class TestErrorStanzas(SlixTest):
 
     def setUp(self):
         # Ensure that the XEP-0086 plugin has been loaded.

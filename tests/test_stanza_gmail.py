@@ -1,11 +1,11 @@
 import unittest
-from sleekxmpp import Iq
-from sleekxmpp.test import SleekTest
-import sleekxmpp.plugins.gmail_notify as gmail
-from sleekxmpp.xmlstream import register_stanza_plugin, ET
+from slixmpp import Iq
+from slixmpp.test import SlixTest
+import slixmpp.plugins.gmail_notify as gmail
+from slixmpp.xmlstream import register_stanza_plugin, ET
 
 
-class TestGmail(SleekTest):
+class TestGmail(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Iq, gmail.GmailQuery)

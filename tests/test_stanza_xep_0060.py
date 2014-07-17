@@ -1,11 +1,11 @@
 import unittest
-from sleekxmpp.test import SleekTest
-import sleekxmpp.plugins.xep_0004 as xep_0004
-import sleekxmpp.plugins.xep_0060.stanza as pubsub
-from sleekxmpp.xmlstream.stanzabase import ET
+from slixmpp.test import SlixTest
+import slixmpp.plugins.xep_0004 as xep_0004
+import slixmpp.plugins.xep_0060.stanza as pubsub
+from slixmpp.xmlstream.stanzabase import ET
 
 
-class TestPubsubStanzas(SleekTest):
+class TestPubsubStanzas(SlixTest):
 
     def testAffiliations(self):
         "Testing iq/pubsub/affiliations/affiliation stanzas"
@@ -55,12 +55,12 @@ class TestPubsubStanzas(SleekTest):
         iq = self.Iq()
         iq['pubsub']['subscription']['suboptions']['required'] = True
         iq['pubsub']['subscription']['node'] = 'testnode alsdkjfas'
-        iq['pubsub']['subscription']['jid'] = "fritzy@netflint.net/sleekxmpp"
+        iq['pubsub']['subscription']['jid'] = "fritzy@netflint.net/slixmpp"
         iq['pubsub']['subscription']['subscription'] = 'unconfigured'
         self.check(iq, """
           <iq id="0">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
-              <subscription node="testnode alsdkjfas" jid="fritzy@netflint.net/sleekxmpp" subscription="unconfigured">
+              <subscription node="testnode alsdkjfas" jid="fritzy@netflint.net/slixmpp" subscription="unconfigured">
               <subscribe-options>
                 <required />
                 </subscribe-options>
@@ -157,17 +157,17 @@ class TestPubsubStanzas(SleekTest):
         iq = self.Iq()
         iq['pubsub']['subscribe']['options']
         iq['pubsub']['subscribe']['node'] = 'cheese'
-        iq['pubsub']['subscribe']['jid'] = 'fritzy@netflint.net/sleekxmpp'
+        iq['pubsub']['subscribe']['jid'] = 'fritzy@netflint.net/slixmpp'
         iq['pubsub']['subscribe']['options']['node'] = 'cheese'
-        iq['pubsub']['subscribe']['options']['jid'] = 'fritzy@netflint.net/sleekxmpp'
+        iq['pubsub']['subscribe']['options']['jid'] = 'fritzy@netflint.net/slixmpp'
         form = xep_0004.Form()
         form.addField('pubsub#title', ftype='text-single', value='this thing is awesome')
         iq['pubsub']['subscribe']['options']['options'] = form
         self.check(iq, """
         <iq id="0">
           <pubsub xmlns="http://jabber.org/protocol/pubsub">
-            <subscribe node="cheese" jid="fritzy@netflint.net/sleekxmpp">
-              <options node="cheese" jid="fritzy@netflint.net/sleekxmpp">
+            <subscribe node="cheese" jid="fritzy@netflint.net/slixmpp">
+              <options node="cheese" jid="fritzy@netflint.net/slixmpp">
                 <x xmlns="jabber:x:data" type="submit">
                   <field var="pubsub#title">
                     <value>this thing is awesome</value>

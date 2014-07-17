@@ -1,9 +1,9 @@
 .. index:: XMLStream, BaseXMPP, ClientXMPP, ComponentXMPP
 
-SleekXMPP Architecture
+Slixmpp Architecture
 ======================
 
-The core of SleekXMPP is contained in four classes: ``XMLStream``,
+The core of Slixmpp is contained in four classes: ``XMLStream``,
 ``BaseXMPP``, ``ClientXMPP``, and ``ComponentXMPP``. Along side this
 stack is a library for working with XML objects that eliminates most
 of the tedium of creating/manipulating XML.
@@ -17,7 +17,7 @@ of the tedium of creating/manipulating XML.
 
 The Foundation: XMLStream
 -------------------------
-:class:`~sleekxmpp.xmlstream.xmlstream.XMLStream` is a mostly XMPP-agnostic
+:class:`~slixmpp.xmlstream.xmlstream.XMLStream` is a mostly XMPP-agnostic
 class whose purpose is to read and write from a bi-directional XML stream.
 It also allows for callback functions to execute when XML matching given
 patterns is received; these callbacks are also referred to as :term:`stream
@@ -26,7 +26,7 @@ which can be triggered either manually or on a timed schedule.
 
 The Main Threads
 ~~~~~~~~~~~~~~~~
-:class:`~sleekxmpp.xmlstream.xmlstream.XMLStream` instances run using at
+:class:`~slixmpp.xmlstream.xmlstream.XMLStream` instances run using at
 least three background threads: the send thread, the read thread, and the
 scheduler thread. The send thread is in charge of monitoring the send queue
 and writing text to the outgoing XML stream. The read thread pulls text off
@@ -34,7 +34,7 @@ of the incoming XML stream and stores the results in an event queue. The
 scheduler thread is used to emit events after a given period of time.
 
 Additionally, the main event processing loop may be executed in its
-own thread if SleekXMPP is being used in the background for another
+own thread if Slixmpp is being used in the background for another
 application.
 
 Short-lived threads may also be spawned as requested for threaded
@@ -61,10 +61,10 @@ when this bit of XML is received (with an assumed namespace of
    new object is determined using a map of namespaced element names to
    classes.
 
-   Our incoming XML is thus turned into a :class:`~sleekxmpp.stanza.Message`
+   Our incoming XML is thus turned into a :class:`~slixmpp.stanza.Message`
    :term:`stanza object` because the namespaced element name
    ``{jabber:client}message`` is associated with the class
-   :class:`~sleekxmpp.stanza.Message`.
+   :class:`~slixmpp.stanza.Message`.
 
 2. **Match stanza objects to callbacks.**
 
@@ -73,14 +73,14 @@ when this bit of XML is received (with an assumed namespace of
    :term:`stanza object` is paired with a reference to the handler and
    placed into the event queue.
 
-   Our :class:`~sleekxmpp.stanza.Message` object is thus paired with the message stanza handler
+   Our :class:`~slixmpp.stanza.Message` object is thus paired with the message stanza handler
    :meth:`BaseXMPP._handle_message` to create the tuple::
 
        ('stanza', stanza_obj, handler)
 
 3. **Process the event queue.**
 
-   The event queue is the heart of SleekXMPP. Nearly every action that
+   The event queue is the heart of Slixmpp. Nearly every action that
    takes place is first inserted into this queue, whether that be received
    stanzas, custom events, or scheduled events.
 
@@ -97,7 +97,7 @@ when this bit of XML is received (with an assumed namespace of
 
    Since a :term:`stream handler` shouldn't block, if extensive processing
    for a stanza is required (such as needing to send and receive an
-   :class:`~sleekxmpp.stanza.Iq` stanza), then custom events must be used.
+   :class:`~slixmpp.stanza.Iq` stanza), then custom events must be used.
    These events are not explicitly tied to the incoming XML stream and may
    be raised at any time. Importantly, these events may be handled in their
    own thread.
@@ -148,8 +148,8 @@ when this bit of XML is received (with an assumed namespace of
 
 Raising XMPP Awareness: BaseXMPP
 --------------------------------
-While :class:`~sleekxmpp.xmlstream.xmlstream.XMLStream` attempts to shy away
-from anything too XMPP specific, :class:`~sleekxmpp.basexmpp.BaseXMPP`'s
+While :class:`~slixmpp.xmlstream.xmlstream.XMLStream` attempts to shy away
+from anything too XMPP specific, :class:`~slixmpp.basexmpp.BaseXMPP`'s
 sole purpose is to provide foundational support for sending and receiving
 XMPP stanzas. This support includes registering the basic message,
 presence, and iq stanzas, methods for creating and sending stanzas, and
@@ -157,14 +157,14 @@ default handlers for incoming messages and keeping track of presence
 notifications.
 
 The plugin system for adding new XEP support is also maintained by
-:class:`~sleekxmpp.basexmpp.BaseXMPP`.
+:class:`~slixmpp.basexmpp.BaseXMPP`.
 
 .. index:: ClientXMPP, BaseXMPP
 
 ClientXMPP
 ----------
-:class:`~sleekxmpp.clientxmpp.ClientXMPP` extends
-:class:`~sleekxmpp.clientxmpp.BaseXMPP` with additional logic for connecting
+:class:`~slixmpp.clientxmpp.ClientXMPP` extends
+:class:`~slixmpp.clientxmpp.BaseXMPP` with additional logic for connecting
 to an XMPP server by performing DNS lookups. It also adds support for stream
 features such as STARTTLS and SASL.
 
@@ -172,6 +172,6 @@ features such as STARTTLS and SASL.
 
 ComponentXMPP
 -------------
-:class:`~sleekxmpp.componentxmpp.ComponentXMPP` is only a thin layer on top of
-:class:`~sleekxmpp.basexmpp.BaseXMPP` that implements the component handshake
+:class:`~slixmpp.componentxmpp.ComponentXMPP` is only a thin layer on top of
+:class:`~slixmpp.basexmpp.BaseXMPP` that implements the component handshake
 protocol.

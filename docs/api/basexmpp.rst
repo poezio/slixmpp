@@ -2,7 +2,7 @@
 BaseXMPP
 ========
 
-.. module:: sleekxmpp.basexmpp
+.. module:: slixmpp.basexmpp
 
 .. autoclass:: BaseXMPP
     :members:

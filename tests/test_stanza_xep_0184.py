@@ -1,11 +1,11 @@
 import unittest
-from sleekxmpp import Message
-from sleekxmpp.test import SleekTest
-import sleekxmpp.plugins.xep_0184 as xep_0184
-from sleekxmpp.xmlstream import register_stanza_plugin
+from slixmpp import Message
+from slixmpp.test import SlixTest
+import slixmpp.plugins.xep_0184 as xep_0184
+from slixmpp.xmlstream import register_stanza_plugin
 
 
-class TestReciept(SleekTest):
+class TestReciept(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Message, xep_0184.Request)

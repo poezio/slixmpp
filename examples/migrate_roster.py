@@ -6,14 +6,14 @@ import logging
 import getpass
 from optparse import OptionParser
 
-import sleekxmpp
+import slixmpp
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
-# throughout SleekXMPP, we will set the default encoding
+# throughout Slixmpp, we will set the default encoding
 # ourselves to UTF-8.
 if sys.version_info < (3, 0):
-    from sleekxmpp.util.misc_ops import setdefaultencoding
+    from slixmpp.util.misc_ops import setdefaultencoding
     setdefaultencoding('utf8')
 else:
     raw_input = input
@@ -62,7 +62,7 @@ if opts.new_password is None:
     opts.new_password = getpass.getpass("New Password: ")
 
 
-old_xmpp = sleekxmpp.ClientXMPP(opts.old_jid, opts.old_password)
+old_xmpp = slixmpp.ClientXMPP(opts.old_jid, opts.old_password)
 
 # If you are connecting to Facebook and wish to use the
 # X-FACEBOOK-PLATFORM authentication mechanism, you will need
@@ -98,7 +98,7 @@ if not roster:
     print('No roster to migrate')
     sys.exit()
 
-new_xmpp = sleekxmpp.ClientXMPP(opts.new_jid, opts.new_password)
+new_xmpp = slixmpp.ClientXMPP(opts.new_jid, opts.new_password)
 def on_session2(event):
     new_xmpp.get_roster()
     new_xmpp.send_presence()

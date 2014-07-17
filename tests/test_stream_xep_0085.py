@@ -1,10 +1,10 @@
 import time
 
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestStreamChatStates(SleekTest):
+class TestStreamChatStates(SlixTest):
 
     def tearDown(self):
         self.stream_close()

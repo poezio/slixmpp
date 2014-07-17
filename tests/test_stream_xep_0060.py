@@ -1,12 +1,12 @@
 import threading
 
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.stanza.atom import AtomEntry
-from sleekxmpp.xmlstream import register_stanza_plugin
+from slixmpp.test import SlixTest
+from slixmpp.stanza.atom import AtomEntry
+from slixmpp.xmlstream import register_stanza_plugin
 
 
-class TestStreamPubsub(SleekTest):
+class TestStreamPubsub(SlixTest):
 
     """
     Test using the XEP-0030 plugin.

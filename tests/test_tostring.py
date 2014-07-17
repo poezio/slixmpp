@@ -1,13 +1,13 @@
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.xmlstream.stanzabase import ET
-from sleekxmpp.xmlstream.tostring import tostring, escape
+from slixmpp.test import SlixTest
+from slixmpp.xmlstream.stanzabase import ET
+from slixmpp.xmlstream.tostring import tostring, escape
 
 
-class TestToString(SleekTest):
+class TestToString(SlixTest):
 
     """
-    Test the implementation of sleekxmpp.xmlstream.tostring
+    Test the implementation of slixmpp.xmlstream.tostring
     """
 
     def tearDown(self):

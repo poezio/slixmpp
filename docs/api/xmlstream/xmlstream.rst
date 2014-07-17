@@ -2,7 +2,7 @@
 XML Stream
 ==========
 
-.. module:: sleekxmpp.xmlstream.xmlstream
+.. module:: slixmpp.xmlstream.xmlstream
 
 .. autoexception:: RestartStream
 

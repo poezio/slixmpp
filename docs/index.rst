@@ -1,49 +1,49 @@
-SleekXMPP
+Slixmpp
 #########
 
 .. sidebar:: Get the Code
 
     .. code-block:: sh
 
-        pip install sleekxmpp
+        pip install slixmpp
 
-    The latest source code for SleekXMPP may be found on `Github
-    <http://github.com/fritzy/SleekXMPP>`_. Releases can be found in the
+    The latest source code for Slixmpp may be found on `Github
+    <http://github.com/fritzy/Slixmpp>`_. Releases can be found in the
     ``master`` branch, while the latest development version is in the
     ``develop`` branch.
 
     **Latest Stable Release**
-        - `1.0 <http://github.com/fritzy/SleekXMPP/zipball/1.0>`_
+        - `1.0 <http://github.com/fritzy/Slixmpp/zipball/1.0>`_
 
     **Develop Releases**
-        - `Latest Develop Version <http://github.com/fritzy/SleekXMPP/zipball/develop>`_
+        - `Latest Develop Version <http://github.com/fritzy/Slixmpp/zipball/develop>`_
 
 
     A mailing list and XMPP chat room are available for discussing and getting
-    help with SleekXMPP.
+    help with Slixmpp.
 
     **Mailing List**
-        `SleekXMPP Discussion on Google Groups <http://groups.google.com/group/sleekxmpp-discussion>`_
+        `Slixmpp Discussion on Google Groups <http://groups.google.com/group/slixmpp-discussion>`_
 
     **Chat**
         `sleek@conference.jabber.org <xmpp:sleek@conference.jabber.org?join>`_
 
 
-SleekXMPP is an :ref:`MIT licensed <license>` XMPP library for Python 2.6/3.1+,
+Slixmpp is an :ref:`MIT licensed <license>` XMPP library for Python 2.6/3.1+,
 and is featured in examples in
 `XMPP: The Definitive Guide <http://oreilly.com/catalog/9780596521271>`_ 
 by Kevin Smith, Remko Tronçon, and Peter Saint-Andre. If you've arrived
 here from reading the Definitive Guide, please see the notes on updating
-the examples to the latest version of SleekXMPP.
+the examples to the latest version of Slixmpp.
 
-SleekXMPP's design goals and philosphy are:
+Slixmpp's design goals and philosphy are:
 
 **Low number of dependencies**
-    Installing and using SleekXMPP should be as simple as possible, without
+    Installing and using Slixmpp should be as simple as possible, without
     having to deal with long dependency chains.
 
     As part of reducing the number of dependencies, some third party
-    modules are included with SleekXMPP in the ``thirdparty`` directory.
+    modules are included with Slixmpp in the ``thirdparty`` directory.
     Imports from this module first try to import an existing installed
     version before loading the packaged version, when possible.
 
@@ -55,19 +55,19 @@ SleekXMPP's design goals and philosphy are:
     XEPs.
 
 **Rewarding to work with**
-    As much as possible, SleekXMPP should allow things to "just work" using
+    As much as possible, Slixmpp should allow things to "just work" using
     sensible defaults and appropriate abstractions. XML can be ugly to work
     with, but it doesn't have to be that way.
 
-Here's your first SleekXMPP Bot:
+Here's your first Slixmpp Bot:
 --------------------------------
 
 .. code-block:: python
 
     import logging
 
-    from sleekxmpp import ClientXMPP
-    from sleekxmpp.exceptions import IqError, IqTimeout
+    from slixmpp import ClientXMPP
+    from slixmpp.exceptions import IqError, IqTimeout
 
 
     class EchoBot(ClientXMPP):
@@ -161,7 +161,7 @@ Plugin Guides
 
     guide_xep_0030
 
-SleekXMPP Architecture and Design
+Slixmpp Architecture and Design
 ---------------------------------
 .. toctree::
     :maxdepth: 3

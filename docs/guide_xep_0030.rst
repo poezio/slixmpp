@@ -18,7 +18,7 @@ Working with service discovery is about creating and querying these nodes.
 According to XEP-0030, a node may contain three types of information:
 identities, features, and items. (Further, extensible, information types are
 defined in `XEP-0128 <http://xmpp.org/extensions/xep-0128.html>`_, but they are
-not yet implemented by SleekXMPP.) SleekXMPP provides methods to configure each
+not yet implemented by Slixmpp.) Slixmpp provides methods to configure each
 of these node attributes.
 
 Configuring Service Discovery
@@ -119,7 +119,7 @@ the same order as expected using positional arguments.
 
     xmpp['xep_0030'].add_identity(category='client',
                                   itype='bot',
-                                  name='Sleek',
+                                  name='Slixmpp',
                                   node='foo',
                                   jid=xmpp.boundjid.full,
                                   lang='no')

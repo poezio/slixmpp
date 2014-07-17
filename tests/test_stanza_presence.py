@@ -1,8 +1,8 @@
 import unittest
-import sleekxmpp
-from sleekxmpp.test import SleekTest
+import slixmpp
+from slixmpp.test import SlixTest
 
-class TestPresenceStanzas(SleekTest):
+class TestPresenceStanzas(SlixTest):
 
     def testPresenceShowRegression(self):
         """Regression check presence['type'] = 'dnd' show value working"""
@@ -38,7 +38,7 @@ class TestPresenceStanzas(SleekTest):
         p['type'] = 'unavailable'
         p['from'] = 'bill@chadmore.com/gmail15af'
 
-        c = sleekxmpp.ClientXMPP('crap@wherever', 'password')
+        c = slixmpp.ClientXMPP('crap@wherever', 'password')
         happened = []
 
         def handlechangedpresence(event):

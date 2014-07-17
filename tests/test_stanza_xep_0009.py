@@ -1,9 +1,9 @@
 # -*- encoding:utf-8 -*-
 
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Copyright (C) 2011 Nathanael C. Fritz, Dann Martens (TOMOTON).
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
@@ -13,14 +13,14 @@ from __future__ import unicode_literals
 import base64
 import sys
 
-from sleekxmpp.plugins.xep_0009.stanza.RPC import RPCQuery, MethodCall, \
+from slixmpp.plugins.xep_0009.stanza.RPC import RPCQuery, MethodCall, \
     MethodResponse
-from sleekxmpp.plugins.xep_0009.binding import py2xml, xml2py, rpcbase64, \
+from slixmpp.plugins.xep_0009.binding import py2xml, xml2py, rpcbase64, \
     rpctime
-from sleekxmpp.stanza.iq import Iq
-from sleekxmpp.test.sleektest import SleekTest
-from sleekxmpp.xmlstream.stanzabase import register_stanza_plugin
-from sleekxmpp.xmlstream.tostring import tostring
+from slixmpp.stanza.iq import Iq
+from slixmpp.test.slixtest import SlixTest
+from slixmpp.xmlstream.stanzabase import register_stanza_plugin
+from slixmpp.xmlstream.tostring import tostring
 import unittest
 
 
@@ -28,7 +28,7 @@ if sys.version_info > (3, 0):
     unicode = str
 
 
-class TestJabberRPC(SleekTest):
+class TestJabberRPC(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Iq, RPCQuery)

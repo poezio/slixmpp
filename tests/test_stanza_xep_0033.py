@@ -1,11 +1,11 @@
 import unittest
-from sleekxmpp import Message
-from sleekxmpp.test import SleekTest
-import sleekxmpp.plugins.xep_0033 as xep_0033
-from sleekxmpp.xmlstream import register_stanza_plugin
+from slixmpp import Message
+from slixmpp.test import SlixTest
+import slixmpp.plugins.xep_0033 as xep_0033
+from slixmpp.xmlstream import register_stanza_plugin
 
 
-class TestAddresses(SleekTest):
+class TestAddresses(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Message, xep_0033.Addresses)

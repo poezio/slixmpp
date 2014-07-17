@@ -1,9 +1,9 @@
 import logging
 
-from sleekxmpp.test import *
+from slixmpp.test import *
 
 
-class TestLiveStream(SleekTest):
+class TestLiveStream(SlixTest):
     """
     Test that we can test a live stanza stream.
     """

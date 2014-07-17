@@ -2,10 +2,10 @@ import time
 import threading
 
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestStreamDisco(SleekTest):
+class TestStreamDisco(SlixTest):
 
     """
     Test using the XEP-0030 plugin.

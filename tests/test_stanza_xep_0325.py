@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Implementation of xeps for Internet of Things
     http://wiki.xmpp.org/web/Tech_pages/IoT_systems
     Copyright (C) 2013 Sustainable Innovation, Joachim.lindborg@sust.se, bjorn.westrom@consoden.se
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
 
-from sleekxmpp.test import *
-import sleekxmpp.plugins.xep_0325 as xep_0325
+from slixmpp.test import *
+import slixmpp.plugins.xep_0325 as xep_0325
 
 namespace='sn'
 
-class TestControlStanzas(SleekTest):
+class TestControlStanzas(SlixTest):
     
 
     def setUp(self):

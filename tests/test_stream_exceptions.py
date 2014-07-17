@@ -1,11 +1,11 @@
-from sleekxmpp.xmlstream.matcher import MatchXPath
-from sleekxmpp.xmlstream.handler import Callback
-from sleekxmpp.exceptions import XMPPError
+from slixmpp.xmlstream.matcher import MatchXPath
+from slixmpp.xmlstream.handler import Callback
+from slixmpp.exceptions import XMPPError
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestStreamExceptions(SleekTest):
+class TestStreamExceptions(SlixTest):
     """
     Test handling roster updates.
     """
@@ -41,7 +41,7 @@ class TestStreamExceptions(SleekTest):
         """)
 
     def testExceptionContinueWorking(self):
-        """Test that Sleek continues to respond after an XMPPError is raised."""
+        """Test that Slixmpp continues to respond after an XMPPError is raised."""
 
         def message(msg):
             msg.reply()
@@ -208,7 +208,7 @@ class TestStreamExceptions(SleekTest):
               <undefined-condition
                   xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
               <text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">
-                SleekXMPP got into trouble.
+                Slixmpp got into trouble.
               </text>
             </error>
           </message>
@@ -217,7 +217,7 @@ class TestStreamExceptions(SleekTest):
         self.assertEqual(raised_errors, [True], "Exception was not raised: %s" % raised_errors)
 
     def testUnknownException(self):
-        """Test Sleek continues to respond after an unknown exception."""
+        """Test Slixmpp continues to respond after an unknown exception."""
 
         raised_errors = []
 
@@ -243,7 +243,7 @@ class TestStreamExceptions(SleekTest):
               <undefined-condition
                   xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
               <text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">
-                SleekXMPP got into trouble.
+                Slixmpp got into trouble.
               </text>
             </error>
           </message>
@@ -261,7 +261,7 @@ class TestStreamExceptions(SleekTest):
               <undefined-condition
                   xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
               <text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">
-                SleekXMPP got into trouble.
+                Slixmpp got into trouble.
               </text>
             </error>
           </message>

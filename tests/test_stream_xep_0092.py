@@ -1,10 +1,10 @@
 import threading
 
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestStreamSet(SleekTest):
+class TestStreamSet(SlixTest):
 
     def tearDown(self):
         self.stream_close()
@@ -12,7 +12,7 @@ class TestStreamSet(SleekTest):
     def testHandleSoftwareVersionRequest(self):
         self.stream_start(mode='client', plugins=['xep_0030', 'xep_0092'])
 
-        self.xmpp['xep_0092'].name = 'SleekXMPP'
+        self.xmpp['xep_0092'].name = 'Slixmpp'
         self.xmpp['xep_0092'].version = 'dev'
         self.xmpp['xep_0092'].os = 'Linux'
 
@@ -25,7 +25,7 @@ class TestStreamSet(SleekTest):
         self.send("""
           <iq type="result" id="1">
             <query xmlns="jabber:iq:version">
-              <name>SleekXMPP</name>
+              <name>Slixmpp</name>
               <version>dev</version>
               <os>Linux</os>
             </query>

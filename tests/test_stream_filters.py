@@ -1,11 +1,11 @@
 import time
 
-from sleekxmpp import Message
+from slixmpp import Message
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestFilters(SleekTest):
+class TestFilters(SlixTest):
 
     """
     Test using incoming and outgoing filters.

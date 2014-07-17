@@ -3,7 +3,7 @@ Stanza Matchers
 
 The Basic Matcher
 -----------------
-.. module:: sleekxmpp.xmlstream.matcher.base
+.. module:: slixmpp.xmlstream.matcher.base
 
 .. autoclass:: MatcherBase
     :members:
@@ -11,7 +11,7 @@ The Basic Matcher
 
 ID Matching
 -----------
-.. module:: sleekxmpp.xmlstream.matcher.id
+.. module:: slixmpp.xmlstream.matcher.id
 
 .. autoclass:: MatcherId
     :members:
@@ -19,7 +19,7 @@ ID Matching
 
 Stanza Path Matching
 --------------------
-.. module:: sleekxmpp.xmlstream.matcher.stanzapath
+.. module:: slixmpp.xmlstream.matcher.stanzapath
 
 .. autoclass:: StanzaPath
     :members:
@@ -27,7 +27,7 @@ Stanza Path Matching
 
 XPath
 -----
-.. module:: sleekxmpp.xmlstream.matcher.xpath
+.. module:: slixmpp.xmlstream.matcher.xpath
 
 .. autoclass:: MatchXPath
     :members:
@@ -35,7 +35,7 @@ XPath
 
 XMLMask
 -------
-.. module:: sleekxmpp.xmlstream.matcher.xmlmask
+.. module:: slixmpp.xmlstream.matcher.xmlmask
 
 .. autoclass:: MatchXMLMask
     :members:

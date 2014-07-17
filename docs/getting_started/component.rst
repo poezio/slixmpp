@@ -8,17 +8,17 @@ Create and Run a Server Component
     
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/sleekxmpp-discussion>`_
+    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
     or join the chat room at `sleek@conference.jabber.org
     <xmpp:sleek@conference.jabber.org?join>`_.
 
-If you have not yet installed SleekXMPP, do so now by either checking out a version
-from `Github <http://github.com/fritzy/SleekXMPP>`_, or installing it using ``pip``
+If you have not yet installed Slixmpp, do so now by either checking out a version
+from `Github <http://github.com/fritzy/Slixmpp>`_, or installing it using ``pip``
 or ``easy_install``.
 
 .. code-block:: sh
 
-    pip install sleekxmpp  # Or: easy_install sleekxmpp
+    pip install slixmpp  # Or: easy_install slixmpp
 
 
 Many XMPP applications eventually graduate to requiring to run as a server 
@@ -30,7 +30,7 @@ The first difference is that we will add an additional import statement:
 
 .. code-block:: python
 
-    from sleekxmpp.componentxmpp import ComponentXMPP
+    from slixmpp.componentxmpp import ComponentXMPP
 
 Likewise, we will change the bot's class definition to match:
 
@@ -48,7 +48,7 @@ a MUC component, the following could be used:
 
 .. code-block:: python
 
-    muc = ComponentXMPP('muc.sleekxmpp.com', '******', 'sleekxmpp.com', 5555)
+    muc = ComponentXMPP('muc.slixmpp.com', '******', 'slixmpp.com', 5555)
 
 .. note::
 
@@ -62,10 +62,10 @@ with presence.
 The other, main difference with components is that the
 ``'from'`` value for every stanza must be explicitly set, since
 components may send stanzas from multiple JIDs. To do so,
-the :meth:`~sleekxmpp.basexmpp.BaseXMPP.send_message()` and
-:meth:`~sleekxmpp.basexmpp.BaseXMPP.send_presence()` accept the parameters
+the :meth:`~slixmpp.basexmpp.BaseXMPP.send_message()` and
+:meth:`~slixmpp.basexmpp.BaseXMPP.send_presence()` accept the parameters
 ``mfrom`` and ``pfrom``, respectively. For any method that uses
-:class:`~sleekxmpp.stanza.iq.Iq` stanzas, ``ifrom`` may be used.
+:class:`~slixmpp.stanza.iq.Iq` stanzas, ``ifrom`` may be used.
 
 
 Final Product

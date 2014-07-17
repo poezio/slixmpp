@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
@@ -14,15 +14,15 @@ import logging
 import getpass
 from optparse import OptionParser
 
-import sleekxmpp
-from sleekxmpp.componentxmpp import ComponentXMPP
+import slixmpp
+from slixmpp.componentxmpp import ComponentXMPP
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
-# throughout SleekXMPP, we will set the default encoding
+# throughout Slixmpp, we will set the default encoding
 # ourselves to UTF-8.
 if sys.version_info < (3, 0):
-    from sleekxmpp.util.misc_ops import setdefaultencoding
+    from slixmpp.util.misc_ops import setdefaultencoding
     setdefaultencoding('utf8')
 else:
     raw_input = input
@@ -31,7 +31,7 @@ else:
 class EchoComponent(ComponentXMPP):
 
     """
-    A simple SleekXMPP component that echoes messages.
+    A simple Slixmpp component that echoes messages.
     """
 
     def __init__(self, jid, secret, server, port):

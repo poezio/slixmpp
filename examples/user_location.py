@@ -16,7 +16,7 @@ except ImportError:
     print('This demo requires the requests package for using HTTP.')
     sys.exit()
 
-from sleekxmpp import ClientXMPP
+from slixmpp import ClientXMPP
 
 
 class LocationBot(ClientXMPP):

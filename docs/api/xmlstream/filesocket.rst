@@ -1,4 +1,4 @@
-.. module:: sleekxmpp.xmlstream.filesocket
+.. module:: slixmpp.xmlstream.filesocket
 
 .. _filesocket:
 

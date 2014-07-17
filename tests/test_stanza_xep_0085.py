@@ -1,11 +1,11 @@
 import unittest
-from sleekxmpp import Message
-from sleekxmpp.test import SleekTest
-import sleekxmpp.plugins.xep_0085 as xep_0085
-from sleekxmpp.xmlstream import register_stanza_plugin
+from slixmpp import Message
+from slixmpp.test import SlixTest
+import slixmpp.plugins.xep_0085 as xep_0085
+from slixmpp.xmlstream import register_stanza_plugin
 
 
-class TestChatStates(SleekTest):
+class TestChatStates(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Message, xep_0085.stanza.Active)

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
@@ -21,24 +21,24 @@ except ImportError:
     from urllib.parse import urlencode
     from http.client import HTTPSConnection
 
-import sleekxmpp
-from sleekxmpp.xmlstream import JID
+import slixmpp
+from slixmpp.xmlstream import JID
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
-# throughout SleekXMPP, we will set the default encoding
+# throughout Slixmpp, we will set the default encoding
 # ourselves to UTF-8.
 if sys.version_info < (3, 0):
-    from sleekxmpp.util.misc_ops import setdefaultencoding
+    from slixmpp.util.misc_ops import setdefaultencoding
     setdefaultencoding('utf8')
 else:
     raw_input = input
 
 
-class ThirdPartyAuthBot(sleekxmpp.ClientXMPP):
+class ThirdPartyAuthBot(slixmpp.ClientXMPP):
 
     """
-    A simple SleekXMPP bot that will echo messages it
+    A simple Slixmpp bot that will echo messages it
     receives, along with a short thank you message.
 
     This version uses a thirdpary service for authentication,
@@ -46,7 +46,7 @@ class ThirdPartyAuthBot(sleekxmpp.ClientXMPP):
     """
 
     def __init__(self, jid, password):
-        sleekxmpp.ClientXMPP.__init__(self, jid, password)
+        slixmpp.ClientXMPP.__init__(self, jid, password)
 
         # The X-GOOGLE-TOKEN mech is ranked lower than PLAIN
         # due to Google only allowing a single SASL attempt per
@@ -55,7 +55,7 @@ class ThirdPartyAuthBot(sleekxmpp.ClientXMPP):
         # X-GOOGLE-TOKEN with a TLS connection, explicitly select
         # it using:
         #
-        # sleekxmpp.ClientXMPP.__init__(self, jid, password,
+        # slixmpp.ClientXMPP.__init__(self, jid, password,
         #                               sasl_mech="X-GOOGLE-TOKEN")
 
         # The session_start event will be triggered when

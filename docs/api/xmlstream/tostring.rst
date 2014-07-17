@@ -1,18 +1,18 @@
-.. module:: sleekxmpp.xmlstream.tostring
+.. module:: slixmpp.xmlstream.tostring
 
 .. _tostring:
 
 XML Serialization
 =================
 
-Since the XML layer of SleekXMPP is based on :mod:`~xml.etree.ElementTree`,
+Since the XML layer of Slixmpp is based on :mod:`~xml.etree.ElementTree`,
 why not just use the built-in :func:`~xml.etree.ElementTree.tostring`
 method? The answer is that using that method produces ugly results when
 using namespaces. The :func:`tostring()` method used here intelligently
 hides namespaces when able and does not introduce excessive namespace
 prefixes::
 
-    >>> from sleekxmpp.xmlstream.tostring import tostring
+    >>> from slixmpp.xmlstream.tostring import tostring
     >>> from xml.etree import cElementTree as ET
     >>> xml = ET.fromstring('<foo xmlns="bar"><baz /></foo>')
     >>> ET.tostring(xml)
@@ -25,7 +25,7 @@ produce unexpected results depending on how the :func:`tostring()` method
 is invoked. For example, when sending XML on the wire, the main XMPP
 stanzas with their namespace of ``jabber:client`` will not include the
 namespace because that is already declared by the stream header. But, if
-you create a :class:`~sleekxmpp.stanza.message.Message` instance and dump
+you create a :class:`~slixmpp.stanza.message.Message` instance and dump
 it to the terminal, the ``jabber:client`` namespace will appear.
 
 .. autofunction:: tostring

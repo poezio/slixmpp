@@ -1,20 +1,20 @@
 Following *XMPP: The Definitive Guide*
 ======================================
 
-SleekXMPP was featured in the first edition of the O'Reilly book 
+Slixmpp was featured in the first edition of the O'Reilly book 
 `XMPP: The Definitive Guide <http://oreilly.com/catalog/9780596521271/>`_
 by Peter Saint-Andre, Kevin Smith, and Remko Tronçon. The original source code
 for the book's examples can be found at http://github.com/remko/xmpp-tdg. An
 updated version of the source code, maintained to stay current with the latest
-SleekXMPP release, is available at http://github.com/legastero/xmpp-tdg.
+Slixmpp release, is available at http://github.com/legastero/xmpp-tdg.
 
-However, since publication, SleekXMPP has advanced from version 0.2.1 to version
+However, since publication, Slixmpp has advanced from version 0.2.1 to version
 1.0 and there have been several major API changes. The most notable is the
 introduction of :term:`stanza objects <stanza object>` which have simplified and
 standardized interactions with the XMPP XML stream.
 
 What follows is a walk-through of *The Definitive Guide* highlighting the
-changes needed to make the code examples work with version 1.0 of SleekXMPP.
+changes needed to make the code examples work with version 1.0 of Slixmpp.
 These changes have been kept to a minimum to preserve the correlation with
 the book's explanations, so be aware that some code may not use current best
 practices.
@@ -47,7 +47,7 @@ Example 14-1. (Page 215)
 **CheshiR IM bot implementation.**
 
 The main event handling method in the Bot class is meant to process both message
-events and presence update events. With the new changes in SleekXMPP 1.0,
+events and presence update events. With the new changes in Slixmpp 1.0,
 extracting a CheshiR status "message" from both types of stanzas
 requires accessing different attributes. In the case of a message stanza, the
 ``"body"`` attribute would contain the CheshiR message. For a presence event,
@@ -72,8 +72,8 @@ Updated Code
 .. code-block:: python
 
   def handleIncomingXMPPEvent(self, event):
-    msgLocations = {sleekxmpp.stanza.presence.Presence: "status",
-                    sleekxmpp.stanza.message.Message: "body"}
+    msgLocations = {slixmpp.stanza.presence.Presence: "status",
+                    slixmpp.stanza.message.Message: "body"}
 
     message = event[msgLocations[type(event)]]
     user = self.backend.getUserFromJID(event["from"].jid)
@@ -102,7 +102,7 @@ Example 14-3. (Page 217)
 
 The main difference for the configurable IM bot is the handling for the
 data form in ``handleConfigurationCommand``. The test for equality
-with the string ``"1"`` is no longer required; SleekXMPP converts
+with the string ``"1"`` is no longer required; Slixmpp converts
 boolean data form fields to the values ``True`` and ``False``
 automatically.
 
@@ -192,7 +192,7 @@ After applying the changes from Example 14-4 above, the registrable component
 implementation should work correctly.
 
 .. tip::
-    To see how to implement in-band registration as a SleekXMPP plugin,
+    To see how to implement in-band registration as a Slixmpp plugin,
     see the tutorial :ref:`tutorial-create-plugin`.
 
 `View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/RegistrableComponent.py>`_ |
@@ -209,7 +209,7 @@ Example 14-7. (Page 225)
 
 While the final code example can look daunting with all of the changes
 made, it requires very few modifications to work with the latest version of
-SleekXMPP. Most differences are the result of CheshiR's backend functions
+Slixmpp. Most differences are the result of CheshiR's backend functions
 expecting JIDs to be strings so that they can be stripped to bare JIDs. To
 resolve these, use the ``jid`` attribute of the JID objects. Also,
 references to ``"message"`` and ``"jid"`` attributes need to

@@ -8,16 +8,16 @@ Enable HTTP Proxy Support
     
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/sleekxmpp-discussion>`_
+    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
     or join the chat room at `sleek@conference.jabber.org
     <xmpp:sleek@conference.jabber.org?join>`_.
 
 In some instances, you may wish to route XMPP traffic through
 an HTTP proxy, probably to get around restrictive firewalls.
-SleekXMPP provides support for basic HTTP proxying with DIGEST
+Slixmpp provides support for basic HTTP proxying with DIGEST
 authentication.
 
-Enabling proxy support is done in two steps. The first is to instruct SleekXMPP
+Enabling proxy support is done in two steps. The first is to instruct Slixmpp
 to use a proxy, and the second is to configure the proxy details:
 
 .. code-block:: python

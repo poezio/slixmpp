@@ -1,9 +1,9 @@
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.xmlstream.stanzabase import ET, StanzaBase
+from slixmpp.test import SlixTest
+from slixmpp.xmlstream.stanzabase import ET, StanzaBase
 
 
-class TestStanzaBase(SleekTest):
+class TestStanzaBase(SlixTest):
 
     def testTo(self):
         """Test the 'to' interface of StanzaBase."""

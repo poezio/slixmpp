@@ -1,76 +1,12 @@
-SleekXMPP
+Slixmpp
 #########
 
-SleekXMPP is an MIT licensed XMPP library for Python 2.6/3.1+,
-and is featured in examples in
-`XMPP: The Definitive Guide <http://oreilly.com/catalog/9780596521271>`_ 
-by Kevin Smith, Remko Tronçon, and Peter Saint-Andre. If you've arrived
-here from reading the Definitive Guide, please see the notes on updating
-the examples to the latest version of SleekXMPP.
+Slixmpp is an MIT licensed XMPP library for Python 3.4+. It is a fork of
+SleekXMPP.
 
-SleekXMPP's design goals and philosphy are:
-
-**Low number of dependencies**
-    Installing and using SleekXMPP should be as simple as possible, without
-    having to deal with long dependency chains.
-
-    As part of reducing the number of dependencies, some third party
-    modules are included with SleekXMPP in the ``thirdparty`` directory.
-    Imports from this module first try to import an existing installed
-    version before loading the packaged version, when possible.
-
-**Every XEP as a plugin**
-    Following Python's "batteries included" approach, the goal is to
-    provide support for all currently active XEPs (final and draft). Since
-    adding XEP support is done through easy to create plugins, the hope is
-    to also provide a solid base for implementing and creating experimental
-    XEPs.
-
-**Rewarding to work with**
-    As much as possible, SleekXMPP should allow things to "just work" using
-    sensible defaults and appropriate abstractions. XML can be ugly to work
-    with, but it doesn't have to be that way.
-
-
-Get the Code
-------------
-
-Get the latest stable version from PyPI::
-
-    pip install sleekxmpp
-
-The latest source code for SleekXMPP may be found on `Github
-<http://github.com/fritzy/SleekXMPP>`_. Releases can be found in the
-``master`` branch, while the latest development version is in the
-``develop`` branch.
-
-**Latest Release**
-    - `1.3.1 <http://github.com/fritzy/SleekXMPP/zipball/1.3.1>`_
-
-**Develop Releases**
-    - `Latest Develop Version <http://github.com/fritzy/SleekXMPP/zipball/develop>`_
-
-
-Installing DNSPython
----------------------
-If you are using Python3 and wish to use dnspython, you will have to checkout and
-install the ``python3`` branch::
-
-    git clone http://github.com/rthalley/dnspython
-    cd dnspython
-    git checkout python3
-    python3 setup.py install
-
-Discussion
-----------
-A mailing list and XMPP chat room are available for discussing and getting
-help with SleekXMPP.
-
-**Mailing List**
-    `SleekXMPP Discussion on Google Groups <http://groups.google.com/group/sleekxmpp-discussion>`_
-
-**Chat**
-    `sleek@conference.jabber.org <xmpp:sleek@conference.jabber.org?join>`_
+Slixmpp's goals is to only rewrite the core of the library (the low level
+socket handling, the timers, the events dispatching) in order to remove all
+threads.
 
 
 Documentation and Testing
@@ -83,22 +19,22 @@ be in ``docs/_build/html``::
     make html
     open _build/html/index.html
 
-To run the test suite for SleekXMPP::
+To run the test suite for Slixmpp::
 
     python testall.py
 
 
-The SleekXMPP Boilerplate
+The Slixmpp Boilerplate
 -------------------------
-Projects using SleekXMPP tend to follow a basic pattern for setting up client/component
-connections and configuration. Here is the gist of the boilerplate needed for a SleekXMPP
+Projects using Slixmpp tend to follow a basic pattern for setting up client/component
+connections and configuration. Here is the gist of the boilerplate needed for a Slixmpp
 based project. See the documetation or examples directory for more detailed archetypes for
-SleekXMPP projects::
+Slixmpp projects::
 
     import logging
 
-    from sleekxmpp import ClientXMPP
-    from sleekxmpp.exceptions import IqError, IqTimeout
+    from slixmpp import ClientXMPP
+    from slixmpp.exceptions import IqError, IqTimeout
 
 
     class EchoBot(ClientXMPP):
@@ -155,8 +91,15 @@ SleekXMPP projects::
         xmpp.process(block=True)
 
 
+Slixmpp Credits
+---------------
+
+**Maintainer of the slixmpp fork:** Florent Le Coz
+    `louiz@louiz.org <xmpp:louiz@louiz.org?message>`_,
+
 Credits
 -------
+
 **Main Author:** Nathan Fritz
     `fritzy@netflint.net <xmpp:fritzy@netflint.net?message>`_, 
     `@fritzy <http://twitter.com/fritzy>`_

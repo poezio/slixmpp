@@ -5,25 +5,25 @@ Sign in, Send a Message, and Disconnect
     
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/sleekxmpp-discussion>`_
+    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
     or join the chat room at `sleek@conference.jabber.org
     <xmpp:sleek@conference.jabber.org?join>`_.
 
-A common use case for SleekXMPP is to send one-off messages from
+A common use case for Slixmpp is to send one-off messages from
 time to time. For example, one use case could be sending out a notice when 
 a shell script finishes a task.
 
 We will create our one-shot bot based on the pattern explained in :ref:`echobot`. To
-start, we create a client class based on :class:`ClientXMPP <sleekxmpp.clientxmpp.ClientXMPP>` and
+start, we create a client class based on :class:`ClientXMPP <slixmpp.clientxmpp.ClientXMPP>` and
 register a handler for the :term:`session_start` event. We will also accept parameters
 for the JID that will receive our message, and the string content of the message.
 
 .. code-block:: python
 
-    import sleekxmpp
+    import slixmpp
 
 
-    class SendMsgBot(sleekxmpp.ClientXMPP):
+    class SendMsgBot(slixmpp.ClientXMPP):
         
         def __init__(self, jid, password, recipient, msg):
             super(SendMsgBot, self).__init__(jid, password)
@@ -38,7 +38,7 @@ for the JID that will receive our message, and the string content of the message
             self.get_roster()
 
 Note that as in :ref:`echobot`, we need to include send an initial presence and request
-the roster. Next, we want to send our message, and to do that we will use :meth:`send_message <sleekxmpp.basexmpp.BaseXMPP.send_message>`.
+the roster. Next, we want to send our message, and to do that we will use :meth:`send_message <slixmpp.basexmpp.BaseXMPP.send_message>`.
 
 .. code-block:: python
 
@@ -48,12 +48,12 @@ the roster. Next, we want to send our message, and to do that we will use :meth:
 
         self.send_message(mto=self.recipient, mbody=self.msg)
 
-Finally, we need to disconnect the client using :meth:`disconnect <sleekxmpp.xmlstream.XMLStream.disconnect>`.
+Finally, we need to disconnect the client using :meth:`disconnect <slixmpp.xmlstream.XMLStream.disconnect>`.
 Now, sent stanzas are placed in a queue to pass them to the send thread. If we were to call
-:meth:`disconnect <sleekxmpp.xmlstream.XMLStream.disconnect>` without any parameters, then it is possible
+:meth:`disconnect <slixmpp.xmlstream.XMLStream.disconnect>` without any parameters, then it is possible
 for the client to disconnect before the send queue is processed and the message is actually
 sent on the wire. To ensure that our message is processed, we use 
-:meth:`disconnect(wait=True) <sleekxmpp.xmlstream.XMLStream.disconnect>`.
+:meth:`disconnect(wait=True) <slixmpp.xmlstream.XMLStream.disconnect>`.
 
 .. code-block:: python
 
@@ -68,7 +68,7 @@ sent on the wire. To ensure that our message is processed, we use
 .. warning::
 
     If you happen to be adding stanzas to the send queue faster than the send thread
-    can process them, then :meth:`disconnect(wait=True) <sleekxmpp.xmlstream.XMLStream.disconnect>`
+    can process them, then :meth:`disconnect(wait=True) <slixmpp.xmlstream.XMLStream.disconnect>`
     will block and not disconnect.
 
 Final Product

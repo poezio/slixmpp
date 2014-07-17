@@ -1,7 +1,7 @@
 Exceptions
 ==========
 
-.. module:: sleekxmpp.exceptions
+.. module:: slixmpp.exceptions
 
     
 .. autoexception:: XMPPError

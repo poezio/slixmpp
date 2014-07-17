@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 
 import unittest
-from sleekxmpp.exceptions import IqTimeout
-from sleekxmpp.test import SleekTest
+from slixmpp.exceptions import IqTimeout
+from slixmpp.test import SlixTest
 import time
 import threading
 
 
-class TestStreamRoster(SleekTest):
+class TestStreamRoster(SlixTest):
     """
     Test handling roster updates.
     """

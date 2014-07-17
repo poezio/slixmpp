@@ -1,10 +1,10 @@
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.xmlstream.stanzabase import ElementBase, register_stanza_plugin, ET
-from sleekxmpp.thirdparty import OrderedDict
+from slixmpp.test import SlixTest
+from slixmpp.xmlstream.stanzabase import ElementBase, register_stanza_plugin, ET
+from slixmpp.thirdparty import OrderedDict
 
 
-class TestElementBase(SleekTest):
+class TestElementBase(SlixTest):
 
     def testFixNs(self):
         """Test fixing namespaces in an XPath expression."""

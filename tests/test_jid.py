@@ -1,12 +1,12 @@
 # -*- encoding: utf8 -*-
 from __future__ import unicode_literals
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp import JID, InvalidJID
-from sleekxmpp.jid import nodeprep
+from slixmpp.test import SlixTest
+from slixmpp import JID, InvalidJID
+from slixmpp.jid import nodeprep
 
 
-class TestJIDClass(SleekTest):
+class TestJIDClass(SlixTest):
 
     """Verify that the JID class can parse and manipulate JIDs."""
 

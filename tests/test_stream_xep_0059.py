@@ -1,13 +1,13 @@
 import threading
 
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.xmlstream import register_stanza_plugin
-from sleekxmpp.plugins.xep_0030 import DiscoItems
-from sleekxmpp.plugins.xep_0059 import ResultIterator, Set
+from slixmpp.test import SlixTest
+from slixmpp.xmlstream import register_stanza_plugin
+from slixmpp.plugins.xep_0030 import DiscoItems
+from slixmpp.plugins.xep_0059 import ResultIterator, Set
 
 
-class TestStreamSet(SleekTest):
+class TestStreamSet(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(DiscoItems, Set)

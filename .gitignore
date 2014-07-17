@@ -6,7 +6,7 @@ docs/_build/
 *.swp
 .tox/
 .coverage
-sleekxmpp.egg-info/
+slixmpp.egg-info/
 .ropeproject/
 4913
 *~

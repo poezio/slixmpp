@@ -1,11 +1,11 @@
-from sleekxmpp import Iq
+from slixmpp import Iq
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.plugins.xep_0050 import Command
-from sleekxmpp.xmlstream import register_stanza_plugin
+from slixmpp.test import SlixTest
+from slixmpp.plugins.xep_0050 import Command
+from slixmpp.xmlstream import register_stanza_plugin
 
 
-class TestAdHocCommandStanzas(SleekTest):
+class TestAdHocCommandStanzas(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Iq, Command)

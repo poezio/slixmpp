@@ -1,17 +1,17 @@
 Send/Receive IQ Stanzas
 =======================
 
-Unlike :class:`~sleekxmpp.stanza.message.Message` and
-:class:`~sleekxmpp.stanza.presence.Presence` stanzas which only use
-text data for basic usage, :class:`~sleekxmpp.stanza.iq.Iq` stanzas
+Unlike :class:`~slixmpp.stanza.message.Message` and
+:class:`~slixmpp.stanza.presence.Presence` stanzas which only use
+text data for basic usage, :class:`~slixmpp.stanza.iq.Iq` stanzas
 require using XML payloads, and generally entail creating a new
-SleekXMPP plugin to provide the necessary convenience methods to
+Slixmpp plugin to provide the necessary convenience methods to
 make working with them easier.
 
 Basic Use
 ---------
 
-XMPP's use of :class:`~sleekxmpp.stanza.iq.Iq` stanzas is built around
+XMPP's use of :class:`~slixmpp.stanza.iq.Iq` stanzas is built around
 namespaced ``<query />`` elements. For clients, just sending the
 empty ``<query />`` element will suffice for retrieving information. For
 example, a very basic implementation of service discovery would just
@@ -26,18 +26,18 @@ need to be able to send:
 Creating Iq Stanzas
 ~~~~~~~~~~~~~~~~~~~
 
-SleekXMPP provides built-in support for creating basic :class:`~sleekxmpp.stanza.iq.Iq`
+Slixmpp provides built-in support for creating basic :class:`~slixmpp.stanza.iq.Iq`
 stanzas this way. The relevant methods are:
 
-* :meth:`~sleekxmpp.basexmpp.BaseXMPP.make_iq`
-* :meth:`~sleekxmpp.basexmpp.BaseXMPP.make_iq_get`
-* :meth:`~sleekxmpp.basexmpp.BaseXMPP.make_iq_set`
-* :meth:`~sleekxmpp.basexmpp.BaseXMPP.make_iq_result`
-* :meth:`~sleekxmpp.basexmpp.BaseXMPP.make_iq_error`
-* :meth:`~sleekxmpp.basexmpp.BaseXMPP.make_iq_query`
+* :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq`
+* :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq_get`
+* :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq_set`
+* :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq_result`
+* :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq_error`
+* :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq_query`
 
 These methods all follow the same pattern: create or modify an existing 
-:class:`~sleekxmpp.stanza.iq.Iq` stanza, set the ``'type'`` value based
+:class:`~slixmpp.stanza.iq.Iq` stanza, set the ``'type'`` value based
 on the method name, and finally add a ``<query />`` element with the given
 namespace. For example, to produce the query above, you would use:
 
@@ -50,14 +50,14 @@ namespace. For example, to produce the query above, you would use:
 Sending Iq Stanzas
 ~~~~~~~~~~~~~~~~~~
 
-Once an :class:`~sleekxmpp.stanza.iq.Iq` stanza is created, sending it
-over the wire is done using its :meth:`~sleekxmpp.stanza.iq.Iq.send()`
+Once an :class:`~slixmpp.stanza.iq.Iq` stanza is created, sending it
+over the wire is done using its :meth:`~slixmpp.stanza.iq.Iq.send()`
 method, like any other stanza object. However, there are a few extra
 options to control how to wait for the query's response.
 
 These options are:
 
-* ``block``: The default behaviour is that :meth:`~sleekxmpp.stanza.iq.Iq.send()`
+* ``block``: The default behaviour is that :meth:`~slixmpp.stanza.iq.Iq.send()`
   will block until a response is received and the response stanza will be the
   return value. Setting ``block`` to ``False`` will cause the call to return
   immediately. In which case, you will need to arrange some way to capture
@@ -90,11 +90,11 @@ These options are:
        # ... later if we need to cancel
        self.remove_handler(cb_name)
 
-Properly working with :class:`~sleekxmpp.stanza.iq.Iq` stanzas requires
+Properly working with :class:`~slixmpp.stanza.iq.Iq` stanzas requires
 handling the intended, normal flow, error responses, and timed out
 requests. To make this easier, two exceptions may be thrown by
-:meth:`~sleekxmpp.stanza.iq.Iq.send()`: :exc:`~sleekxmpp.exceptions.IqError`
-and :exc:`~sleekxmpp.exceptions.IqTimeout`. These exceptions only
+:meth:`~slixmpp.stanza.iq.Iq.send()`: :exc:`~slixmpp.exceptions.IqError`
+and :exc:`~slixmpp.exceptions.IqTimeout`. These exceptions only
 apply to the default, blocking calls.
 
 .. code-block:: python
@@ -110,7 +110,7 @@ apply to the default, blocking calls.
         pass
 
 If you do not care to distinguish between errors and timeouts, then you
-can combine both cases with a generic :exc:`~sleekxmpp.exceptions.XMPPError`
+can combine both cases with a generic :exc:`~slixmpp.exceptions.XMPPError`
 exception:
 
 .. code-block:: python
@@ -124,9 +124,9 @@ exception:
 Advanced Use
 ------------
 
-Going beyond the basics provided by SleekXMPP requires building at least a
-rudimentary SleekXMPP plugin to create a :term:`stanza object` for
-interfacting with the :class:`~sleekxmpp.stanza.iq.Iq` payload.
+Going beyond the basics provided by Slixmpp requires building at least a
+rudimentary Slixmpp plugin to create a :term:`stanza object` for
+interfacting with the :class:`~slixmpp.stanza.iq.Iq` payload.
 
 .. seealso::
 
@@ -135,13 +135,13 @@ interfacting with the :class:`~sleekxmpp.stanza.iq.Iq` payload.
     * :ref:`using-handlers-matchers`
     
 
-The typical way to respond to :class:`~sleekxmpp.stanza.iq.Iq` requests is
+The typical way to respond to :class:`~slixmpp.stanza.iq.Iq` requests is
 to register stream handlers. As an example, suppose we create a stanza class
 named ``CustomXEP`` which uses the XML element ``<query xmlns="custom-xep" />``,
-and has a :attr:`~sleekxmpp.xmlstream.stanzabase.ElementBase.plugin_attrib` value
+and has a :attr:`~slixmpp.xmlstream.stanzabase.ElementBase.plugin_attrib` value
 of ``custom_xep``.
 
-There are two types of incoming :class:`~sleekxmpp.stanza.iq.Iq` requests:
+There are two types of incoming :class:`~slixmpp.stanza.iq.Iq` requests:
 ``get`` and ``set``. You can register a handler that will accept both and then
 filter by type as needed, as so:
 
@@ -167,7 +167,7 @@ filter by type as needed, as so:
 
 If you want to filter out query types beforehand, you can adjust the matching
 filter by using ``@type=get`` or ``@type=set`` if you are using the recommended
-:class:`~sleekxmpp.xmlstream.matcher.stanzapath.StanzaPath` matcher.
+:class:`~slixmpp.xmlstream.matcher.stanzapath.StanzaPath` matcher.
 
 .. code-block:: python
 

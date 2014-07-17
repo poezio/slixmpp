@@ -1,9 +1,9 @@
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.xmlstream import ET
+from slixmpp.test import SlixTest
+from slixmpp.xmlstream import ET
 
 
-class TestRosterStanzas(SleekTest):
+class TestRosterStanzas(SlixTest):
 
     def testAddItems(self):
         """Test adding items to a roster stanza."""

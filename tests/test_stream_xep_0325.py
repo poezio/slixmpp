@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-    SleekXMPP: The Sleek XMPP Library
+    Slixmpp: The Slick XMPP Library
     Implementation of xeps for Internet of Things
     http://wiki.xmpp.org/web/Tech_pages/IoT_systems
     Copyright (C) 2013 Sustainable Innovation, Joachim.lindborg@sust.se, bjorn.westrom@consoden.se
-    This file is part of SleekXMPP.
+    This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
 """
@@ -14,12 +14,12 @@ import datetime
 import time
 import threading
 
-from sleekxmpp.test import *
-from sleekxmpp.xmlstream import ElementBase
-from sleekxmpp.plugins.xep_0325.device import Device
+from slixmpp.test import *
+from slixmpp.xmlstream import ElementBase
+from slixmpp.plugins.xep_0325.device import Device
 
 
-class TestStreamControl(SleekTest):
+class TestStreamControl(SlixTest):
 
     """
     Test using the XEP-0325 plugin.

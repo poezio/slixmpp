@@ -1,8 +1,8 @@
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestStreamExtendedDisco(SleekTest):
+class TestStreamExtendedDisco(SlixTest):
 
     """
     Test using the XEP-0128 plugin.

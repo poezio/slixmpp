@@ -1,10 +1,10 @@
 import unittest
-from sleekxmpp.test import SleekTest
-from sleekxmpp.plugins.xep_0059 import Set
-from sleekxmpp.xmlstream import ET
+from slixmpp.test import SlixTest
+from slixmpp.plugins.xep_0059 import Set
+from slixmpp.xmlstream import ET
 
 
-class TestSetStanzas(SleekTest):
+class TestSetStanzas(SlixTest):
 
     def testSetFirstIndex(self):
         s = Set()

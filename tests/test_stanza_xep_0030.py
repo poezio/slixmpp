@@ -1,11 +1,11 @@
 import unittest
-from sleekxmpp import Iq
-from sleekxmpp.test import SleekTest
-import sleekxmpp.plugins.xep_0030 as xep_0030
-from sleekxmpp.xmlstream import register_stanza_plugin
+from slixmpp import Iq
+from slixmpp.test import SlixTest
+import slixmpp.plugins.xep_0030 as xep_0030
+from slixmpp.xmlstream import register_stanza_plugin
 
 
-class TestDisco(SleekTest):
+class TestDisco(SlixTest):
 
     """
     Test creating and manipulating the disco#info and

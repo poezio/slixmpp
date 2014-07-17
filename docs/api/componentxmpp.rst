@@ -2,7 +2,7 @@
 ComponentXMPP
 =============
 
-.. module:: sleekxmpp.componentxmpp
+.. module:: slixmpp.componentxmpp
 
 .. autoclass:: ComponentXMPP
     :members:

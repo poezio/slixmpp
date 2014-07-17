@@ -1,10 +1,10 @@
 import time
 
 import unittest
-from sleekxmpp.test import SleekTest
+from slixmpp.test import SlixTest
 
 
-class TestStreamDirectInvite(SleekTest):
+class TestStreamDirectInvite(SlixTest):
 
     """
     Test using the XEP-0249 plugin.
@@ -47,13 +47,13 @@ class TestStreamDirectInvite(SleekTest):
 
         self.xmpp['xep_0249'].send_invitation('user@example.com',
                                               'sleek@conference.jabber.org',
-                                              reason='Need to test Sleek')
+                                              reason='Need to test Slixmpp')
 
         self.send("""
           <message to="user@example.com">
             <x xmlns="jabber:x:conference"
                jid="sleek@conference.jabber.org"
-               reason="Need to test Sleek" />
+               reason="Need to test Slixmpp" />
           </message>
         """)
 
