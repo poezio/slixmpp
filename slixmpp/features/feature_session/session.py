@@ -44,8 +44,9 @@ class FeatureSession(BasePlugin):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq.enable('session')
-        iq.send(now=True)
+        iq.send(block=False, callback=self._on_start_session_response)
 
+    def _on_start_session_response(self, response):
         self.xmpp.features.add('session')
 
         log.debug("Established Session")

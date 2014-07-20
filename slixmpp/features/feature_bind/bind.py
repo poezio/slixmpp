@@ -42,13 +42,16 @@ class FeatureBind(BasePlugin):
             features -- The stream features stanza.
         """
         log.debug("Requesting resource: %s", self.xmpp.requested_jid.resource)
+        self.features = features
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq.enable('bind')
         if self.xmpp.requested_jid.resource:
             iq['bind']['resource'] = self.xmpp.requested_jid.resource
-        response = iq.send(now=True)
 
+        iq.send(block=False, callback=self._on_bind_response)
+
+    def _on_bind_response(self, response):
         self.xmpp.boundjid = JID(response['bind']['jid'], cache_lock=True)
         self.xmpp.bound = True
         self.xmpp.event('session_bind', self.xmpp.boundjid, direct=True)
@@ -58,7 +61,7 @@ class FeatureBind(BasePlugin):
 
         log.info("JID set to: %s", self.xmpp.boundjid.full)
 
-        if 'session' not in features['features']:
+        if 'session' not in self.features['features']:
             log.debug("Established Session")
             self.xmpp.sessionstarted = True
             self.xmpp.session_started_event.set()

@@ -52,7 +52,7 @@ class FeatureSTARTTLS(BasePlugin):
             # We have already negotiated TLS, but the server is
             # offering it again, against spec.
             return False
-        elif not self.xmpp.use_tls:
+        elif self.xmpp.disable_starttls:
             return False
         else:
             self.xmpp.send(features['starttls'], now=True)
@@ -63,4 +63,3 @@ class FeatureSTARTTLS(BasePlugin):
         log.debug("Starting TLS")
         if self.xmpp.start_tls():
             self.xmpp.features.add('starttls')
-            raise RestartStream()

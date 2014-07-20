@@ -233,7 +233,9 @@ class FeatureMechanisms(BasePlugin):
             self.xmpp.authenticated = True
             self.xmpp.features.add('mechanisms')
             self.xmpp.event('auth_success', stanza, direct=True)
-            raise RestartStream()
+            # Restart the stream
+            self.xmpp.init_parser()
+            self.xmpp.send_raw(self.xmpp.stream_header)
 
     def _handle_fail(self, stanza):
         """SASL authentication failed. Disconnect and shutdown."""

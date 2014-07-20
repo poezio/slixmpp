@@ -213,37 +213,12 @@ class BaseXMPP(XMLStream):
             log.warning('Legacy XMPP 0.9 protocol detected.')
             self.event('legacy_protocol')
 
-    def process(self, *args, **kwargs):
-        """Initialize plugins and begin processing the XML stream.
-
-        The number of threads used for processing stream events is determined
-        by :data:`HANDLER_THREADS`.
-
-        :param bool block: If ``False``, then event dispatcher will run
-                    in a separate thread, allowing for the stream to be
-                    used in the background for another application.
-                    Otherwise, ``process(block=True)`` blocks the current
-                    thread. Defaults to ``False``.
-        :param bool threaded: **DEPRECATED**
-                    If ``True``, then event dispatcher will run
-                    in a separate thread, allowing for the stream to be
-                    used in the background for another application.
-                    Defaults to ``True``. This does **not** mean that no
-                    threads are used at all if ``threaded=False``.
-
-        Regardless of these threading options, these threads will
-        always exist:
-
-        - The event queue processor
-        - The send queue processor
-        - The scheduler
-        """
+    def init_plugins(self, *args, **kwargs):
         for name in self.plugin:
             if not hasattr(self.plugin[name], 'post_inited'):
                 if hasattr(self.plugin[name], 'post_init'):
                     self.plugin[name].post_init()
                 self.plugin[name].post_inited = True
-        return XMLStream.process(self, *args, **kwargs)
 
     def register_plugin(self, plugin, pconfig={}, module=None):
         """Register and configure  a plugin for use in this stream.

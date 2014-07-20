@@ -128,8 +128,8 @@ class ClientXMPP(BaseXMPP):
     def password(self, value):
         self.credentials['password'] = value
 
-    def connect(self, address=tuple(), reattempt=True,
-                use_tls=True, use_ssl=False):
+    def connect(self, address=tuple(), use_ssl=False,
+                force_starttls=True, disable_starttls=False):
         """Connect to the XMPP server.
 
         When no address is given, a SRV lookup for the server will
@@ -155,9 +155,8 @@ class ClientXMPP(BaseXMPP):
             address = (self.boundjid.host, 5222)
             self.dns_service = 'xmpp-client'
 
-        return XMLStream.connect(self, address[0], address[1],
-                                 use_tls=use_tls, use_ssl=use_ssl,
-                                 reattempt=reattempt)
+        return XMLStream.connect(self, address[0], address[1], use_ssl=use_ssl,
+                                 force_starttls=force_starttls, disable_starttls=disable_starttls)
 
     def register_feature(self, name, handler, restart=False, order=5000):
         """Register a stream feature handler.
