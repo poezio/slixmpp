@@ -1580,7 +1580,7 @@ class StanzaBase(ElementBase):
                          stanza sent immediately. Useful for stream
                          initialization. Defaults to ``False``.
         """
-        self.stream.send(self, now=now)
+        self.stream.send(self)
 
     def __copy__(self):
         """Return a copy of the stanza object that does not share the

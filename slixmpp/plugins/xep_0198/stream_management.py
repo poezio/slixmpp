@@ -173,7 +173,7 @@ class XEP_0198(BasePlugin):
         ack = stanza.Ack(self.xmpp)
         with self.handled_lock:
             ack['h'] = self.handled
-        self.xmpp.send_raw(str(ack), now=True)
+        self.xmpp.send_raw(str(ack))
 
     def request_ack(self, e=None):
         """Request an ack from the server."""
@@ -199,14 +199,14 @@ class XEP_0198(BasePlugin):
                 self.enabled.set()
                 enable = stanza.Enable(self.xmpp)
                 enable['resume'] = self.allow_resume
-                enable.send(now=True)
+                enable.send()
                 self.handled = 0
         elif self.sm_id and self.allow_resume:
             self.enabled.set()
             resume = stanza.Resume(self.xmpp)
             resume['h'] = self.handled
             resume['previd'] = self.sm_id
-            resume.send(now=True)
+            resume.send()
 
             # Wait for a response before allowing stream feature processing
             # to continue. The actual result processing will be done in the
@@ -239,8 +239,7 @@ class XEP_0198(BasePlugin):
         self.xmpp.features.add('stream_management')
         self._handle_ack(stanza)
         for id, stanza in self.unacked_queue:
-            self.xmpp.send(stanza, now=True, use_filters=False)
-        self.xmpp.session_started_event.set()
+            self.xmpp.send(stanza, use_filters=False)
         self.xmpp.event('session_resumed', stanza)
 
     def _handle_failed(self, stanza):

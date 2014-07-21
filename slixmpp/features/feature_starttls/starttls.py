@@ -55,7 +55,7 @@ class FeatureSTARTTLS(BasePlugin):
         elif self.xmpp.disable_starttls:
             return False
         else:
-            self.xmpp.send(features['starttls'], now=True)
+            self.xmpp.send(features['starttls'])
             return True
 
     def _handle_starttls_proceed(self, proceed):

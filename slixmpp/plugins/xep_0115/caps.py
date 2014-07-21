@@ -305,7 +305,7 @@ class XEP_0115(BasePlugin):
             self.cache_caps(ver, info)
             self.assign_verstring(jid, ver)
 
-            if self.xmpp.session_started_event.is_set() and self.broadcast:
+            if self.xmpp.sessionstarted and self.broadcast:
                 if self.xmpp.is_component or preserve:
                     for contact in self.xmpp.roster[jid]:
                         self.xmpp.roster[jid][contact].send_last_presence()

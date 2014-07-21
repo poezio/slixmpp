@@ -191,9 +191,6 @@ class Iq(RootStanza):
                         stanza.  Only called if there is a callback parameter
                         (and therefore are in async mode).
         """
-        if timeout is None:
-            timeout = self.stream.response_timeout
-
         if self.stream.session_bind_event.is_set():
             matcher = MatchIDSender({
                 'id': self['id'],

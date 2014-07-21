@@ -51,5 +51,4 @@ class FeatureSession(BasePlugin):
 
         log.debug("Established Session")
         self.xmpp.sessionstarted = True
-        self.xmpp.session_started_event.set()
         self.xmpp.event('session_start')

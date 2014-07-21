@@ -196,7 +196,7 @@ class FeatureMechanisms(BasePlugin):
             self.attempted_mechs.add(self.mech.name)
             self.xmpp.disconnect()
         else:
-            resp.send(now=True)
+            resp.send()
 
         return True
 
@@ -217,7 +217,7 @@ class FeatureMechanisms(BasePlugin):
         else:
             if resp.get_value() == '':
                 resp.del_value()
-            resp.send(now=True)
+            resp.send()
 
     def _handle_success(self, stanza):
         """SASL authentication succeeded. Restart the stream."""

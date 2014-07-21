@@ -101,7 +101,7 @@ class RegisterBot(slixmpp.ClientXMPP):
         resp['register']['password'] = self.password
 
         try:
-            resp.send(now=True)
+            resp.send()
             logging.info("Account created for %s!" % self.boundjid)
         except IqError as e:
             logging.error("Could not register account: %s" %

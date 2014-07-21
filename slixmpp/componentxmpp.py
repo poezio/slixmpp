@@ -143,7 +143,7 @@ class ComponentXMPP(BaseXMPP):
 
         handshake = ET.Element('{jabber:component:accept}handshake')
         handshake.text = hashlib.sha1(pre_hash).hexdigest().lower()
-        self.send_xml(handshake, now=True)
+        self.send_xml(handshake)
 
     def _handle_handshake(self, xml):
         """The handshake has been accepted.
