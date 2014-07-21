@@ -35,7 +35,6 @@ import xml.etree.ElementTree
 
 import slixmpp
 from slixmpp.util import Queue, QueueEmpty, safedict
-from slixmpp.thirdparty.statemachine import StateMachine
 from slixmpp.xmlstream import tostring, cert
 from slixmpp.xmlstream.stanzabase import StanzaBase, ET, ElementBase
 from slixmpp.xmlstream.handler import Waiter, XMLCallback
@@ -141,11 +140,6 @@ class XMLStream(object):
         self.keyfile = None
 
         self._der_cert = None
-
-        #: The connection state machine tracks if the stream is
-        #: ``'connected'`` or ``'disconnected'``.
-        self.state = StateMachine(('disconnected', 'connected'))
-        self.state._set_state('disconnected')
 
         #: The default port to return when querying DNS records.
         self.default_port = int(port)
