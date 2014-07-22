@@ -11,8 +11,7 @@ from slixmpp.xmlstream.stanzabase import StanzaBase, ElementBase, ET
 from slixmpp.xmlstream.stanzabase import register_stanza_plugin
 from slixmpp.xmlstream.tostring import tostring
 from slixmpp.xmlstream.xmlstream import XMLStream, RESPONSE_TIMEOUT
-from slixmpp.xmlstream.xmlstream import RestartStream
 
 __all__ = ['JID', 'StanzaBase', 'ElementBase',
            'ET', 'StateMachine', 'tostring', 'XMLStream',
-           'RESPONSE_TIMEOUT', 'RestartStream']
+           'RESPONSE_TIMEOUT']

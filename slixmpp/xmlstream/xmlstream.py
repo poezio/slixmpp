@@ -47,12 +47,6 @@ RESPONSE_TIMEOUT = 30
 log = logging.getLogger(__name__)
 
 
-class RestartStream(Exception):
-    """
-    Exception to restart stream processing, including
-    resending the stream header.
-    """
-
 class NotConnectedError(Exception):
     """
     Raised when we try to send something over the wire but we are not

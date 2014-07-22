@@ -12,7 +12,7 @@ import logging
 from slixmpp.util import sasl
 from slixmpp.util.stringprep_profiles import StringPrepError
 from slixmpp.stanza import StreamFeatures
-from slixmpp.xmlstream import RestartStream, register_stanza_plugin
+from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream.matcher import MatchXPath
 from slixmpp.xmlstream.handler import Callback
