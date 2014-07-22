@@ -650,11 +650,9 @@ class XMLStream(object):
                 # remove it now instead of waiting for it to be
                 # processed in the queue.
                 try:
-                    h_index = self.__event_handlers[name].index(handler)
-                except:
+                    self.__event_handlers[name].remove(handler)
+                except ValueError:
                     pass
-                else:
-                    self.__event_handlers[name].pop(h_index)
 
     def schedule(self, name, seconds, callback, args=tuple(),
                  kwargs={}, repeat=False):
