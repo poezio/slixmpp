@@ -82,12 +82,12 @@ class XEP_0078(BasePlugin):
             resp = iq.send(now=True)
         except IqError as err:
             log.info("Authentication failed: %s", err.iq['error']['condition'])
-            self.xmpp.event('failed_auth', direct=True)
+            self.xmpp.event('failed_auth')
             self.xmpp.disconnect()
             return True
         except IqTimeout:
             log.info("Authentication failed: %s", 'timeout')
-            self.xmpp.event('failed_auth', direct=True)
+            self.xmpp.event('failed_auth')
             self.xmpp.disconnect()
             return True
 
@@ -123,11 +123,11 @@ class XEP_0078(BasePlugin):
             result = iq.send(now=True)
         except IqError as err:
             log.info("Authentication failed")
-            self.xmpp.event("failed_auth", direct=True)
+            self.xmpp.event("failed_auth")
             self.xmpp.disconnect()
         except IqTimeout:
             log.info("Authentication failed")
-            self.xmpp.event("failed_auth", direct=True)
+            self.xmpp.event("failed_auth")
             self.xmpp.disconnect()
 
         self.xmpp.features.add('auth')
@@ -137,7 +137,7 @@ class XEP_0078(BasePlugin):
         self.xmpp.boundjid = JID(self.xmpp.requested_jid,
                 resource=resource,
                 cache_lock=True)
-        self.xmpp.event('session_bind', self.xmpp.boundjid, direct=True)
+        self.xmpp.event('session_bind', self.xmpp.boundjid)
 
         log.debug("Established Session")
         self.xmpp.sessionstarted = True

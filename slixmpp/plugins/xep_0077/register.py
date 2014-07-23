@@ -77,7 +77,7 @@ class XEP_0077(BasePlugin):
 
         if self.create_account and self.xmpp.event_handled('register'):
             form = self.get_registration()
-            self.xmpp.event('register', form, direct=True)
+            self.xmpp.event('register', form)
             return True
         return False
 

@@ -152,7 +152,7 @@ class ComponentXMPP(BaseXMPP):
         """
         self.session_bind_event.set()
         self.session_started_event.set()
-        self.event('session_bind', self.boundjid, direct=True)
+        self.event('session_bind', self.boundjid)
         self.event('session_start')
 
     def _handle_probe(self, pres):

@@ -108,10 +108,6 @@ when this bit of XML is received (with an assumed namespace of
    handlers <event handler>`. Each stanza/handler pair is then put into the
    event queue.
 
-   .. note::
-       It is possible to skip the event queue and process an event immediately
-       by using ``direct=True`` when raising the event.
-
    The code for :meth:`BaseXMPP._handle_message` follows this pattern, and
    raises a ``'message'`` event::
 

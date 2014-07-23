@@ -172,8 +172,8 @@ class FeatureMechanisms(BasePlugin):
                                     min_mech=self.min_mech)
         except sasl.SASLNoAppropriateMechanism:
             log.error("No appropriate login method.")
-            self.xmpp.event("no_auth", direct=True)
-            self.xmpp.event("failed_auth", direct=True)
+            self.xmpp.event("no_auth")
+            self.xmpp.event("failed_auth")
             self.attempted_mechs = set()
             return self.xmpp.disconnect()
         except StringPrepError:
@@ -232,7 +232,7 @@ class FeatureMechanisms(BasePlugin):
             self.attempted_mechs = set()
             self.xmpp.authenticated = True
             self.xmpp.features.add('mechanisms')
-            self.xmpp.event('auth_success', stanza, direct=True)
+            self.xmpp.event('auth_success', stanza)
             # Restart the stream
             self.xmpp.init_parser()
             self.xmpp.send_raw(self.xmpp.stream_header)
@@ -241,6 +241,6 @@ class FeatureMechanisms(BasePlugin):
         """SASL authentication failed. Disconnect and shutdown."""
         self.attempted_mechs.add(self.mech.name)
         log.info("Authentication failed: %s", stanza['condition'])
-        self.xmpp.event("failed_auth", stanza, direct=True)
+        self.xmpp.event("failed_auth", stanza)
         self._send_auth()
         return True
