@@ -826,8 +826,6 @@ class XMLStream(object):
             try:
                 handler.run(stanza_copy)
             except Exception as e:
-                error_msg = 'Error processing stream handler: %s'
-                log.exception(error_msg, handler.name)
                 stanza_copy.exception(e)
             if handler.check_delete():
                 self.__handlers.remove(handler)
