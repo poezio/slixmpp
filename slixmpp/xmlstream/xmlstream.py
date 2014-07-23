@@ -447,7 +447,6 @@ class XMLStream(object):
     def _remove_schedules(self, event):
         """Remove some schedules that become pointless when disconnected"""
         self.cancel_schedule('Whitespace Keepalive')
-        self.cancel_schedule('Certificate Expiration')
         self.cancel_schedule('Disconnect wait')
 
     def start_stream_handler(self, xml):
@@ -684,7 +683,6 @@ class XMLStream(object):
         try:
             cb()
         except Exception as e:
-            log.exception('Error processing scheduled task')
             self.exception(e)
 
     def _execute_and_reschedule(self, name, cb, seconds):
