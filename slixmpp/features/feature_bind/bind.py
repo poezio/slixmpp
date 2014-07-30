@@ -49,7 +49,7 @@ class FeatureBind(BasePlugin):
         if self.xmpp.requested_jid.resource:
             iq['bind']['resource'] = self.xmpp.requested_jid.resource
 
-        iq.send(block=False, callback=self._on_bind_response)
+        iq.send(callback=self._on_bind_response)
 
     def _on_bind_response(self, response):
         self.xmpp.boundjid = JID(response['bind']['jid'], cache_lock=True)

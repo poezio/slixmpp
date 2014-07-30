@@ -32,6 +32,7 @@ class XEP_0223(BasePlugin):
         """
         Update a node's configuration to match the public storage profile.
         """
+        # TODO: that cannot possibly work, why is this here?
         config = self.xmpp['xep_0004'].Form()
         config['type'] = 'submit'
 
@@ -39,13 +40,12 @@ class XEP_0223(BasePlugin):
             config.add_field(var=field, value=value)
 
         return self.xmpp['xep_0060'].set_node_config(None, node, config,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+                                                     ifrom=ifrom,
+                                                     callback=callback,
+                                                     timeout=timeout)
 
     def store(self, stanza, node=None, id=None, ifrom=None, options=None,
-              block=True, callback=None, timeout=None):
+              callback=None, timeout=None, timeout_callback=None):
         """
         Store private data via PEP.
 
@@ -60,8 +60,6 @@ class XEP_0223(BasePlugin):
             options  -- Publish options to use, which will be modified to
                         fit the persistent storage option profile.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -82,15 +80,13 @@ class XEP_0223(BasePlugin):
                 options.add_field(var=field)
             options['fields'][field]['value'] = value
 
-        return self.xmpp['xep_0163'].publish(stanza, node,
-                options=options,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+        return self.xmpp['xep_0163'].publish(stanza, node, options=options,
+                                             ifrom=ifrom, callback=callback,
+                                             timeout=timeout,
+                                             timeout_callback=timeout_callback)
 
     def retrieve(self, node, id=None, item_ids=None, ifrom=None,
-                 block=True, callback=None, timeout=None):
+                 callback=None, timeout=None, timeout_callback=None):
         """
         Retrieve private data via PEP.
 
@@ -103,8 +99,6 @@ class XEP_0223(BasePlugin):
             item_ids -- Specify a group of IDs. If id is also specified, it
                         will be included in item_ids.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -117,11 +111,9 @@ class XEP_0223(BasePlugin):
             item_ids.append(id)
 
         return self.xmpp['xep_0060'].get_items(None, node,
-                item_ids=item_ids,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+                                               item_ids=item_ids, ifrom=ifrom,
+                                               callback=callback, timeout=timeout,
+                                               timeout_callback=timeout_callback)
 
 
 register_plugin(XEP_0223)

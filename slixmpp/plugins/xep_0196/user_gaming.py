@@ -33,9 +33,11 @@ class XEP_0196(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_gaming', UserGaming)
 
-    def publish_gaming(self, name=None, level=None, server_name=None, uri=None,
-                    character_name=None, character_profile=None, server_address=None,
-                    options=None, ifrom=None, block=True, callback=None, timeout=None):
+    def publish_gaming(self, name=None, level=None, server_name=None,
+                       uri=None, character_name=None,
+                       character_profile=None, server_address=None,
+                       options=None, ifrom=None, callback=None,
+                       timeout=None, timeout_callback=None):
         """
         Publish the user's current gaming status.
 
@@ -50,8 +52,6 @@ class XEP_0196(BasePlugin):
             character_profile -- A URI for a profile of the user's character.
             options           -- Optional form of publish options.
             ifrom             -- Specify the sender's JID.
-            block             -- Specify if the send call will block until a response
-                                 is received, or a timeout occurs. Defaults to True.
             timeout           -- The length of time (in seconds) to wait for a response
                                  before exiting the send call if blocking is used.
                                  Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -67,21 +67,18 @@ class XEP_0196(BasePlugin):
         gaming['server_name'] = server_name
         gaming['server_address'] = server_address
         return self.xmpp['xep_0163'].publish(gaming,
-                node=UserGaming.namespace,
-                options=options,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+                                             node=UserGaming.namespace,
+                                             options=options, ifrom=ifrom,
+                                             callback=callback, timeout=timeout,
+                                             timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, block=True, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None,
+             timeout_callback=None):
         """
         Clear existing user gaming information to stop notifications.
 
         Arguments:
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -90,8 +87,7 @@ class XEP_0196(BasePlugin):
         """
         gaming = UserGaming()
         return self.xmpp['xep_0163'].publish(gaming,
-                node=UserGaming.namespace,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+                                             node=UserGaming.namespace,
+                                             ifrom=ifrom, callback=callback,
+                                             timeout=timeout,
+                                             timeout_callback=timeout_callback)

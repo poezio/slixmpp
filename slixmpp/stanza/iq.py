@@ -158,38 +158,26 @@ class Iq(RootStanza):
         StanzaBase.reply(self, clear)
         return self
 
-    def send(self, block=True, timeout=None, callback=None, now=False, timeout_callback=None):
-        """
-        Send an <iq> stanza over the XML stream.
+    def send(self, callback=None, timeout=None, timeout_callback=None):
+        """Send an <iq> stanza over the XML stream.
 
-        The send call can optionally block until a response is received or
-        a timeout occurs. Be aware that using blocking in non-threaded event
-        handlers can drastically impact performance. Otherwise, a callback
-        handler can be provided that will be executed when the Iq stanza's
-        result reply is received. Be aware though that that the callback
-        handler will not be executed in its own thread.
-
-        Using both block and callback is not recommended, and only the
-        callback argument will be used in that case.
+        A callback handler can be provided that will be executed when the Iq
+        stanza's result reply is received.
 
         Overrides StanzaBase.send
 
         Arguments:
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
-            now      -- Indicates if the send queue should be skipped and send
-                        the stanza immediately. Used during stream
-                        initialization. Defaults to False.
-            timeout_callback -- Optional reference to a stream handler function.
-                        Will be executed when the timeout expires before a
-                        response has been received with the originally-sent IQ
-                        stanza.  Only called if there is a callback parameter
-                        (and therefore are in async mode).
+
+            callback -- Optional reference to a stream handler
+                        function. Will be executed when a reply stanza is
+                        received.
+            timeout -- The length of time (in seconds) to wait for a
+                        response before the timeout_callback is called,
+                        instead of the regular callback
+            timeout_callback -- Optional reference to a stream handler
+                        function.  Will be executed when the timeout expires
+                        before a response has been received with the
+                        originally-sent IQ stanza.
         """
         if self.stream.session_bind_event.is_set():
             matcher = MatchIDSender({
@@ -219,24 +207,14 @@ class Iq(RootStanza):
                                    callback,
                                    once=True)
             self.stream.register_handler(handler)
-            StanzaBase.send(self, now=now)
+            StanzaBase.send(self)
             return handler_name
-        elif block and self['type'] in ('get', 'set'):
-            waitfor = Waiter('IqWait_%s' % self['id'], matcher)
-            self.stream.register_handler(waitfor)
-            StanzaBase.send(self, now=now)
-            result = waitfor.wait(timeout)
-            if not result:
-                raise IqTimeout(self)
-            if result['type'] == 'error':
-                raise IqError(result)
-            return result
         else:
-            return StanzaBase.send(self, now=now)
+            return StanzaBase.send(self)
 
     def _handle_result(self, iq):
         # we got the IQ, so don't fire the timeout
-        self.stream.scheduler.remove('IqTimeout_%s' % self['id'])
+        self.stream.cancel_schedule('IqTimeout_%s' % self['id'])
         self.callback(iq)
 
     def _fire_timeout(self):

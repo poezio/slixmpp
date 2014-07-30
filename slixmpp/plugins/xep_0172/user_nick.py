@@ -42,7 +42,7 @@ class XEP_0172(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_nick', UserNick)
 
-    def publish_nick(self, nick=None, options=None, ifrom=None, block=True,
+    def publish_nick(self, nick=None, options=None, ifrom=None, timeout_callback=None,
                      callback=None, timeout=None):
         """
         Publish the user's current nick.
@@ -51,8 +51,6 @@ class XEP_0172(BasePlugin):
             nick     -- The user nickname to publish.
             options  -- Optional form of publish options.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -61,22 +59,17 @@ class XEP_0172(BasePlugin):
         """
         nickname = UserNick()
         nickname['nick'] = nick
-        return self.xmpp['xep_0163'].publish(nickname,
-                node=UserNick.namespace,
-                options=options,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+        self.xmpp['xep_0163'].publish(nickname, node=UserNick.namespace,
+                                      options=options, ifrom=ifrom,
+                                      callback=callback, timeout=timeout,
+                                      timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, block=True, callback=None, timeout=None):
+    def stop(self, ifrom=None, timeout_callback=None, callback=None, timeout=None):
         """
         Clear existing user nick information to stop notifications.
 
         Arguments:
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -84,9 +77,7 @@ class XEP_0172(BasePlugin):
                         be executed when a reply stanza is received.
         """
         nick = UserNick()
-        return self.xmpp['xep_0163'].publish(nick,
-                node=UserNick.namespace,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+        return self.xmpp['xep_0163'].publish(nick, node=UserNick.namespace,
+                                             ifrom=ifrom, callback=callback,
+                                             timeout=timeout,
+                                             timeout_callback=timeout_callback)

@@ -317,10 +317,8 @@ class XEP_0030(BasePlugin):
                         be skipped, even if a result has already been
                         cached. Defaults to false.
             ifrom    -- Specifiy the sender's JID.
-            block    -- If true, block and wait for the stanzas' reply.
-            timeout  -- The time in seconds to block while waiting for
-                        a reply. If None, then wait indefinitely. The
-                        timeout value is only used when block=True.
+            timeout  -- The time in seconds to wait for reply, before
+                        calling timeout_callback
             callback -- Optional callback to execute when a reply is
                         received instead of blocking and waiting for
                         the reply.
@@ -364,10 +362,9 @@ class XEP_0030(BasePlugin):
         iq['to'] = jid
         iq['type'] = 'get'
         iq['disco_info']['node'] = node if node else ''
-        return iq.send(timeout=kwargs.get('timeout', None),
-                       block=kwargs.get('block', True),
-                       callback=kwargs.get('callback', None),
-                       timeout_callback=kwargs.get('timeout_callback', None))
+        iq.send(timeout=kwargs.get('timeout', None),
+                callback=kwargs.get('callback', None),
+                timeout_callback=kwargs.get('timeout_callback', None))
 
     def set_info(self, jid=None, node=None, info=None):
         """
@@ -399,7 +396,6 @@ class XEP_0030(BasePlugin):
                         Otherwise, a disco stanza must be sent to the
                         remove JID to retrieve the items.
             ifrom    -- Specifiy the sender's JID.
-            block    -- If true, block and wait for the stanzas' reply.
             timeout  -- The time in seconds to block while waiting for
                         a reply. If None, then wait indefinitely.
             callback -- Optional callback to execute when a reply is
@@ -424,12 +420,12 @@ class XEP_0030(BasePlugin):
         iq['type'] = 'get'
         iq['disco_items']['node'] = node if node else ''
         if kwargs.get('iterator', False) and self.xmpp['xep_0059']:
+            raise NotImplementedError("XEP 0059 has not yet been fixed")
             return self.xmpp['xep_0059'].iterate(iq, 'disco_items')
         else:
-            return iq.send(timeout=kwargs.get('timeout', None),
-                           block=kwargs.get('block', True),
-                           callback=kwargs.get('callback', None),
-                           timeout_callback=kwargs.get('timeout_callback', None))
+            iq.send(timeout=kwargs.get('timeout', None),
+                    callback=kwargs.get('callback', None),
+                    timeout_callback=kwargs.get('timeout_callback', None))
 
     def set_items(self, jid=None, node=None, **kwargs):
         """

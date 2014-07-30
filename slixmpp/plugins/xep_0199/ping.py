@@ -101,7 +101,7 @@ class XEP_0199(BasePlugin):
                            repeat=True)
 
     def disable_keepalive(self, event=None):
-        self.xmpp.scheduler.remove('Ping keepalive')
+        self.xmpp.cancel_schedule('Ping keepalive')
 
     def _keepalive(self, event=None):
         log.debug("Keepalive ping...")
@@ -119,15 +119,13 @@ class XEP_0199(BasePlugin):
         log.debug("Pinged by %s", iq['from'])
         iq.reply().send()
 
-    def send_ping(self, jid, ifrom=None, block=True, timeout=None, callback=None):
+    def send_ping(self, jid, ifrom=None, timeout=None, callback=None,
+                  timeout_callback=None):
         """Send a ping request.
 
         Arguments:
             jid        -- The JID that will receive the ping.
             ifrom      -- Specifiy the sender JID.
-            block      -- Indicate if execution should block until
-                          a pong response is received. Defaults
-                          to True.
             timeout    -- Time in seconds to wait for a response.
                           Defaults to self.timeout.
             callback   -- Optional handler to execute when a pong
@@ -143,7 +141,8 @@ class XEP_0199(BasePlugin):
         iq['from'] = ifrom
         iq.enable('ping')
 
-        return iq.send(block=block, timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback,
+                       timeout_callback=timeout_callback)
 
     def ping(self, jid=None, ifrom=None, timeout=None):
         """Send a ping request and calculate RTT.

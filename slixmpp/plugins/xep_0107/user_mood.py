@@ -40,8 +40,8 @@ class XEP_0107(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_mood', UserMood)
 
-    def publish_mood(self, value=None, text=None, options=None,
-                     ifrom=None, block=True, callback=None, timeout=None):
+    def publish_mood(self, value=None, text=None, options=None, ifrom=None,
+                     callback=None, timeout=None, timeout_callback=None):
         """
         Publish the user's current mood.
 
@@ -51,8 +51,6 @@ class XEP_0107(BasePlugin):
                         for the mood.
             options  -- Optional form of publish options.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -62,22 +60,18 @@ class XEP_0107(BasePlugin):
         mood = UserMood()
         mood['value'] = value
         mood['text'] = text
-        return self.xmpp['xep_0163'].publish(mood,
-                node=UserMood.namespace,
-                options=options,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+        self.xmpp['xep_0163'].publish(mood, node=UserMood.namespace,
+                                      options=options, ifrom=ifrom,
+                                      callback=callback, timeout=timeout,
+                                      timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, block=True, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None,
+             timeout_callback=None):
         """
         Clear existing user mood information to stop notifications.
 
         Arguments:
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -85,9 +79,7 @@ class XEP_0107(BasePlugin):
                         be executed when a reply stanza is received.
         """
         mood = UserMood()
-        return self.xmpp['xep_0163'].publish(mood,
-                node=UserMood.namespace,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+        self.xmpp['xep_0163'].publish(mood, node=UserMood.namespace,
+                                      ifrom=ifrom, callback=callback,
+                                      timeout=timeout,
+                                      timeout_callback=timeout_callback)

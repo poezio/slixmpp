@@ -9,7 +9,6 @@
 import logging
 import hashlib
 import base64
-import threading
 
 from slixmpp import __version__
 from slixmpp.stanza import StreamFeatures, Presence, Iq
@@ -65,8 +64,7 @@ class XEP_0115(BasePlugin):
 
         self.xmpp.add_filter('out', self._filter_add_caps)
 
-        self.xmpp.add_event_handler('entity_caps', self._process_caps,
-                                    threaded=True)
+        self.xmpp.add_event_handler('entity_caps', self._process_caps)
 
         if not self.xmpp.is_component:
             self.xmpp.register_feature('caps',
@@ -89,9 +87,6 @@ class XEP_0115(BasePlugin):
         disco.update_caps = self.update_caps
         disco.assign_verstring = self.assign_verstring
         disco.get_verstring = self.get_verstring
-
-        self._processing_lock = threading.Lock()
-        self._processing = set()
 
     def plugin_end(self):
         self.xmpp['xep_0030'].del_feature(feature=stanza.Capabilities.namespace)
@@ -164,13 +159,6 @@ class XEP_0115(BasePlugin):
             except XMPPError:
                 return
 
-        # Only lookup the same caps once at a time.
-        with self._processing_lock:
-            if ver in self._processing:
-                log.debug('Already processing verstring %s' % ver)
-                return
-            self._processing.add(ver)
-
         log.debug("New caps verification string: %s", ver)
         try:
             node = '%s#%s' % (pres['caps']['node'], ver)
@@ -184,9 +172,6 @@ class XEP_0115(BasePlugin):
                 self.assign_verstring(pres['from'], pres['caps']['ver'])
         except XMPPError:
             log.debug("Could not retrieve disco#info results for caps for %s", node)
-
-        with self._processing_lock:
-            self._processing.remove(ver)
 
     def _validate_caps(self, caps, hash, check_verstring):
         # Check Identities

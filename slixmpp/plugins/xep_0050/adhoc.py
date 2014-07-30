@@ -104,17 +104,13 @@ class XEP_0050(BasePlugin):
         register_stanza_plugin(Command, Form)
 
         self.xmpp.add_event_handler('command_execute',
-                                    self._handle_command_start,
-                                    threaded=self.threaded)
+                                    self._handle_command_start)
         self.xmpp.add_event_handler('command_next',
-                                    self._handle_command_next,
-                                    threaded=self.threaded)
+                                    self._handle_command_next)
         self.xmpp.add_event_handler('command_cancel',
-                                    self._handle_command_cancel,
-                                    threaded=self.threaded)
+                                    self._handle_command_cancel)
         self.xmpp.add_event_handler('command_complete',
-                                    self._handle_command_complete,
-                                    threaded=self.threaded)
+                                    self._handle_command_complete)
 
     def plugin_end(self):
         self.xmpp.del_event_handler('command_execute',
@@ -450,7 +446,6 @@ class XEP_0050(BasePlugin):
                         Otherwise, a disco stanza must be sent to the
                         remove JID to retrieve the items.
             ifrom    -- Specifiy the sender's JID.
-            block    -- If true, block and wait for the stanzas' reply.
             timeout  -- The time in seconds to block while waiting for
                         a reply. If None, then wait indefinitely.
             callback -- Optional callback to execute when a reply is
@@ -483,9 +478,6 @@ class XEP_0050(BasePlugin):
                          command workflow methods contained in the
                          session instead of returning the response
                          stanza itself. Defaults to False.
-            block     -- Specify if the send call will block until a
-                         response is received, or a timeout occurs.
-                         Defaults to True.
             timeout   -- The length of time (in seconds) to wait for a
                          response before exiting the send call
                          if blocking is used. Defaults to
@@ -510,21 +502,11 @@ class XEP_0050(BasePlugin):
         if not flow:
             return iq.send(**kwargs)
         else:
-            if kwargs.get('block', True):
-                try:
-                    result = iq.send(**kwargs)
-                except IqError as err:
-                    result = err.iq
-                self._handle_command_result(result)
-            else:
-                iq.send(block=False, callback=self._handle_command_result)
+            iq.send(callback=self._handle_command_result)
 
-    def start_command(self, jid, node, session, ifrom=None, block=False):
+    def start_command(self, jid, node, session, ifrom=None):
         """
         Initiate executing a command provided by a remote agent.
-
-        The default workflow provided is non-blocking, but a blocking
-        version may be used with block=True.
 
         The provided session dictionary should contain:
             next  -- A handler for processing the command result.
@@ -536,13 +518,10 @@ class XEP_0050(BasePlugin):
             node    -- The node for the desired command.
             session -- A dictionary of relevant session data.
             ifrom   -- Optionally specify the sender's JID.
-            block   -- If True, block execution until a result
-                       is received. Defaults to False.
         """
         session['jid'] = jid
         session['node'] = node
         session['timestamp'] = time.time()
-        session['block'] = block
         if 'payload' not in session:
             session['payload'] = None
 
@@ -562,14 +541,7 @@ class XEP_0050(BasePlugin):
         sessionid = 'client:pending_' + iq['id']
         session['id'] = sessionid
         self.sessions[sessionid] = session
-        if session['block']:
-            try:
-                result = iq.send(block=True)
-            except IqError as err:
-                result = err.iq
-            self._handle_command_result(result)
-        else:
-            iq.send(block=False, callback=self._handle_command_result)
+        iq.send(callback=self._handle_command_result)
 
     def continue_command(self, session, direction='next'):
         """
@@ -588,8 +560,7 @@ class XEP_0050(BasePlugin):
                           action=direction,
                           payload=session.get('payload', None),
                           sessionid=session['id'],
-                          flow=True,
-                          block=session['block'])
+                          flow=True)
 
     def cancel_command(self, session):
         """
@@ -608,8 +579,7 @@ class XEP_0050(BasePlugin):
                           action='cancel',
                           payload=session.get('payload', None),
                           sessionid=session['id'],
-                          flow=True,
-                          block=session['block'])
+                          flow=True)
 
     def complete_command(self, session):
         """
@@ -628,8 +598,7 @@ class XEP_0050(BasePlugin):
                           action='complete',
                           payload=session.get('payload', None),
                           sessionid=session['id'],
-                          flow=True,
-                          block=session['block'])
+                          flow=True)
 
     def terminate_command(self, session):
         """

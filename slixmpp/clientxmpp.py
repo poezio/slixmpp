@@ -221,19 +221,11 @@ class ClientXMPP(BaseXMPP):
         """
         return self.client_roster.remove(jid)
 
-    def get_roster(self, block=True, timeout=None, callback=None):
+    def get_roster(self, callback=None, timeout=None, timeout_callback=None):
         """Request the roster from the server.
 
-        :param block: Specify if the roster request will block until a
-                      response is received, or a timeout occurs.
-                      Defaults to ``True``.
-        :param timeout: The length of time (in seconds) to wait for a response
-                        before continuing if blocking is used.
-                        Defaults to
-            :attr:`~slixmpp.xmlstream.xmlstream.XMLStream.response_timeout`.
-        :param callback: Optional reference to a stream handler function. Will
+        :param callback: Reference to a stream handler function. Will
                          be executed when the roster is received.
-                         Implies ``block=False``.
         """
         iq = self.Iq()
         iq['type'] = 'get'
@@ -241,23 +233,16 @@ class ClientXMPP(BaseXMPP):
         if 'rosterver' in self.features:
             iq['roster']['ver'] = self.client_roster.version
 
+        if callback is None:
+            callback = lambda resp: self.event('roster_update', resp)
+        else:
+            orig_cb = callback
+            def wrapped(resp):
+                self.event('roster_update', resp)
+                orig_cb(resp)
+            callback = wrapped
 
-        if not block or callback is not None:
-            block = False
-            if callback is None:
-                callback = lambda resp: self.event('roster_update', resp)
-            else:
-                orig_cb = callback
-                def wrapped(resp):
-                    self.event('roster_update', resp)
-                    orig_cb(resp)
-                callback = wrapped
-
-        response = iq.send(block, timeout, callback)
-
-        if block:
-            self.event('roster_update', response)
-            return response
+        iq.send(callback, timeout, timeout_callback)
 
     def _reset_connection_state(self, event=None):
         #TODO: Use stream state here

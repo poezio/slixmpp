@@ -1573,7 +1573,7 @@ class StanzaBase(ElementBase):
         log.exception('Error handling {%s}%s stanza', self.namespace,
                                                       self.name)
 
-    def send(self, now=False):
+    def send(self):
         """Queue the stanza to be sent on the XML stream.
 
         :param bool now: Indicates if the queue should be skipped and the

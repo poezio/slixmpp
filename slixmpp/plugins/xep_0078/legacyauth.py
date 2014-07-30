@@ -79,7 +79,7 @@ class XEP_0078(BasePlugin):
         iq['auth']['username'] = self.xmpp.requested_jid.user
 
         try:
-            resp = iq.send(now=True)
+            resp = iq.send()
         except IqError as err:
             log.info("Authentication failed: %s", err.iq['error']['condition'])
             self.xmpp.event('failed_auth')
@@ -120,7 +120,7 @@ class XEP_0078(BasePlugin):
 
         # Step 3: Send credentials
         try:
-            result = iq.send(now=True)
+            result = iq.send()
         except IqError as err:
             log.info("Authentication failed")
             self.xmpp.event("failed_auth")

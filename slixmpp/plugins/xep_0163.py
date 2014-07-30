@@ -83,7 +83,7 @@ class XEP_0163(BasePlugin):
         self.xmpp['xep_0115'].update_caps(jid)
 
     def publish(self, stanza, node=None, id=None, options=None, ifrom=None,
-                block=True, callback=None, timeout=None):
+                timeout_callback=None, callback=None, timeout=None):
         """
         Publish a PEP update.
 
@@ -97,8 +97,6 @@ class XEP_0163(BasePlugin):
             id       -- Optionally specify the ID of the item.
             options  -- A form of publish options.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -110,14 +108,12 @@ class XEP_0163(BasePlugin):
         if id is None:
             id = 'current'
 
-        return self.xmpp['xep_0060'].publish(ifrom, node,
-                id=id,
-                payload=stanza.xml,
-                options=options,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+        return self.xmpp['xep_0060'].publish(ifrom, node, id=id,
+                                             payload=stanza.xml,
+                                             options=options, ifrom=ifrom,
+                                             callback=callback,
+                                             timeout=timeout,
+                                             timeout_callback=timeout_callback)
 
 
 register_plugin(XEP_0163)

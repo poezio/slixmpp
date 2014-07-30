@@ -89,7 +89,7 @@ class XEP_0077(BasePlugin):
         iq['from'] = ifrom
         iq.enable('register')
         return iq.send(block=block, timeout=timeout,
-                       callback=callback, now=True)
+                       callback=callback)
 
     def cancel_registration(self, jid=None, ifrom=None, block=True,
                             timeout=None, callback=None):

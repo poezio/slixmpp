@@ -33,8 +33,9 @@ class XEP_0108(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_activity', UserActivity)
 
-    def publish_activity(self, general, specific=None, text=None, options=None,
-                     ifrom=None, block=True, callback=None, timeout=None):
+    def publish_activity(self, general, specific=None, text=None,
+                         options=None, ifrom=None, callback=None,
+                         timeout=None, timeout_callback=None):
         """
         Publish the user's current activity.
 
@@ -46,8 +47,6 @@ class XEP_0108(BasePlugin):
                         for the activity.
             options  -- Optional form of publish options.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -57,22 +56,19 @@ class XEP_0108(BasePlugin):
         activity = UserActivity()
         activity['value'] = (general, specific)
         activity['text'] = text
-        return self.xmpp['xep_0163'].publish(activity,
-                node=UserActivity.namespace,
-                options=options,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+        self.xmpp['xep_0163'].publish(activity, node=UserActivity.namespace,
+                                      options=options, ifrom=ifrom,
+                                      callback=callback,
+                                      timeout=timeout,
+                                      timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, block=True, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None,
+             timeout_callback=None):
         """
         Clear existing user activity information to stop notifications.
 
         Arguments:
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -80,9 +76,7 @@ class XEP_0108(BasePlugin):
                         be executed when a reply stanza is received.
         """
         activity = UserActivity()
-        return self.xmpp['xep_0163'].publish(activity,
-                node=UserActivity.namespace,
-                ifrom=ifrom,
-                block=block,
-                callback=callback,
-                timeout=timeout)
+        self.xmpp['xep_0163'].publish(activity, node=UserActivity.namespace,
+                                      ifrom=ifrom, callback=callback,
+                                      timeout=timeout,
+                                      timeout_callback=timeout_callback)
