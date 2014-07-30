@@ -107,6 +107,10 @@ class XMLStream(object):
         #:     xmpp.ssl_version = ssl.PROTOCOL_SSLv23
         self.ssl_version = ssl.PROTOCOL_TLSv1
 
+        # The event to trigger when the create_connection() succeeds. It can
+        # be "connected" or "tls_success" depending on the step we are at.
+        self.event_when_connected = "connected"
+
         #: The list of accepted ciphers, in OpenSSL Format.
         #: It might be useful to override it for improved security
         #: over the python defaults.
@@ -279,12 +283,19 @@ class XMLStream(object):
         if disable_starttls is not None:
             self.disable_starttls = disable_starttls
 
+        asyncio.async(self._connect_routine())
+
+    @asyncio.coroutine
+    def _connect_routine(self):
         loop = asyncio.get_event_loop()
-        connect_routine = loop.create_connection(lambda: self,
-                                                 self.address[0],
-                                                 self.address[1],
-                                                 ssl=self.use_ssl)
-        asyncio.async(connect_routine)
+        self.event_when_connected = "connected"
+        try:
+            yield from loop.create_connection(lambda: self,
+                                              self.address[0],
+                                              self.address[1],
+                                              ssl=self.use_ssl)
+        except OSError as e:
+            self.event("connection_failed", e)
 
     def init_parser(self):
         """init the XML parser. The parser must always be reset for each new
@@ -297,7 +308,7 @@ class XMLStream(object):
     def connection_made(self, transport):
         """Called when the TCP connection has been established with the server
         """
-        self.event("connected")
+        self.event(self.event_when_connected)
         self.transport = transport
         self.socket = self.transport.get_extra_info("socket")
         self.init_parser()
@@ -338,10 +349,13 @@ class XMLStream(object):
                         # save on memory use.
                         self.xml_root.clear()
 
+    def is_connected(self):
+        return self.transport is not None
+
     def eof_received(self):
         """When the TCP connection is properly closed by the remote end
         """
-        log.debug("eof_received")
+        self.event("eof_received")
 
     def connection_lost(self, exception):
         """On any kind of disconnection, initiated by us or not.  This signals the
@@ -422,6 +436,8 @@ class XMLStream(object):
         to be restarted.
         """
         loop = asyncio.get_event_loop()
+        self.event_when_connected = "tls_success"
+
         ssl_connect_routine = loop.create_connection(lambda: self, ssl=self.ssl_context,
                                                      sock=self.socket,
                                                      server_hostname=self.address[0])
@@ -619,7 +635,7 @@ class XMLStream(object):
                      Defaults to an empty dictionary, but is usually
                      a stanza object.
         """
-        log.debug("Event triggered: " + name)
+        log.debug("Event triggered: %s", name)
 
         handlers = self.__event_handlers.get(name, [])
         for handler in handlers:
@@ -658,6 +674,8 @@ class XMLStream(object):
         :param repeat: Flag indicating if the scheduled event should
                        be reset and repeat after executing.
         """
+        if seconds is None:
+            seconds = RESPONSE_TIMEOUT
         loop = asyncio.get_event_loop()
         cb = functools.partial(callback, *args, **kwargs)
         if repeat:
@@ -757,7 +775,7 @@ class XMLStream(object):
 
         :param string data: Any bytes or utf-8 string value.
         """
-        print("SEND: %s" % (data))
+        log.debug("Send raw: %s" % (data,))
         if not self.transport:
             raise NotConnectedError()
         if isinstance(data, str):
