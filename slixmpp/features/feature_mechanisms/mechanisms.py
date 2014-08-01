@@ -172,8 +172,11 @@ class FeatureMechanisms(BasePlugin):
                                     min_mech=self.min_mech)
         except sasl.SASLNoAppropriateMechanism:
             log.error("No appropriate login method.")
-            self.xmpp.event("no_auth")
-            self.xmpp.event("failed_auth")
+            self.xmpp.event("failed_all_auth")
+            if not self.attempted_mechs:
+                # Only trigger this event if we didn't try at least one
+                # method
+                self.xmpp.event("no_auth")
             self.attempted_mechs = set()
             return self.xmpp.disconnect()
         except StringPrepError:
