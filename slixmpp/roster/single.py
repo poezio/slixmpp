@@ -238,7 +238,7 @@ class RosterNode(object):
             return self.update(jid, subscription='remove')
 
     def update(self, jid, name=None, subscription=None, groups=[],
-                     block=True, timeout=None, callback=None):
+                     timeout=None, callback=None, timeout_callback=None):
         """
         Update a JID's subscription information.
 
@@ -248,15 +248,11 @@ class RosterNode(object):
             subscription -- The subscription state. May be one of: 'to',
                             'from', 'both', 'none', or 'remove'.
             groups       -- A list of group names.
-            block        -- Specify if the roster request will block
-                            until a response is received, or a timeout
-                            occurs. Defaults to True.
             timeout      -- The length of time (in seconds) to wait
                             for a response before continuing if blocking
                             is used. Defaults to self.response_timeout.
             callback     -- Optional reference to a stream handler function.
                             Will be executed when the roster is received.
-                            Implies block=False.
         """
         self[jid]['name'] = name
         self[jid]['groups'] = groups
@@ -269,7 +265,8 @@ class RosterNode(object):
                                            'subscription': subscription,
                                            'groups': groups}}
 
-            return iq.send(block, timeout, callback)
+            return iq.send(timeout=timeout, callback=callback,
+                           timeout_callback=timeout_callback)
 
     def presence(self, jid, resource=None):
         """

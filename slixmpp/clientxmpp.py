@@ -188,9 +188,6 @@ class ClientXMPP(BaseXMPP):
                              ``'none'``. If set to ``'remove'``,
                              the entry will be deleted.
         :param groups: The roster groups that contain this item.
-        :param block: Specify if the roster request will block
-                      until a response is received, or a timeout
-                      occurs. Defaults to ``True``.
         :param timeout: The length of time (in seconds) to wait
                         for a response before continuing if blocking
                         is used. Defaults to
@@ -205,12 +202,11 @@ class ClientXMPP(BaseXMPP):
         subscription = kwargs.get('subscription', current['subscription'])
         groups = kwargs.get('groups', current['groups'])
 
-        block = kwargs.get('block', True)
         timeout = kwargs.get('timeout', None)
         callback = kwargs.get('callback', None)
 
         return self.client_roster.update(jid, name, subscription, groups,
-                                         block, timeout, callback)
+                                         timeout, callback)
 
     def del_roster_item(self, jid):
         """Remove an item from the roster.
