@@ -283,6 +283,7 @@ class XMLStream(object):
         if disable_starttls is not None:
             self.disable_starttls = disable_starttls
 
+        self.event("connecting")
         asyncio.async(self._connect_routine())
 
     @asyncio.coroutine
