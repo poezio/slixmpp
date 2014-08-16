@@ -27,6 +27,23 @@ from slixmpp.xmlstream import tostring
 from slixmpp.xmlstream.stanzabase import StanzaBase, ElementBase
 from slixmpp.xmlstream.resolver import resolve, default_resolver
 
+try:
+    from pygments import highlight
+    from pygments.lexers import get_lexer_by_name
+    from pygments.formatters import Terminal256Formatter
+
+    LEXER = get_lexer_by_name('xml')
+    FORMATTER = Terminal256Formatter()
+except ImportError:
+    def highlight(text, lexer, formatter, outfile=None):
+        if outfile is not None:
+            outfile.write(text)
+            return
+        return text
+
+    LEXER = None
+    FORMATTER = None
+
 #: The time in seconds to wait before timing out waiting for response stanzas.
 RESPONSE_TIMEOUT = 30
 
@@ -315,10 +332,10 @@ class XMLStream(object):
                 if self.xml_depth == 0:
                     # We have received the start of the root element.
                     self.xml_root = xml
-                    log.debug('RECV: %s', tostring(self.xml_root, xmlns=self.default_ns,
+                    log.debug('[33;1mRECV[0m: %s', highlight(tostring(self.xml_root, xmlns=self.default_ns,
                                                          stream=self,
                                                          top_level=True,
-                                                         open_only=True))
+                                                         open_only=True), LEXER, FORMATTER).strip())
                     self.start_stream_handler(self.xml_root)
                 self.xml_depth += 1
             if event == 'end':
@@ -760,7 +777,7 @@ class XMLStream(object):
 
         :param string data: Any bytes or utf-8 string value.
         """
-        log.debug("Send raw: %s" % (data,))
+        log.debug("[36;1mSEND[0m: %s", highlight(data, LEXER, FORMATTER).strip())
         if not self.transport:
             raise NotConnectedError()
         if isinstance(data, str):
@@ -813,7 +830,7 @@ class XMLStream(object):
         if stanza is None:
             return
 
-        log.debug("RECV: %s", stanza)
+        log.debug("[33;1mRECV[0m: %s", highlight(str(stanza), LEXER, FORMATTER).strip())
 
         # Match the stanza against registered handlers. Handlers marked
         # to run "in stream" will be executed immediately; the rest will
