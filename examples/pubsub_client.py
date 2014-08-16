@@ -168,13 +168,6 @@ if __name__ == '__main__':
                         action=args[1],
                         data=args[3])
 
-    # If you are working with an OpenFire server, you may need
-    # to adjust the SSL version used:
-    # xmpp.ssl_version = ssl.PROTOCOL_SSLv3
-
-    # If you want to verify the SSL certificates offered by a server:
-    # xmpp.ca_certs = "path/to/ca/cert"
-
     # Connect to the XMPP server and start processing XMPP stanzas.
     xmpp.connect()
     xmpp.process()
