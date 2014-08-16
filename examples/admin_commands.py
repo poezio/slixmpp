@@ -11,7 +11,7 @@
 
 import logging
 from getpass import getpass
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 import slixmpp
 
@@ -105,44 +105,41 @@ class AdminCommands(slixmpp.ClientXMPP):
 
 if __name__ == '__main__':
     # Setup the command line arguments.
-    optp = OptionParser()
+    parser = ArgumentParser()
 
     # Output verbosity options.
-    optp.add_option('-q', '--quiet', help='set logging to ERROR',
-                    action='store_const', dest='loglevel',
-                    const=logging.ERROR, default=logging.INFO)
-    optp.add_option('-d', '--debug', help='set logging to DEBUG',
-                    action='store_const', dest='loglevel',
-                    const=logging.DEBUG, default=logging.INFO)
-    optp.add_option('-v', '--verbose', help='set logging to COMM',
-                    action='store_const', dest='loglevel',
-                    const=5, default=logging.INFO)
+    parser.add_argument("-q", "--quiet", help="set logging to ERROR",
+                        action="store_const", dest="loglevel",
+                        const=logging.ERROR, default=logging.INFO)
+    parser.add_argument("-d", "--debug", help="set logging to DEBUG",
+                        action="store_const", dest="loglevel",
+                        const=logging.DEBUG, default=logging.INFO)
 
     # JID and password options.
-    optp.add_option("-j", "--jid", dest="jid",
-                    help="JID to use")
-    optp.add_option("-p", "--password", dest="password",
-                    help="password to use")
-    optp.add_option("-c", "--command", dest="command",
-                    help="admin command to use")
+    parser.add_argument("-j", "--jid", dest="jid",
+                        help="JID to use")
+    parser.add_argument("-p", "--password", dest="password",
+                        help="password to use")
+    parser.add_argument("-c", "--command", dest="command",
+                        help="admin command to use")
 
-    opts, args = optp.parse_args()
+    args = parser.parse_args()
 
     # Setup logging.
-    logging.basicConfig(level=opts.loglevel,
+    logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
 
-    if opts.jid is None:
-        opts.jid = input("Username: ")
-    if opts.password is None:
-        opts.password = getpass("Password: ")
-    if opts.command is None:
-        opts.command = input("Admin command: ")
+    if args.jid is None:
+        args.jid = input("Username: ")
+    if args.password is None:
+        args.password = getpass("Password: ")
+    if args.command is None:
+        args.command = input("Admin command: ")
 
     # Setup the CommandBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does
     # not matter.
-    xmpp = AdminCommands(opts.jid, opts.password, opts.command)
+    xmpp = AdminCommands(args.jid, args.password, args.command)
     xmpp.register_plugin('xep_0133') # Service Administration
 
     # Connect to the XMPP server and start processing XMPP stanzas.

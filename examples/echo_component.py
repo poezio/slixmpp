@@ -11,7 +11,7 @@
 
 import logging
 from getpass import getpass
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.componentxmpp import ComponentXMPP
@@ -56,48 +56,45 @@ class EchoComponent(ComponentXMPP):
 
 if __name__ == '__main__':
     # Setup the command line arguments.
-    optp = OptionParser()
+    parser = ArgumentParser(description=EchoComponent.__doc__)
 
     # Output verbosity options.
-    optp.add_option('-q', '--quiet', help='set logging to ERROR',
-                    action='store_const', dest='loglevel',
-                    const=logging.ERROR, default=logging.INFO)
-    optp.add_option('-d', '--debug', help='set logging to DEBUG',
-                    action='store_const', dest='loglevel',
-                    const=logging.DEBUG, default=logging.INFO)
-    optp.add_option('-v', '--verbose', help='set logging to COMM',
-                    action='store_const', dest='loglevel',
-                    const=5, default=logging.INFO)
+    parser.add_argument("-q", "--quiet", help="set logging to ERROR",
+                        action="store_const", dest="loglevel",
+                        const=logging.ERROR, default=logging.INFO)
+    parser.add_argument("-d", "--debug", help="set logging to DEBUG",
+                        action="store_const", dest="loglevel",
+                        const=logging.DEBUG, default=logging.INFO)
 
     # JID and password options.
-    optp.add_option("-j", "--jid", dest="jid",
-                    help="JID to use")
-    optp.add_option("-p", "--password", dest="password",
-                    help="password to use")
-    optp.add_option("-s", "--server", dest="server",
-                    help="server to connect to")
-    optp.add_option("-P", "--port", dest="port",
-                    help="port to connect to")
+    parser.add_argument("-j", "--jid", dest="jid",
+                        help="JID to use")
+    parser.add_argument("-p", "--password", dest="password",
+                        help="password to use")
+    parser.add_argument("-s", "--server", dest="server",
+                        help="server to connect to")
+    parser.add_argument("-P", "--port", dest="port",
+                        help="port to connect to")
 
-    opts, args = optp.parse_args()
+    args = parser.parse_args()
 
-    if opts.jid is None:
-        opts.jid = input("Component JID: ")
-    if opts.password is None:
-        opts.password = getpass("Password: ")
-    if opts.server is None:
-        opts.server = input("Server: ")
-    if opts.port is None:
-        opts.port = int(input("Port: "))
+    if args.jid is None:
+        args.jid = input("Component JID: ")
+    if args.password is None:
+        args.password = getpass("Password: ")
+    if args.server is None:
+        args.server = input("Server: ")
+    if args.port is None:
+        args.port = int(input("Port: "))
 
     # Setup logging.
-    logging.basicConfig(level=opts.loglevel,
+    logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
 
     # Setup the EchoComponent and register plugins. Note that while plugins
     # may have interdependencies, the order in which you register them does
     # not matter.
-    xmpp = EchoComponent(opts.jid, opts.password, opts.server, opts.port)
+    xmpp = EchoComponent(args.jid, args.password, args.server, args.port)
     xmpp.registerPlugin('xep_0030') # Service Discovery
     xmpp.registerPlugin('xep_0004') # Data Forms
     xmpp.registerPlugin('xep_0060') # PubSub

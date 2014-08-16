@@ -14,7 +14,7 @@ import imghdr
 import logging
 from getpass import getpass
 import threading
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.exceptions import XMPPError
@@ -99,44 +99,40 @@ class AvatarSetter(slixmpp.ClientXMPP):
 
 if __name__ == '__main__':
     # Setup the command line arguments.
-    optp = OptionParser()
-    optp.add_option('-q','--quiet', help='set logging to ERROR',
-                    action='store_const',
-                    dest='loglevel',
-                    const=logging.ERROR,
-                    default=logging.ERROR)
-    optp.add_option('-d','--debug', help='set logging to DEBUG',
-                    action='store_const',
-                    dest='loglevel',
-                    const=logging.DEBUG,
-                    default=logging.ERROR)
-    optp.add_option('-v','--verbose', help='set logging to COMM',
-                    action='store_const',
-                    dest='loglevel',
-                    const=5,
-                    default=logging.ERROR)
+    parser = ArgumentParser()
+    parser.add_argument("-q","--quiet", help="set logging to ERROR",
+                        action="store_const",
+                        dest="loglevel",
+                        const=logging.ERROR,
+                        default=logging.ERROR)
+    parser.add_argument("-d","--debug", help="set logging to DEBUG",
+                        action="store_const",
+                        dest="loglevel",
+                        const=logging.DEBUG,
+                        default=logging.ERROR)
 
     # JID and password options.
-    optp.add_option("-j", "--jid", dest="jid",
-                    help="JID to use")
-    optp.add_option("-p", "--password", dest="password",
-                    help="password to use")
-    optp.add_option("-f", "--file", dest="filepath",
-                    help="path to the avatar file")
-    opts,args = optp.parse_args()
+    parser.add_argument("-j", "--jid", dest="jid",
+                        help="JID to use")
+    parser.add_argument("-p", "--password", dest="password",
+                        help="password to use")
+    parser.add_argument("-f", "--file", dest="filepath",
+                        help="path to the avatar file")
+
+    args = parser.parse_args()
 
     # Setup logging.
-    logging.basicConfig(level=opts.loglevel,
+    logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
 
-    if opts.jid is None:
-        opts.jid = input("Username: ")
-    if opts.password is None:
-        opts.password = getpass("Password: ")
-    if opts.filepath is None:
-        opts.filepath = input("Avatar file location: ")
+    if args.jid is None:
+        args.jid = input("Username: ")
+    if args.password is None:
+        args.password = getpass("Password: ")
+    if args.filepath is None:
+        args.filepath = input("Avatar file location: ")
 
-    xmpp = AvatarSetter(opts.jid, opts.password, opts.filepath)
+    xmpp = AvatarSetter(args.jid, args.password, args.filepath)
     xmpp.register_plugin('xep_0054')
     xmpp.register_plugin('xep_0153')
     xmpp.register_plugin('xep_0084')

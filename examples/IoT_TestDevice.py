@@ -23,7 +23,7 @@ import datetime
 
 from glob import glob
 from os.path import splitext, basename, join as pjoin
-from optparse import OptionParser
+from argparse import ArgumentParser
 from urllib import urlopen
 
 import slixmpp
@@ -115,47 +115,44 @@ if __name__ == '__main__':
     #
     #   "client" an IoT device or other party that would like to get data from another device
 
-    optp = OptionParser()
+    parser = ArgumentParser()
 
     # Output verbosity options.
-    optp.add_option('-q', '--quiet', help='set logging to ERROR',
-                    action='store_const', dest='loglevel',
-                    const=logging.ERROR, default=logging.INFO)
-    optp.add_option('-d', '--debug', help='set logging to DEBUG',
-                    action='store_const', dest='loglevel',
-                    const=logging.DEBUG, default=logging.INFO)
-    optp.add_option('-v', '--verbose', help='set logging to COMM',
-                    action='store_const', dest='loglevel',
-                    const=5, default=logging.INFO)
-    optp.add_option('-t', '--pingto', help='set jid to ping',
-                    action='store', type='string', dest='pingjid',
-                    default=None)
+    parser.add_argument("-q", "--quiet", help="set logging to ERROR",
+                        action="store_const", dest="loglevel",
+                        const=logging.ERROR, default=logging.INFO)
+    parser.add_argument("-d", "--debug", help="set logging to DEBUG",
+                        action="store_const", dest="loglevel",
+                        const=logging.DEBUG, default=logging.INFO)
+    parser.add_argument("-t", "--pingto", help="set jid to ping",
+                        action="store", type="string", dest="pingjid",
+                        default=None)
 
     # JID and password options.
-    optp.add_option("-j", "--jid", dest="jid",
-                    help="JID to use")
-    optp.add_option("-p", "--password", dest="password",
-                    help="password to use")
+    parser.add_argument("-j", "--jid", dest="jid",
+                        help="JID to use")
+    parser.add_argument("-p", "--password", dest="password",
+                        help="password to use")
 
     # IoT test
-    optp.add_option("-c", "--sensorjid", dest="sensorjid",
-                    help="Another device to call for data on", default=None)
-    optp.add_option("-n", "--nodeid", dest="nodeid",
-                    help="I am a device get ready to be called", default=None)
+    parser.add_argument("-c", "--sensorjid", dest="sensorjid",
+                        help="Another device to call for data on", default=None)
+    parser.add_argument("-n", "--nodeid", dest="nodeid",
+                        help="I am a device get ready to be called", default=None)
 
-    opts, args = optp.parse_args()
+    args = parser.parse_args()
 
      # Setup logging.
-    logging.basicConfig(level=opts.loglevel,
+    logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
 
-    if opts.jid is None:
-        opts.jid = input("Username: ")
-    if opts.password is None:
-        opts.password = getpass("Password: ")
+    if args.jid is None:
+        args.jid = input("Username: ")
+    if args.password is None:
+        args.password = getpass("Password: ")
 
 
-    xmpp = IoT_TestDevice(opts.jid,opts.password)
+    xmpp = IoT_TestDevice(args.jid,args.password)
     xmpp.register_plugin('xep_0030')
     #xmpp['xep_0030'].add_feature(feature='urn:xmpp:iot:sensordata',
     #                             node=None,
@@ -163,27 +160,27 @@ if __name__ == '__main__':
     xmpp.register_plugin('xep_0323')
     xmpp.register_plugin('xep_0325')
 
-    if opts.nodeid:
+    if args.nodeid:
 
         # xmpp['xep_0030'].add_feature(feature='urn:xmpp:sn',
-        # node=opts.nodeid,
+        # node=args.nodeid,
         # jid=xmpp.boundjid.full)
 
-        myDevice = TheDevice(opts.nodeid);
+        myDevice = TheDevice(args.nodeid);
         # myDevice._add_field(name="Relay", typename="numeric", unit="Bool");
         myDevice._add_field(name="Temperature", typename="numeric", unit="C");
         myDevice._set_momentary_timestamp("2013-03-07T16:24:30")
         myDevice._add_field_momentary_data("Temperature", "23.4", flags={"automaticReadout": "true"});
 
-        xmpp['xep_0323'].register_node(nodeId=opts.nodeid, device=myDevice, commTimeout=10);
+        xmpp['xep_0323'].register_node(nodeId=args.nodeid, device=myDevice, commTimeout=10);
         xmpp.beClientOrServer(server=True)
         while not(xmpp.testForRelease()):
             xmpp.connect()
             xmpp.process(block=True)
             logging.debug("lost connection")
-    if opts.sensorjid:
+    if args.sensorjid:
         logging.debug("will try to call another device for data")
-        xmpp.beClientOrServer(server=False,clientJID=opts.sensorjid)
+        xmpp.beClientOrServer(server=False,clientJID=args.sensorjid)
         xmpp.connect()
         xmpp.process(block=True)
         logging.debug("ready ending")

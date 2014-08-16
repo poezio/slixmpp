@@ -4,55 +4,52 @@
 import sys
 import logging
 from getpass import getpass
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 import slixmpp
 
 
 # Setup the command line arguments.
-optp = OptionParser()
+parser = ArgumentParser()
 
 # Output verbosity options.
-optp.add_option('-q', '--quiet', help='set logging to ERROR',
-                action='store_const', dest='loglevel',
-                const=logging.ERROR, default=logging.INFO)
-optp.add_option('-d', '--debug', help='set logging to DEBUG',
-                action='store_const', dest='loglevel',
-                const=logging.DEBUG, default=logging.INFO)
-optp.add_option('-v', '--verbose', help='set logging to COMM',
-                action='store_const', dest='loglevel',
-                const=5, default=logging.INFO)
+parser.add_argument("-q", "--quiet", help="set logging to ERROR",
+                    action="store_const", dest="loglevel",
+                    const=logging.ERROR, default=logging.INFO)
+parser.add_argument("-d", "--debug", help="set logging to DEBUG",
+                    action="store_const", dest="loglevel",
+                    const=logging.DEBUG, default=logging.INFO)
 
 # JID and password options.
-optp.add_option("--oldjid", dest="old_jid",
-                help="JID of the old account")
-optp.add_option("--oldpassword", dest="old_password",
-                help="password of the old account")
+parser.add_argument("--oldjid", dest="old_jid",
+                    help="JID of the old account")
+parser.add_argument("--oldpassword", dest="old_password",
+                    help="password of the old account")
 
-optp.add_option("--newjid", dest="new_jid",
-                help="JID of the old account")
-optp.add_option("--newpassword", dest="new_password",
-                help="password of the old account")
+parser.add_argument("--newjid", dest="new_jid",
+                    help="JID of the old account")
+parser.add_argument("--newpassword", dest="new_password",
+                    help="password of the old account")
 
 
-opts, args = optp.parse_args()
+args = parser.parse_args()
 
 # Setup logging.
-logging.basicConfig(level=opts.loglevel,
+logging.basicConfig(level=args.loglevel,
                     format='%(levelname)-8s %(message)s')
 
-if opts.old_jid is None:
-    opts.old_jid = input("Old JID: ")
-if opts.old_password is None:
-    opts.old_password = getpass("Old Password: ")
+if args.old_jid is None:
+    args.old_jid = input("Old JID: ")
+if args.old_password is None:
+    args.old_password = getpass("Old Password: ")
 
-if opts.new_jid is None:
-    opts.new_jid = input("New JID: ")
-if opts.new_password is None:
-    opts.new_password = getpass("New Password: ")
+if args.new_jid is None:
+    args.new_jid = input("New JID: ")
+if args.new_password is None:
+    args.new_password = getpass("New Password: ")
 
 
-old_xmpp = slixmpp.ClientXMPP(opts.old_jid, opts.old_password)
+old_xmpp = slixmpp.ClientXMPP(args.old_jid, args.old_password)
 
 # If you are connecting to Facebook and wish to use the
 # X-FACEBOOK-PLATFORM authentication mechanism, you will need
@@ -88,7 +85,7 @@ if not roster:
     print('No roster to migrate')
     sys.exit()
 
-new_xmpp = slixmpp.ClientXMPP(opts.new_jid, opts.new_password)
+new_xmpp = slixmpp.ClientXMPP(args.new_jid, args.new_password)
 def on_session2(event):
     new_xmpp.get_roster()
     new_xmpp.send_presence()

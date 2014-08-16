@@ -11,7 +11,7 @@
 
 import logging
 from getpass import getpass
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 import slixmpp
 
@@ -82,37 +82,34 @@ class IBBReceiver(slixmpp.ClientXMPP):
 
 if __name__ == '__main__':
     # Setup the command line arguments.
-    optp = OptionParser()
+    parser = ArgumentParser()
 
     # Output verbosity options.
-    optp.add_option('-q', '--quiet', help='set logging to ERROR',
-                    action='store_const', dest='loglevel',
-                    const=logging.ERROR, default=logging.INFO)
-    optp.add_option('-d', '--debug', help='set logging to DEBUG',
-                    action='store_const', dest='loglevel',
-                    const=logging.DEBUG, default=logging.INFO)
-    optp.add_option('-v', '--verbose', help='set logging to COMM',
-                    action='store_const', dest='loglevel',
-                    const=5, default=logging.INFO)
+    parser.add_argument("-q", "--quiet", help="set logging to ERROR",
+                        action="store_const", dest="loglevel",
+                        const=logging.ERROR, default=logging.INFO)
+    parser.add_argument("-d", "--debug", help="set logging to DEBUG",
+                        action="store_const", dest="loglevel",
+                        const=logging.DEBUG, default=logging.INFO)
 
     # JID and password options.
-    optp.add_option("-j", "--jid", dest="jid",
-                    help="JID to use")
-    optp.add_option("-p", "--password", dest="password",
-                    help="password to use")
+    parser.add_argument("-j", "--jid", dest="jid",
+                        help="JID to use")
+    parser.add_argument("-p", "--password", dest="password",
+                        help="password to use")
 
-    opts, args = optp.parse_args()
+    args = parser.parse_args()
 
     # Setup logging.
-    logging.basicConfig(level=opts.loglevel,
+    logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
 
-    if opts.jid is None:
-        opts.jid = input("Username: ")
-    if opts.password is None:
-        opts.password = getpass("Password: ")
+    if args.jid is None:
+        args.jid = input("Username: ")
+    if args.password is None:
+        args.password = getpass("Password: ")
 
-    xmpp = IBBReceiver(opts.jid, opts.password)
+    xmpp = IBBReceiver(args.jid, args.password)
 
     # Connect to the XMPP server and start processing XMPP stanzas.
     xmpp.connect()

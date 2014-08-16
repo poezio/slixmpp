@@ -3,7 +3,7 @@
 
 import logging
 from getpass import getpass
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.xmlstream import ET, tostring
@@ -111,62 +111,51 @@ class PubsubClient(slixmpp.ClientXMPP):
 
 if __name__ == '__main__':
     # Setup the command line arguments.
-    optp = OptionParser()
-    optp.version = '%%prog 0.1'
-    optp.usage = "Usage: %%prog [options] <jid> " + \
+    parser = ArgumentParser()
+    parser.version = '%%prog 0.1'
+    parser.usage = "Usage: %%prog [options] <jid> " + \
                              'nodes|create|delete|purge|subscribe|unsubscribe|publish|retract|get' + \
                              ' [<node> <data>]'
 
-    optp.add_option('-q','--quiet', help='set logging to ERROR',
-                    action='store_const',
-                    dest='loglevel',
-                    const=logging.ERROR,
-                    default=logging.ERROR)
-    optp.add_option('-d','--debug', help='set logging to DEBUG',
-                    action='store_const',
-                    dest='loglevel',
-                    const=logging.DEBUG,
-                    default=logging.ERROR)
-    optp.add_option('-v','--verbose', help='set logging to COMM',
-                    action='store_const',
-                    dest='loglevel',
-                    const=5,
-                    default=logging.ERROR)
+    parser.add_argument("-q","--quiet", help="set logging to ERROR",
+                        action="store_const",
+                        dest="loglevel",
+                        const=logging.ERROR,
+                        default=logging.ERROR)
+    parser.add_argument("-d","--debug", help="set logging to DEBUG",
+                        action="store_const",
+                        dest="loglevel",
+                        const=logging.DEBUG,
+                        default=logging.ERROR)
 
     # JID and password options.
-    optp.add_option("-j", "--jid", dest="jid",
-                    help="JID to use")
-    optp.add_option("-p", "--password", dest="password",
-                    help="password to use")
-    opts,args = optp.parse_args()
+    parser.add_argument("-j", "--jid", dest="jid",
+                        help="JID to use")
+    parser.add_argument("-p", "--password", dest="password",
+                        help="password to use")
+
+    parser.add_argument("server")
+    parser.add_argument("action", choice=["nodes", "create", "delete", "purge", "subscribe", "unsubscribe", "publish", "retract", "get"])
+    parser.add_argument("node", nargs='?')
+    parser.add_argument("data", nargs='?')
+
+    args = parser.parse_args()
 
     # Setup logging.
-    logging.basicConfig(level=opts.loglevel,
+    logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
 
-    if len(args) < 2:
-        optp.print_help()
-        exit()
-
-    if opts.jid is None:
-        opts.jid = input("Username: ")
-    if opts.password is None:
-        opts.password = getpass("Password: ")
-
-    if len(args) == 2:
-        args = (args[0], args[1], '', '', '')
-    elif len(args) == 3:
-        args = (args[0], args[1], args[2], '', '')
-    elif len(args) == 4:
-        args = (args[0], args[1], args[2], args[3], '')
-
+    if args.jid is None:
+        args.jid = input("Username: ")
+    if args.password is None:
+        args.password = getpass("Password: ")
 
     # Setup the Pubsub client
-    xmpp = PubsubClient(opts.jid, opts.password,
-                        server=args[0],
-                        node=args[2],
-                        action=args[1],
-                        data=args[3])
+    xmpp = PubsubClient(args.jid, args.password,
+                        server=args.server,
+                        node=args.node,
+                        action=args.action,
+                        data=args.data)
 
     # Connect to the XMPP server and start processing XMPP stanzas.
     xmpp.connect()
