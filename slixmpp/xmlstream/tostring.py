@@ -13,14 +13,6 @@
     :license: MIT, see LICENSE for more details
 """
 
-from __future__ import unicode_literals
-
-import sys
-
-if sys.version_info < (3, 0):
-    import types
-
-
 XML_NS = 'http://www.w3.org/XML/1998/namespace'
 
 
@@ -145,10 +137,6 @@ def escape(text, use_cdata=False):
     :param string text: The XML text to convert.
     :rtype: Unicode string
     """
-    if sys.version_info < (3, 0):
-        if type(text) != types.UnicodeType:
-            text = unicode(text, 'utf-8', 'ignore')
-
     escapes = {'&': '&amp;',
                '<': '&lt;',
                '>': '&gt;',

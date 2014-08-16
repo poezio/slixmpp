@@ -24,10 +24,6 @@ from slixmpp.xmlstream.tostring import tostring
 import unittest
 
 
-if sys.version_info > (3, 0):
-    unicode = str
-
-
 class TestJabberRPC(SlixTest):
 
     def setUp(self):

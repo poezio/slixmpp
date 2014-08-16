@@ -15,7 +15,6 @@
     :license: MIT, see LICENSE for more details
 """
 
-import sys
 import hmac
 import random
 
@@ -365,8 +364,7 @@ class DIGEST(Mech):
 
 
         for char in challenge:
-            if sys.version_info >= (3, 0):
-                char = bytes([char])
+            char = bytes([char])
 
             if state == 'var':
                 if char.isspace():

@@ -15,10 +15,7 @@ class TestOverall(unittest.TestCase):
     def testModules(self):
         """Testing all modules by compiling them"""
         src = '.%sslixmpp' % os.sep
-        if sys.version_info < (3, 0):
-            rx = re.compile('/[.]svn')
-        else:
-            rx = re.compile('/[.]svn|.*26.*')
+        rx = re.compile('/[.]svn|.*26.*')
         self.failUnless(compileall.compile_dir(src, rx=rx, quiet=True))
 
     def testTabNanny(self):

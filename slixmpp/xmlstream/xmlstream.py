@@ -12,32 +12,19 @@
     :license: MIT, see LICENSE for more details
 """
 
-from __future__ import with_statement, unicode_literals
-
 import asyncio
 import functools
-import base64
 import copy
 import logging
-import signal
 import socket as Socket
 import ssl
-import sys
-import time
-import random
 import weakref
 import uuid
-import errno
 
-from xml.parsers.expat import ExpatError
 import xml.etree.ElementTree
 
-import slixmpp
-from slixmpp.util import Queue, QueueEmpty, safedict
-from slixmpp.xmlstream import tostring, cert
-from slixmpp.xmlstream.stanzabase import StanzaBase, ET, ElementBase
-from slixmpp.xmlstream.handler import Waiter, XMLCallback
-from slixmpp.xmlstream.matcher import MatchXMLMask
+from slixmpp.xmlstream import tostring
+from slixmpp.xmlstream.stanzabase import StanzaBase, ElementBase
 from slixmpp.xmlstream.resolver import resolve, default_resolver
 
 #: The time in seconds to wait before timing out waiting for response stanzas.
@@ -584,10 +571,7 @@ class XMLStream(object):
         if not self.dns_answers:
             self.dns_answers = self.get_dns_records(domain, port)
 
-        if sys.version_info < (3, 0):
-            return self.dns_answers.next()
-        else:
-            return next(self.dns_answers)
+        return next(self.dns_answers)
 
     def add_event_handler(self, name, pointer, disposable=False):
         """Add a custom event handler that will be executed whenever

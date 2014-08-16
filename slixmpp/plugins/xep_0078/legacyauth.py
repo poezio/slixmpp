@@ -9,8 +9,6 @@
 import uuid
 import logging
 import hashlib
-import random
-import sys
 
 from slixmpp.jid import JID
 from slixmpp.exceptions import IqError, IqTimeout
@@ -105,12 +103,8 @@ class XEP_0078(BasePlugin):
 
         if 'digest' in resp['auth']['fields']:
             log.debug('Authenticating via jabber:iq:auth Digest')
-            if sys.version_info < (3, 0):
-                stream_id = bytes(self.xmpp.stream_id)
-                password = bytes(self.xmpp.password)
-            else:
-                stream_id = bytes(self.xmpp.stream_id, encoding='utf-8')
-                password = bytes(self.xmpp.password, encoding='utf-8')
+            stream_id = bytes(self.xmpp.stream_id, encoding='utf-8')
+            password = bytes(self.xmpp.password, encoding='utf-8')
 
             digest = hashlib.sha1(b'%s%s' % (stream_id, password)).hexdigest()
             iq['auth']['digest'] = digest

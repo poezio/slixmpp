@@ -19,10 +19,6 @@ import logging
 import threading
 
 
-if sys.version_info >= (3, 0):
-    unicode = str
-
-
 log = logging.getLogger(__name__)
 
 
@@ -89,7 +85,7 @@ def load_plugin(name, module=None):
                 module = 'slixmpp.features.%s' % name
                 __import__(module)
                 mod = sys.modules[module]
-        elif isinstance(module, (str, unicode)):
+        elif isinstance(module, str):
             __import__(module)
             mod = sys.modules[module]
         else:

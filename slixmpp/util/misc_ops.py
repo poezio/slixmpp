@@ -3,12 +3,7 @@ import hashlib
 
 
 def unicode(text):
-    if sys.version_info < (3, 0):
-        if isinstance(text, str):
-            text = text.decode('utf-8')
-        import __builtin__
-        return __builtin__.unicode(text)
-    elif not isinstance(text, str):
+    if not isinstance(text, str):
         return text.decode('utf-8')
     else:
         return text
@@ -27,20 +22,16 @@ def bytes(text):
     if text is None:
         return b''
 
-    if sys.version_info < (3, 0):
-        import __builtin__
-        return __builtin__.bytes(text)
+    import builtins
+    if isinstance(text, builtins.bytes):
+        # We already have bytes, so do nothing
+        return text
+    if isinstance(text, list):
+        # Convert a list of integers to bytes
+        return builtins.bytes(text)
     else:
-        import builtins
-        if isinstance(text, builtins.bytes):
-            # We already have bytes, so do nothing
-            return text
-        if isinstance(text, list):
-            # Convert a list of integers to bytes
-            return builtins.bytes(text)
-        else:
-            # Convert UTF-8 text to bytes
-            return builtins.bytes(text, encoding='utf-8')
+        # Convert UTF-8 text to bytes
+        return builtins.bytes(text, encoding='utf-8')
 
 
 def quote(text):
@@ -91,10 +82,7 @@ def XOR(x, y):
     """
     result = b''
     for a, b in zip(x, y):
-        if sys.version_info < (3, 0):
-            result += chr((ord(a) ^ ord(b)))
-        else:
-            result += bytes([a ^ b])
+        result += bytes([a ^ b])
     return result
 
 
@@ -153,13 +141,3 @@ def setdefaultencoding(encoding):
             raise RuntimeError("Could not find setdefaultencoding")
         sys.setdefaultencoding = func
     return func(encoding)
-
-
-def safedict(data):
-    if sys.version_info < (2, 7):
-        safe = {}
-        for key in data:
-            safe[key.encode('utf8')] = data[key]
-        return safe
-    else:
-        return data

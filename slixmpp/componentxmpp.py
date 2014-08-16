@@ -12,10 +12,7 @@
     :license: MIT, see LICENSE for more details
 """
 
-from __future__ import absolute_import
-
 import logging
-import sys
 import hashlib
 
 from slixmpp.basexmpp import BaseXMPP
@@ -136,10 +133,7 @@ class ComponentXMPP(BaseXMPP):
 
         # Construct a hash of the stream ID and the component secret.
         sid = xml.get('id', '')
-        pre_hash = '%s%s' % (sid, self.secret)
-        if sys.version_info >= (3, 0):
-            # Handle Unicode byte encoding in Python 3.
-            pre_hash = bytes(pre_hash, 'utf-8')
+        pre_hash = bytes('%s%s' % (sid, self.secret), 'utf-8')
 
         handshake = ET.Element('{jabber:component:accept}handshake')
         handshake.text = hashlib.sha1(pre_hash).hexdigest().lower()
