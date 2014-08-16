@@ -203,6 +203,10 @@ class BaseXMPP(XMLStream):
             log.warning('Legacy XMPP 0.9 protocol detected.')
             self.event('legacy_protocol')
 
+    def process(self, timeout=None):
+        self.init_plugins()
+        XMLStream.process(self, timeout)
+
     def init_plugins(self):
         for name in self.plugin:
             if not hasattr(self.plugin[name], 'post_inited'):

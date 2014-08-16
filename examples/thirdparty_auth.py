@@ -223,15 +223,5 @@ if __name__ == '__main__':
     # Connect to the XMPP server and start processing XMPP stanzas.
     # Google only allows one SASL attempt per connection, so in order to 
     # enable the X-GOOGLE-TOKEN mechanism, we'll disable TLS.
-    if xmpp.connect(use_tls=False):
-        # If you do not have the dnspython library installed, you will need
-        # to manually specify the name of the server if it does not match
-        # the one in the JID. For example, to use Google Talk you would
-        # need to use:
-        #
-        # if xmpp.connect(('talk.google.com', 5222)):
-        #     ...
-        xmpp.process(block=True)
-        print("Done")
-    else:
-        print("Unable to connect.")
+    xmpp.connect()
+    xmpp.process()

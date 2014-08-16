@@ -104,8 +104,5 @@ if __name__ == '__main__':
     xmpp.registerPlugin('xep_0199') # XMPP Ping
 
     # Connect to the XMPP server and start processing XMPP stanzas.
-    if xmpp.connect():
-        xmpp.process(block=True)
-        print("Done")
-    else:
-        print("Unable to connect.")
+    xmpp.connect()
+    xmpp.process()

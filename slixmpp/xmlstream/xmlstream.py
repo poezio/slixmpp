@@ -302,6 +302,20 @@ class XMLStream(object):
         except OSError as e:
             self.event("connection_failed", e)
 
+    def process(self, timeout=None):
+        """Process all the available XMPP events (receiving or sending data on the
+        socket(s), calling various registered callbacks, calling expired
+        timers, handling signal events, etc).  If timeout is None, this
+        function will run forever. If timeout is a number, this function
+        will return after the given time in seconds.
+        """
+        loop = asyncio.get_event_loop()
+        if timeout is None:
+            loop.run_forever()
+        else:
+            future = asyncio.sleep(timeout)
+            loop.run_until_complete(future)
+
     def init_parser(self):
         """init the XML parser. The parser must always be reset for each new
         connexion
