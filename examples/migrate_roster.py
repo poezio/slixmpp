@@ -8,16 +8,6 @@ from optparse import OptionParser
 
 import slixmpp
 
-# Python versions before 3.0 do not use UTF-8 encoding
-# by default. To ensure that Unicode is handled properly
-# throughout Slixmpp, we will set the default encoding
-# ourselves to UTF-8.
-if sys.version_info < (3, 0):
-    from slixmpp.util.misc_ops import setdefaultencoding
-    setdefaultencoding('utf8')
-else:
-    raw_input = input
-
 
 # Setup the command line arguments.
 optp = OptionParser()
@@ -52,12 +42,12 @@ logging.basicConfig(level=opts.loglevel,
                     format='%(levelname)-8s %(message)s')
 
 if opts.old_jid is None:
-    opts.old_jid = raw_input("Old JID: ")
+    opts.old_jid = input("Old JID: ")
 if opts.old_password is None:
     opts.old_password = getpass.getpass("Old Password: ")
 
 if opts.new_jid is None:
-    opts.new_jid = raw_input("New JID: ")
+    opts.new_jid = input("New JID: ")
 if opts.new_password is None:
     opts.new_password = getpass.getpass("New Password: ")
 

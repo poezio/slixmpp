@@ -9,22 +9,11 @@
     See the file LICENSE for copying permission.
 """
 
-import sys
 import logging
 import getpass
 from optparse import OptionParser
 
 import slixmpp
-
-# Python versions before 3.0 do not use UTF-8 encoding
-# by default. To ensure that Unicode is handled properly
-# throughout Slixmpp, we will set the default encoding
-# ourselves to UTF-8.
-if sys.version_info < (3, 0):
-    from slixmpp.util.misc_ops import setdefaultencoding
-    setdefaultencoding('utf8')
-else:
-    raw_input = input
 
 
 class AdminCommands(slixmpp.ClientXMPP):
@@ -81,13 +70,13 @@ class AdminCommands(slixmpp.ClientXMPP):
             for var, field in form['fields'].items():
                 if var != 'FORM_TYPE':
                     if field['type'] == 'boolean':
-                        answers[var] = raw_input('%s (y/n): ' % field['label'])
+                        answers[var] = input('%s (y/n): ' % field['label'])
                         if answers[var].lower() in ('1', 'true', 'y', 'yes'):
                             answers[var] = '1'
                         else:
                             answers[var] = '0'
                     else:
-                        answers[var] = raw_input('%s: ' % field['label'])
+                        answers[var] = input('%s: ' % field['label'])
                 else:
                     answers['FORM_TYPE'] = field['value']
             form['type'] = 'submit'
@@ -144,11 +133,11 @@ if __name__ == '__main__':
                         format='%(levelname)-8s %(message)s')
 
     if opts.jid is None:
-        opts.jid = raw_input("Username: ")
+        opts.jid = input("Username: ")
     if opts.password is None:
         opts.password = getpass.getpass("Password: ")
     if opts.command is None:
-        opts.command = raw_input("Admin command: ")
+        opts.command = input("Admin command: ")
 
     # Setup the CommandBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does

@@ -9,23 +9,12 @@
     See the file LICENSE for copying permission.
 """
 
-import sys
 import logging
 import getpass
 from optparse import OptionParser
 
 import slixmpp
 from slixmpp.componentxmpp import ComponentXMPP
-
-# Python versions before 3.0 do not use UTF-8 encoding
-# by default. To ensure that Unicode is handled properly
-# throughout Slixmpp, we will set the default encoding
-# ourselves to UTF-8.
-if sys.version_info < (3, 0):
-    from slixmpp.util.misc_ops import setdefaultencoding
-    setdefaultencoding('utf8')
-else:
-    raw_input = input
 
 
 class EchoComponent(ComponentXMPP):
@@ -93,13 +82,13 @@ if __name__ == '__main__':
     opts, args = optp.parse_args()
 
     if opts.jid is None:
-        opts.jid = raw_input("Component JID: ")
+        opts.jid = input("Component JID: ")
     if opts.password is None:
         opts.password = getpass.getpass("Password: ")
     if opts.server is None:
-        opts.server = raw_input("Server: ")
+        opts.server = input("Server: ")
     if opts.port is None:
-        opts.port = int(raw_input("Port: "))
+        opts.port = int(input("Port: "))
 
     # Setup logging.
     logging.basicConfig(level=opts.loglevel,

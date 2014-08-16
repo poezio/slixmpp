@@ -9,7 +9,6 @@
     See the file LICENSE for copying permission.
 """
 
-import sys
 import logging
 import getpass
 from optparse import OptionParser
@@ -20,16 +19,6 @@ from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import register_stanza_plugin
 
 from stanza import Action
-
-# Python versions before 3.0 do not use UTF-8 encoding
-# by default. To ensure that Unicode is handled properly
-# throughout Slixmpp, we will set the default encoding
-# ourselves to UTF-8.
-if sys.version_info < (3, 0):
-    from slixmpp.util.misc_ops import setdefaultencoding
-    setdefaultencoding('utf8')
-else:
-    raw_input = input
 
 
 class ActionUserBot(slixmpp.ClientXMPP):
@@ -139,11 +128,11 @@ if __name__ == '__main__':
                         format='%(levelname)-8s %(message)s')
 
     if opts.jid is None:
-        opts.jid = raw_input("Username: ")
+        opts.jid = input("Username: ")
     if opts.password is None:
         opts.password = getpass.getpass("Password: ")
     if opts.other is None:
-        opts.other = raw_input("JID Providing custom stanza: ")
+        opts.other = input("JID Providing custom stanza: ")
 
     # Setup the CommandBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does

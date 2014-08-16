@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import logging
 import getpass
 from optparse import OptionParser
@@ -10,17 +9,6 @@ import slixmpp
 from slixmpp.xmlstream import ET, tostring
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.xmlstream.handler import Callback
-
-
-# Python versions before 3.0 do not use UTF-8 encoding
-# by default. To ensure that Unicode is handled properly
-# throughout Slixmpp, we will set the default encoding
-# ourselves to UTF-8.
-if sys.version_info < (3, 0):
-    from slixmpp.util.misc_ops import setdefaultencoding
-    setdefaultencoding('utf8')
-else:
-    raw_input = input
 
 
 class PubsubEvents(slixmpp.ClientXMPP):
@@ -122,7 +110,7 @@ if __name__ == '__main__':
                         format='%(levelname)-8s %(message)s')
 
     if opts.jid is None:
-        opts.jid = raw_input("Username: ")
+        opts.jid = input("Username: ")
     if opts.password is None:
         opts.password = getpass.getpass("Password: ")
 

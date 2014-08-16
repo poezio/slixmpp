@@ -27,16 +27,6 @@ from optparse import OptionParser
 from urllib import urlopen
 
 import slixmpp
-# Python versions before 3.0 do not use UTF-8 encoding
-# by default. To ensure that Unicode is handled properly
-# throughout Slixmpp, we will set the default encoding
-# ourselves to UTF-8.
-if sys.version_info < (3, 0):
-    from slixmpp.util.misc_ops import setdefaultencoding
-    setdefaultencoding('utf8')
-else:
-    raw_input = input
-
 from slixmpp.plugins.xep_0323.device import Device
 
 #from slixmpp.exceptions import IqError, IqTimeout
@@ -160,7 +150,7 @@ if __name__ == '__main__':
                         format='%(levelname)-8s %(message)s')
 
     if opts.jid is None:
-        opts.jid = raw_input("Username: ")
+        opts.jid = input("Username: ")
     if opts.password is None:
         opts.password = getpass.getpass("Password: ")
 
