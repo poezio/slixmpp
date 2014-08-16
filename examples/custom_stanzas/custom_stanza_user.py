@@ -38,7 +38,7 @@ class ActionUserBot(slixmpp.ClientXMPP):
         # and the XML streams are ready for use. We want to
         # listen for this event so that we we can initialize
         # our roster.
-        self.add_event_handler("session_start", self.start, threaded=True)
+        self.add_event_handler("session_start", self.start)
         self.add_event_handler("message", self.message)
 
         register_stanza_plugin(Iq, Action)

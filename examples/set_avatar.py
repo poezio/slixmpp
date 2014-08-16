@@ -29,7 +29,7 @@ class AvatarSetter(slixmpp.ClientXMPP):
     def __init__(self, jid, password, filepath):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
-        self.add_event_handler("session_start", self.start, threaded=True)
+        self.add_event_handler("session_start", self.start)
 
         self.filepath = filepath
 

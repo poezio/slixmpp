@@ -31,10 +31,8 @@ class RosterBrowser(slixmpp.ClientXMPP):
         # the bot establishes its connection with the server
         # and the XML streams are ready for use. We want to
         # listen for this event so that we we can initialize
-        # our roster. We need threaded=True so that the
-        # session_start handler doesn't block event processing
-        # while we wait for presence stanzas to arrive.
-        self.add_event_handler("session_start", self.start, threaded=True)
+        # our roster.
+        self.add_event_handler("session_start", self.start)
         self.add_event_handler("changed_status", self.wait_for_presences)
 
         self.received = set()

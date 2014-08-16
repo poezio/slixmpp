@@ -28,7 +28,7 @@ class PubsubClient(slixmpp.ClientXMPP):
         self.data = data
         self.pubsub_server = server
 
-        self.add_event_handler('session_start', self.start, threaded=True)
+        self.add_event_handler('session_start', self.start)
 
     def start(self, event):
         self.get_roster()

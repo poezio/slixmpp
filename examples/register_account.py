@@ -36,7 +36,7 @@ class RegisterBot(slixmpp.ClientXMPP):
         # and the XML streams are ready for use. We want to
         # listen for this event so that we we can initialize
         # our roster.
-        self.add_event_handler("session_start", self.start, threaded=True)
+        self.add_event_handler("session_start", self.start)
 
         # The register event provides an Iq result stanza with
         # a registration form from the server. This may include
@@ -45,7 +45,7 @@ class RegisterBot(slixmpp.ClientXMPP):
         # cases, you will need to examine the fields provided
         # and respond accordingly. Slixmpp provides plugins
         # for data forms and OOB links that will make that easier.
-        self.add_event_handler("register", self.register, threaded=True)
+        self.add_event_handler("register", self.register)
 
     def start(self, event):
         """

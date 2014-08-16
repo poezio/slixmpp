@@ -37,7 +37,7 @@ class IBBReceiver(slixmpp.ClientXMPP):
         # our roster.
         self.add_event_handler("session_start", self.start)
 
-        self.add_event_handler("ibb_stream_start", self.stream_opened, threaded=True)
+        self.add_event_handler("ibb_stream_start", self.stream_opened)
         self.add_event_handler("ibb_stream_data", self.stream_data)
 
     def start(self, event):

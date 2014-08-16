@@ -46,8 +46,7 @@ class ActionBot(slixmpp.ClientXMPP):
             self._handle_action))
 
         self.add_event_handler('custom_action',
-                self._handle_action_event,
-                threaded=True)
+                self._handle_action_event)
 
         register_stanza_plugin(Iq, Action)
 
@@ -77,10 +76,6 @@ class ActionBot(slixmpp.ClientXMPP):
     def _handle_action_event(self, iq):
         """
         Respond to the custom action event.
-
-        Since one of the actions is to disconnect, this
-        event handler needs to be run in threaded mode, by
-        using `threaded=True` in the `add_event_handler` call.
         """
         method = iq['action']['method']
         param = iq['action']['param']

@@ -33,7 +33,7 @@ class AvatarDownloader(slixmpp.ClientXMPP):
 
     def __init__(self, jid, password):
         slixmpp.ClientXMPP.__init__(self, jid, password)
-        self.add_event_handler("session_start", self.start, threaded=True)
+        self.add_event_handler("session_start", self.start)
         self.add_event_handler("changed_status", self.wait_for_presences)
 
         self.add_event_handler('vcard_avatar_update', self.on_vcard_avatar)
