@@ -10,7 +10,7 @@
 """
 
 import logging
-import getpass
+from getpass import getpass
 from optparse import OptionParser
 
 import slixmpp
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Username: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
 
     # Setup the Disco browser.
     xmpp = Disco(opts.jid, opts.password, args[1], args[2], args[0])

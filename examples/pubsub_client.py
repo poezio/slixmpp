@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import getpass
+from getpass import getpass
 from optparse import OptionParser
 
 import slixmpp
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Username: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
 
     if len(args) == 2:
         args = (args[0], args[1], '', '', '')

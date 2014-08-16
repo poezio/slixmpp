@@ -10,7 +10,7 @@
 """
 
 import logging
-import getpass
+from getpass import getpass
 from optparse import OptionParser
 
 import slixmpp
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Username: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
 
     # Setup the EchoBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does

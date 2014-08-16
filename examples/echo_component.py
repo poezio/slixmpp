@@ -10,7 +10,7 @@
 """
 
 import logging
-import getpass
+from getpass import getpass
 from optparse import OptionParser
 
 import slixmpp
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Component JID: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
     if opts.server is None:
         opts.server = input("Server: ")
     if opts.port is None:

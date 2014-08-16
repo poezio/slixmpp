@@ -2,7 +2,7 @@
 
 import sys
 import logging
-import getpass
+from getpass import getpass
 from optparse import OptionParser
 
 try:
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Username: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
 
     xmpp = LocationBot(opts.jid, opts.password)
 

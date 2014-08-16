@@ -10,7 +10,7 @@
 """
 
 import logging
-import getpass
+from getpass import getpass
 import threading
 from optparse import OptionParser
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Username: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
 
     xmpp = RosterBrowser(opts.jid, opts.password)
 

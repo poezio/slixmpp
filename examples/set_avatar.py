@@ -12,7 +12,7 @@
 import os
 import imghdr
 import logging
-import getpass
+from getpass import getpass
 import threading
 from optparse import OptionParser
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Username: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
     if opts.filepath is None:
         opts.filepath = input("Avatar file location: ")
 

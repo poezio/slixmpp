@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import getpass
+from getpass import getpass
 from optparse import OptionParser
 
 import slixmpp
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Username: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
 
     logging.info("Run this in conjunction with the pubsub_client.py " + \
                  "example to watch events happen as you give commands.")

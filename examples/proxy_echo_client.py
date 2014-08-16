@@ -10,7 +10,7 @@
 """
 
 import logging
-import getpass
+from getpass import getpass
 from optparse import OptionParser
 
 import slixmpp
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     if opts.jid is None:
         opts.jid = input("Username: ")
     if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+        opts.password = getpass("Password: ")
     if opts.proxy_host is None:
         opts.proxy_host = input("Proxy host: ")
     if opts.proxy_port is None:
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     if opts.proxy_user is None:
         opts.proxy_user = input("Proxy username: ")
     if opts.proxy_pass is None and opts.proxy_user:
-        opts.proxy_pass = getpass.getpass("Proxy password: ")
+        opts.proxy_pass = getpass("Proxy password: ")
 
     # Setup the EchoBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does

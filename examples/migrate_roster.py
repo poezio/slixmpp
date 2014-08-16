@@ -3,7 +3,7 @@
 
 import sys
 import logging
-import getpass
+from getpass import getpass
 from optparse import OptionParser
 
 import slixmpp
@@ -44,12 +44,12 @@ logging.basicConfig(level=opts.loglevel,
 if opts.old_jid is None:
     opts.old_jid = input("Old JID: ")
 if opts.old_password is None:
-    opts.old_password = getpass.getpass("Old Password: ")
+    opts.old_password = getpass("Old Password: ")
 
 if opts.new_jid is None:
     opts.new_jid = input("New JID: ")
 if opts.new_password is None:
-    opts.new_password = getpass.getpass("New Password: ")
+    opts.new_password = getpass("New Password: ")
 
 
 old_xmpp = slixmpp.ClientXMPP(opts.old_jid, opts.old_password)
