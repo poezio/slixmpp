@@ -159,7 +159,7 @@ item itself, and the JID and node that will own the item.
 .. note::
 
     In this case, the owning JID and node are provided with the
-    parameters ``ijid`` and ``node``. 
+    parameters ``ijid`` and ``node``.
 
 Peforming Disco Queries
 -----------------------
@@ -197,5 +197,5 @@ a full Iq stanza.
 
     info = self['xep_0030'].get_info(node='foo', local=True)
     items = self['xep_0030'].get_items(jid='somejid@mycomponent.example.com',
-                                       node='bar', 
+                                       node='bar',
                                        local=True)

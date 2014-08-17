@@ -15,7 +15,7 @@ import slixmpp.plugins.xep_0325 as xep_0325
 namespace='sn'
 
 class TestControlStanzas(SlixTest):
-    
+
 
     def setUp(self):
         pass
@@ -89,7 +89,7 @@ class TestControlStanzas(SlixTest):
         msg['set'].add_data("Tjohej", "boolean", "true")
 
         self.check(msg,"""
-            <message 
+            <message
                 from='master@clayster.com/amr'
                 to='device@clayster.com'>
                 <set xmlns='urn:xmpp:iot:control'>
@@ -244,5 +244,5 @@ class TestControlStanzas(SlixTest):
             </iq>
         """
             )
-    
+
 suite = unittest.TestLoader().loadTestsFromTestCase(TestControlStanzas)

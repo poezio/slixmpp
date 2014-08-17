@@ -2,7 +2,7 @@ Sign in, Send a Message, and Disconnect
 =======================================
 
 .. note::
-    
+
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
     `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
@@ -10,7 +10,7 @@ Sign in, Send a Message, and Disconnect
     <xmpp:sleek@conference.jabber.org?join>`_.
 
 A common use case for Slixmpp is to send one-off messages from
-time to time. For example, one use case could be sending out a notice when 
+time to time. For example, one use case could be sending out a notice when
 a shell script finishes a task.
 
 We will create our one-shot bot based on the pattern explained in :ref:`echobot`. To
@@ -24,7 +24,7 @@ for the JID that will receive our message, and the string content of the message
 
 
     class SendMsgBot(slixmpp.ClientXMPP):
-        
+
         def __init__(self, jid, password, recipient, msg):
             super(SendMsgBot, self).__init__(jid, password)
 
@@ -52,7 +52,7 @@ Finally, we need to disconnect the client using :meth:`disconnect <slixmpp.xmlst
 Now, sent stanzas are placed in a queue to pass them to the send thread. If we were to call
 :meth:`disconnect <slixmpp.xmlstream.XMLStream.disconnect>` without any parameters, then it is possible
 for the client to disconnect before the send queue is processed and the message is actually
-sent on the wire. To ensure that our message is processed, we use 
+sent on the wire. To ensure that our message is processed, we use
 :meth:`disconnect(wait=True) <slixmpp.xmlstream.XMLStream.disconnect>`.
 
 .. code-block:: python

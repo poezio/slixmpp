@@ -53,7 +53,7 @@ class ControlSet(ElementBase):
         Arguments:
             nodeId    -- The ID for the node.
             sourceId  -- [optional] identifying the data source controlling the device
-            cacheType -- [optional] narrowing down the search to a specific kind of node        
+            cacheType -- [optional] narrowing down the search to a specific kind of node
         """
         if nodeId not in self._nodes:
             self._nodes.add((nodeId))
@@ -117,12 +117,12 @@ class ControlSet(ElementBase):
 
     def add_data(self, name, typename, value):
         """
-        Add a new data element. 
+        Add a new data element.
 
         Arguments:
             name       -- The name of the data element
-            typename   -- The type of data element 
-                          (boolean, color, string, date, dateTime, 
+            typename   -- The type of data element
+                          (boolean, color, string, date, dateTime,
                            double, duration, int, long, time)
             value      -- The value of the data element
         """
@@ -244,7 +244,7 @@ class ControlSetResponse(ElementBase):
         Arguments:
             nodeId    -- The ID for the node.
             sourceId  -- [optional] identifying the data source controlling the device
-            cacheType -- [optional] narrowing down the search to a specific kind of node        
+            cacheType -- [optional] narrowing down the search to a specific kind of node
         """
         if nodeId not in self._nodes:
             self._nodes.add(nodeId)
@@ -308,7 +308,7 @@ class ControlSetResponse(ElementBase):
 
     def add_data(self, name):
         """
-        Add a new ResponseParameter element. 
+        Add a new ResponseParameter element.
 
         Arguments:
             name   -- Name of the parameter
@@ -389,12 +389,12 @@ class Error(ElementBase):
     def del_text(self):
         """Remove the contents inside the XML tag."""
         self.xml.text = ""
-        return self    
+        return self
 
 class ResponseParameter(ElementBase):
-    """ 
-    Parameter element in ControlSetResponse. 
-    """    
+    """
+    Parameter element in ControlSetResponse.
+    """
     namespace = 'urn:xmpp:iot:control'
     name = 'parameter'
     plugin_attrib = name
@@ -402,7 +402,7 @@ class ResponseParameter(ElementBase):
 
 
 class BaseParameter(ElementBase):
-    """ 
+    """
     Parameter element in SetCommand. This is a base class,
     all instances of parameters added to SetCommand must be of types:
         BooleanParameter
@@ -415,7 +415,7 @@ class BaseParameter(ElementBase):
         IntParameter
         LongParameter
         TimeParameter
-    """    
+    """
     namespace = 'urn:xmpp:iot:control'
     name = 'baseParameter'
     plugin_attrib = name
@@ -425,80 +425,80 @@ class BaseParameter(ElementBase):
         return self.name;
 
 class BooleanParameter(BaseParameter):
-    """ 
-    Field data of type boolean. 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type boolean.
+    Note that the value is expressed as a string.
     """
     name = 'boolean'
     plugin_attrib = name
 
 class ColorParameter(BaseParameter):
-    """ 
-    Field data of type color. 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type color.
+    Note that the value is expressed as a string.
     """
     name = 'color'
     plugin_attrib = name
 
 class StringParameter(BaseParameter):
-    """ 
-    Field data of type string. 
+    """
+    Field data of type string.
     """
     name = 'string'
     plugin_attrib = name
 
 class DateParameter(BaseParameter):
-    """ 
-    Field data of type date. 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type date.
+    Note that the value is expressed as a string.
     """
     name = 'date'
     plugin_attrib = name
 
 class DateTimeParameter(BaseParameter):
-    """ 
-    Field data of type dateTime. 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type dateTime.
+    Note that the value is expressed as a string.
     """
     name = 'dateTime'
     plugin_attrib = name
 
 class DoubleParameter(BaseParameter):
-    """ 
-    Field data of type double. 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type double.
+    Note that the value is expressed as a string.
     """
     name = 'double'
     plugin_attrib = name
 
 class DurationParameter(BaseParameter):
-    """ 
-    Field data of type duration. 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type duration.
+    Note that the value is expressed as a string.
     """
     name = 'duration'
     plugin_attrib = name
 
 class IntParameter(BaseParameter):
-    """ 
-    Field data of type int. 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type int.
+    Note that the value is expressed as a string.
     """
     name = 'int'
     plugin_attrib = name
 
 class LongParameter(BaseParameter):
-    """ 
-    Field data of type long (64-bit int). 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type long (64-bit int).
+    Note that the value is expressed as a string.
     """
     name = 'long'
     plugin_attrib = name
 
 class TimeParameter(BaseParameter):
-    """ 
-    Field data of type time. 
-    Note that the value is expressed as a string. 
+    """
+    Field data of type time.
+    Note that the value is expressed as a string.
     """
     name = 'time'
     plugin_attrib = name

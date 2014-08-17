@@ -5,7 +5,7 @@ Slixmpp Quickstart - Echo Bot
 ===============================
 
 .. note::
-    
+
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
     `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
@@ -93,7 +93,7 @@ as well.
 .. code-block:: python
 
     class EchoBot(slixmpp.ClientXMPP):
-        
+
         def __init__(self, jid, password):
             super(EchoBot, self).__init__(jid, password)
 
@@ -102,7 +102,7 @@ Handling Session Start
 The XMPP spec requires clients to broadcast its presence and retrieve its roster (buddy list) once
 it connects and establishes a session with the XMPP server. Until these two tasks are completed,
 some servers may not deliver or send messages or presence notifications to the client. So we now
-need to be sure that we retrieve our roster and send an initial presence once the session has 
+need to be sure that we retrieve our roster and send an initial presence once the session has
 started. To do that, we will register an event handler for the :term:`session_start` event.
 
 .. code-block:: python
@@ -198,7 +198,7 @@ or ``chat``. (Other potential types are ``error``, ``headline``, and ``groupchat
 
 Let's take a closer look at the ``.reply()`` method used above. For message stanzas,
 ``.reply()`` accepts the parameter ``body`` (also as the first positional argument),
-which is then used as the value of the ``<body />`` element of the message. 
+which is then used as the value of the ``<body />`` element of the message.
 Setting the appropriate ``to`` JID is also handled by ``.reply()``.
 
 Another way to have sent the reply message would be to use :meth:`send_message <slixmpp.basexmpp.BaseXMPP.send_message>`,
@@ -242,7 +242,7 @@ the newer ``argparse`` module.
 
 We want to accept three parameters: the JID for the echo bot, its password, and a flag for
 displaying the debugging logs. We also want these to be optional parameters, since passing
-a password directly through the command line can be a security risk. 
+a password directly through the command line can be a security risk.
 
 .. code-block:: python
 
@@ -303,21 +303,21 @@ the ``EchoBot.__init__`` method instead.
 
 .. note::
 
-    If you are using the OpenFire server, you will need to include an additional 
+    If you are using the OpenFire server, you will need to include an additional
     configuration step. OpenFire supports a different version of SSL than what
     most servers and Slixmpp support.
 
     .. code-block:: python
-    
+
         import ssl
         xmpp.ssl_version = ssl.PROTOCOL_SSLv3
 
 Now we're ready to connect and begin echoing messages. If you have the package
 ``dnspython`` installed, then the :meth:`slixmpp.clientxmpp.ClientXMPP` method
 will perform a DNS query to find the appropriate server to connect to for the
-given JID. If you do not have ``dnspython``, then Slixmpp will attempt to 
+given JID. If you do not have ``dnspython``, then Slixmpp will attempt to
 connect to the hostname used by the JID, unless an address tuple is supplied
-to :meth:`slixmpp.clientxmpp.ClientXMPP`. 
+to :meth:`slixmpp.clientxmpp.ClientXMPP`.
 
 .. code-block:: python
 
@@ -349,12 +349,12 @@ to :meth:`slixmpp.clientxmpp.ClientXMPP`.
 To begin responding to messages, you'll see we called :meth:`slixmpp.basexmpp.BaseXMPP.process`
 which will start the event handling, send queue, and XML reader threads. It will also call
 the :meth:`slixmpp.plugins.base.base_plugin.post_init` method on all registered plugins. By
-passing ``block=True`` to :meth:`slixmpp.basexmpp.BaseXMPP.process` we are running the 
+passing ``block=True`` to :meth:`slixmpp.basexmpp.BaseXMPP.process` we are running the
 main processing loop in the main thread of execution. The :meth:`slixmpp.basexmpp.BaseXMPP.process`
 call will not return until after Slixmpp disconnects. If you need to run the client in the background
 for another program, use ``block=False`` to spawn the processing loop in its own thread.
 
-.. note:: 
+.. note::
 
     Before 1.0, controlling the blocking behaviour of :meth:`slixmpp.basexmpp.BaseXMPP.process` was
     done via the ``threaded`` argument. This arrangement was a source of confusion because some users

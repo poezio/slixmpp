@@ -121,7 +121,7 @@ if __name__ == '__main__':
     if args.password is None:
         args.password = getpass("Password: ")
 
-    
+
     access_token = None
 
     # Since documentation on how to work with Google tokens
@@ -147,7 +147,7 @@ if __name__ == '__main__':
         'Passwd': args.password
     })
     headers = {
-        'Content-Type': 'application/x-www-form-urlencoded' 
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
     try:
         conn.request('POST', '/accounts/ClientLogin', params, headers)
@@ -195,12 +195,12 @@ if __name__ == '__main__':
     # We're using an access token instead of a password, so we'll use `''` as
     # a password argument filler.
 
-    xmpp = ThirdPartyAuthBot(args.jid, '')  
+    xmpp = ThirdPartyAuthBot(args.jid, '')
     xmpp.credentials['access_token'] = access_token
 
     # The credentials dictionary is used to provide additional authentication
     # information beyond just a password.
-    
+
     xmpp.register_plugin('xep_0030') # Service Discovery
     xmpp.register_plugin('xep_0004') # Data Forms
     xmpp.register_plugin('xep_0060') # PubSub
@@ -218,7 +218,7 @@ if __name__ == '__main__':
     # xmpp.ca_certs = "path/to/ca/cert"
 
     # Connect to the XMPP server and start processing XMPP stanzas.
-    # Google only allows one SASL attempt per connection, so in order to 
+    # Google only allows one SASL attempt per connection, so in order to
     # enable the X-GOOGLE-TOKEN mechanism, we'll disable TLS.
     xmpp.connect()
     xmpp.process()

@@ -307,7 +307,7 @@ class XEP_0045(BasePlugin):
         if role not in ('moderator', 'participant', 'visitor', 'none'):
             raise TypeError
         query = ET.Element('{http://jabber.org/protocol/muc#admin}query')
-        item = ET.Element('item', {'role':role, 'nick':nick})    
+        item = ET.Element('item', {'role':role, 'nick':nick})
         query.append(item)
         iq = self.xmpp.makeIqSet(query)
         iq['to'] = room

@@ -6,7 +6,7 @@ import slixmpp.plugins.xep_0323 as xep_0323
 namespace='sn'
 
 class TestSensorDataStanzas(SlixTest):
-    
+
 
     def setUp(self):
         pass
@@ -171,7 +171,7 @@ class TestSensorDataStanzas(SlixTest):
         iq['accepted']['seqnr'] = '2'
 
         self.check(iq,"""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='2'>
@@ -193,7 +193,7 @@ class TestSensorDataStanzas(SlixTest):
         iq['rejected']['error'] = 'Access denied.'
 
         self.check(iq,"""
-            <iq type='error' 
+            <iq type='error'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='4'>
@@ -250,7 +250,7 @@ class TestSensorDataStanzas(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1'>
                     <node nodeId='Device02'>
                         <timestamp value='2013-03-07T16:24:30'>
-                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='-12.42' unit='K'/> 
+                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='-12.42' unit='K'/>
                         </timestamp>
                     </node>
                 </fields>
@@ -269,7 +269,7 @@ class TestSensorDataStanzas(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1'>
                     <node nodeId='Device02'>
                         <timestamp value='2013-03-07T16:24:30'>
-                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='-12.42' unit='K'/> 
+                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='-12.42' unit='K'/>
                         </timestamp>
                     </node>
                     <node nodeId='EmptyDevice'/>
@@ -314,7 +314,7 @@ class TestSensorDataStanzas(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1'>
                     <node nodeId='Device02'>
                         <timestamp value='2013-03-07T16:24:30'>
-                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='-12.42' unit='K'/> 
+                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='-12.42' unit='K'/>
                         </timestamp>
                     </node>
                     <node nodeId='EmptyDevice'/>
@@ -323,18 +323,18 @@ class TestSensorDataStanzas(SlixTest):
                     </node>
                     <node nodeId='Device77'>
                         <timestamp value='2013-05-03T12:00:01'>
-                            <numeric name='Temperature' historicalDay='true' value='-12.42' unit='K'/> 
-                            <numeric name='Speed' historicalWeek='false' value='312.42' unit='km/h'/> 
-                            <string name='Temperature name' historicalMonth='true' value='Bottom oil'/> 
-                            <string name='Speed name' historicalQuarter='false' value='Top speed'/> 
-                            <dateTime name='T1' historicalYear='true' value='1979-01-01T00:00:00'/> 
-                            <dateTime name='T2' historicalOther='false' value='2000-01-01T01:02:03'/> 
-                            <timeSpan name='TS1' missing='true' value='P5Y'/> 
-                            <timeSpan name='TS2' manualEstimate='false' value='PT2M1S'/> 
-                            <enum name='top color' invoiced='true' value='red' dataType='string'/> 
-                            <enum name='bottom color' powerFailure='false' value='black' dataType='string'/> 
-                            <boolean name='Temperature real' historicalDay='true' value='false'/> 
-                            <boolean name='Speed real' historicalWeek='false' value='true'/> 
+                            <numeric name='Temperature' historicalDay='true' value='-12.42' unit='K'/>
+                            <numeric name='Speed' historicalWeek='false' value='312.42' unit='km/h'/>
+                            <string name='Temperature name' historicalMonth='true' value='Bottom oil'/>
+                            <string name='Speed name' historicalQuarter='false' value='Top speed'/>
+                            <dateTime name='T1' historicalYear='true' value='1979-01-01T00:00:00'/>
+                            <dateTime name='T2' historicalOther='false' value='2000-01-01T01:02:03'/>
+                            <timeSpan name='TS1' missing='true' value='P5Y'/>
+                            <timeSpan name='TS2' manualEstimate='false' value='PT2M1S'/>
+                            <enum name='top color' invoiced='true' value='red' dataType='string'/>
+                            <enum name='bottom color' powerFailure='false' value='black' dataType='string'/>
+                            <boolean name='Temperature real' historicalDay='true' value='false'/>
+                            <boolean name='Speed real' historicalWeek='false' value='true'/>
                         </timestamp>
                     </node>
                 </fields>
@@ -342,7 +342,7 @@ class TestSensorDataStanzas(SlixTest):
                        """
             )
 
-        
+
     def testTimestamp(self):
         msg = self.Message();
 
@@ -386,8 +386,8 @@ class TestSensorDataStanzas(SlixTest):
         self.check(msg,emptyStringIdXML)
         msg['fields']['stringIds'] = "1"
         self.check(msg,emptyStringIdXML)
-        
 
 
-    
+
+
 suite = unittest.TestLoader().loadTestsFromTestCase(TestSensorDataStanzas)

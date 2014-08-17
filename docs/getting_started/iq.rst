@@ -36,7 +36,7 @@ stanzas this way. The relevant methods are:
 * :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq_error`
 * :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq_query`
 
-These methods all follow the same pattern: create or modify an existing 
+These methods all follow the same pattern: create or modify an existing
 :class:`~slixmpp.stanza.iq.Iq` stanza, set the ``'type'`` value based
 on the method name, and finally add a ``<query />`` element with the given
 namespace. For example, to produce the query above, you would use:
@@ -74,7 +74,7 @@ These options are:
   To change the timeout for a single call, the ``timeout`` parameter works:
 
     .. code-block:: python
-        
+
         iq.send(timeout=60)
 
 * ``callback``: When not using a blocking call, using the ``callback``
@@ -85,7 +85,7 @@ These options are:
 
     .. code-block:: python
 
-       cb_name = iq.send(callback=self.a_callback) 
+       cb_name = iq.send(callback=self.a_callback)
 
        # ... later if we need to cancel
        self.remove_handler(cb_name)
@@ -133,7 +133,7 @@ interfacting with the :class:`~slixmpp.stanza.iq.Iq` payload.
     * :ref:`create-plugin`
     * :ref:`work-with-stanzas`
     * :ref:`using-handlers-matchers`
-    
+
 
 The typical way to respond to :class:`~slixmpp.stanza.iq.Iq` requests is
 to register stream handlers. As an example, suppose we create a stanza class

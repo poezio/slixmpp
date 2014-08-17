@@ -1,7 +1,7 @@
 Following *XMPP: The Definitive Guide*
 ======================================
 
-Slixmpp was featured in the first edition of the O'Reilly book 
+Slixmpp was featured in the first edition of the O'Reilly book
 `XMPP: The Definitive Guide <http://oreilly.com/catalog/9780596521271/>`_
 by Peter Saint-Andre, Kevin Smith, and Remko Tronçon. The original source code
 for the book's examples can be found at http://github.com/remko/xmpp-tdg. An
@@ -79,7 +79,7 @@ Updated Code
     user = self.backend.getUserFromJID(event["from"].jid)
     if user is not None:
       self.backend.addMessageFromUser(message, user)
-  
+
   def handleMessageAddedToBackend(self, message) :
     body = message.user + ": " + message.text
     htmlBody = "<p><a href='%(uri)s'>%(user)s</a>: %(message)s</p>" % {
@@ -203,7 +203,7 @@ Example 14-7. (Page 225)
 **Extended CheshiR IM server component implementation.**
 
 .. note::
-    Since the CheshiR examples build on each other, see previous 
+    Since the CheshiR examples build on each other, see previous
     sections for corrections to code that is not marked as new in the book
     example.
 
@@ -246,4 +246,4 @@ Updated Code
         self.sendAllContactSubscriptionRequestsToUser(userJID)
 
 `View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/Component.py>`_ |
-`View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/Component.py>`_ 
+`View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/Component.py>`_

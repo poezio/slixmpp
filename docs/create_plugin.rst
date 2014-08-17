@@ -40,7 +40,7 @@ module. To do so, use the following form when registering the plugin:
     self.register_plugin('myplugin', module=mod_containing_my_plugin)
 
 The plugin name must be the same as the plugin's class name.
- 
+
 Now, we can open our favorite text editors and create ``xep_0077.py`` in
 ``Slixmpp/slixmpp/plugins``. We want to do some basic house-keeping and
 declare the name and description of the XEP we are implementing. If you
@@ -535,9 +535,9 @@ with some additional registration fields implemented.
         namespace = 'jabber:iq:register'
         name = 'query'
         plugin_attrib = 'register'
-        interfaces = set(('username', 'password', 'email', 'nick', 'name', 
-                          'first', 'last', 'address', 'city', 'state', 'zip', 
-                          'phone', 'url', 'date', 'misc', 'text', 'key', 
+        interfaces = set(('username', 'password', 'email', 'nick', 'name',
+                          'first', 'last', 'address', 'city', 'state', 'zip',
+                          'phone', 'url', 'date', 'misc', 'text', 'key',
                           'registered', 'remove', 'instructions'))
         sub_interfaces = interfaces
 

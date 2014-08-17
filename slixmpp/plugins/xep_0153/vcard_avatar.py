@@ -129,7 +129,7 @@ class XEP_0153(BasePlugin):
                 # Don't process vCard avatars for MUC occupants
                 # since they all share the same bare JID.
                 return
-        except: pass    
+        except: pass
 
         if not pres.match('presence/vcard_temp_update'):
             self.api['set_hash'](pres['from'], args=None)

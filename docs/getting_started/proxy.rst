@@ -5,7 +5,7 @@ Enable HTTP Proxy Support
 =========================
 
 .. note::
-    
+
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
     `mailing list <http://groups.google.com/group/slixmpp-discussion>`_

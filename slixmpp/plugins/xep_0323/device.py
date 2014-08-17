@@ -13,9 +13,9 @@ import logging
 
 class Device(object):
     """
-    Example implementation of a device readout object. 
+    Example implementation of a device readout object.
     Is registered in the XEP_0323.register_node call
-    The device object may be any custom implementation to support 
+    The device object may be any custom implementation to support
     specific devices, but it must implement the functions:
           has_field
           request_fields
@@ -38,19 +38,19 @@ class Device(object):
         Returns true if the supplied field name exists in this device.
 
         Arguments:
-            field      -- The field name        
+            field      -- The field name
         """
         if field in self.fields.keys():
             return True;
         return False;
-    
+
     def refresh(self, fields):
         """
         override method to do the refresh work
         refresh values from hardware or other
         """
         pass
-        
+
 
     def request_fields(self, fields, flags, session, callback):
         """
@@ -65,7 +65,7 @@ class Device(object):
                         Formatted as a dictionary like { "flag name": "flag value" ... }
             session  -- Session id, only used in the callback as identifier
             callback -- Callback function to call when data is available.
-        
+
                     The callback function must support the following arguments:
 
                 session  -- Session id, as supplied in the request_fields call
@@ -73,11 +73,11 @@ class Device(object):
                 result   -- The current result status of the readout. Valid values are:
                                "error"  - Readout failed.
                                "fields" - Contains readout data.
-                               "done"   - Indicates that the readout is complete. May contain 
+                               "done"   - Indicates that the readout is complete. May contain
                                           readout data.
-                timestamp_block -- [optional] Only applies when result != "error" 
+                timestamp_block -- [optional] Only applies when result != "error"
                                The readout data. Structured as a dictionary:
-                  { 
+                  {
                     timestamp:     timestamp for this datablock,
                     fields:        list of field dictionary (one per readout field).
                       readout field dictionary format:
@@ -89,10 +89,10 @@ class Device(object):
                         dataType:  The datatype of the field. Only applies to type enum.
                         flags:     [optional] data classifier flags for the field, e.g. momentary
                                Formatted as a dictionary like { "flag name": "flag value" ... }
-                      }  
+                      }
                   }
                 error_msg -- [optional] Only applies when result == "error".
-                                Error details when a request failed. 
+                                Error details when a request failed.
 
         """
         logging.debug("request_fields called looking for fields %s",fields)
@@ -125,11 +125,11 @@ class Device(object):
             field_block = [];
             for f in self.momentary_data:
                 if f in fields:
-                    field_block.append({"name": f, 
-                                "type": self.fields[f]["type"], 
+                    field_block.append({"name": f,
+                                "type": self.fields[f]["type"],
                                 "unit": self.fields[f]["unit"],
                                 "dataType": self.fields[f]["dataType"],
-                                "value": self.momentary_data[f]["value"], 
+                                "value": self.momentary_data[f]["value"],
                                 "flags": self.momentary_data[f]["flags"]});
             ts_block["timestamp"] = timestamp;
             ts_block["fields"] = field_block;
@@ -142,25 +142,25 @@ class Device(object):
 
         for ts in sorted(self.timestamp_data.keys()):
             tsdt = datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S")
-            if not from_flag is None: 
-                if tsdt < from_flag: 
+            if not from_flag is None:
+                if tsdt < from_flag:
                     #print (str(tsdt) + " < " + str(from_flag))
                     continue
-            if not to_flag is None: 
-                if tsdt > to_flag: 
+            if not to_flag is None:
+                if tsdt > to_flag:
                     #print (str(tsdt) + " > " + str(to_flag))
                     continue
-    
+
             ts_block = {};
             field_block = [];
 
             for f in self.timestamp_data[ts]:
                 if f in fields:
-                    field_block.append({"name": f, 
-                                "type": self.fields[f]["type"], 
+                    field_block.append({"name": f,
+                                "type": self.fields[f]["type"],
                                 "unit": self.fields[f]["unit"],
                                 "dataType": self.fields[f]["dataType"],
-                                "value": self.timestamp_data[ts][f]["value"], 
+                                "value": self.timestamp_data[ts][f]["value"],
                                 "flags": self.timestamp_data[ts][f]["flags"]});
 
             ts_block["timestamp"] = ts;
@@ -171,7 +171,7 @@ class Device(object):
     def _datetime_flag_parser(self, flags, flagname):
         if not flagname in flags:
             return None
-        
+
         dt = None
         try:
             dt = datetime.datetime.strptime(flags[flagname], "%Y-%m-%dT%H:%M:%S")
@@ -242,7 +242,7 @@ class Device(object):
             return False;
         if flags is None:
             flags = {};
-        
+
         flags["momentary"] = "true"
         self.momentary_data[name] = {"value": value, "flags": flags};
         return True;

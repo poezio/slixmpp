@@ -77,7 +77,7 @@ class TestPlugins(unittest.TestCase):
         p.disable('a')
 
         self.assertEqual(len(p), 0, "Wrong number of enabled plugins.")
-        self.assertEqual(events, ['init', 'end'], 
+        self.assertEqual(events, ['init', 'end'],
                 "Plugin lifecycle methods not called.")
 
     def test_enable_dependencies(self):

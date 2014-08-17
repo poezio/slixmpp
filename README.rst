@@ -80,7 +80,7 @@ Slixmpp projects::
 
 
     if __name__ == '__main__':
-        # Ideally use optparse or argparse to get JID, 
+        # Ideally use optparse or argparse to get JID,
         # password, and log level.
 
         logging.basicConfig(level=logging.DEBUG,
@@ -101,15 +101,15 @@ Credits
 -------
 
 **Main Author:** Nathan Fritz
-    `fritzy@netflint.net <xmpp:fritzy@netflint.net?message>`_, 
+    `fritzy@netflint.net <xmpp:fritzy@netflint.net?message>`_,
     `@fritzy <http://twitter.com/fritzy>`_
 
     Nathan is also the author of XMPPHP and `Seesmic-AS3-XMPP
-    <http://code.google.com/p/seesmic-as3-xmpp/>`_, and a former member of 
+    <http://code.google.com/p/seesmic-as3-xmpp/>`_, and a former member of
     the XMPP Council.
 
 **Co-Author:** Lance Stout
-    `lancestout@gmail.com <xmpp:lancestout@gmail.com?message>`_, 
+    `lancestout@gmail.com <xmpp:lancestout@gmail.com?message>`_,
     `@lancestout <http://twitter.com/lancestout>`_
 
 **Contributors:**

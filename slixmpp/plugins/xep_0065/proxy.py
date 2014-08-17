@@ -206,7 +206,7 @@ class XEP_0065(base_plugin):
             # Though this should not be neccessary remove the closed session anyway
             with self._sessions_lock:
                 if sid in self._sessions:
-                    log.warn(('SOCKS5 session with sid = "%s" was not ' + 
+                    log.warn(('SOCKS5 session with sid = "%s" was not ' +
                               'removed from _sessions by sock.close()') % sid)
                     del self._sessions[sid]
 

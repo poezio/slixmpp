@@ -133,7 +133,7 @@ def resolve(host, port=None, service=None, proto='tcp',
     if not service:
         hosts = [(host, port)]
     else:
-        hosts = get_SRV(host, port, service, proto, 
+        hosts = get_SRV(host, port, service, proto,
                         resolver=resolver,
                         use_dnspython=use_dnspython)
 
@@ -144,7 +144,7 @@ def resolve(host, port=None, service=None, proto='tcp',
                 results.append((host, '::1', port))
             results.append((host, '127.0.0.1', port))
         if use_ipv6:
-            for address in get_AAAA(host, resolver=resolver, 
+            for address in get_AAAA(host, resolver=resolver,
                                           use_dnspython=use_dnspython):
                 results.append((host, address, port))
         for address in get_A(host, resolver=resolver,

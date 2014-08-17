@@ -60,7 +60,7 @@ class TestStreamControl(SlixTest):
                 to='master@clayster.com/amr'
                 id='1'>
                 <setResponse xmlns='urn:xmpp:iot:control' responseCode="OK" />
-            </iq>            
+            </iq>
             """)
 
         self.assertEqual(myDevice._get_field_value("Temperature"), "17");
@@ -99,7 +99,7 @@ class TestStreamControl(SlixTest):
                 to='master@clayster.com/amr'
                 id='1'>
                 <setResponse xmlns='urn:xmpp:iot:control' responseCode="OK" />
-            </iq>            
+            </iq>
             """)
 
         self.assertEqual(myDevice._get_field_value("Temperature"), "17");
@@ -125,7 +125,7 @@ class TestStreamControl(SlixTest):
                 to='master@clayster.com/amr'
                 id='2'>
                 <setResponse xmlns='urn:xmpp:iot:control' responseCode="OK" />
-            </iq>            
+            </iq>
             """)
 
         self.assertEqual(myDevice._get_field_value("Temperature"), "20");
@@ -163,7 +163,7 @@ class TestStreamControl(SlixTest):
                     <parameter name='Voltage' />
                     <error var='Output'>Invalid field Voltage</error>
                 </setResponse>
-            </iq>            
+            </iq>
             """)
 
         self.assertEqual(myDevice._get_field_value("Temperature"), "15");
@@ -180,7 +180,7 @@ class TestStreamControl(SlixTest):
         self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5);
 
         self.recv("""
-            <message 
+            <message
                 from='master@clayster.com/amr'
                 to='device@clayster.com'>
                 <set xmlns='urn:xmpp:iot:control'>
@@ -204,7 +204,7 @@ class TestStreamControl(SlixTest):
         self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5);
 
         self.recv("""
-            <message 
+            <message
                 from='master@clayster.com/amr'
                 to='device@clayster.com'>
                 <set xmlns='urn:xmpp:iot:control'>
@@ -225,7 +225,7 @@ class TestStreamControl(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        results = []; 
+        results = [];
 
         def my_callback(from_jid, result, nodeIds=None, fields=None, error_msg=None):
             results.append(result);
@@ -256,7 +256,7 @@ class TestStreamControl(SlixTest):
                 to='tester@localhost'
                 id='1'>
                 <setResponse xmlns='urn:xmpp:iot:control' responseCode="OK" />
-            </iq>               
+            </iq>
             """)
 
         time.sleep(.5)
@@ -269,7 +269,7 @@ class TestStreamControl(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        results = []; 
+        results = [];
 
         def my_callback(from_jid, result, nodeIds=None, fields=None, error_msg=None):
             results.append(result);
@@ -302,7 +302,7 @@ class TestStreamControl(SlixTest):
                 <setResponse xmlns='urn:xmpp:iot:control' responseCode="OtherError" >
                     <error var='Temperature'>Sensor error</error>
                 </setResponse>
-            </iq>               
+            </iq>
             """)
 
         time.sleep(.5)
@@ -330,8 +330,8 @@ class TestStreamControl(SlixTest):
             <query xmlns='http://jabber.org/protocol/disco#info'>
                 <identity category='client' type='bot'/>
                 <feature var='urn:xmpp:iot:control'/>
-            </query>  
-        </iq>            
+            </query>
+        </iq>
         """)
 
     def testServiceDiscoveryComponent(self):
@@ -356,8 +356,8 @@ class TestStreamControl(SlixTest):
             <query xmlns='http://jabber.org/protocol/disco#info'>
                 <identity category='component' type='generic'/>
                 <feature var='urn:xmpp:iot:control'/>
-            </query>  
-        </iq>            
+            </query>
+        </iq>
         """)
 
 

@@ -88,7 +88,7 @@ when this bit of XML is received (with an assumed namespace of
    callback, the callback function is executed with the stanza as its only
    parameter.
 
-   .. warning:: 
+   .. warning::
        The callback, aka :term:`stream handler`, is executed in the main event
        processing thread. If the handler blocks, event processing will also
        block.
@@ -117,7 +117,7 @@ when this bit of XML is received (with an assumed namespace of
    paired with an :term:`event handler`::
 
        ('event', 'message', msg_copy1, custom_event_handler_1)
-       ('event', 'message', msg_copy2, custom_evetn_handler_2) 
+       ('event', 'message', msg_copy2, custom_evetn_handler_2)
 
 5. **Process Custom Events**
 
@@ -127,9 +127,9 @@ when this bit of XML is received (with an assumed namespace of
    will be spawned for it.
 
    .. note::
-       Events may be raised without needing :term:`stanza objects <stanza object>`. 
-       For example, you could use ``self.event('custom', {'a': 'b'})``. 
-       You don't even need any arguments: ``self.event('no_parameters')``. 
+       Events may be raised without needing :term:`stanza objects <stanza object>`.
+       For example, you could use ``self.event('custom', {'a': 'b'})``.
+       You don't even need any arguments: ``self.event('no_parameters')``.
        However, every event handler MUST accept at least one argument.
 
    Finally, after a long trek, our message is handed off to the user's

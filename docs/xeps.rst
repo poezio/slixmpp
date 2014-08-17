@@ -4,9 +4,9 @@ Supported XEPS
 ======= ============================= ================
 XEP     Description                   Notes
 ======= ============================= ================
-`0004`_ Data forms                   
-`0009`_ Jabber RPC                   
-`0012`_ Last Activity             
+`0004`_ Data forms
+`0009`_ Jabber RPC
+`0012`_ Last Activity
 `0030`_ Service Discovery
 `0033`_ Extended Stanza Addressing
 `0045`_ Multi-User Chat (MUC)         Client-side only

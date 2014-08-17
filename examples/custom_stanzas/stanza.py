@@ -11,7 +11,7 @@ class Action(ElementBase):
       <status>X</status>
     </action>
     """
-   
+
     #: The `name` field refers to the basic XML tag name of the
     #: stanza. Here, the tag name will be 'action'.
     name = 'action'
@@ -22,9 +22,9 @@ class Action(ElementBase):
     #: The `plugin_attrib` value is the name that can be used
     #: with a parent stanza to access this stanza. For example
     #: from an Iq stanza object, accessing:
-    #: 
+    #:
     #:     iq['action']
-    #: 
+    #:
     #: would reference an Action object, and will even create
     #: an Action object and append it to the Iq stanza if
     #: one doesn't already exist.
@@ -49,7 +49,7 @@ class Action(ElementBase):
     #: the sub_interfaces set. For example, here all interfaces
     #: are marked as sub_interfaces, and so the XML produced will
     #: look like:
-    #: 
+    #:
     #:     <action xmlns="slixmpp:custom:actions">
     #:       <method>foo</method>
     #:     </action>

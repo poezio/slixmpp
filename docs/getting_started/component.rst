@@ -5,7 +5,7 @@ Create and Run a Server Component
 =================================
 
 .. note::
-    
+
     If you have any issues working through this quickstart guide
     or the other tutorials here, please either send a message to the
     `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
@@ -21,8 +21,8 @@ or ``easy_install``.
     pip install slixmpp  # Or: easy_install slixmpp
 
 
-Many XMPP applications eventually graduate to requiring to run as a server 
-component in order to meet scalability requirements. To demonstrate how to 
+Many XMPP applications eventually graduate to requiring to run as a server
+component in order to meet scalability requirements. To demonstrate how to
 turn an XMPP client bot into a component, we'll turn the echobot example
 (:ref:`echobot`) into a component version.
 

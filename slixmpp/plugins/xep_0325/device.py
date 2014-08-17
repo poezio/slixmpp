@@ -13,8 +13,8 @@ import datetime
 class Device(object):
     """
     Example implementation of a device control object.
-    
-    The device object may by any custom implementation to support 
+
+    The device object may by any custom implementation to support
     specific devices, but it must implement the functions:
           has_control_field
           set_control_fields
@@ -30,7 +30,7 @@ class Device(object):
         and the type matches for control in this device.
 
         Arguments:
-            field      -- The field name        
+            field      -- The field name
             typename   -- The expected type
         """
         if field in self.control_fields and self.control_fields[field]["type"] == typename:
@@ -43,22 +43,22 @@ class Device(object):
         sets the data and (if needed) and calls the callback.
 
         Arguments:
-            fields   -- List of control fields in tuple format: 
+            fields   -- List of control fields in tuple format:
                         (name, typename, value)
             session  -- Session id, only used in the callback as identifier
             callback -- Callback function to call when control set is complete.
 
                     The callback function must support the following arguments:
 
-                session     -- Session id, as supplied in the 
+                session     -- Session id, as supplied in the
                                request_fields call
                 nodeId      -- Identifier for this device
-                result      -- The current result status of the readout. 
+                result      -- The current result status of the readout.
                                Valid values are:
                                "error"  - Set fields failed.
                                "ok"     - All fields were set.
-                error_field -- [optional] Only applies when result == "error" 
-                               The field name that failed 
+                error_field -- [optional] Only applies when result == "error"
+                               The field name that failed
                                (usually means it is missing)
                 error_msg   -- [optional] Only applies when result == "error".
                                Error details when a request failed.
@@ -82,9 +82,9 @@ class Device(object):
         Sends a reject to the caller
 
         Arguments:
-            session  -- Session id, see definition in 
+            session  -- Session id, see definition in
                         set_control_fields function
-            callback -- Callback function, see definition in 
+            callback -- Callback function, see definition in
                         set_control_fields function
         """
         callback(session, result="error", nodeId=self.nodeId, error_field=field, error_msg=message);
@@ -95,8 +95,8 @@ class Device(object):
 
         Arguments:
             name     -- Name of the field
-            typename -- Type of the field, one of: 
-                        (boolean, color, string, date, dateTime, 
+            typename -- Type of the field, one of:
+                        (boolean, color, string, date, dateTime,
                          double, duration, int, long, time)
             value    -- Field value
         """

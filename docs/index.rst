@@ -31,7 +31,7 @@ Slixmpp
 
 Slixmpp is an :ref:`MIT licensed <license>` XMPP library for Python 2.6/3.1+,
 and is featured in examples in
-`XMPP: The Definitive Guide <http://oreilly.com/catalog/9780596521271>`_ 
+`XMPP: The Definitive Guide <http://oreilly.com/catalog/9780596521271>`_
 by Kevin Smith, Remko Tronçon, and Peter Saint-Andre. If you've arrived
 here from reading the Definitive Guide, please see the notes on updating
 the examples to the latest version of Slixmpp.
@@ -113,7 +113,7 @@ Here's your first Slixmpp Bot:
 
 
     if __name__ == '__main__':
-        # Ideally use optparse or argparse to get JID, 
+        # Ideally use optparse or argparse to get JID,
         # password, and log level.
 
         logging.basicConfig(level=logging.DEBUG,
@@ -129,7 +129,7 @@ Getting Started (with Examples)
 -------------------------------
 .. toctree::
     :maxdepth: 1
-    
+
     getting_started/echobot
     getting_started/sendlogout
     getting_started/component
@@ -144,7 +144,7 @@ Tutorials, FAQs, and How To Guides
 ----------------------------------
 .. toctree::
     :maxdepth: 1
-   
+
     faq
     xeps
     xmpp_tdg
@@ -156,7 +156,7 @@ Tutorials, FAQs, and How To Guides
 
 Plugin Guides
 ~~~~~~~~~~~~~
-.. toctree:: 
+.. toctree::
     :maxdepth: 1
 
     guide_xep_0030
@@ -173,7 +173,7 @@ API Reference
 -------------
 .. toctree::
     :maxdepth: 2
-    
+
     event_index
     api/clientxmpp
     api/componentxmpp

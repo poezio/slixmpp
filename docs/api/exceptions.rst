@@ -3,7 +3,7 @@ Exceptions
 
 .. module:: slixmpp.exceptions
 
-    
+
 .. autoexception:: XMPPError
     :members:
 

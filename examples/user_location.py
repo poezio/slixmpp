@@ -25,7 +25,7 @@ class LocationBot(ClientXMPP):
         super(LocationBot, self).__init__(jid, password)
 
         self.add_event_handler('session_start', self.start)
-        self.add_event_handler('user_location_publish', 
+        self.add_event_handler('user_location_publish',
                                self.user_location_publish)
 
         self.register_plugin('xep_0004')

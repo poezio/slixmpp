@@ -60,13 +60,13 @@ Event Index
     disco_info
         - **Data:** :py:class:`~slixmpp.plugins.xep_0030.stanza.DiscoInfo`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0030.disco.xep_0030`
-        
+
         Triggered whenever a ``disco#info`` result stanza is received.
 
     disco_items
         - **Data:** :py:class:`~slixmpp.plugins.xep_0030.stanza.DiscoItems`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0030.disco.xep_0030`
-        
+
         Triggered whenever a ``disco#items`` result stanza is received.
 
     disconnected
@@ -88,13 +88,13 @@ Event Index
     gmail_notify
         - **Data:** ``{}``
         - **Source:** :py:class:`~slixmpp.plugins.gmail_notify.gmail_notify`
-        
+
         Signal that there are unread emails for the Gmail account associated with the current XMPP account.
 
     gmail_messages
         - **Data:** :py:class:`~slixmpp.Iq`
         - **Source:** :py:class:`~slixmpp.plugins.gmail_notify.gmail_notify`
-        
+
         Signal that there are unread emails for the Gmail account associated with the current XMPP account.
 
     got_online
@@ -122,19 +122,19 @@ Event Index
     groupchat_message
         - **Data:** :py:class:`~slixmpp.Message`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0045.xep_0045`
-        
+
         Triggered whenever a message is received from a multi-user chat room.
 
     groupchat_presence
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0045.xep_0045`
-        
+
         Triggered whenever a presence stanza is received from a user in a multi-user chat room.
 
     groupchat_subject
         - **Data:** :py:class:`~slixmpp.Message`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0045.xep_0045`
-        
+
         Triggered whenever the subject of a multi-user chat room is changed, or announced when joining a room.
 
     killed
@@ -148,7 +148,7 @@ Event Index
     message
         - **Data:** :py:class:`~slixmpp.Message`
         - **Source:** :py:class:`BaseXMPP <slixmpp.BaseXMPP>`
-        
+
         Makes the contents of message stanzas available whenever one is received. Be
         sure to check the message type in order to handle error messages.
 
@@ -183,67 +183,67 @@ Event Index
     presence_available
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
-        
+
         A presence stanza with a type of '``available``' is received.
 
     presence_error
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
-        
+
         A presence stanza with a type of '``error``' is received.
 
     presence_form
         - **Data:** :py:class:`~slixmpp.plugins.xep_0004.Form`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0004.xep_0004`
-        
+
         This event is present in the XEP-0004 plugin code, but is currently not used.
 
     presence_probe
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
-        
+
         A presence stanza with a type of '``probe``' is received.
 
     presence_subscribe
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
-        
+
         A presence stanza with a type of '``subscribe``' is received.
 
     presence_subscribed
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
-        
+
         A presence stanza with a type of '``subscribed``' is received.
 
     presence_unavailable
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
-        
+
         A presence stanza with a type of '``unavailable``' is received.
 
     presence_unsubscribe
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
-        
+
         A presence stanza with a type of '``unsubscribe``' is received.
 
     presence_unsubscribed
         - **Data:** :py:class:`~slixmpp.Presence`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
-        
+
         A presence stanza with a type of '``unsubscribed``' is received.
 
     roster_update
         - **Data:** :py:class:`~slixmpp.stanza.Roster`
         - **Source:** :py:class:`~slixmpp.ClientXMPP`
-        
+
         An IQ result containing roster entries is received.
 
     sent_presence
         - **Data:** ``{}``
         - **Source:** :py:class:`~slixmpp.roster.multi.Roster`
-        
+
         Signal that an initial presence stanza has been written to the XML stream.
 
     session_end

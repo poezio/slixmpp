@@ -46,7 +46,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='1'>
@@ -60,11 +60,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1' done='true'>
                     <node nodeId='Device22'>
                         <timestamp value='2013-03-07T16:24:30'>
-                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='23.4' unit='°C'/> 
+                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='23.4' unit='°C'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
     def testRequestRejectAuth(self):
@@ -85,7 +85,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='error' 
+            <iq type='error'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='4'>
@@ -118,7 +118,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='error' 
+            <iq type='error'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='77'>
@@ -142,7 +142,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='8'>
@@ -177,7 +177,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='error' 
+            <iq type='error'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='7'>
@@ -201,7 +201,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='8'>
@@ -215,11 +215,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='7'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-01-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -227,7 +227,7 @@ class TestStreamSensorData(SlixTest):
                      to='master@clayster.com/amr'>
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='7' done='true'>
                 </fields>
-            </message>            
+            </message>
             """)
 
     def testRequestMultiTimestampSingleField(self):
@@ -260,7 +260,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='8'>
@@ -274,11 +274,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='7'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-01-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -287,11 +287,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='7'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-01-01T01:01:02'>
-                            <numeric name='Voltage' value='230.6' unit='V'/> 
+                            <numeric name='Voltage' value='230.6' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -299,7 +299,7 @@ class TestStreamSensorData(SlixTest):
                      to='master@clayster.com/amr'>
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='7' done='true'>
                 </fields>
-            </message>            
+            </message>
             """)
 
     def testRequestMultiTimestampAllFields(self):
@@ -330,7 +330,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='8'>
@@ -344,11 +344,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='7'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-01-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -357,12 +357,12 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='7'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-01-01T01:01:02'>
-                            <numeric name='Voltage' value='230.6' unit='V'/> 
-                            <string name='Height' invoiced='true' value='115 m'/> 
+                            <numeric name='Voltage' value='230.6' unit='V'/>
+                            <string name='Height' invoiced='true' value='115 m'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -370,7 +370,7 @@ class TestStreamSensorData(SlixTest):
                      to='master@clayster.com/amr'>
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='7' done='true'>
                 </fields>
-            </message>            
+            </message>
             """)
 
     def testRequestAPI(self):
@@ -424,7 +424,7 @@ class TestStreamSensorData(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0323'])
 
-        results = []; 
+        results = [];
 
         def my_callback(from_jid, result, nodeId=None, timestamp=None, fields=None, error_msg=None):
             if (result == "rejected") and (error_msg == "Invalid device Device22"):
@@ -445,19 +445,19 @@ class TestStreamSensorData(SlixTest):
             """)
 
         self.recv("""
-            <iq type='error' 
+            <iq type='error'
                 from='you@google.com'
                 to='tester@localhost'
                 id='1'>
                 <rejected xmlns='urn:xmpp:iot:sensordata' seqnr='1'>
                     <error>Invalid device Device22</error>
                 </rejected>
-            </iq>            
+            </iq>
             """)
 
         time.sleep(.1)
 
-        self.failUnless(results == ["rejected"], 
+        self.failUnless(results == ["rejected"],
                 "Rejected callback was not properly executed");
 
     def testRequestAcceptedAPI(self):
@@ -466,7 +466,7 @@ class TestStreamSensorData(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0323'])
 
-        results = []; 
+        results = [];
 
         def my_callback(from_jid, result, nodeId=None, timestamp=None, fields=None, error_msg=None):
             results.append(result);
@@ -486,17 +486,17 @@ class TestStreamSensorData(SlixTest):
             """)
 
         self.recv("""
-            <iq type='result' 
+            <iq type='result'
                 from='you@google.com'
                 to='tester@localhost'
                 id='1'>
                 <accepted xmlns='urn:xmpp:iot:sensordata' seqnr='1'/>
-            </iq>            
+            </iq>
             """)
 
         time.sleep(.1)
 
-        self.failUnless(results == ["accepted"], 
+        self.failUnless(results == ["accepted"],
                 "Accepted callback was not properly executed");
 
     def testRequestFieldsAPI(self):
@@ -505,8 +505,8 @@ class TestStreamSensorData(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0323'])
 
-        results = []; 
-        callback_data = {}; 
+        results = [];
+        callback_data = {};
 
         def my_callback(from_jid, result, nodeId=None, timestamp=None, fields=None, error_msg=None):
             results.append(result);
@@ -519,9 +519,9 @@ class TestStreamSensorData(SlixTest):
 
         t1= threading.Thread(name="request_data",
                          target=self.xmpp['xep_0323'].request_data,
-                         kwargs={"from_jid": "tester@localhost", 
-                                    "to_jid": "you@google.com", 
-                                    "nodeIds": ['Device33'], 
+                         kwargs={"from_jid": "tester@localhost",
+                                    "to_jid": "you@google.com",
+                                    "nodeIds": ['Device33'],
                                     "callback": my_callback});
         t1.start();
         #self.xmpp['xep_0323'].request_data(from_jid="tester@localhost", to_jid="you@google.com", nodeIds=['Device33'], callback=my_callback);
@@ -538,12 +538,12 @@ class TestStreamSensorData(SlixTest):
             """)
 
         self.recv("""
-            <iq type='result' 
+            <iq type='result'
                 from='you@google.com'
                 to='tester@localhost'
                 id='1'>
                 <accepted xmlns='urn:xmpp:iot:sensordata' seqnr='1'/>
-            </iq>            
+            </iq>
             """)
 
         self.recv("""
@@ -552,19 +552,19 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1'>
                     <node nodeId='Device33'>
                         <timestamp value='2000-01-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/> 
-                            <boolean name='TestBool' value='true'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/>
+                            <boolean name='TestBool' value='true'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.recv("""
             <message from='you@google.com'
                      to='tester@localhost'>
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1' done='true'/>
-            </message>            
+            </message>
             """)
 
         t1.join();
@@ -605,8 +605,8 @@ class TestStreamSensorData(SlixTest):
             <query xmlns='http://jabber.org/protocol/disco#info'>
                 <identity category='client' type='bot'/>
                 <feature var='urn:xmpp:iot:sensordata'/>
-            </query>  
-        </iq>            
+            </query>
+        </iq>
         """)
 
     def testServiceDiscoveryComponent(self):
@@ -631,8 +631,8 @@ class TestStreamSensorData(SlixTest):
             <query xmlns='http://jabber.org/protocol/disco#info'>
                 <identity category='component' type='generic'/>
                 <feature var='urn:xmpp:iot:sensordata'/>
-            </query>  
-        </iq>            
+            </query>
+        </iq>
         """)
 
     def testRequestTimeout(self):
@@ -642,7 +642,7 @@ class TestStreamSensorData(SlixTest):
                                    'xep_0323'])
 
         results = [];
-        callback_data = {}; 
+        callback_data = {};
 
         def my_callback(from_jid, result, nodeId=None, timestamp=None, error_msg=None):
             results.append(result);
@@ -653,9 +653,9 @@ class TestStreamSensorData(SlixTest):
 
         t1= threading.Thread(name="request_data",
                          target=self.xmpp['xep_0323'].request_data,
-                         kwargs={"from_jid": "tester@localhost", 
-                                    "to_jid": "you@google.com", 
-                                    "nodeIds": ['Device33'], 
+                         kwargs={"from_jid": "tester@localhost",
+                                    "to_jid": "you@google.com",
+                                    "nodeIds": ['Device33'],
                                     "callback": my_callback});
         t1.start();
 
@@ -671,12 +671,12 @@ class TestStreamSensorData(SlixTest):
             """)
 
         self.recv("""
-            <iq type='result' 
+            <iq type='result'
                 from='you@google.com'
                 to='tester@localhost'
                 id='1'>
                 <accepted xmlns='urn:xmpp:iot:sensordata' seqnr='1'/>
-            </iq>            
+            </iq>
             """)
 
         self.recv("""
@@ -729,7 +729,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='1'>
@@ -743,7 +743,7 @@ class TestStreamSensorData(SlixTest):
             <message from='device@clayster.com'
                      to='master@clayster.com/amr'>
                 <started xmlns='urn:xmpp:iot:sensordata' seqnr='1' />
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -752,11 +752,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1' done='true'>
                     <node nodeId='Device22'>
                         <timestamp value='2013-03-07T16:24:30'>
-                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='23.4' unit='°C'/> 
+                            <numeric name='Temperature' momentary='true' automaticReadout='true' value='23.4' unit='°C'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
     def testDelayedRequestFail(self):
@@ -792,7 +792,7 @@ class TestStreamSensorData(SlixTest):
         xml_stanza['rejected']['error'] = error_text
 
         self._filtered_stanza_check("""
-            <iq type='error' 
+            <iq type='error'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='1'>
@@ -847,7 +847,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='6'>
@@ -861,11 +861,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='6'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-02-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.2' unit='V'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.2' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -874,11 +874,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='6'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-03-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.3' unit='V'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.3' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -886,7 +886,7 @@ class TestStreamSensorData(SlixTest):
                      to='master@clayster.com/amr'>
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='6' done='true'>
                 </fields>
-            </message>            
+            </message>
             """)
 
     def testRequestFieldTo(self):
@@ -917,7 +917,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='6'>
@@ -931,11 +931,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='6'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-01-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.1' unit='V'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.1' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -944,11 +944,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='6'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-02-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.2' unit='V'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.2' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -956,7 +956,7 @@ class TestStreamSensorData(SlixTest):
                      to='master@clayster.com/amr'>
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='6' done='true'>
                 </fields>
-            </message>            
+            </message>
             """)
 
     def testRequestFieldFromTo(self):
@@ -987,7 +987,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='6'>
@@ -1001,11 +1001,11 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='6'>
                     <node nodeId='Device44'>
                         <timestamp value='2000-02-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.2' unit='V'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.2' unit='V'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.send("""
@@ -1013,7 +1013,7 @@ class TestStreamSensorData(SlixTest):
                      to='master@clayster.com/amr'>
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='6' done='true'>
                 </fields>
-            </message>            
+            </message>
             """)
 
     def testDelayedRequestClient(self):
@@ -1021,8 +1021,8 @@ class TestStreamSensorData(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0323'])
 
-        results = []; 
-        callback_data = {}; 
+        results = [];
+        callback_data = {};
 
         def my_callback(from_jid, result, nodeId=None, timestamp=None, fields=None, error_msg=None):
             results.append(result);
@@ -1035,9 +1035,9 @@ class TestStreamSensorData(SlixTest):
 
         t1= threading.Thread(name="request_data",
                          target=self.xmpp['xep_0323'].request_data,
-                         kwargs={"from_jid": "tester@localhost", 
-                                    "to_jid": "you@google.com", 
-                                    "nodeIds": ['Device33'], 
+                         kwargs={"from_jid": "tester@localhost",
+                                    "to_jid": "you@google.com",
+                                    "nodeIds": ['Device33'],
                                     "callback": my_callback});
         t1.start();
         #self.xmpp['xep_0323'].request_data(from_jid="tester@localhost", to_jid="you@google.com", nodeIds=['Device33'], callback=my_callback);
@@ -1054,20 +1054,20 @@ class TestStreamSensorData(SlixTest):
             """)
 
         self.recv("""
-            <iq type='result' 
+            <iq type='result'
                 from='you@google.com'
                 to='tester@localhost'
                 id='1'>
                 <accepted xmlns='urn:xmpp:iot:sensordata' seqnr='1'  queued='true'/>
-            </iq>            
+            </iq>
             """)
 
         self.recv("""
             <message from='device@clayster.com'
                      to='master@clayster.com/amr'>
                 <started xmlns='urn:xmpp:iot:sensordata' seqnr='1' />
-            </message>            
-            """)        
+            </message>
+            """)
 
         self.recv("""
             <message from='you@google.com'
@@ -1075,19 +1075,19 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1'>
                     <node nodeId='Device33'>
                         <timestamp value='2000-01-01T00:01:02'>
-                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/> 
-                            <boolean name='TestBool' value='true'/> 
+                            <numeric name='Voltage' invoiced='true' value='230.4' unit='V'/>
+                            <boolean name='TestBool' value='true'/>
                         </timestamp>
                     </node>
                 </fields>
-            </message>            
+            </message>
             """)
 
         self.recv("""
             <message from='you@google.com'
                      to='tester@localhost'>
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1' done='true'/>
-            </message>            
+            </message>
             """)
 
         t1.join();
@@ -1114,7 +1114,7 @@ class TestStreamSensorData(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0323'])
 
-        results = []; 
+        results = [];
 
         def my_callback(from_jid, result, nodeId=None, timestamp=None, fields=None, error_msg=None):
             results.append(result);
@@ -1133,12 +1133,12 @@ class TestStreamSensorData(SlixTest):
             """)
 
         self.recv("""
-            <iq type='result' 
+            <iq type='result'
                 from='you@google.com'
                 to='tester@localhost'
                 id='1'>
                 <accepted xmlns='urn:xmpp:iot:sensordata' seqnr='1'/>
-            </iq>            
+            </iq>
             """)
 
         self.xmpp['xep_0323'].cancel_request(session=session);
@@ -1192,7 +1192,7 @@ class TestStreamSensorData(SlixTest):
         """)
 
         self.send("""
-            <iq type='result' 
+            <iq type='result'
                 from='device@clayster.com'
                 to='master@clayster.com/amr'
                 id='1'>
