@@ -26,7 +26,7 @@ class ControlSet(ElementBase):
     interfaces = set(['nodes','datas'])
 
     def __init__(self, xml=None, parent=None):
-        ElementBase.__init__(self, xml, parent);
+        ElementBase.__init__(self, xml, parent)
         self._nodes = set()
         self._datas = set()
 
@@ -127,30 +127,30 @@ class ControlSet(ElementBase):
             value      -- The value of the data element
         """
         if name not in self._datas:
-            dataObj = None;
+            dataObj = None
             if typename == "boolean":
-                dataObj = BooleanParameter(parent=self);
+                dataObj = BooleanParameter(parent=self)
             elif typename == "color":
-                dataObj = ColorParameter(parent=self);
+                dataObj = ColorParameter(parent=self)
             elif typename == "string":
-                dataObj = StringParameter(parent=self);
+                dataObj = StringParameter(parent=self)
             elif typename == "date":
-                dataObj = DateParameter(parent=self);
+                dataObj = DateParameter(parent=self)
             elif typename == "dateTime":
-                dataObj = DateTimeParameter(parent=self);
+                dataObj = DateTimeParameter(parent=self)
             elif typename == "double":
-                dataObj = DoubleParameter(parent=self);
+                dataObj = DoubleParameter(parent=self)
             elif typename == "duration":
-                dataObj = DurationParameter(parent=self);
+                dataObj = DurationParameter(parent=self)
             elif typename == "int":
-                dataObj = IntParameter(parent=self);
+                dataObj = IntParameter(parent=self)
             elif typename == "long":
-                dataObj = LongParameter(parent=self);
+                dataObj = LongParameter(parent=self)
             elif typename == "time":
-                dataObj = TimeParameter(parent=self);
+                dataObj = TimeParameter(parent=self)
 
-            dataObj['name'] = name;
-            dataObj['value'] = value;
+            dataObj['name'] = name
+            dataObj['value'] = value
 
             self._datas.add(name)
             self.iterables.append(dataObj)
@@ -217,7 +217,7 @@ class ControlSetResponse(ElementBase):
     interfaces = set(['responseCode'])
 
     def __init__(self, xml=None, parent=None):
-        ElementBase.__init__(self, xml, parent);
+        ElementBase.__init__(self, xml, parent)
         self._nodes = set()
         self._datas = set()
 
@@ -316,7 +316,7 @@ class ControlSetResponse(ElementBase):
         if name not in self._datas:
             self._datas.add(name)
             data = ResponseParameter(parent=self)
-            data['name'] = name;
+            data['name'] = name
             self.iterables.append(data)
             return data
         return None
@@ -383,7 +383,7 @@ class Error(ElementBase):
             value -- string
         """
 
-        self.xml.text = value;
+        self.xml.text = value
         return self
 
     def del_text(self):
@@ -398,7 +398,7 @@ class ResponseParameter(ElementBase):
     namespace = 'urn:xmpp:iot:control'
     name = 'parameter'
     plugin_attrib = name
-    interfaces = set(['name']);
+    interfaces = set(['name'])
 
 
 class BaseParameter(ElementBase):
@@ -419,10 +419,10 @@ class BaseParameter(ElementBase):
     namespace = 'urn:xmpp:iot:control'
     name = 'baseParameter'
     plugin_attrib = name
-    interfaces = set(['name','value']);
+    interfaces = set(['name','value'])
 
     def _get_typename(self):
-        return self.name;
+        return self.name
 
 class BooleanParameter(BaseParameter):
     """

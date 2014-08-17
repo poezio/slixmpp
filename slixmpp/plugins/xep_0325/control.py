@@ -135,11 +135,11 @@ class XEP_0325(BasePlugin):
                     self._handle_set_response))
 
         # Server side dicts
-        self.nodes = {};
-        self.sessions = {};
+        self.nodes = {}
+        self.sessions = {}
 
-        self.last_seqnr = 0;
-        self.seqnr_lock = Lock();
+        self.last_seqnr = 0
+        self.seqnr_lock = Lock()
 
         ## For testning only
         self.test_authenticated_from = ""
@@ -156,13 +156,13 @@ class XEP_0325(BasePlugin):
 
     def plugin_end(self):
         """ Stop the XEP-0325 plugin """
-        self.sessions.clear();
+        self.sessions.clear()
         self.xmpp.remove_handler('Control Event:DirectSet')
         self.xmpp.remove_handler('Control Event:SetReq')
         self.xmpp.remove_handler('Control Event:SetResponse')
         self.xmpp.remove_handler('Control Event:SetResponseError')
         self.xmpp['xep_0030'].del_feature(feature=Control.namespace)
-        self.xmpp['xep_0030'].set_items(node=Control.namespace, items=tuple());
+        self.xmpp['xep_0030'].set_items(node=Control.namespace, items=tuple())
 
 
     # =================================================================
@@ -190,18 +190,18 @@ class XEP_0325(BasePlugin):
         self.nodes[nodeId] = {"device": device,
                                 "commTimeout": commTimeout,
                                 "sourceId": sourceId,
-                                "cacheType": cacheType};
+                                "cacheType": cacheType}
 
     def _set_authenticated(self, auth=''):
         """ Internal testing function """
-        self.test_authenticated_from = auth;
+        self.test_authenticated_from = auth
 
     def _get_new_seqnr(self):
         """ Returns a unique sequence number (unique across threads) """
-        self.seqnr_lock.acquire();
-        self.last_seqnr = self.last_seqnr + 1;
-        self.seqnr_lock.release();
-        return str(self.last_seqnr);
+        self.seqnr_lock.acquire()
+        self.last_seqnr = self.last_seqnr + 1
+        self.seqnr_lock.release()
+        return str(self.last_seqnr)
 
     def _handle_set_req(self, iq):
         """
@@ -220,69 +220,69 @@ class XEP_0325(BasePlugin):
         is sent.
         """
 
-        error_msg = '';
-        req_ok = True;
-        missing_node = None;
-        missing_field = None;
+        error_msg = ''
+        req_ok = True
+        missing_node = None
+        missing_field = None
 
         # Authentication
         if len(self.test_authenticated_from) > 0 and not iq['from'] == self.test_authenticated_from:
             # Invalid authentication
-            req_ok = False;
-            error_msg = "Access denied";
+            req_ok = False
+            error_msg = "Access denied"
 
         # Nodes
-        process_nodes = [];
+        process_nodes = []
         if len(iq['set']['nodes']) > 0:
             for n in iq['set']['nodes']:
                 if not n['nodeId'] in self.nodes:
-                    req_ok = False;
-                    missing_node = n['nodeId'];
-                    error_msg = "Invalid nodeId " + n['nodeId'];
-            process_nodes = [n['nodeId'] for n in iq['set']['nodes']];
+                    req_ok = False
+                    missing_node = n['nodeId']
+                    error_msg = "Invalid nodeId " + n['nodeId']
+            process_nodes = [n['nodeId'] for n in iq['set']['nodes']]
         else:
-            process_nodes = self.nodes.keys();
+            process_nodes = self.nodes.keys()
 
         # Fields - for control we need to find all in all devices, otherwise we reject
-        process_fields = [];
+        process_fields = []
         if len(iq['set']['datas']) > 0:
             for f in iq['set']['datas']:
                 for node in self.nodes:
                     if not self.nodes[node]["device"].has_control_field(f['name'], f._get_typename()):
-                        req_ok = False;
-                        missing_field = f['name'];
-                        error_msg = "Invalid field " + f['name'];
-                        break;
-            process_fields = [(f['name'], f._get_typename(), f['value']) for f in iq['set']['datas']];
+                        req_ok = False
+                        missing_field = f['name']
+                        error_msg = "Invalid field " + f['name']
+                        break
+            process_fields = [(f['name'], f._get_typename(), f['value']) for f in iq['set']['datas']]
 
         if req_ok:
-            session = self._new_session();
-            self.sessions[session] = {"from": iq['from'], "to": iq['to'], "seqnr": iq['id']};
-            self.sessions[session]["commTimers"] = {};
-            self.sessions[session]["nodeDone"] = {};
+            session = self._new_session()
+            self.sessions[session] = {"from": iq['from'], "to": iq['to'], "seqnr": iq['id']}
+            self.sessions[session]["commTimers"] = {}
+            self.sessions[session]["nodeDone"] = {}
             # Flag that a reply is exected when we are done
-            self.sessions[session]["reply"] = True;
+            self.sessions[session]["reply"] = True
 
-            self.sessions[session]["node_list"] = process_nodes;
+            self.sessions[session]["node_list"] = process_nodes
             if self.threaded:
                 #print("starting thread")
                 tr_req = Thread(target=self._threaded_node_request, args=(session, process_fields))
                 tr_req.start()
                 #print("started thread")
             else:
-                self._threaded_node_request(session, process_fields);
+                self._threaded_node_request(session, process_fields)
 
         else:
-            iq.reply();
-            iq['type'] = 'error';
-            iq['setResponse']['responseCode'] = "NotFound";
+            iq.reply()
+            iq['type'] = 'error'
+            iq['setResponse']['responseCode'] = "NotFound"
             if missing_node is not None:
-                iq['setResponse'].add_node(missing_node);
+                iq['setResponse'].add_node(missing_node)
             if missing_field is not None:
-                iq['setResponse'].add_data(missing_field);
-            iq['setResponse']['error']['var'] = "Output";
-            iq['setResponse']['error']['text'] = error_msg;
-            iq.send(block=False);
+                iq['setResponse'].add_data(missing_field)
+            iq['setResponse']['error']['var'] = "Output"
+            iq['setResponse']['error']['text'] = error_msg
+            iq.send(block=False)
 
     def _handle_direct_set(self, msg):
         """
@@ -299,46 +299,46 @@ class XEP_0325(BasePlugin):
         to the devices (in a separate thread).
         If the verification fails, do nothing.
         """
-        req_ok = True;
+        req_ok = True
 
         # Nodes
-        process_nodes = [];
+        process_nodes = []
         if len(msg['set']['nodes']) > 0:
             for n in msg['set']['nodes']:
                 if not n['nodeId'] in self.nodes:
-                    req_ok = False;
-                    error_msg = "Invalid nodeId " + n['nodeId'];
-            process_nodes = [n['nodeId'] for n in msg['set']['nodes']];
+                    req_ok = False
+                    error_msg = "Invalid nodeId " + n['nodeId']
+            process_nodes = [n['nodeId'] for n in msg['set']['nodes']]
         else:
-            process_nodes = self.nodes.keys();
+            process_nodes = self.nodes.keys()
 
         # Fields - for control we need to find all in all devices, otherwise we reject
-        process_fields = [];
+        process_fields = []
         if len(msg['set']['datas']) > 0:
             for f in msg['set']['datas']:
                 for node in self.nodes:
                     if not self.nodes[node]["device"].has_control_field(f['name'], f._get_typename()):
-                        req_ok = False;
-                        missing_field = f['name'];
-                        error_msg = "Invalid field " + f['name'];
-                        break;
-            process_fields = [(f['name'], f._get_typename(), f['value']) for f in msg['set']['datas']];
+                        req_ok = False
+                        missing_field = f['name']
+                        error_msg = "Invalid field " + f['name']
+                        break
+            process_fields = [(f['name'], f._get_typename(), f['value']) for f in msg['set']['datas']]
 
         if req_ok:
-            session = self._new_session();
-            self.sessions[session] = {"from": msg['from'], "to": msg['to']};
-            self.sessions[session]["commTimers"] = {};
-            self.sessions[session]["nodeDone"] = {};
-            self.sessions[session]["reply"] = False;
+            session = self._new_session()
+            self.sessions[session] = {"from": msg['from'], "to": msg['to']}
+            self.sessions[session]["commTimers"] = {}
+            self.sessions[session]["nodeDone"] = {}
+            self.sessions[session]["reply"] = False
 
-            self.sessions[session]["node_list"] = process_nodes;
+            self.sessions[session]["node_list"] = process_nodes
             if self.threaded:
                 #print("starting thread")
                 tr_req = Thread(target=self._threaded_node_request, args=(session, process_fields))
                 tr_req.start()
                 #print("started thread")
             else:
-                self._threaded_node_request(session, process_fields);
+                self._threaded_node_request(session, process_fields)
 
 
     def _threaded_node_request(self, session, process_fields):
@@ -351,13 +351,13 @@ class XEP_0325(BasePlugin):
                                (name, datatype, value)
         """
         for node in self.sessions[session]["node_list"]:
-            self.sessions[session]["nodeDone"][node] = False;
+            self.sessions[session]["nodeDone"][node] = False
 
         for node in self.sessions[session]["node_list"]:
-            timer = Timer(self.nodes[node]['commTimeout'], self._event_comm_timeout, args=(session, node));
-            self.sessions[session]["commTimers"][node] = timer;
-            timer.start();
-            self.nodes[node]['device'].set_control_fields(process_fields, session=session, callback=self._device_set_command_callback);
+            timer = Timer(self.nodes[node]['commTimeout'], self._event_comm_timeout, args=(session, node))
+            self.sessions[session]["commTimers"][node] = timer
+            timer.start()
+            self.nodes[node]['device'].set_control_fields(process_fields, session=session, callback=self._device_set_command_callback)
 
     def _event_comm_timeout(self, session, nodeId):
         """
@@ -373,24 +373,24 @@ class XEP_0325(BasePlugin):
 
         if self.sessions[session]["reply"]:
             # Reply is exected when we are done
-            iq = self.xmpp.Iq();
-            iq['from'] = self.sessions[session]['to'];
-            iq['to'] = self.sessions[session]['from'];
-            iq['type'] = "error";
-            iq['id'] = self.sessions[session]['seqnr'];
-            iq['setResponse']['responseCode'] = "OtherError";
-            iq['setResponse'].add_node(nodeId);
-            iq['setResponse']['error']['var'] = "Output";
-            iq['setResponse']['error']['text'] = "Timeout.";
-            iq.send(block=False);
+            iq = self.xmpp.Iq()
+            iq['from'] = self.sessions[session]['to']
+            iq['to'] = self.sessions[session]['from']
+            iq['type'] = "error"
+            iq['id'] = self.sessions[session]['seqnr']
+            iq['setResponse']['responseCode'] = "OtherError"
+            iq['setResponse'].add_node(nodeId)
+            iq['setResponse']['error']['var'] = "Output"
+            iq['setResponse']['error']['text'] = "Timeout."
+            iq.send(block=False)
 
         ## TODO - should we send one timeout per node??
 
         # Drop communication with this device and check if we are done
-        self.sessions[session]["nodeDone"][nodeId] = True;
+        self.sessions[session]["nodeDone"][nodeId] = True
         if (self._all_nodes_done(session)):
             # The session is complete, delete it
-            del self.sessions[session];
+            del self.sessions[session]
 
     def _all_nodes_done(self, session):
         """
@@ -401,8 +401,8 @@ class XEP_0325(BasePlugin):
         """
         for n in self.sessions[session]["nodeDone"]:
             if not self.sessions[session]["nodeDone"][n]:
-                return False;
-        return True;
+                return False
+        return True
 
     def _device_set_command_callback(self, session, nodeId, result, error_field=None, error_msg=None):
         """
@@ -428,45 +428,45 @@ class XEP_0325(BasePlugin):
             return
 
         if result == "error":
-            self.sessions[session]["commTimers"][nodeId].cancel();
+            self.sessions[session]["commTimers"][nodeId].cancel()
 
             if self.sessions[session]["reply"]:
                 # Reply is exected when we are done
-                iq = self.xmpp.Iq();
-                iq['from'] = self.sessions[session]['to'];
-                iq['to'] = self.sessions[session]['from'];
-                iq['type'] = "error";
-                iq['id'] = self.sessions[session]['seqnr'];
-                iq['setResponse']['responseCode'] = "OtherError";
-                iq['setResponse'].add_node(nodeId);
+                iq = self.xmpp.Iq()
+                iq['from'] = self.sessions[session]['to']
+                iq['to'] = self.sessions[session]['from']
+                iq['type'] = "error"
+                iq['id'] = self.sessions[session]['seqnr']
+                iq['setResponse']['responseCode'] = "OtherError"
+                iq['setResponse'].add_node(nodeId)
                 if error_field is not None:
-                    iq['setResponse'].add_data(error_field);
-                iq['setResponse']['error']['var'] = error_field;
-                iq['setResponse']['error']['text'] = error_msg;
-                iq.send(block=False);
+                    iq['setResponse'].add_data(error_field)
+                iq['setResponse']['error']['var'] = error_field
+                iq['setResponse']['error']['text'] = error_msg
+                iq.send(block=False)
 
                 # Drop communication with this device and check if we are done
-                self.sessions[session]["nodeDone"][nodeId] = True;
+                self.sessions[session]["nodeDone"][nodeId] = True
                 if (self._all_nodes_done(session)):
                     # The session is complete, delete it
-                    del self.sessions[session];
+                    del self.sessions[session]
         else:
-            self.sessions[session]["commTimers"][nodeId].cancel();
+            self.sessions[session]["commTimers"][nodeId].cancel()
 
-            self.sessions[session]["nodeDone"][nodeId] = True;
+            self.sessions[session]["nodeDone"][nodeId] = True
             if (self._all_nodes_done(session)):
                 if self.sessions[session]["reply"]:
                     # Reply is exected when we are done
-                    iq = self.xmpp.Iq();
-                    iq['from'] = self.sessions[session]['to'];
-                    iq['to'] = self.sessions[session]['from'];
-                    iq['type'] = "result";
-                    iq['id'] = self.sessions[session]['seqnr'];
-                    iq['setResponse']['responseCode'] = "OK";
-                    iq.send(block=False);
+                    iq = self.xmpp.Iq()
+                    iq['from'] = self.sessions[session]['to']
+                    iq['to'] = self.sessions[session]['from']
+                    iq['type'] = "result"
+                    iq['id'] = self.sessions[session]['seqnr']
+                    iq['setResponse']['responseCode'] = "OK"
+                    iq.send(block=False)
 
                 # The session is complete, delete it
-                del self.sessions[session];
+                del self.sessions[session]
 
 
     # =================================================================
@@ -512,21 +512,21 @@ class XEP_0325(BasePlugin):
             fields          -- Fields to set. List of tuple format: (name, typename, value).
             nodeIds         -- [optional] Limits the request to the node Ids in this list.
         """
-        iq = self.xmpp.Iq();
-        iq['from'] = from_jid;
-        iq['to'] = to_jid;
-        seqnr = self._get_new_seqnr();
-        iq['id'] = seqnr;
-        iq['type'] = "set";
+        iq = self.xmpp.Iq()
+        iq['from'] = from_jid
+        iq['to'] = to_jid
+        seqnr = self._get_new_seqnr()
+        iq['id'] = seqnr
+        iq['type'] = "set"
         if nodeIds is not None:
             for nodeId in nodeIds:
-                iq['set'].add_node(nodeId);
+                iq['set'].add_node(nodeId)
         if fields is not None:
             for name, typename, value in fields:
-                iq['set'].add_data(name=name, typename=typename, value=value);
+                iq['set'].add_data(name=name, typename=typename, value=value)
 
-        self.sessions[seqnr] = {"from": iq['from'], "to": iq['to'], "callback": callback};
-        iq.send(block=False);
+        self.sessions[seqnr] = {"from": iq['from'], "to": iq['to'], "callback": callback}
+        iq.send(block=False)
 
     def set_command(self, from_jid, to_jid, fields, nodeIds=None):
         """
@@ -541,34 +541,34 @@ class XEP_0325(BasePlugin):
             fields          -- Fields to set. List of tuple format: (name, typename, value).
             nodeIds         -- [optional] Limits the request to the node Ids in this list.
         """
-        msg = self.xmpp.Message();
-        msg['from'] = from_jid;
-        msg['to'] = to_jid;
-        msg['type'] = "set";
+        msg = self.xmpp.Message()
+        msg['from'] = from_jid
+        msg['to'] = to_jid
+        msg['type'] = "set"
         if nodeIds is not None:
             for nodeId in nodeIds:
-                msg['set'].add_node(nodeId);
+                msg['set'].add_node(nodeId)
         if fields is not None:
             for name, typename, value in fields:
-                msg['set'].add_data(name, typename, value);
+                msg['set'].add_data(name, typename, value)
 
         # We won't get any reply, so don't create a session
-        msg.send();
+        msg.send()
 
     def _handle_set_response(self, iq):
         """ Received response from device(s) """
         #print("ooh")
-        seqnr = iq['id'];
-        from_jid = str(iq['from']);
-        result = iq['setResponse']['responseCode'];
-        nodeIds = [n['name'] for n in iq['setResponse']['nodes']];
-        fields = [f['name'] for f in iq['setResponse']['datas']];
-        error_msg = None;
+        seqnr = iq['id']
+        from_jid = str(iq['from'])
+        result = iq['setResponse']['responseCode']
+        nodeIds = [n['name'] for n in iq['setResponse']['nodes']]
+        fields = [f['name'] for f in iq['setResponse']['datas']]
+        error_msg = None
 
         if not iq['setResponse'].find('error') is None and not iq['setResponse']['error']['text'] == "":
-            error_msg = iq['setResponse']['error']['text'];
+            error_msg = iq['setResponse']['error']['text']
 
-        callback = self.sessions[seqnr]["callback"];
-        callback(from_jid=from_jid, result=result, nodeIds=nodeIds, fields=fields, error_msg=error_msg);
+        callback = self.sessions[seqnr]["callback"]
+        callback(from_jid=from_jid, result=result, nodeIds=nodeIds, fields=fields, error_msg=error_msg)
 
 

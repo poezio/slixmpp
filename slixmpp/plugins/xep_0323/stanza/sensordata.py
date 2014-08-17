@@ -38,12 +38,12 @@ class Request(ElementBase):
     name = 'req'
     plugin_attrib = name
     interfaces = set(['seqnr','nodes','fields','serviceToken','deviceToken','userToken','from','to','when','historical','all'])
-    interfaces.update(FieldTypes.field_types);
-    _flags = set(['serviceToken','deviceToken','userToken','from','to','when','historical','all']);
-    _flags.update(FieldTypes.field_types);
+    interfaces.update(FieldTypes.field_types)
+    _flags = set(['serviceToken','deviceToken','userToken','from','to','when','historical','all'])
+    _flags.update(FieldTypes.field_types)
 
     def __init__(self, xml=None, parent=None):
-        ElementBase.__init__(self, xml, parent);
+        ElementBase.__init__(self, xml, parent)
         self._nodes = set()
         self._fields = set()
 
@@ -67,11 +67,11 @@ class Request(ElementBase):
         Helper function for getting of flags. Returns all flags in
         dictionary format: { "flag name": "flag value" ... }
         """
-        flags = {};
+        flags = {}
         for f in self._flags:
             if not self[f] == "":
-                flags[f] = self[f];
-        return flags;
+                flags[f] = self[f]
+        return flags
 
     def _set_flags(self, flags):
         """
@@ -82,9 +82,9 @@ class Request(ElementBase):
         """
         for f in self._flags:
             if flags is not None and f in flags:
-                self[f] = flags[f];
+                self[f] = flags[f]
             else:
-                self[f] = None;
+                self[f] = None
 
     def add_node(self, nodeId, sourceId=None, cacheType=None):
         """
@@ -269,7 +269,7 @@ class Error(ElementBase):
         :param value: string
         """
 
-        self.xml.text = value;
+        self.xml.text = value
         return self
 
     def del_text(self):
@@ -292,7 +292,7 @@ class Fields(ElementBase):
     interfaces = set(['seqnr','done','nodes'])
 
     def __init__(self, xml=None, parent=None):
-        ElementBase.__init__(self, xml, parent);
+        ElementBase.__init__(self, xml, parent)
         self._nodes = set()
 
     def setup(self, xml=None):
@@ -392,7 +392,7 @@ class FieldsNode(ElementBase):
     interfaces = set(['nodeId','sourceId','cacheType','timestamps'])
 
     def __init__(self, xml=None, parent=None):
-        ElementBase.__init__(self, xml, parent);
+        ElementBase.__init__(self, xml, parent)
         self._timestamps = set()
 
     def setup(self, xml=None):
@@ -423,7 +423,7 @@ class FieldsNode(ElementBase):
             ts = Timestamp(parent=self)
             ts['value'] = timestamp
             if not substanzas is None:
-                ts.set_datas(substanzas);
+                ts.set_datas(substanzas)
                 #print("add_timestamp with substanzas: " + str(substanzas))
             self.iterables.append(ts)
             #print(str(id(self)) + " added_timestamp: " + str(id(ts)))
@@ -498,13 +498,13 @@ class Field(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'field'
     plugin_attrib = name
-    interfaces = set(['name','module','stringIds']);
-    interfaces.update(FieldTypes.field_types);
-    interfaces.update(FieldStatus.field_status);
+    interfaces = set(['name','module','stringIds'])
+    interfaces.update(FieldTypes.field_types)
+    interfaces.update(FieldStatus.field_status)
 
-    _flags = set();
-    _flags.update(FieldTypes.field_types);
-    _flags.update(FieldStatus.field_status);
+    _flags = set()
+    _flags.update(FieldTypes.field_types)
+    _flags.update(FieldStatus.field_status)
 
     def set_stringIds(self, value):
         """Verifies stringIds according to regexp from specification XMPP-0323.
@@ -514,7 +514,7 @@ class Field(ElementBase):
 
         pattern = re.compile("^\d+([|]\w+([.]\w+)*([|][^,]*)?)?(,\d+([|]\w+([.]\w+)*([|][^,]*)?)?)*$")
         if pattern.match(value) is not None:
-            self.xml.stringIds = value;
+            self.xml.stringIds = value
         else:
             # Bad content, add nothing
             pass
@@ -526,11 +526,11 @@ class Field(ElementBase):
         Helper function for getting of flags. Returns all flags in
         dictionary format: { "flag name": "flag value" ... }
         """
-        flags = {};
+        flags = {}
         for f in self._flags:
             if not self[f] == "":
-                flags[f] = self[f];
-        return flags;
+                flags[f] = self[f]
+        return flags
 
     def _set_flags(self, flags):
         """
@@ -541,12 +541,12 @@ class Field(ElementBase):
         """
         for f in self._flags:
             if flags is not None and f in flags:
-                self[f] = flags[f];
+                self[f] = flags[f]
             else:
-                self[f] = None;
+                self[f] = None
 
     def _get_typename(self):
-        return "invalid type, use subclasses!";
+        return "invalid type, use subclasses!"
 
 
 class Timestamp(ElementBase):
@@ -557,7 +557,7 @@ class Timestamp(ElementBase):
     interfaces = set(['value','datas'])
 
     def __init__(self, xml=None, parent=None):
-        ElementBase.__init__(self, xml, parent);
+        ElementBase.__init__(self, xml, parent)
         self._datas = set()
 
     def setup(self, xml=None):
@@ -587,29 +587,29 @@ class Timestamp(ElementBase):
             dataType   -- [optional] The dataType. Only applicable for type enum
         """
         if name not in self._datas:
-            dataObj = None;
+            dataObj = None
             if typename == "numeric":
-                dataObj = DataNumeric(parent=self);
-                dataObj['unit'] = unit;
+                dataObj = DataNumeric(parent=self)
+                dataObj['unit'] = unit
             elif typename == "string":
-                dataObj = DataString(parent=self);
+                dataObj = DataString(parent=self)
             elif typename == "boolean":
-                dataObj = DataBoolean(parent=self);
+                dataObj = DataBoolean(parent=self)
             elif typename == "dateTime":
-                dataObj = DataDateTime(parent=self);
+                dataObj = DataDateTime(parent=self)
             elif typename == "timeSpan":
-                dataObj = DataTimeSpan(parent=self);
+                dataObj = DataTimeSpan(parent=self)
             elif typename == "enum":
-                dataObj = DataEnum(parent=self);
-                dataObj['dataType'] = dataType;
+                dataObj = DataEnum(parent=self)
+                dataObj['dataType'] = dataType
 
-            dataObj['name'] = name;
-            dataObj['value'] = value;
-            dataObj['module'] = module;
-            dataObj['stringIds'] = stringIds;
+            dataObj['name'] = name
+            dataObj['value'] = value
+            dataObj['module'] = module
+            dataObj['stringIds'] = stringIds
 
             if flags is not None:
-                dataObj._set_flags(flags);
+                dataObj._set_flags(flags)
 
             self._datas.add(name)
             self.iterables.append(dataObj)
@@ -668,8 +668,8 @@ class DataNumeric(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'numeric'
     plugin_attrib = name
-    interfaces = set(['value', 'unit']);
-    interfaces.update(Field.interfaces);
+    interfaces = set(['value', 'unit'])
+    interfaces.update(Field.interfaces)
 
     def _get_typename(self):
         return "numeric"
@@ -681,8 +681,8 @@ class DataString(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'string'
     plugin_attrib = name
-    interfaces = set(['value']);
-    interfaces.update(Field.interfaces);
+    interfaces = set(['value'])
+    interfaces.update(Field.interfaces)
 
     def _get_typename(self):
         return "string"
@@ -695,8 +695,8 @@ class DataBoolean(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'boolean'
     plugin_attrib = name
-    interfaces = set(['value']);
-    interfaces.update(Field.interfaces);
+    interfaces = set(['value'])
+    interfaces.update(Field.interfaces)
 
     def _get_typename(self):
         return "boolean"
@@ -709,8 +709,8 @@ class DataDateTime(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'dateTime'
     plugin_attrib = name
-    interfaces = set(['value']);
-    interfaces.update(Field.interfaces);
+    interfaces = set(['value'])
+    interfaces.update(Field.interfaces)
 
     def _get_typename(self):
         return "dateTime"
@@ -723,8 +723,8 @@ class DataTimeSpan(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'timeSpan'
     plugin_attrib = name
-    interfaces = set(['value']);
-    interfaces.update(Field.interfaces);
+    interfaces = set(['value'])
+    interfaces.update(Field.interfaces)
 
     def _get_typename(self):
         return "timeSpan"
@@ -737,8 +737,8 @@ class DataEnum(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'enum'
     plugin_attrib = name
-    interfaces = set(['value', 'dataType']);
-    interfaces.update(Field.interfaces);
+    interfaces = set(['value', 'dataType'])
+    interfaces.update(Field.interfaces)
 
     def _get_typename(self):
         return "enum"
