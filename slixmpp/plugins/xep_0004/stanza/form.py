@@ -9,7 +9,7 @@
 import copy
 import logging
 
-from slixmpp.thirdparty import OrderedDict
+from collections import OrderedDict
 
 from slixmpp.xmlstream import ElementBase, ET
 from slixmpp.plugins.xep_0004.stanza import FormField

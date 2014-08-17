@@ -1,7 +1,7 @@
 import unittest
 from slixmpp.test import SlixTest
 from slixmpp.xmlstream.stanzabase import ElementBase, register_stanza_plugin, ET
-from slixmpp.thirdparty import OrderedDict
+from collections import OrderedDict
 
 
 class TestElementBase(SlixTest):

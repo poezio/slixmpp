@@ -22,7 +22,7 @@ import encodings.idna
 from copy import deepcopy
 
 from slixmpp.util import stringprep_profiles
-from slixmpp.thirdparty import OrderedDict
+from collections import OrderedDict
 
 #: These characters are not allowed to appear in a JID.
 ILLEGAL_CHARS = '\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r' + \

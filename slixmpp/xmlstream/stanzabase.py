@@ -21,7 +21,7 @@ from xml.etree import cElementTree as ET
 
 from slixmpp.xmlstream import JID
 from slixmpp.xmlstream.tostring import tostring
-from slixmpp.thirdparty import OrderedDict
+from collections import OrderedDict
 
 
 log = logging.getLogger(__name__)

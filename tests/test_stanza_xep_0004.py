@@ -1,7 +1,7 @@
 import unittest
 from slixmpp import Message
 from slixmpp.test import SlixTest
-from slixmpp.thirdparty import OrderedDict
+from collections import OrderedDict
 
 import slixmpp.plugins.xep_0004 as xep_0004
 from slixmpp.xmlstream import register_stanza_plugin

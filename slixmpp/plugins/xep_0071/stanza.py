@@ -8,7 +8,7 @@
 
 from slixmpp.stanza import Message
 from slixmpp.util import unicode
-from slixmpp.thirdparty import OrderedDict
+from collections import OrderedDict
 from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin, tostring
 
 

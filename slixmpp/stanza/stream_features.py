@@ -6,7 +6,7 @@
     See the file LICENSE for copying permission.
 """
 
-from slixmpp.thirdparty import OrderedDict
+from collections import OrderedDict
 from slixmpp.xmlstream import StanzaBase
 
 

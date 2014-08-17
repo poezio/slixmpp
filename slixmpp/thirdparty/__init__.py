@@ -1,9 +1,4 @@
 try:
-    from collections import OrderedDict
-except:
-    from slixmpp.thirdparty.ordereddict import OrderedDict
-
-try:
     from gnupg import GPG
 except:
     from slixmpp.thirdparty.gnupg import GPG
