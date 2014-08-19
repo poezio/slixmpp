@@ -18,26 +18,10 @@ from slixmpp.util.misc_ops import bytes, unicode, hashes, hash, \
 # =====================================================================
 # Standardize import of Queue class:
 
-import sys
-
-def _gevent_threads_enabled():
-    if not 'gevent' in sys.modules:
-        return False
-    try:
-        from gevent import thread as green_thread
-        thread = __import__('thread')
-        return thread.LockType is green_thread.LockType
-    except ImportError:
-        return False
-
-if _gevent_threads_enabled():
-    import gevent.queue as queue
-    Queue = queue.JoinableQueue
-else:
-    try:
-        import queue
-    except ImportError:
-        import Queue as queue
-    Queue = queue.Queue
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+Queue = queue.Queue
 
 QueueEmpty = queue.Empty
