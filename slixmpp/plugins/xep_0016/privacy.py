@@ -67,8 +67,8 @@ class XEP_0016(BasePlugin):
         iq.send(timeout=timeout, callback=callback,
                 timeout_callback=timeout_callback)
 
-   def deactivate(self, timeout=None, callback=None,
-                  timeout_callback=None):
+    def deactivate(self, timeout=None, callback=None,
+                   timeout_callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['privacy'].enable('active')
@@ -124,4 +124,4 @@ class XEP_0016(BasePlugin):
         iq['type'] = 'set'
         iq['privacy']['list']['name'] = name
         iq.send(timeout=timeout, callback=callback,
-                       timeout_callback=timeout_callback)
+                timeout_callback=timeout_callback)
