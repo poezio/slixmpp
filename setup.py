@@ -13,7 +13,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-from testall import TestCommand
+from run_tests import TestCommand
 from slixmpp.version import __version__
 
 VERSION = __version__
