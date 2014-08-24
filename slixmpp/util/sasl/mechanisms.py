@@ -223,17 +223,16 @@ class SCRAM(Mech):
         return self.hash(text).digest()
 
     def saslname(self, value):
-        escaped = b''
-        for char in bytes(value):
-            if char == b',':
+        value = value.decode("utf-8")
+        escaped = []
+        for char in value:
+            if char == ',':
                 escaped += b'=2C'
-            elif char == b'=':
+            elif char == '=':
                 escaped += b'=3D'
             else:
-                if isinstance(char, int):
-                    char = chr(char)
-                escaped += bytes(char)
-        return escaped
+                escaped += char
+        return "".join(escaped).encode("utf-8")
 
     def parse(self, challenge):
         items = {}
