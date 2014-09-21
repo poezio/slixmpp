@@ -7,14 +7,7 @@
 """
 
 import logging
-if hasattr(logging, 'NullHandler'):
-    NullHandler = logging.NullHandler
-else:
-    class NullHandler(logging.Handler):
-        def handle(self, record):
-            pass
-logging.getLogger(__name__).addHandler(NullHandler())
-del NullHandler
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 from slixmpp.stanza import Message, Presence, Iq
