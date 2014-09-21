@@ -7,10 +7,10 @@
 """
 
 import unittest
+from queue import Queue
 from xml.parsers.expat import ExpatError
 
 from slixmpp import ClientXMPP, ComponentXMPP
-from slixmpp.util import Queue
 from slixmpp.stanza import Message, Iq, Presence
 from slixmpp.test import TestSocket, TestLiveSocket
 from slixmpp.xmlstream import ET

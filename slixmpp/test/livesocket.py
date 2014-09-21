@@ -8,8 +8,7 @@
 
 import socket
 import threading
-
-from slixmpp.util import Queue
+from queue import Queue
 
 
 class TestLiveSocket(object):

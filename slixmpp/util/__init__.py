@@ -13,15 +13,3 @@
 from slixmpp.util.misc_ops import bytes, unicode, hashes, hash, \
                                     num_to_bytes, bytes_to_num, quote, \
                                     XOR
-
-
-# =====================================================================
-# Standardize import of Queue class:
-
-try:
-    import queue
-except ImportError:
-    import Queue as queue
-Queue = queue.Queue
-
-QueueEmpty = queue.Empty

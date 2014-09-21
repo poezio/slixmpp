@@ -7,8 +7,7 @@
 """
 
 import socket
-
-from slixmpp.util import Queue
+from queue import Queue
 
 
 class TestSocket(object):

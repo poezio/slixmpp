@@ -10,8 +10,8 @@
 """
 
 import logging
+from queue import Queue, Empty
 
-from slixmpp.util import Queue, QueueEmpty
 from slixmpp.xmlstream.handler.base import BaseHandler
 
 
@@ -59,7 +59,7 @@ class Collector(BaseHandler):
         try:
             while True:
                 results.append(self._payload.get(False))
-        except QueueEmpty:
+        except Empty:
             pass
 
         self.stream().remove_handler(self.name)

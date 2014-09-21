@@ -1,9 +1,9 @@
 import socket
 import threading
 import logging
+from queue import Queue
 
 from slixmpp.stanza import Iq
-from slixmpp.util import Queue
 from slixmpp.exceptions import XMPPError
 
 

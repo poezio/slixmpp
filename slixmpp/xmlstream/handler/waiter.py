@@ -10,8 +10,8 @@
 """
 
 import logging
+from queue import Queue, Empty
 
-from slixmpp.util import Queue, QueueEmpty
 from slixmpp.xmlstream.handler.base import BaseHandler
 
 
@@ -71,7 +71,7 @@ class Waiter(BaseHandler):
             try:
                 stanza = self._payload.get(True, 1)
                 break
-            except QueueEmpty:
+            except Empty:
                 elapsed_time += 1
                 if elapsed_time >= timeout:
                     log.warning("Timed out waiting for %s", self.name)
