@@ -55,7 +55,7 @@ class XEP_0009(BasePlugin):
         self.xmpp['xep_0030'].add_identity('automation','rpc')
 
     def make_iq_method_call(self, pto, pmethod, params):
-        iq = self.xmpp.makeIqSet()
+        iq = self.xmpp.make_iq_set()
         iq.attrib['to'] = pto
         iq.attrib['from'] = self.xmpp.boundjid.full
         iq.enable('rpc_query')
@@ -64,7 +64,7 @@ class XEP_0009(BasePlugin):
         return iq
 
     def make_iq_method_response(self, pid, pto, params):
-        iq = self.xmpp.makeIqResult(pid)
+        iq = self.xmpp.make_iq_result(pid)
         iq.attrib['to'] = pto
         iq.attrib['from'] = self.xmpp.boundjid.full
         iq.enable('rpc_query')
@@ -72,7 +72,7 @@ class XEP_0009(BasePlugin):
         return iq
 
     def make_iq_method_response_fault(self, pid, pto, params):
-        iq = self.xmpp.makeIqResult(pid)
+        iq = self.xmpp.make_iq_result(pid)
         iq.attrib['to'] = pto
         iq.attrib['from'] = self.xmpp.boundjid.full
         iq.enable('rpc_query')
@@ -81,7 +81,7 @@ class XEP_0009(BasePlugin):
         return iq
 
 #    def make_iq_method_error(self, pto, pid, pmethod, params, code, type, condition):
-#        iq = self.xmpp.makeIqError(pid)
+#        iq = self.xmpp.make_iq_error(pid)
 #        iq.attrib['to'] = pto
 #        iq.attrib['from'] = self.xmpp.boundjid.full
 #        iq['error']['code'] = code

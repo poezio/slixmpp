@@ -19,7 +19,7 @@ class TestIqStanzas(SlixTest):
     def testPayload(self):
         """Test setting Iq stanza payload."""
         iq = self.Iq()
-        iq.setPayload(ET.Element('{test}tester'))
+        iq.set_payload(ET.Element('{test}tester'))
         self.check(iq, """
           <iq id="0">
             <tester xmlns="test" />

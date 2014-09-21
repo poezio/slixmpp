@@ -779,23 +779,3 @@ class BaseXMPP(XMLStream):
             pass
         else:
             log.exception(exception)
-
-
-# Restore the old, lowercased name for backwards compatibility.
-basexmpp = BaseXMPP
-
-# To comply with PEP8, method names now use underscores.
-# Deprecated method names are re-mapped for backwards compatibility.
-BaseXMPP.registerPlugin = BaseXMPP.register_plugin
-BaseXMPP.makeIq = BaseXMPP.make_iq
-BaseXMPP.makeIqGet = BaseXMPP.make_iq_get
-BaseXMPP.makeIqResult = BaseXMPP.make_iq_result
-BaseXMPP.makeIqSet = BaseXMPP.make_iq_set
-BaseXMPP.makeIqError = BaseXMPP.make_iq_error
-BaseXMPP.makeIqQuery = BaseXMPP.make_iq_query
-BaseXMPP.makeQueryRoster = BaseXMPP.make_query_roster
-BaseXMPP.makeMessage = BaseXMPP.make_message
-BaseXMPP.makePresence = BaseXMPP.make_presence
-BaseXMPP.sendMessage = BaseXMPP.send_message
-BaseXMPP.sendPresence = BaseXMPP.send_presence
-BaseXMPP.sendPresenceSubscription = BaseXMPP.send_presence_subscription

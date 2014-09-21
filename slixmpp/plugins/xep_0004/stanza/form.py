@@ -237,21 +237,16 @@ class Form(ElementBase):
         return new
 
 
-Form.setType = Form.set_type
 Form.addField = Form.add_field
-Form.addItem = Form.add_item
 Form.addReported = Form.add_reported
 Form.delFields = Form.del_fields
 Form.delInstructions = Form.del_instructions
-Form.delItems = Form.del_items
 Form.delReported = Form.del_reported
 Form.getFields = Form.get_fields
 Form.getInstructions = Form.get_instructions
-Form.getItems = Form.get_items
 Form.getReported = Form.get_reported
 Form.getValues = Form.get_values
 Form.setFields = Form.set_fields
 Form.setInstructions = Form.set_instructions
-Form.setItems = Form.set_items
 Form.setReported = Form.set_reported
 Form.setValues = Form.set_values

@@ -91,10 +91,6 @@ def register_stanza_plugin(stanza, plugin, iterable=False, overrides=False):
             stanza.plugin_overrides[interface] = plugin.plugin_attrib
 
 
-# To maintain backwards compatibility for now, preserve the camel case name.
-registerStanzaPlugin = register_stanza_plugin
-
-
 def multifactory(stanza, plugin_attrib):
     """
     Returns a ElementBase class for handling reoccuring child stanzas
@@ -1620,25 +1616,3 @@ class StanzaBase(ElementBase):
 #: Child stanzas are exposed as nested dictionaries.
 ElementBase.values = property(ElementBase._get_stanza_values,
                               ElementBase._set_stanza_values)
-
-
-# To comply with PEP8, method names now use underscores.
-# Deprecated method names are re-mapped for backwards compatibility.
-ElementBase.initPlugin = ElementBase.init_plugin
-ElementBase._getAttr = ElementBase._get_attr
-ElementBase._setAttr = ElementBase._set_attr
-ElementBase._delAttr = ElementBase._del_attr
-ElementBase._getSubText = ElementBase._get_sub_text
-ElementBase._setSubText = ElementBase._set_sub_text
-ElementBase._delSub = ElementBase._del_sub
-ElementBase.getStanzaValues = ElementBase._get_stanza_values
-ElementBase.setStanzaValues = ElementBase._set_stanza_values
-
-StanzaBase.setType = StanzaBase.set_type
-StanzaBase.getTo = StanzaBase.get_to
-StanzaBase.setTo = StanzaBase.set_to
-StanzaBase.getFrom = StanzaBase.get_from
-StanzaBase.setFrom = StanzaBase.set_from
-StanzaBase.getPayload = StanzaBase.get_payload
-StanzaBase.setPayload = StanzaBase.set_payload
-StanzaBase.delPayload = StanzaBase.del_payload

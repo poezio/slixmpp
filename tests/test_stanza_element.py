@@ -38,7 +38,7 @@ class TestElementBase(SlixTest):
         """)
 
     def testGetStanzaValues(self):
-        """Test getStanzaValues using plugins and substanzas."""
+        """Test get_stanza_values using plugins and substanzas."""
 
         class TestStanzaPlugin(ElementBase):
             name = "foo2"
@@ -65,7 +65,7 @@ class TestElementBase(SlixTest):
         substanza['bar'] = 'c'
         stanza.append(substanza)
 
-        values = stanza.getStanzaValues()
+        values = stanza.get_stanza_values()
         expected = {'lang': '',
                     'bar': 'a',
                     'baz': '',
@@ -85,7 +85,7 @@ class TestElementBase(SlixTest):
 
 
     def testSetStanzaValues(self):
-        """Test using setStanzaValues with substanzas and plugins."""
+        """Test using set_stanza_values with substanzas and plugins."""
 
         class TestStanzaPlugin(ElementBase):
             name = "pluginfoo"
@@ -157,10 +157,10 @@ class TestElementBase(SlixTest):
         stanza = TestStanza()
         substanza = TestStanza()
         stanza.append(substanza)
-        stanza.setStanzaValues({'bar': 'a',
-                                'baz': 'b',
-                                'qux': 42,
-                                'foobar': {'fizz': 'c'}})
+        stanza.set_stanza_values({'bar': 'a',
+                                  'baz': 'b',
+                                  'qux': 42,
+                                  'foobar': {'fizz': 'c'}})
 
         # Test non-plugin interfaces
         expected = {'substanzas': [substanza],

@@ -351,6 +351,3 @@ class BasePlugin(object):
         Only needed if the plugin has circular dependencies.
         """
         pass
-
-
-base_plugin = BasePlugin

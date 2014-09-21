@@ -154,7 +154,7 @@ class XEP_0045(BasePlugin):
         got_online = False
         if pr['muc']['room'] not in self.rooms.keys():
             return
-        entry = pr['muc'].getStanzaValues()
+        entry = pr['muc'].get_stanza_values()
         entry['show'] = pr['show']
         entry['status'] = pr['status']
         entry['alt_nick'] = pr['nick']
@@ -210,7 +210,7 @@ class XEP_0045(BasePlugin):
     def configureRoom(self, room, form=None, ifrom=None):
         if form is None:
             form = self.getRoomConfig(room, ifrom=ifrom)
-        iq = self.xmpp.makeIqSet()
+        iq = self.xmpp.make_iq_set()
         iq['to'] = room
         if ifrom is not None:
             iq['from'] = ifrom
@@ -230,7 +230,7 @@ class XEP_0045(BasePlugin):
     def joinMUC(self, room, nick, maxhistory="0", password='', wait=False, pstatus=None, pshow=None, pfrom=None):
         """ Join the specified room, requesting 'maxhistory' lines of history.
         """
-        stanza = self.xmpp.makePresence(pto="%s/%s" % (room, nick), pstatus=pstatus, pshow=pshow, pfrom=pfrom)
+        stanza = self.xmpp.make_presence(pto="%s/%s" % (room, nick), pstatus=pstatus, pshow=pshow, pfrom=pfrom)
         x = ET.Element('{http://jabber.org/protocol/muc}x')
         if password:
             passelement = ET.Element('{http://jabber.org/protocol/muc}password')
@@ -254,7 +254,7 @@ class XEP_0045(BasePlugin):
         self.ourNicks[room] = nick
 
     def destroy(self, room, reason='', altroom = '', ifrom=None):
-        iq = self.xmpp.makeIqSet()
+        iq = self.xmpp.make_iq_set()
         if ifrom is not None:
             iq['from'] = ifrom
         iq['to'] = room
@@ -286,7 +286,7 @@ class XEP_0045(BasePlugin):
         else:
             item = ET.Element('{http://jabber.org/protocol/muc#admin}item', {'affiliation':affiliation, 'jid':jid})
         query.append(item)
-        iq = self.xmpp.makeIqSet(query)
+        iq = self.xmpp.make_iq_set(query)
         iq['to'] = room
         iq['from'] = ifrom
         # For now, swallow errors to preserve existing API
@@ -309,7 +309,7 @@ class XEP_0045(BasePlugin):
         query = ET.Element('{http://jabber.org/protocol/muc#admin}query')
         item = ET.Element('item', {'role':role, 'nick':nick})
         query.append(item)
-        iq = self.xmpp.makeIqSet(query)
+        iq = self.xmpp.make_iq_set(query)
         iq['to'] = room
         result = iq.send()
         if result is False or result['type'] != 'result':
@@ -318,7 +318,7 @@ class XEP_0045(BasePlugin):
 
     def invite(self, room, jid, reason='', mfrom=''):
         """ Invite a jid to a room."""
-        msg = self.xmpp.makeMessage(room)
+        msg = self.xmpp.make_message(room)
         msg['from'] = mfrom
         x = ET.Element('{http://jabber.org/protocol/muc#user}x')
         invite = ET.Element('{http://jabber.org/protocol/muc#user}invite', {'to': jid})
@@ -334,13 +334,13 @@ class XEP_0045(BasePlugin):
         """ Leave the specified room.
         """
         if msg:
-            self.xmpp.sendPresence(pshow='unavailable', pto="%s/%s" % (room, nick), pstatus=msg, pfrom=pfrom)
+            self.xmpp.send_presence(pshow='unavailable', pto="%s/%s" % (room, nick), pstatus=msg, pfrom=pfrom)
         else:
-            self.xmpp.sendPresence(pshow='unavailable', pto="%s/%s" % (room, nick), pfrom=pfrom)
+            self.xmpp.send_presence(pshow='unavailable', pto="%s/%s" % (room, nick), pfrom=pfrom)
         del self.rooms[room]
 
     def getRoomConfig(self, room, ifrom=''):
-        iq = self.xmpp.makeIqGet('http://jabber.org/protocol/muc#owner')
+        iq = self.xmpp.make_iq_get('http://jabber.org/protocol/muc#owner')
         iq['to'] = room
         iq['from'] = ifrom
         # For now, swallow errors to preserve existing API
@@ -359,7 +359,7 @@ class XEP_0045(BasePlugin):
         query = ET.Element('{http://jabber.org/protocol/muc#owner}query')
         x = ET.Element('{jabber:x:data}x', type='cancel')
         query.append(x)
-        iq = self.xmpp.makeIqSet(query)
+        iq = self.xmpp.make_iq_set(query)
         iq['to'] = room
         iq['from'] = ifrom
         iq.send()
@@ -368,7 +368,7 @@ class XEP_0045(BasePlugin):
         query = ET.Element('{http://jabber.org/protocol/muc#owner}query')
         x = config.getXML('submit')
         query.append(x)
-        iq = self.xmpp.makeIqSet(query)
+        iq = self.xmpp.make_iq_set(query)
         iq['to'] = room
         iq['from'] = ifrom
         iq.send()

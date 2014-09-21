@@ -348,7 +348,7 @@ to :meth:`slixmpp.clientxmpp.ClientXMPP`.
 
 To begin responding to messages, you'll see we called :meth:`slixmpp.basexmpp.BaseXMPP.process`
 which will start the event handling, send queue, and XML reader threads. It will also call
-the :meth:`slixmpp.plugins.base.base_plugin.post_init` method on all registered plugins. By
+the :meth:`slixmpp.plugins.base.BasePlugin.post_init` method on all registered plugins. By
 passing ``block=True`` to :meth:`slixmpp.basexmpp.BaseXMPP.process` we are running the
 main processing loop in the main thread of execution. The :meth:`slixmpp.basexmpp.BaseXMPP.process`
 call will not return until after Slixmpp disconnects. If you need to run the client in the background

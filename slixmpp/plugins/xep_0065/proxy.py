@@ -12,7 +12,7 @@ from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
-from slixmpp.plugins.base import base_plugin
+from slixmpp.plugins.base import BasePlugin
 
 from slixmpp.plugins.xep_0065 import stanza, Socks5
 
@@ -20,7 +20,7 @@ from slixmpp.plugins.xep_0065 import stanza, Socks5
 log = logging.getLogger(__name__)
 
 
-class XEP_0065(base_plugin):
+class XEP_0065(BasePlugin):
 
     name = 'xep_0065'
     description = "Socks5 Bytestreams"

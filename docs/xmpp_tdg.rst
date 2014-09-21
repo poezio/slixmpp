@@ -36,7 +36,7 @@ Updated Code
 .. code-block:: python
 
     def handleIncomingMessage(self, message):
-        self.xmpp.sendMessage(message["from"], message["body"])
+        self.xmpp.send_message(message["from"], message["body"])
 
 `View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/EchoBot/EchoBot.py>`_ |
 `View original code <http://github.com/remko/xmpp-tdg/blob/master/code/EchoBot/EchoBot.py>`_
@@ -86,7 +86,7 @@ Updated Code
       "uri": self.url + "/" + message.user,
       "user" : message.user, "message" : message.text }
     for subscriberJID in self.backend.getSubscriberJIDs(message.user) :
-      self.xmpp.sendMessage(subscriberJID, body, mhtml=htmlBody)
+      self.xmpp.send_message(subscriberJID, body, mhtml=htmlBody)
 
 `View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/Bot.py>`_ |
 `View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/Bot.py>`_
@@ -145,7 +145,7 @@ Example 14-4. (Page 220)
 
 Like several previous examples, a needed change is to replace
 ``subscription["from"]`` with ``subscription["from"].jid`` because the
-``BaseXMPP`` method ``makePresence`` requires the JID to be a string.
+``BaseXMPP`` method ``make_presence`` requires the JID to be a string.
 
 A correction needs to be made in ``handleXMPPPresenceProbe`` because a line was
 left out of the original implementation; the variable ``user`` is undefined. The
@@ -154,7 +154,7 @@ JID of the user can be extracted from the presence stanza's ``from`` attribute.
 Since this implementation of CheshiR uses an XMPP component, it must
 include a ``from`` attribute in all messages that it sends. Adding the
 ``from`` attribute is done by including ``mfrom=self.xmpp.jid`` in calls to
-``self.xmpp.sendMessage``.
+``self.xmpp.send_message``.
 
 Updated Code
 ~~~~~~~~~~~~
@@ -162,19 +162,19 @@ Updated Code
 .. code-block:: python
 
   def handleXMPPPresenceProbe(self, event) :
-    self.xmpp.sendPresence(pto = event["from"])
+    self.xmpp.send_presence(pto = event["from"])
 
   def handleXMPPPresenceSubscription(self, subscription) :
     if subscription["type"] == "subscribe" :
       userJID = subscription["from"].jid
-      self.xmpp.sendPresenceSubscription(pto=userJID, ptype="subscribed")
-      self.xmpp.sendPresence(pto = userJID)
-      self.xmpp.sendPresenceSubscription(pto=userJID, ptype="subscribe")
+      self.xmpp.send_presence_subscription(pto=userJID, ptype="subscribed")
+      self.xmpp.send_presence(pto = userJID)
+      self.xmpp.send_presence_subscription(pto=userJID, ptype="subscribe")
 
   def handleMessageAddedToBackend(self, message) :
     body = message.user + ": " + message.text
     for subscriberJID in self.backend.getSubscriberJIDs(message.user) :
-      self.xmpp.sendMessage(subscriberJID, body, mfrom=self.xmpp.jid)
+      self.xmpp.send_message(subscriberJID, body, mfrom=self.xmpp.jid)
 
 `View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/SimpleComponent.py>`_ |
 `View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/SimpleComponent.py>`_
@@ -239,7 +239,7 @@ Updated Code
       userJID = subscription["from"].jid
       user = self.backend.getUserFromJID(userJID)
       contactJID = subscription["to"]
-      self.xmpp.sendPresenceSubscription(
+      self.xmpp.send_presence_subscription(
           pfrom=contactJID, pto=userJID, ptype="subscribed", pnick=user)
       self.sendPresenceOfContactToUser(contactJID=contactJID, userJID=userJID)
       if contactJID == self.componentDomain :

@@ -83,9 +83,9 @@ class XEP_0323(BasePlugin):
                     sequence number (unique between the client/sensor pair)
 
     Methods:
-        plugin_init       -- Overrides base_plugin.plugin_init
-        post_init         -- Overrides base_plugin.post_init
-        plugin_end        -- Overrides base_plugin.plugin_end
+        plugin_init       -- Overrides BasePlugin.plugin_init
+        post_init         -- Overrides BasePlugin.post_init
+        plugin_end        -- Overrides BasePlugin.plugin_end
 
         Sensor side
         -----------

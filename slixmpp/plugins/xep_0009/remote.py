@@ -453,7 +453,7 @@ class RemoteSession(object):
 
     def _notify(self, event):
         log.debug("RPC Session as %s started.", self._client.boundjid.full)
-        self._client.sendPresence()
+        self._client.send_presence()
         self._event.set()
         pass
 
@@ -733,10 +733,10 @@ class Remote(object):
         '''
         client = slixmpp.ClientXMPP(jid, password)
         #? Register plug-ins.
-        client.registerPlugin('xep_0004') # Data Forms
-        client.registerPlugin('xep_0009') # Jabber-RPC
-        client.registerPlugin('xep_0030') # Service Discovery
-        client.registerPlugin('xep_0060') # PubSub
-        client.registerPlugin('xep_0199') # XMPP Ping
+        client.register_plugin('xep_0004') # Data Forms
+        client.register_plugin('xep_0009') # Jabber-RPC
+        client.register_plugin('xep_0030') # Service Discovery
+        client.register_plugin('xep_0060') # PubSub
+        client.register_plugin('xep_0199') # XMPP Ping
         return cls.new_session_with_client(client, callback)
 

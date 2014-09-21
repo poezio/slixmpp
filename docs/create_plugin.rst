@@ -29,7 +29,7 @@ in the future.
 
 First Steps
 -----------
-Every plugin inherits from the class :mod:`base_plugin <slixmpp.plugins.base.base_plugin>`,
+Every plugin inherits from the class :mod:`BasePlugin <slixmpp.plugins.base.BasePlugin`,
 and must include a ``plugin_init`` method. While the
 plugins distributed with Slixmpp must be placed in the plugins directory
 ``slixmpp/plugins`` to be loaded, custom plugins may be loaded from any
@@ -56,9 +56,9 @@ attribute.
     as a tutorial for creating Slixmpp plugins.
     """
 
-    from slixmpp.plugins.base import base_plugin
+    from slixmpp.plugins.base import BasePlugin
 
-    class xep_0077(base_plugin):
+    class xep_0077(BasePlugin):
         """
         XEP-0077 In-Band Registration
         """
@@ -81,7 +81,7 @@ call in a method named ``post_init`` which will be called once the plugin has
 been loaded; by doing so we advertise that we can do registrations only after we
 finish activating the plugin.
 
-The ``post_init`` method needs to call ``base_plugin.post_init(self)``
+The ``post_init`` method needs to call ``BasePlugin.post_init(self)``
 which will mark that ``post_init`` has been called for the plugin. Once the
 Slixmpp object begins processing, ``post_init`` will be called on any plugins
 that have not already run ``post_init``. This allows you to register plugins and
@@ -94,7 +94,7 @@ does not automatically load plugin dependencies for you.
 .. code-block:: python
 
     def post_init(self):
-        base_plugin.post_init(self)
+        BasePlugin.post_init(self)
         self.xmpp['xep_0030'].add_feature("jabber:iq:register")
 
 Creating Custom Stanza Objects
@@ -347,7 +347,7 @@ method ``setForm`` which will take the names of the fields we wish to include.
                 # Add a blank field
                 reg.addField(field)
 
-        iq.reply().setPayload(reg.xml)
+        iq.reply().set_payload(reg.xml)
         iq.send()
 
 Note how we are able to access our ``Registration`` stanza object with
@@ -421,7 +421,7 @@ to the IQ reply.
     ...
 
     def _sendError(self, iq, code, error_type, name, text=''):
-        iq.reply().setPayload(iq['register'].xml)
+        iq.reply().set_payload(iq['register'].xml)
         iq.error()
         iq['error']['code'] = code
         iq['error']['type'] = error_type
@@ -464,7 +464,7 @@ component examples below for how to respond to this event.
             if self.backend.register(iq['from'].bare, iq['register']):
                 # Successful registration
                 self.xmpp.event('registered_user', iq)
-                iq.reply().setPayload(iq['register'].xml)
+                iq.reply().set_payload(iq['register'].xml)
                 iq.send()
             else:
                 # Conflicting registration
@@ -491,8 +491,8 @@ and that we specified the form fields we wish to use with
         def __init__(self, jid, password):
             slixmpp.componentxmpp.ComponentXMPP.__init__(self, jid, password, 'localhost', 8888)
 
-            self.registerPlugin('xep_0030')
-            self.registerPlugin('xep_0077')
+            self.register_plugin('xep_0030')
+            self.register_plugin('xep_0077')
             self.plugin['xep_0077'].setForm('username', 'password')
 
             self.add_event_handler("registered_user", self.reg)
@@ -500,11 +500,11 @@ and that we specified the form fields we wish to use with
 
         def reg(self, iq):
             msg = "Welcome! %s" % iq['register']['username']
-            self.sendMessage(iq['from'], msg, mfrom=self.fulljid)
+            self.send_message(iq['from'], msg, mfrom=self.fulljid)
 
         def unreg(self, iq):
             msg = "Bye! %s" % iq['register']['username']
-            self.sendMessage(iq['from'], msg, mfrom=self.fulljid)
+            self.send_message(iq['from'], msg, mfrom=self.fulljid)
 
 **Congratulations!** We now have a basic, functioning implementation of
 XEP-0077.
@@ -523,7 +523,7 @@ with some additional registration fields implemented.
     as a tutorial for creating Slixmpp plugins.
     """
 
-    from slixmpp.plugins.base import base_plugin
+    from slixmpp.plugins.base import BasePlugin
     from slixmpp.xmlstream.handler.callback import Callback
     from slixmpp.xmlstream.matcher.xpath import MatchXPath
     from slixmpp.xmlstream import ElementBase, ET, JID, register_stanza_plugin
@@ -589,7 +589,7 @@ with some additional registration fields implemented.
         def unregister(self, jid):
             del self.users[jid]
 
-    class xep_0077(base_plugin):
+    class xep_0077(BasePlugin):
         """
         XEP-0077 In-Band Registration
         """
@@ -608,7 +608,7 @@ with some additional registration fields implemented.
             register_stanza_plugin(Iq, Registration)
 
         def post_init(self):
-            base_plugin.post_init(self)
+            BasePlugin.post_init(self)
             self.xmpp['xep_0030'].add_feature("jabber:iq:register")
 
         def __handleRegistration(self, iq):
@@ -634,7 +634,7 @@ with some additional registration fields implemented.
                 if self.backend.register(iq['from'].bare, iq['register']):
                     # Successful registration
                     self.xmpp.event('registered_user', iq)
-                    iq.reply().setPayload(iq['register'].xml)
+                    iq.reply().set_payload(iq['register'].xml)
                     iq.send()
                 else:
                     # Conflicting registration
@@ -666,11 +666,11 @@ with some additional registration fields implemented.
                     # Add a blank field
                     reg.addField(field)
 
-            iq.reply().setPayload(reg.xml)
+            iq.reply().set_payload(reg.xml)
             iq.send()
 
         def _sendError(self, iq, code, error_type, name, text=''):
-            iq.reply().setPayload(iq['register'].xml)
+            iq.reply().set_payload(iq['register'].xml)
             iq.error()
             iq['error']['code'] = code
             iq['error']['type'] = error_type

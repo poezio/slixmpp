@@ -300,11 +300,3 @@ class ClientXMPP(BaseXMPP):
             dictated by the server. The same as :attr:`boundjid`.
         """
         self.client_roster = self.roster[jid]
-
-
-# To comply with PEP8, method names now use underscores.
-# Deprecated method names are re-mapped for backwards compatibility.
-ClientXMPP.updateRoster = ClientXMPP.update_roster
-ClientXMPP.delRosterItem = ClientXMPP.del_roster_item
-ClientXMPP.getRoster = ClientXMPP.get_roster
-ClientXMPP.registerFeature = ClientXMPP.register_feature

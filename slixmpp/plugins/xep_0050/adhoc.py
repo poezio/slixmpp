@@ -57,8 +57,8 @@ class XEP_0050(BasePlugin):
                     relevant to a command's session.
 
     Methods:
-        plugin_init       -- Overrides base_plugin.plugin_init
-        post_init         -- Overrides base_plugin.post_init
+        plugin_init       -- Overrides BasePlugin.plugin_init
+        post_init         -- Overrides BasePlugin.post_init
         new_session       -- Return a new session ID.
         prep_handlers     -- Placeholder. May call with a list of handlers
                              to prepare them for use with the session storage

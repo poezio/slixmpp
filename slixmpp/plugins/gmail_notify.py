@@ -7,10 +7,10 @@
 """
 
 import logging
-from . import base
+from slixmpp.plugins import BasePlugin
 from .. xmlstream.handler.callback import Callback
 from .. xmlstream.matcher.xpath import MatchXPath
-from .. xmlstream.stanzabase import registerStanzaPlugin, ElementBase, ET, JID
+from .. xmlstream.stanzabase import register_stanza_plugin, ElementBase, ET, JID
 from .. stanza.iq import Iq
 
 
@@ -90,7 +90,7 @@ class NewMail(ElementBase):
     plugin_attrib = 'new-mail'
 
 
-class gmail_notify(base.base_plugin):
+class gmail_notify(BasePlugin):
     """
     Google Talk: Gmail Notifications
     """
@@ -112,9 +112,9 @@ class gmail_notify(base.base_plugin):
                                                    NewMail.name)),
                      self.handle_new_mail))
 
-        registerStanzaPlugin(Iq, GmailQuery)
-        registerStanzaPlugin(Iq, MailBox)
-        registerStanzaPlugin(Iq, NewMail)
+        register_stanza_plugin(Iq, GmailQuery)
+        register_stanza_plugin(Iq, MailBox)
+        register_stanza_plugin(Iq, NewMail)
 
         self.last_result_time = None
 
