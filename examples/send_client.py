@@ -58,9 +58,7 @@ class SendMsgBot(slixmpp.ClientXMPP):
                           mbody=self.msg,
                           mtype='chat')
 
-        # Using wait=True ensures that the send queue will be
-        # emptied before ending the session.
-        self.disconnect(wait=True)
+        self.disconnect()
 
 
 if __name__ == '__main__':

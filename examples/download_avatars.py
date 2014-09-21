@@ -60,7 +60,7 @@ class AvatarDownloader(slixmpp.ClientXMPP):
 
         print('Waiting for presence updates...\n')
         self.presences_received.wait(15)
-        self.disconnect(wait=True)
+        self.disconnect()
 
     def on_vcard_avatar(self, pres):
         print("Received vCard avatar update from %s" % pres['from'].bare)

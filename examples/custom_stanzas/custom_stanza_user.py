@@ -83,9 +83,7 @@ class ActionUserBot(slixmpp.ClientXMPP):
                 iq2['action']['method'] = 'bye'
                 iq2.send(block=False)
 
-                # The wait=True delays the disconnect until the queue
-                # of stanzas to be sent becomes empty.
-                self.disconnect(wait=True)
+                self.disconnect()
         except XMPPError:
             print('There was an error sending the custom action.')
 
