@@ -1616,3 +1616,6 @@ class StanzaBase(ElementBase):
 #: Child stanzas are exposed as nested dictionaries.
 ElementBase.values = property(ElementBase._get_stanza_values,
                               ElementBase._set_stanza_values)
+
+ElementBase.get_stanza_values = ElementBase._get_stanza_values
+ElementBase.set_stanza_values = ElementBase._set_stanza_values
