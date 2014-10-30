@@ -103,13 +103,6 @@ class XMLStream(object):
         self.ssl_context = ssl.create_default_context()
         self.ssl_context.check_hostname = False
         self.ssl_context.verify_mode = ssl.CERT_NONE
-        #: Most XMPP servers support TLSv1, but OpenFire in particular
-        #: does not work well with it. For OpenFire, set
-        #: :attr:`ssl_version` to use ``SSLv23``::
-        #:
-        #:     import ssl
-        #:     xmpp.ssl_version = ssl.PROTOCOL_SSLv23
-        self.ssl_version = ssl.PROTOCOL_TLSv1
 
         # The event to trigger when the create_connection() succeeds. It can
         # be "connected" or "tls_success" depending on the step we are at.
