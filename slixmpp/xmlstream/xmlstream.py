@@ -453,7 +453,19 @@ class XMLStream(object):
         ssl_connect_routine = loop.create_connection(lambda: self, ssl=self.ssl_context,
                                                      sock=self.socket,
                                                      server_hostname=self.address[0])
-        asyncio.async(ssl_connect_routine)
+        def ssl_coro():
+            try:
+                transp, prot = yield from ssl_connect_routine
+            except ssl.SSLError:
+                import traceback
+                log.debug('SSL: Unable to connect:\n%s', exc_info=True)
+                self.event('ssl_invalid_chain', direct=True)
+            else:
+                der_cert = transp._sock.getpeercert(True)
+                pem_cert = ssl.DER_cert_to_PEM_cert(der_cert)
+                self.event('ssl_cert', pem_cert)
+
+        asyncio.async(ssl_coro())
 
     def _start_keepalive(self, event):
         """Begin sending whitespace periodically to keep the connection alive.
