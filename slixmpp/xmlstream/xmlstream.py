@@ -111,7 +111,7 @@ class XMLStream(object):
         #: The list of accepted ciphers, in OpenSSL Format.
         #: It might be useful to override it for improved security
         #: over the python defaults.
-        self.ciphers = None
+        self._ciphers = None
 
         #: Path to a file containing certificates for verifying the
         #: server SSL certificate. A non-``None`` value will trigger
@@ -871,3 +871,13 @@ class XMLStream(object):
         :param exception: An unhandled exception object.
         """
         pass
+
+    @property
+    def ciphers(self):
+        return self._ciphers
+
+    @ciphers.setter
+    def ciphers(self, value):
+        self.ssl_context.set_ciphers(value)
+        self._ciphers = value
+
