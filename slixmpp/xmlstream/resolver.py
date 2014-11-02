@@ -8,6 +8,7 @@
     :license: MIT, see LICENSE for more details
 """
 
+import asyncio
 import socket
 import logging
 import random
@@ -16,51 +17,42 @@ import random
 log = logging.getLogger(__name__)
 
 
-#: Global flag indicating the availability of the ``dnspython`` package.
-#: Installing ``dnspython`` can be done via:
+#: Global flag indicating the availability of the ``aiodns`` package.
+#: Installing ``aiodns`` can be done via:
 #:
 #: .. code-block:: sh
 #:
-#:     pip install dnspython
-#:
-#: For Python3, installation may require installing from source using
-#: the ``python3`` branch:
-#:
-#: .. code-block:: sh
-#:
-#:     git clone http://github.com/rthalley/dnspython
-#:     cd dnspython
-#:     git checkout python3
-#:     python3 setup.py install
-DNSPYTHON_AVAILABLE = False
+#:     pip install aiodns
+AIODNS_AVAILABLE = False
 try:
-    import dns.resolver
-    DNSPYTHON_AVAILABLE = True
+    import aiodns
+    AIODNS_AVAILABLE = True
 except ImportError as e:
-    log.debug("Could not find dnspython package. " + \
+    log.debug("Could not find aiodns package. " + \
               "Not all features will be available")
 
 
 def default_resolver():
     """Return a basic DNS resolver object.
 
-    :returns: A :class:`dns.resolver.Resolver` object if dnspython
+    :returns: A :class:`aiodns.DNSResolver` object if aiodns
               is available. Otherwise, ``None``.
     """
-    if DNSPYTHON_AVAILABLE:
-        return dns.resolver.get_default_resolver()
+    if AIODNS_AVAILABLE:
+        return aiodns.DNSResolver(loop=asyncio.get_event_loop())
     return None
 
 
+@asyncio.coroutine
 def resolve(host, port=None, service=None, proto='tcp',
-            resolver=None, use_ipv6=True, use_dnspython=True):
+            resolver=None, use_ipv6=True, use_aiodns=True):
     """Peform DNS resolution for a given hostname.
 
     Resolution may perform SRV record lookups if a service and protocol
     are specified. The returned addresses will be sorted according to
     the SRV priorities and weights.
 
-    If no resolver is provided, the dnspython resolver will be used if
+    If no resolver is provided, the aiodns resolver will be used if
     available. Otherwise the built-in socket facilities will be used,
     but those do not provide SRV support.
 
@@ -77,7 +69,7 @@ def resolve(host, port=None, service=None, proto='tcp',
     :param use_ipv6: Optionally control the use of IPv6 in situations
                      where it is either not available, or performance
                      is degraded. Defaults to ``True``.
-    :param use_dnspython: Optionally control if dnspython is used to make
+    :param use_aiodns: Optionally control if aiodns is used to make
                           the DNS queries instead of the built-in DNS
                           library.
 
@@ -85,25 +77,25 @@ def resolve(host, port=None, service=None, proto='tcp',
     :type     port: int
     :type  service: string
     :type    proto: string
-    :type resolver: :class:`dns.resolver.Resolver`
+    :type resolver: :class:`aiodns.DNSResolver`
     :type use_ipv6: bool
-    :type use_dnspython: bool
+    :type use_aiodns: bool
 
     :return: An iterable of IP address, port pairs in the order
              dictated by SRV priorities and weights, if applicable.
     """
 
-    if not use_dnspython:
-        if DNSPYTHON_AVAILABLE:
-            log.debug("DNS: Not using dnspython, but dnspython is installed.")
+    if not use_aiodns:
+        if AIODNS_AVAILABLE:
+            log.debug("DNS: Not using aiodns, but aiodns is installed.")
         else:
-            log.debug("DNS: Not using dnspython.")
+            log.debug("DNS: Not using aiodns.")
 
     if not use_ipv6:
         log.debug("DNS: Use of IPv6 has been disabled.")
 
-    if resolver is None and DNSPYTHON_AVAILABLE and use_dnspython:
-        resolver = dns.resolver.get_default_resolver()
+    if resolver is None and AIODNS_AVAILABLE and use_aiodns:
+        resolver = aiodns.DNSResolver(loop=asyncio.get_event_loop())
 
     # An IPv6 literal is allowed to be enclosed in square brackets, but
     # the brackets must be stripped in order to process the literal;
@@ -113,7 +105,7 @@ def resolve(host, port=None, service=None, proto='tcp',
     try:
         # If `host` is an IPv4 literal, we can return it immediately.
         ipv4 = socket.inet_aton(host)
-        yield (host, host, port)
+        return [(host, host, port)]
     except socket.error:
         pass
 
@@ -123,7 +115,7 @@ def resolve(host, port=None, service=None, proto='tcp',
             # it immediately.
             if hasattr(socket, 'inet_pton'):
                 ipv6 = socket.inet_pton(socket.AF_INET6, host)
-                yield (host, host, port)
+                return [(host, host, port)]
         except (socket.error, ValueError):
             pass
 
@@ -133,29 +125,31 @@ def resolve(host, port=None, service=None, proto='tcp',
     if not service:
         hosts = [(host, port)]
     else:
-        hosts = get_SRV(host, port, service, proto,
-                        resolver=resolver,
-                        use_dnspython=use_dnspython)
-
+        hosts = yield from get_SRV(host, port, service, proto,
+                                   resolver=resolver,
+                                   use_aiodns=use_aiodns)
+    results = []
     for host, port in hosts:
-        results = []
         if host == 'localhost':
             if use_ipv6:
                 results.append((host, '::1', port))
             results.append((host, '127.0.0.1', port))
+
         if use_ipv6:
-            for address in get_AAAA(host, resolver=resolver,
-                                          use_dnspython=use_dnspython):
+            aaaa = yield from get_AAAA(host, resolver=resolver,
+                                       use_aiodns=use_aiodns)
+            for address in aaaa:
                 results.append((host, address, port))
-        for address in get_A(host, resolver=resolver,
-                                   use_dnspython=use_dnspython):
+
+        a = yield from get_A(host, resolver=resolver,
+                             use_aiodns=use_aiodns)
+        for address in a:
             results.append((host, address, port))
 
-        for host, address, port in results:
-            yield host, address, port
+    return results
 
-
-def get_A(host, resolver=None, use_dnspython=True):
+@asyncio.coroutine
+def get_A(host, resolver=None, use_aiodns=True):
     """Lookup DNS A records for a given host.
 
     If ``resolver`` is not provided, or is ``None``, then resolution will
@@ -163,46 +157,41 @@ def get_A(host, resolver=None, use_dnspython=True):
 
     :param     host: The hostname to resolve for A record IPv4 addresses.
     :param resolver: Optional DNS resolver object to use for the query.
-    :param use_dnspython: Optionally control if dnspython is used to make
+    :param use_aiodns: Optionally control if aiodns is used to make
                           the DNS queries instead of the built-in DNS
                           library.
 
     :type     host: string
-    :type resolver: :class:`dns.resolver.Resolver` or ``None``
-    :type use_dnspython: bool
+    :type resolver: :class:`aiodns.DNSResolver` or ``None``
+    :type use_aiodns: bool
 
     :return: A list of IPv4 literals.
     """
     log.debug("DNS: Querying %s for A records." % host)
 
-    # If not using dnspython, attempt lookup using the OS level
+    # If not using aiodns, attempt lookup using the OS level
     # getaddrinfo() method.
-    if resolver is None or not use_dnspython:
+    if resolver is None or not use_aiodns:
         try:
             recs = socket.getaddrinfo(host, None, socket.AF_INET,
                                                   socket.SOCK_STREAM)
             return [rec[4][0] for rec in recs]
         except socket.gaierror:
-            log.debug("DNS: Error retreiving A address info for %s." % host)
+            log.debug("DNS: Error retrieving A address info for %s." % host)
             return []
 
-    # Using dnspython:
+    # Using aiodns:
+    future = resolver.query(host, 'A')
     try:
-        recs = resolver.query(host, dns.rdatatype.A)
-        return [rec.to_text() for rec in recs]
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-        log.debug("DNS: No A records for %s" % host)
-        return []
-    except dns.exception.Timeout:
-        log.debug("DNS: A record resolution timed out for %s" % host)
-        return []
-    except dns.exception.DNSException as e:
-        log.debug("DNS: Error querying A records for %s" % host)
-        log.exception(e)
-        return []
+        recs = yield from future
+    except Exception as e:
+        log.debug('DNS: Exception while querying for %s A records: %s', host, e)
+        recs = []
+    return recs
 
 
-def get_AAAA(host, resolver=None, use_dnspython=True):
+@asyncio.coroutine
+def get_AAAA(host, resolver=None, use_aiodns=True):
     """Lookup DNS AAAA records for a given host.
 
     If ``resolver`` is not provided, or is ``None``, then resolution will
@@ -210,23 +199,23 @@ def get_AAAA(host, resolver=None, use_dnspython=True):
 
     :param     host: The hostname to resolve for AAAA record IPv6 addresses.
     :param resolver: Optional DNS resolver object to use for the query.
-    :param use_dnspython: Optionally control if dnspython is used to make
+    :param use_aiodns: Optionally control if aiodns is used to make
                           the DNS queries instead of the built-in DNS
                           library.
 
     :type     host: string
-    :type resolver: :class:`dns.resolver.Resolver` or ``None``
-    :type use_dnspython: bool
+    :type resolver: :class:`aiodns.DNSResolver` or ``None``
+    :type use_aiodns: bool
 
     :return: A list of IPv6 literals.
     """
     log.debug("DNS: Querying %s for AAAA records." % host)
 
-    # If not using dnspython, attempt lookup using the OS level
+    # If not using aiodns, attempt lookup using the OS level
     # getaddrinfo() method.
-    if resolver is None or not use_dnspython:
+    if resolver is None or not use_aiodns:
         if not socket.has_ipv6:
-            log.debug("Unable to query %s for AAAA records: IPv6 is not supported", host)
+            log.debug("DNS: Unable to query %s for AAAA records: IPv6 is not supported", host)
             return []
         try:
             recs = socket.getaddrinfo(host, None, socket.AF_INET6,
@@ -237,29 +226,23 @@ def get_AAAA(host, resolver=None, use_dnspython=True):
                       "info for %s." % host)
             return []
 
-    # Using dnspython:
+    # Using aiodns:
+    future = resolver.query(host, 'AAAA')
     try:
-        recs = resolver.query(host, dns.rdatatype.AAAA)
-        return [rec.to_text() for rec in recs]
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-        log.debug("DNS: No AAAA records for %s" % host)
-        return []
-    except dns.exception.Timeout:
-        log.debug("DNS: AAAA record resolution timed out for %s" % host)
-        return []
-    except dns.exception.DNSException as e:
-        log.debug("DNS: Error querying AAAA records for %s" % host)
-        log.exception(e)
-        return []
+        recs = yield from future
+    except Exception as e:
+        log.debug('DNS: Exception while querying for %s AAAA records: %s', host, e)
+        recs = []
+    return recs
 
-
-def get_SRV(host, port, service, proto='tcp', resolver=None, use_dnspython=True):
+@asyncio.coroutine
+def get_SRV(host, port, service, proto='tcp', resolver=None, use_aiodns=True):
     """Perform SRV record resolution for a given host.
 
     .. note::
 
-        This function requires the use of the ``dnspython`` package. Calling
-        :func:`get_SRV` without ``dnspython`` will return the provided host
+        This function requires the use of the ``aiodns`` package. Calling
+        :func:`get_SRV` without ``aiodns`` will return the provided host
         and port without performing any DNS queries.
 
     :param     host: The hostname to resolve.
@@ -274,32 +257,23 @@ def get_SRV(host, port, service, proto='tcp', resolver=None, use_dnspython=True)
     :type     port: int
     :type  service: string
     :type    proto: string
-    :type resolver: :class:`dns.resolver.Resolver`
+    :type resolver: :class:`aiodns.DNSResolver`
 
     :return: A list of hostname, port pairs in the order dictacted
              by SRV priorities and weights.
     """
-    if resolver is None or not use_dnspython:
-        log.warning("DNS: dnspython not found. Can not use SRV lookup.")
+    if resolver is None or not use_aiodns:
+        log.warning("DNS: aiodns not found. Can not use SRV lookup.")
         return [(host, port)]
 
     log.debug("DNS: Querying SRV records for %s" % host)
     try:
-        recs = resolver.query('_%s._%s.%s' % (service, proto, host),
-                              dns.rdatatype.SRV)
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-        log.debug("DNS: No SRV records for %s." % host)
-        return [(host, port)]
-    except dns.exception.Timeout:
-        log.debug("DNS: SRV record resolution timed out for %s." % host)
-        return [(host, port)]
-    except dns.exception.DNSException as e:
-        log.debug("DNS: Error querying SRV records for %s." % host)
-        log.exception(e)
-        return [(host, port)]
-
-    if len(recs) == 1 and recs[0].target == '.':
-        return [(host, port)]
+        future = resolver.query('_%s._%s.%s' % (service, proto, host),
+                                'SRV')
+        recs = yield from future
+    except Exception as e:
+        log.debug('DNS: Exception while querying for %s SRV records: %s', host, e)
+        return []
 
     answers = {}
     for rec in recs:
@@ -323,7 +297,7 @@ def get_SRV(host, port, service, proto='tcp', resolver=None, use_dnspython=True)
             for running_sum in sums:
                 if running_sum >= selected:
                     rec = sums[running_sum]
-                    host = rec.target.to_text()
+                    host = rec.host
                     if host.endswith('.'):
                         host = host[:-1]
                     sorted_recs.append((host, rec.port))

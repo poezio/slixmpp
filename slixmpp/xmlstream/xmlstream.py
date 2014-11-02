@@ -162,7 +162,7 @@ class XMLStream(object):
         #: If set to ``True``, allow using the ``dnspython`` DNS library
         #: if available. If set to ``False``, the builtin DNS resolver
         #: will be used, even if ``dnspython`` is installed.
-        self.use_dnspython = True
+        self.use_aiodns = True
 
         #: Use CDATA for escaping instead of XML entities. Defaults
         #: to ``False``.
@@ -287,13 +287,32 @@ class XMLStream(object):
     def _connect_routine(self):
         loop = asyncio.get_event_loop()
         self.event_when_connected = "connected"
+
+        try:
+            record = yield from self.pick_dns_answer(self.default_domain)
+        except StopIteration:
+            # No more DNS records to try
+            self.dns_answers = None
+            return
+        else:
+            if record:
+                host, address, port = record
+                self._service_name = host
+            else:
+                self.event('connection_failed',
+                           'No DNS record available for %s' % self.default_domain)
+                self.dns_answers = None
+                return
+
         try:
             yield from loop.create_connection(lambda: self,
-                                              self.address[0],
-                                              self.address[1],
+                                              address,
+                                              port,
                                               ssl=self.use_ssl)
         except OSError as e:
+            log.debug('Connection failed: %s', e)
             self.event("connection_failed", e)
+            asyncio.async(self._connect_routine())
 
     def process(self, timeout=None):
         """Process all the available XMPP events (receiving or sending data on the
@@ -578,6 +597,7 @@ class XMLStream(object):
             idx += 1
         return False
 
+    @asyncio.coroutine
     def get_dns_records(self, domain, port=None):
         """Get the DNS records for a domain.
 
@@ -590,11 +610,14 @@ class XMLStream(object):
         resolver = default_resolver()
         self.configure_dns(resolver, domain=domain, port=port)
 
-        return resolve(domain, port, service=self.dns_service,
-                                     resolver=resolver,
-                                     use_ipv6=self.use_ipv6,
-                                     use_dnspython=self.use_dnspython)
+        result = yield from resolve(domain, port,
+                                    service=self.dns_service,
+                                    resolver=resolver,
+                                    use_ipv6=self.use_ipv6,
+                                    use_aiodns=self.use_aiodns)
+        return result
 
+    @asyncio.coroutine
     def pick_dns_answer(self, domain, port=None):
         """Pick a server and port from DNS answers.
 
@@ -604,8 +627,9 @@ class XMLStream(object):
         :param domain: The domain in question.
         :param port: If the results don't include a port, use this one.
         """
-        if not self.dns_answers:
-            self.dns_answers = self.get_dns_records(domain, port)
+        if self.dns_answers is None:
+            dns_records = yield from self.get_dns_records(domain, port)
+            self.dns_answers = iter(dns_records)
 
         return next(self.dns_answers)
 
