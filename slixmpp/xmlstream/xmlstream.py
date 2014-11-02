@@ -218,7 +218,7 @@ class XMLStream(object):
         self._id_prefix = '%s-' % uuid.uuid4()
 
         #: A list of DNS results that have not yet been tried.
-        self.dns_answers = []
+        self.dns_answers = None
 
         #: The service name to check with DNS SRV records. For
         #: example, setting this to ``'xmpp-client'`` would query the
