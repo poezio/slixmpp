@@ -43,7 +43,7 @@ setup(
     license='MIT',
     platforms=['any'],
     packages=packages,
-    requires=['dnspython', 'pyasn1', 'pyasn1_modules'],
+    requires=['aiodns', 'pyasn1', 'pyasn1_modules'],
     classifiers=CLASSIFIERS,
     cmdclass={'test': TestCommand}
 )
