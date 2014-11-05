@@ -128,6 +128,9 @@ def resolve(host, port=None, service=None, proto='tcp',
         hosts = yield from get_SRV(host, port, service, proto,
                                    resolver=resolver,
                                    use_aiodns=use_aiodns)
+        if not hosts:
+            hosts = [(host, port)]
+
     results = []
     for host, port in hosts:
         if host == 'localhost':
