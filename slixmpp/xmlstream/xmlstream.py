@@ -297,18 +297,21 @@ class XMLStream(object):
         else:
             if record:
                 host, address, port = record
+                self.address = (address, port)
                 self._service_name = host
             else:
-                self.event('connection_failed',
-                           'No DNS record available for %s' % self.default_domain)
+                # No DNS records left, stop iterating
+                # and try (host, port) as a last resort
                 self.dns_answers = None
-                return
 
         try:
             yield from loop.create_connection(lambda: self,
-                                              address,
-                                              port,
+                                              self.address[0],
+                                              self.address[1],
                                               ssl=self.use_ssl)
+        except Socket.gaierror as e:
+            self.event('connection_failed',
+                       'No DNS record available for %s' % self.default_domain)
         except OSError as e:
             log.debug('Connection failed: %s', e)
             self.event("connection_failed", e)
