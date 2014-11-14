@@ -39,7 +39,9 @@ def default_resolver():
               is available. Otherwise, ``None``.
     """
     if AIODNS_AVAILABLE:
-        return aiodns.DNSResolver(loop=asyncio.get_event_loop())
+        return aiodns.DNSResolver(loop=asyncio.get_event_loop(),
+                                  tries=1,
+                                  timeout=1.0)
     return None
 
 
