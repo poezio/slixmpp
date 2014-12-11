@@ -111,7 +111,7 @@ class XMLStream(object):
         #: The list of accepted ciphers, in OpenSSL Format.
         #: It might be useful to override it for improved security
         #: over the python defaults.
-        self._ciphers = None
+        self.ciphers = None
 
         #: Path to a file containing certificates for verifying the
         #: server SSL certificate. A non-``None`` value will trigger
@@ -471,6 +471,16 @@ class XMLStream(object):
         """
         loop = asyncio.get_event_loop()
         self.event_when_connected = "tls_success"
+
+        self.ssl_context.set_ciphers(self.ciphers)
+        if self.keyfile and self.certfile:
+            try:
+                self.ssl_context.load_cert_chain(self.certfile, self.keyfile)
+            except (ssl.SSLError, OSError):
+                log.debug('Error loading the cert chain:', exc_info=True)
+            else:
+                log.debug('Loaded cert file %s and key file %s',
+                          self.certfile, self.keyfile)
 
         ssl_connect_routine = loop.create_connection(lambda: self, ssl=self.ssl_context,
                                                      sock=self.socket,
@@ -910,13 +920,4 @@ class XMLStream(object):
         :param exception: An unhandled exception object.
         """
         pass
-
-    @property
-    def ciphers(self):
-        return self._ciphers
-
-    @ciphers.setter
-    def ciphers(self, value):
-        self.ssl_context.set_ciphers(value)
-        self._ciphers = value
 

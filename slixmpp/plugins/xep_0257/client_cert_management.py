@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class XEP_0257(BasePlugin):
 
     name = 'xep_0257'
-    description = 'XEP-0258: Client Certificate Management for SASL EXTERNAL'
+    description = 'XEP-0257: Client Certificate Management for SASL EXTERNAL'
     dependencies = set(['xep_0030'])
     stanza = stanza
 
