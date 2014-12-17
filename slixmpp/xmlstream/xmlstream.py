@@ -481,6 +481,9 @@ class XMLStream(object):
             else:
                 log.debug('Loaded cert file %s and key file %s',
                           self.certfile, self.keyfile)
+        if self.ca_certs is not None:
+            self.ssl_context.verify_mode = ssl.CERT_REQUIRED
+            self.ssl_context.load_verify_locations(cafile=self.ca_certs)
 
         ssl_connect_routine = loop.create_connection(lambda: self, ssl=self.ssl_context,
                                                      sock=self.socket,
@@ -488,12 +491,15 @@ class XMLStream(object):
         def ssl_coro():
             try:
                 transp, prot = yield from ssl_connect_routine
-            except ssl.SSLError:
-                import traceback
-                log.debug('SSL: Unable to connect:\n%s', exc_info=True)
-                self.event('ssl_invalid_chain', direct=True)
+            except ssl.SSLError as e:
+                log.error('CERT: Invalid certificate trust chain.')
+                log.debug('SSL: Unable to connect', exc_info=True)
+                if not self.event_handled('ssl_invalid_chain'):
+                    self.disconnect()
+                else:
+                    self.event('ssl_invalid_chain', e)
             else:
-                der_cert = transp._sock.getpeercert(True)
+                der_cert = transp.get_extra_info("socket").getpeercert(True)
                 pem_cert = ssl.DER_cert_to_PEM_cert(der_cert)
                 self.event('ssl_cert', pem_cert)
 
