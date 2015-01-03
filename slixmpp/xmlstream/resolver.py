@@ -8,7 +8,7 @@
     :license: MIT, see LICENSE for more details
 """
 
-import asyncio
+from slixmpp.xmlstream.asyncio import asyncio
 import socket
 import logging
 import random

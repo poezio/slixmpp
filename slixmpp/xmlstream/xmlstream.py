@@ -12,7 +12,6 @@
     :license: MIT, see LICENSE for more details
 """
 
-import asyncio
 import functools
 import copy
 import logging
@@ -23,6 +22,7 @@ import uuid
 
 import xml.etree.ElementTree
 
+from slixmpp.xmlstream.asyncio import asyncio
 from slixmpp.xmlstream import tostring
 from slixmpp.xmlstream.stanzabase import StanzaBase, ElementBase
 from slixmpp.xmlstream.resolver import resolve, default_resolver
@@ -377,7 +377,8 @@ class XMLStream(object):
                 elif self.xml_depth == 1:
                     # A stanza is an XML element that is a direct child of
                     # the root element, hence the check of depth == 1
-                    self.__spawn_event(xml)
+                    asyncio.get_event_loop().\
+                        idle_call(functools.partial(self.__spawn_event, xml))
                     if self.xml_root is not None:
                         # Keep the root element empty of children to
                         # save on memory use.
