@@ -9,6 +9,8 @@ call_soon() ones. These callback are called only once each.
 import asyncio
 from asyncio import tasks, events
 
+import collections
+
 def idle_call(self, callback):
     if tasks.iscoroutinefunction(callback):
         raise TypeError("coroutines cannot be used with idle_call()")
@@ -20,12 +22,12 @@ def my_run_once(self):
         self._ready.append(events.Handle(lambda: None, (), self))
     real_run_once(self)
     if self._idle:
-        handle = self._idle.pop(0)
+        handle = self._idle.popleft()
         handle._run()
 
 cls = asyncio.get_event_loop().__class__
 
-cls._idle = []
+cls._idle = collections.deque()
 cls.idle_call = idle_call
 real_run_once = cls._run_once
 cls._run_once = my_run_once
