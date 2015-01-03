@@ -901,15 +901,11 @@ class XMLStream(object):
         handled = False
         matched_handlers = [h for h in self.__handlers if h.match(stanza)]
         for handler in matched_handlers:
-            if len(matched_handlers) > 1:
-                stanza_copy = copy.copy(stanza)
-            else:
-                stanza_copy = stanza
-            handler.prerun(stanza_copy)
+            handler.prerun(stanza)
             try:
-                handler.run(stanza_copy)
+                handler.run(stanza)
             except Exception as e:
-                stanza_copy.exception(e)
+                stanza.exception(e)
             if handler.check_delete():
                 self.__handlers.remove(handler)
             handled = True
