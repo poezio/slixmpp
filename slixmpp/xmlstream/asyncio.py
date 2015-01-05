@@ -7,12 +7,12 @@ call_soon() ones. These callback are called only once each.
 """
 
 import asyncio
-from asyncio import tasks, events
+from asyncio import events
 
 import collections
 
 def idle_call(self, callback):
-    if tasks.iscoroutinefunction(callback):
+    if asyncio.iscoroutinefunction(callback):
         raise TypeError("coroutines cannot be used with idle_call()")
     handle = events.Handle(callback, [], self)
     self._idle.append(handle)
