@@ -135,6 +135,12 @@ class XEP_0045(BasePlugin):
             'http://jabber.org/protocol/muc#user',
             'http://jabber.org/protocol/muc#user')), self.handle_groupchat_invite))
 
+    def plugin_end(self):
+        self.xmpp.plugin['xep_0030'].del_feature(feature='http://jabber.org/protocol/muc')
+
+    def session_bind(self, jid):
+        self.xmpp.plugin['xep_0030'].add_feature('http://jabber.org/protocol/muc')
+
     def handle_groupchat_invite(self, inv):
         """ Handle an invite into a muc.
         """
