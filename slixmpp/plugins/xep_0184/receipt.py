@@ -67,9 +67,7 @@ class XEP_0184(BasePlugin):
         """
         ack = self.xmpp.Message()
         ack['to'] = msg['from']
-        ack['from'] = msg['to']
         ack['receipt'] = msg['id']
-        ack['id'] = msg['id']
         ack.send()
 
     def _handle_receipt_received(self, msg):
