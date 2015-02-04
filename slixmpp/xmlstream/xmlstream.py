@@ -55,7 +55,7 @@ class NotConnectedError(Exception):
     connected.
     """
 
-class XMLStream(object):
+class XMLStream(asyncio.BaseProtocol):
     """
     An XML stream connection manager and event dispatcher.
 
