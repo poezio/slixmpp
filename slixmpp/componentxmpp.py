@@ -55,7 +55,7 @@ class ComponentXMPP(BaseXMPP):
         BaseXMPP.__init__(self, jid, default_ns)
 
         self.auto_authorize = None
-        self.stream_header = "<stream:stream %s %s to='%s'>" % (
+        self.stream_header = '<stream:stream %s %s to="%s">' % (
                 'xmlns="jabber:component:accept"',
                 'xmlns:stream="%s"' % self.stream_ns,
                 jid)
@@ -67,6 +67,8 @@ class ComponentXMPP(BaseXMPP):
         self.plugin_config = plugin_config
         self.plugin_whitelist = plugin_whitelist
         self.is_component = True
+
+        self.sessionstarted = False
 
         self.register_handler(
                 Callback('Handshake',
@@ -145,7 +147,7 @@ class ComponentXMPP(BaseXMPP):
         :param xml: The reply handshake stanza.
         """
         self.session_bind_event.set()
-        self.session_started_event.set()
+        self.sessionstarted = True
         self.event('session_bind', self.boundjid)
         self.event('session_start')
 
