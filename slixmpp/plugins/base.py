@@ -142,7 +142,6 @@ class PluginManager(object):
         :param dict config: Optional settings dictionary for
                             configuring plugin behaviour.
         """
-        top_level = False
         if enabled is None:
             enabled = set()
 
@@ -166,14 +165,14 @@ class PluginManager(object):
                     self.enable(dep, enabled=enabled)
                 plugin._init()
 
-        if top_level:
-            for name in enabled:
-                if hasattr(self.plugins[name], 'old_style'):
-                    # Older style plugins require post_init()
-                    # to run just before stream processing begins,
-                    # so we don't call it here.
-                    pass
-                self.plugins[name].post_init()
+        for name in enabled:
+            if hasattr(self._plugins[name], 'old_style'):
+                # Older style plugins require post_init()
+                # to run just before stream processing begins,
+                # so we don't call it here.
+                pass
+            else:
+                self._plugins[name].post_init()
 
     def enable_all(self, names=None, config=None):
         """Enable all registered plugins.
