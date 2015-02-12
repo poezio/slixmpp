@@ -189,7 +189,7 @@ class TestStreamControl(SlixTest):
             </message>
         """)
 
-        time.sleep(.5)
+        time.sleep(0.5)
 
         self.assertEqual(myDevice._get_field_value("Temperature"), "17");
 
@@ -212,8 +212,6 @@ class TestStreamControl(SlixTest):
                 </set>
             </message>
         """)
-
-        time.sleep(.5)
 
         self.assertEqual(myDevice._get_field_value("Temperature"), "15");
         self.assertFalse(myDevice.has_control_field("Voltage", "int"));
@@ -259,8 +257,6 @@ class TestStreamControl(SlixTest):
             </iq>
             """)
 
-        time.sleep(.5)
-
         self.assertEqual(results, ["OK"]);
 
     def testRequestSetErrorAPI(self):
@@ -304,8 +300,6 @@ class TestStreamControl(SlixTest):
                 </setResponse>
             </iq>
             """)
-
-        time.sleep(.5)
 
         self.assertEqual(results, ["OtherError"]);
 

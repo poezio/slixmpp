@@ -48,15 +48,15 @@ class TestHandlers(SlixTest):
             iq['id'] = 'test'
             iq['type'] = 'set'
             iq['query'] = 'test'
-            reply = iq.send(block=True)
-            if reply:
+            def callback_waiter(result):
                 self.xmpp.send_raw("""
                   <message>
                     <body>Successful: %s</body>
                   </message>
-                """ % reply['query'])
+                """ % result['query'])
+            iq.send(callback=callback_waiter)
 
-        self.xmpp.add_event_handler('message', waiter_handler, threaded=True)
+        self.xmpp.add_event_handler('message', waiter_handler)
 
         # Send message to trigger waiter_handler
         self.recv("""
@@ -93,11 +93,11 @@ class TestHandlers(SlixTest):
             iq['type'] = 'set'
             iq['query'] = 'test2'
             try:
-                reply = iq.send(block=True, timeout=0)
+                reply = iq.send(timeout=0)
             except IqTimeout:
                 pass
 
-        self.xmpp.add_event_handler('message', waiter_handler, threaded=True)
+        self.xmpp.add_event_handler('message', waiter_handler)
 
         # Start test by triggerig waiter_handler
         self.recv("""<message><body>Start Test</body></message>""")
@@ -108,9 +108,6 @@ class TestHandlers(SlixTest):
         iq['type'] = 'set'
         iq['query'] = 'test2'
         self.send(iq)
-
-        # Give the event queue time to process.
-        time.sleep(0.1)
 
         # Check that the waiter is no longer registered
         waiter_exists = self.xmpp.remove_handler('IqWait_test2')
@@ -148,40 +145,8 @@ class TestHandlers(SlixTest):
           </iq>
         """)
 
-        # Give event queue time to process
-        time.sleep(0.1)
-
         self.failUnless(events == ['foo'],
                 "Iq callback was not executed: %s" % events)
-
-    def testIqTimeoutCallback(self):
-        """Test that iq.send(tcallback=handle_foo, timeout_callback=handle_timeout) works."""
-        events = []
-
-        def handle_foo(iq):
-            events.append('foo')
-
-        def handle_timeout(iq):
-            events.append('timeout')
-
-        iq = self.Iq()
-        iq['type'] = 'get'
-        iq['id'] = 'test-foo'
-        iq['to'] = 'user@localhost'
-        iq['query'] = 'foo'
-        iq.send(callback=handle_foo, timeout_callback=handle_timeout, timeout=0.05)
-
-        self.send("""
-          <iq type="get" id="test-foo" to="user@localhost">
-            <query xmlns="foo" />
-          </iq>
-        """)
-
-        # Give event queue time to process
-        time.sleep(1)
-
-        self.failUnless(events == ['timeout'],
-                "Iq timeout was not executed: %s" % events)
 
     def testMultipleHandlersForStanza(self):
         """
@@ -235,18 +200,15 @@ class TestHandlers(SlixTest):
 
       events = []
 
-      def run_test():
-          # Check that Iq was sent by waiter_handler
-          iq = self.Iq()
-          iq['id'] = 'test'
-          iq['to'] = 'tester@slixmpp.com/test'
-          iq['type'] = 'set'
-          iq['query'] = 'test'
-          result = iq.send()
+      def callback(result):
           events.append(result['from'].full)
 
-      t = threading.Thread(name="sender_test", target=run_test)
-      t.start()
+      iq = self.Iq()
+      iq['id'] = 'test'
+      iq['to'] = 'tester@slixmpp.com/test'
+      iq['type'] = 'set'
+      iq['query'] = 'test'
+      iq.send(callback=callback)
 
       self.recv("""
         <iq id="test" from="evil@slixmpp.com/bad" type="result">
@@ -271,13 +233,7 @@ class TestHandlers(SlixTest):
         </iq>
       """)
 
-      t.join()
-
-      time.sleep(0.1)
-
       self.assertEqual(events, ['tester@slixmpp.com/test'], "Did not timeout on bad sender")
-
-
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestHandlers)

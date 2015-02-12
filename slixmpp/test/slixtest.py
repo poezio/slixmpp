@@ -10,15 +10,19 @@ import unittest
 from queue import Queue
 from xml.parsers.expat import ExpatError
 
+from slixmpp.test import TestTransport
 from slixmpp import ClientXMPP, ComponentXMPP
 from slixmpp.stanza import Message, Iq, Presence
-from slixmpp.test import TestSocket, TestLiveSocket
 from slixmpp.xmlstream import ET
 from slixmpp.xmlstream import ElementBase
 from slixmpp.xmlstream.tostring import tostring
 from slixmpp.xmlstream.matcher import StanzaPath, MatcherId, MatchIDSender
 from slixmpp.xmlstream.matcher import MatchXMLMask, MatchXPath
 
+import asyncio
+cls = asyncio.get_event_loop().__class__
+
+cls.idle_call = lambda self, callback: callback()
 
 class SlixTest(unittest.TestCase):
 
@@ -326,41 +330,27 @@ class SlixTest(unittest.TestCase):
         else:
             raise ValueError("Unknown XMPP connection mode.")
 
+        self.xmpp.connection_made(TestTransport(self.xmpp))
+        self.xmpp.session_bind_event.set()
         # Remove unique ID prefix to make it easier to test
         self.xmpp._id_prefix = ''
-        self.xmpp._disconnect_wait_for_threads = False
         self.xmpp.default_lang = None
         self.xmpp.peer_default_lang = None
 
-        # We will use this to wait for the session_start event
-        # for live connections.
-        skip_queue = Queue()
+        # Simulate connecting for mock sockets.
+        self.xmpp.auto_reconnect = False
 
-        if socket == 'mock':
-            self.xmpp.set_socket(TestSocket())
+        # Must have the stream header ready for xmpp.process() to work.
+        if not header:
+            header = self.xmpp.stream_header
 
-            # Simulate connecting for mock sockets.
-            self.xmpp.auto_reconnect = False
-            self.xmpp.state._set_state('connected')
+        self.xmpp.data_received(header)
 
-            # Must have the stream header ready for xmpp.process() to work.
-            if not header:
-                header = self.xmpp.stream_header
-            self.xmpp.socket.recv_data(header)
-        elif socket == 'live':
-            self.xmpp.socket_class = TestLiveSocket
+        if skip:
+            self.xmpp.socket.next_sent()
+            if mode == 'component':
+                self.xmpp.socket.next_sent()
 
-            def wait_for_session(x):
-                self.xmpp.socket.clear()
-                skip_queue.put('started')
-
-            self.xmpp.add_event_handler('session_start', wait_for_session)
-            if server is not None:
-                self.xmpp.connect((server, port))
-            else:
-                self.xmpp.connect()
-        else:
-            raise ValueError("Unknown socket type.")
 
         if plugins is None:
             self.xmpp.register_plugins()
@@ -371,19 +361,6 @@ class SlixTest(unittest.TestCase):
         # Some plugins require messages to have ID values. Set
         # this to True in tests related to those plugins.
         self.xmpp.use_message_ids = False
-
-        self.xmpp.process(threaded=True)
-        if skip:
-            if socket != 'live':
-                # Mark send queue as usable
-                self.xmpp.session_bind_event.set()
-                self.xmpp.session_started_event.set()
-                # Clear startup stanzas
-                self.xmpp.socket.next_sent(timeout=1)
-                if mode == 'component':
-                    self.xmpp.socket.next_sent(timeout=1)
-            else:
-                skip_queue.get(block=True, timeout=10)
 
     def make_header(self, sto='',
                           sfrom='',
@@ -447,24 +424,7 @@ class SlixTest(unittest.TestCase):
             timeout      -- Time to wait in seconds for data to be received by
                             a live connection.
         """
-        if self.xmpp.socket.is_live:
-            # we are working with a live connection, so we should
-            # verify what has been received instead of simulating
-            # receiving data.
-            recv_data = self.xmpp.socket.next_recv(timeout)
-            if recv_data is None:
-                self.fail("No stanza was received.")
-            xml = self.parse_xml(recv_data)
-            self.fix_namespaces(xml, 'jabber:client')
-            stanza = self.xmpp._build_stanza(xml, 'jabber:client')
-            self.check(stanza, data,
-                       method=method,
-                       defaults=defaults,
-                       use_values=use_values)
-        else:
-            # place the data in the dummy socket receiving queue.
-            data = str(data)
-            self.xmpp.socket.recv_data(data)
+        self.xmpp.data_received(data)
 
     def recv_header(self, sto='',
                           sfrom='',
@@ -522,7 +482,7 @@ class SlixTest(unittest.TestCase):
         if list(recv_xml):
             # We received more than just the header
             for xml in recv_xml:
-                self.xmpp.socket.recv_data(tostring(xml))
+                self.xmpp.data_received(tostring(xml))
 
             attrib = recv_xml.attrib
             recv_xml.clear()
@@ -540,31 +500,7 @@ class SlixTest(unittest.TestCase):
         if method is None and hasattr(self, 'match_method'):
             method = getattr(self, 'match_method')
 
-        if self.xmpp.socket.is_live:
-            # we are working with a live connection, so we should
-            # verify what has been received instead of simulating
-            # receiving data.
-            recv_data = self.xmpp.socket.next_recv(timeout)
-            xml = self.parse_xml(data)
-            recv_xml = self.parse_xml(recv_data)
-            if recv_data is None:
-                self.fail("No stanza was received.")
-            if method == 'exact':
-                self.failUnless(self.compare(xml, recv_xml),
-                    "Features do not match.\nDesired:\n%s\nReceived:\n%s" % (
-                        tostring(xml), tostring(recv_xml)))
-            elif method == 'mask':
-                matcher = MatchXMLMask(xml)
-                self.failUnless(matcher.match(recv_xml),
-                    "Stanza did not match using %s method:\n" % method + \
-                    "Criteria:\n%s\n" % tostring(xml) + \
-                    "Stanza:\n%s" % tostring(recv_xml))
-            else:
-                raise ValueError("Uknown matching method: %s" % method)
-        else:
-            # place the data in the dummy socket receiving queue.
-            data = str(data)
-            self.xmpp.socket.recv_data(data)
+        self.xmpp.socket.data_received(data)
 
     def send_header(self, sto='',
                           sfrom='',
@@ -682,7 +618,7 @@ class SlixTest(unittest.TestCase):
         that the XMPP client is disconnected after an error.
         """
         if hasattr(self, 'xmpp') and self.xmpp is not None:
-            self.xmpp.socket.recv_data(self.xmpp.stream_footer)
+            self.xmpp.data_received(self.xmpp.stream_footer)
             self.xmpp.disconnect()
 
     # ------------------------------------------------------------------

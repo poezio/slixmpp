@@ -20,10 +20,7 @@ class TestStreamPubsub(SlixTest):
 
     def testCreateInstantNode(self):
         """Test creating an instant node"""
-        t = threading.Thread(name='create_node',
-                             target=self.xmpp['xep_0060'].create_node,
-                             args=('pubsub.example.com', None))
-        t.start()
+        self.xmpp['xep_0060'].create_node('pubsub.example.com', None)
 
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
@@ -42,14 +39,11 @@ class TestStreamPubsub(SlixTest):
           </iq>
         """)
 
-        t.join()
-
     def testCreateNodeNoConfig(self):
         """Test creating a node without a config"""
         self.xmpp['xep_0060'].create_node(
             'pubsub.example.com',
-            'princely_musings',
-            block=False)
+            'princely_musings')
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -67,7 +61,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].create_node(
                 'pubsub.example.com',
                 'princely_musings',
-                config=form, block=False)
+                config=form)
 
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
@@ -91,8 +85,7 @@ class TestStreamPubsub(SlixTest):
         """Test deleting a node"""
         self.xmpp['xep_0060'].delete_node(
             'pubsub.example.com',
-            'some_node',
-            block=False)
+            'some_node')
         self.send("""
           <iq type="set" to="pubsub.example.com" id="1">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
@@ -108,8 +101,7 @@ class TestStreamPubsub(SlixTest):
         """
         self.xmpp['xep_0060'].subscribe(
             'pubsub.example.com',
-            'somenode',
-            block=False)
+            'somenode')
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -126,8 +118,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].subscribe(
             'pubsub.example.com',
             'somenode',
-            ifrom='foo@comp.example.com/bar',
-            block=False)
+            ifrom='foo@comp.example.com/bar')
         self.send("""
           <iq type="set" id="1"
               to="pubsub.example.com" from="foo@comp.example.com/bar">
@@ -146,8 +137,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             ifrom='foo@comp.example.com/bar',
-            bare=False,
-            block=False)
+            bare=False)
         self.send("""
           <iq type="set" id="1"
               to="pubsub.example.com" from="foo@comp.example.com/bar">
@@ -168,8 +158,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].subscribe(
             'pubsub.example.com',
             'somenode',
-            bare=False,
-            block=False)
+            bare=False)
         self.send("""
           <iq type="set" id="1"
               to="pubsub.example.com">
@@ -188,8 +177,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             subscribee='user@example.com/foo',
-            ifrom='foo@comp.example.com/bar',
-            block=False)
+            ifrom='foo@comp.example.com/bar')
         self.send("""
           <iq type="set" id="1"
               to="pubsub.example.com" from="foo@comp.example.com/bar">
@@ -215,8 +203,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].subscribe(
             'pubsub.example.com',
             'somenode',
-            options=opts,
-            block=False)
+            options=opts)
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -242,8 +229,7 @@ class TestStreamPubsub(SlixTest):
         """
         self.xmpp['xep_0060'].unsubscribe(
             'pubsub.example.com',
-            'somenode',
-            block=False)
+            'somenode')
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -260,8 +246,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].unsubscribe(
             'pubsub.example.com',
             'somenode',
-            ifrom='foo@comp.example.com/bar',
-            block=False)
+            ifrom='foo@comp.example.com/bar')
         self.send("""
           <iq type="set" id="1"
               to="pubsub.example.com" from="foo@comp.example.com/bar">
@@ -280,8 +265,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             ifrom='foo@comp.example.com/bar',
-            bare=False,
-            block=False)
+            bare=False)
         self.send("""
           <iq type="set" id="1"
               to="pubsub.example.com" from="foo@comp.example.com/bar">
@@ -302,8 +286,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].unsubscribe(
             'pubsub.example.com',
             'somenode',
-            bare=False,
-            block=False)
+            bare=False)
         self.send("""
           <iq type="set" id="1"
               to="pubsub.example.com">
@@ -322,8 +305,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             subscribee='user@example.com/foo',
-            ifrom='foo@comp.example.com/bar',
-            block=False)
+            ifrom='foo@comp.example.com/bar')
         self.send("""
           <iq type="set" id="1"
               to="pubsub.example.com" from="foo@comp.example.com/bar">
@@ -336,8 +318,7 @@ class TestStreamPubsub(SlixTest):
     def testGetDefaultNodeConfig(self):
         """Test retrieving the default node config for a pubsub service."""
         self.xmpp['xep_0060'].get_node_config(
-                'pubsub.example.com',
-                block=False)
+                'pubsub.example.com')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
@@ -350,8 +331,7 @@ class TestStreamPubsub(SlixTest):
         """Test getting the config for a given node."""
         self.xmpp['xep_0060'].get_node_config(
             'pubsub.example.com',
-            'somenode',
-            block=False)
+            'somenode')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
@@ -372,8 +352,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].set_node_config(
             'pubsub.example.com',
             'somenode',
-            form,
-            block=False)
+            form)
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
@@ -395,8 +374,7 @@ class TestStreamPubsub(SlixTest):
         """Test publishing no items (in order to generate events)"""
         self.xmpp['xep_0060'].publish(
             'pubsub.example.com',
-            'somenode',
-            block=False)
+            'somenode')
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -416,8 +394,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             id='id42',
-            payload=payload,
-            block=False)
+            payload=payload)
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -451,8 +428,7 @@ class TestStreamPubsub(SlixTest):
             'somenode',
             id='ID42',
             payload=payload,
-            options=options,
-            block=False)
+            options=options)
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -483,8 +459,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             'ID1',
-            notify=True,
-            block=False)
+            notify=True)
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -500,8 +475,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].retract(
             'pubsub.example.com',
             'somenode',
-            'ID1',
-            block=False)
+            'ID1')
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -516,8 +490,7 @@ class TestStreamPubsub(SlixTest):
         """Test removing all items from a node."""
         self.xmpp['xep_0060'].purge(
                 'pubsub.example.com',
-                'somenode',
-                block=False)
+                'somenode')
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
@@ -531,8 +504,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].get_item(
             'pubsub.example.com',
             'somenode',
-            'id42',
-            block=False)
+            'id42')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -548,8 +520,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].get_items(
             'pubsub.example.com',
             'somenode',
-            max_items=3,
-            block=False)
+            max_items=3)
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -562,8 +533,7 @@ class TestStreamPubsub(SlixTest):
         """Test retrieving all items."""
         self.xmpp['xep_0060'].get_items(
             'pubsub.example.com',
-            'somenode',
-            block=False)
+            'somenode')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -577,8 +547,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].get_items(
             'pubsub.example.com',
             'somenode',
-            item_ids=['A', 'B', 'C'],
-            block=False)
+            item_ids=['A', 'B', 'C'])
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -594,8 +563,7 @@ class TestStreamPubsub(SlixTest):
     def testGetSubscriptionGlobalDefaultOptions(self):
         """Test getting the subscription options for a node/JID."""
         self.xmpp['xep_0060'].get_subscription_options(
-            'pubsub.example.com',
-            block=False)
+            'pubsub.example.com')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -608,8 +576,7 @@ class TestStreamPubsub(SlixTest):
         """Test getting the subscription options for a node/JID."""
         self.xmpp['xep_0060'].get_subscription_options(
             'pubsub.example.com',
-            node='somenode',
-            block=False)
+            node='somenode')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -623,8 +590,7 @@ class TestStreamPubsub(SlixTest):
         self.xmpp['xep_0060'].get_subscription_options(
             'pubsub.example.com',
             'somenode',
-            'tester@localhost',
-            block=False)
+            'tester@localhost')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -650,8 +616,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             'tester@localhost',
-            opts,
-            block=False)
+            opts)
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -673,8 +638,7 @@ class TestStreamPubsub(SlixTest):
         """Test retrieving all subscriptions for a node."""
         self.xmpp['xep_0060'].get_node_subscriptions(
             'pubsub.example.com',
-            'somenode',
-            block=False)
+            'somenode')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
@@ -686,8 +650,7 @@ class TestStreamPubsub(SlixTest):
     def testGetSubscriptions(self):
         """Test retrieving a users's subscriptions."""
         self.xmpp['xep_0060'].get_subscriptions(
-            'pubsub.example.com',
-            block=False)
+            'pubsub.example.com')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -700,8 +663,7 @@ class TestStreamPubsub(SlixTest):
         """Test retrieving a users's subscriptions for a given node."""
         self.xmpp['xep_0060'].get_subscriptions(
             'pubsub.example.com',
-            node='somenode',
-            block=False)
+            node='somenode')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -713,8 +675,7 @@ class TestStreamPubsub(SlixTest):
     def testGetAffiliations(self):
         """Test retrieving a users's affiliations."""
         self.xmpp['xep_0060'].get_affiliations(
-            'pubsub.example.com',
-            block=False)
+            'pubsub.example.com')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -727,8 +688,7 @@ class TestStreamPubsub(SlixTest):
         """Test retrieving a users's affiliations for a given node."""
         self.xmpp['xep_0060'].get_affiliations(
             'pubsub.example.com',
-            node='somenode',
-            block=False)
+            node='somenode')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
@@ -741,8 +701,7 @@ class TestStreamPubsub(SlixTest):
         """Test getting the affiliations for a node."""
         self.xmpp['xep_0060'].get_node_affiliations(
             'pubsub.example.com',
-            'somenode',
-            block=False)
+            'somenode')
         self.send("""
           <iq type="get" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
@@ -757,8 +716,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             subscriptions=[('user@example.com', 'subscribed'),
-                           ('foo@example.net', 'none')],
-            block=False)
+                           ('foo@example.net', 'none')])
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
@@ -776,8 +734,7 @@ class TestStreamPubsub(SlixTest):
             'pubsub.example.com',
             'somenode',
             affiliations=[('user@example.com', 'publisher'),
-                          ('foo@example.net', 'none')],
-            block=False)
+                          ('foo@example.net', 'none')])
         self.send("""
           <iq type="set" id="1" to="pubsub.example.com">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">

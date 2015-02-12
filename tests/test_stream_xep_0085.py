@@ -49,8 +49,6 @@ class TestStreamChatStates(SlixTest):
           </message>
         """)
 
-        # Give event queue time to process
-        time.sleep(0.3)
         expected = ['active', 'inactive', 'paused', 'composing', 'gone']
         self.failUnless(results == expected,
                 "Chat state event not handled: %s" % results)

@@ -17,7 +17,7 @@ class TestMessageStanzas(SlixTest):
         msg['from'] = 'room@someservice.someserver.tld/somenick'
         msg['type'] = 'groupchat'
         msg['body'] = "this is a message"
-        msg.reply()
+        msg = msg.reply()
         self.failUnless(str(msg['to']) == 'room@someservice.someserver.tld')
 
     def testAttribProperty(self):

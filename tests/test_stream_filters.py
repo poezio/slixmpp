@@ -47,8 +47,6 @@ class TestFilters(SlixTest):
           </message>
         """)
 
-        time.sleep(0.5)
-
         self.assertEqual(data, ['', 'testing filter'],
                 'Incoming filter did not apply %s' % data)
 

@@ -22,9 +22,6 @@ class TestEvents(SlixTest):
         self.xmpp.event("test_event")
         self.xmpp.event("test_event")
 
-        # Give the event queue time to process.
-        time.sleep(0.1)
-
         msg = "Event was not triggered the correct number of times: %s"
         self.failUnless(happened == [True, True], msg)
 
@@ -42,9 +39,6 @@ class TestEvents(SlixTest):
 
         # Should not trigger because it was deleted
         self.xmpp.event("test_event", {})
-
-        # Give the event queue time to process.
-        time.sleep(0.1)
 
         msg = "Event was not triggered the correct number of times: %s"
         self.failUnless(happened == [True], msg % happened)
@@ -66,9 +60,6 @@ class TestEvents(SlixTest):
         self.xmpp.add_event_handler("test_event", handletestevent)
         self.xmpp.event("test_event", {})
 
-        # Give the event queue time to process.
-        time.sleep(0.1)
-
         msg = "Event was not triggered the correct number of times: %s"
         self.failUnless(happened == [True, True], msg % happened)
 
@@ -85,9 +76,6 @@ class TestEvents(SlixTest):
 
         # Should not trigger because it was deleted
         self.xmpp.event("test_event", {})
-
-        # Give the event queue time to process.
-        time.sleep(0.1)
 
         msg = "Event was not triggered the correct number of times: %s"
         self.failUnless(happened == [True], msg % happened)

@@ -86,7 +86,7 @@ class TestIBB(SlixTest):
 
         self.check(iq, """
           <iq type="set">
-            <data xmlns="http://jabber.org/protocol/ibb" seq="0">c2xlZWt4bXBw</data>
+            <data xmlns="http://jabber.org/protocol/ibb" seq="0">c2xpeG1wcA==</data>
           </iq>
         """)
 

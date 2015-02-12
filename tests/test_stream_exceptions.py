@@ -13,40 +13,11 @@ class TestStreamExceptions(SlixTest):
     def tearDown(self):
         self.stream_close()
 
-    def testExceptionReply(self):
-        """Test that raising an exception replies with the original stanza."""
-
-        def message(msg):
-            msg.reply()
-            msg['body'] = 'Body changed'
-            raise XMPPError(clear=False)
-
-        self.stream_start()
-        self.xmpp.add_event_handler('message', message)
-
-        self.recv("""
-          <message>
-            <body>This is going to cause an error.</body>
-          </message>
-        """)
-
-        self.send("""
-          <message type="error">
-            <body>This is going to cause an error.</body>
-            <error type="cancel" code="500">
-              <undefined-condition
-                  xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
-            </error>
-          </message>
-        """)
-
     def testExceptionContinueWorking(self):
         """Test that Slixmpp continues to respond after an XMPPError is raised."""
 
         def message(msg):
-            msg.reply()
-            msg['body'] = 'Body changed'
-            raise XMPPError(clear=False)
+            raise XMPPError(clear=True)
 
         self.stream_start()
         self.xmpp.add_event_handler('message', message)
@@ -59,7 +30,6 @@ class TestStreamExceptions(SlixTest):
 
         self.send("""
           <message type="error">
-            <body>This is going to cause an error.</body>
             <error type="cancel" code="500">
               <undefined-condition
                   xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
@@ -75,7 +45,6 @@ class TestStreamExceptions(SlixTest):
 
         self.send("""
           <message type="error">
-            <body>This is going to cause an error.</body>
             <error type="cancel" code="500">
               <undefined-condition
                   xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
@@ -151,38 +120,8 @@ class TestStreamExceptions(SlixTest):
           </iq>
         """, use_values=False)
 
-    def testThreadedXMPPErrorException(self):
-        """Test raising an XMPPError exception in a threaded handler."""
-
-        def message(msg):
-            raise XMPPError(condition='feature-not-implemented',
-                            text="We don't do things that way here.",
-                            etype='cancel')
-
-        self.stream_start()
-        self.xmpp.add_event_handler('message', message,
-                                    threaded=True)
-
-        self.recv("""
-          <message>
-            <body>This is going to cause an error.</body>
-          </message>
-        """)
-
-        self.send("""
-          <message type="error">
-            <error type="cancel" code="501">
-              <feature-not-implemented
-                  xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
-              <text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">
-                We don&apos;t do things that way here.
-              </text>
-            </error>
-          </message>
-        """)
-
     def testUnknownException(self):
-        """Test raising an generic exception in a threaded handler."""
+        """Test raising an generic exception in a handler."""
 
         raised_errors = []
 

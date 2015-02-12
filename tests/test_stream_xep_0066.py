@@ -15,13 +15,8 @@ class TestOOB(SlixTest):
 
         url = 'http://github.com/fritzy/Slixmpp/blob/master/README'
 
-        t = threading.Thread(
-                name='send_oob',
-                target=self.xmpp['xep_0066'].send_oob,
-                args=('user@example.com', url),
-                kwargs={'desc': 'Slixmpp README'})
-
-        t.start()
+        self.xmpp['xep_0066'].send_oob('user@example.com', url,
+                                       desc='Slixmpp README')
 
         self.send("""
           <iq to="user@example.com" type="set" id="1">
@@ -37,8 +32,6 @@ class TestOOB(SlixTest):
               to="tester@localhost"
               from="user@example.com" />
         """)
-
-        t.join()
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestOOB)

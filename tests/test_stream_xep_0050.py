@@ -623,9 +623,6 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-        # Give the event queue time to process
-        time.sleep(0.3)
-
         self.failUnless(results == ['foo', 'bar', 'baz'],
                 'Incomplete command workflow: %s' % results)
 
@@ -689,9 +686,6 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-        # Give the event queue time to process
-        time.sleep(0.3)
-
         self.failUnless(results == ['foo', 'bar'],
                 'Incomplete command workflow: %s' % results)
 
@@ -730,9 +724,6 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-        # Give the event queue time to process
-        time.sleep(0.3)
-
         self.failUnless(results == ['foo'],
                 'Incomplete command workflow: %s' % results)
 
@@ -768,14 +759,8 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-        # Give the event queue time to process
-        time.sleep(0.3)
-
         self.failUnless(results == ['foo'],
                 'Incomplete command workflow: %s' % results)
-
-
-
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAdHocCommands)

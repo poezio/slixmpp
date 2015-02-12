@@ -35,8 +35,6 @@ class TestStreamDirectInvite(SlixTest):
           </message>
         """)
 
-        time.sleep(.5)
-
         self.failUnless(events == [True],
                 "Event not raised: %s" % events)
 

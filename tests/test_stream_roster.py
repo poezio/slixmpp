@@ -24,9 +24,7 @@ class TestStreamRoster(SlixTest):
 
         self.xmpp.add_event_handler('roster_update', roster_updates.append)
 
-        # Since get_roster blocks, we need to run it in a thread.
-        t = threading.Thread(name='get_roster', target=self.xmpp.get_roster)
-        t.start()
+        self.xmpp.get_roster()
 
         self.send("""
           <iq type="get" id="1">
@@ -46,12 +44,6 @@ class TestStreamRoster(SlixTest):
             </query>
           </iq>
         """)
-
-        # Wait for get_roster to return.
-        t.join()
-
-        # Give the event queue time to process.
-        time.sleep(.1)
 
         self.check_roster('tester@localhost', 'user@localhost',
                           name='User',
@@ -96,8 +88,6 @@ class TestStreamRoster(SlixTest):
                           subscription='both',
                           groups=['Friends', 'Examples'])
 
-        # Give the event queue time to process.
-        time.sleep(.1)
 
         self.failUnless('roster_update' in events,
                 "Roster updated event not triggered: %s" % events)
@@ -170,16 +160,6 @@ class TestStreamRoster(SlixTest):
           </iq>
         """)
 
-    def testRosterTimeout(self):
-        """Test handling a timed out roster request."""
-        self.stream_start()
-
-        def do_test():
-            self.xmpp.get_roster(timeout=0)
-            time.sleep(.1)
-
-        self.assertRaises(IqTimeout, do_test)
-
     def testRosterCallback(self):
         """Test handling a roster request callback."""
         self.stream_start()
@@ -188,12 +168,7 @@ class TestStreamRoster(SlixTest):
         def roster_callback(iq):
             events.append('roster_callback')
 
-        # Since get_roster blocks, we need to run it in a thread.
-        t = threading.Thread(name='get_roster',
-                             target=self.xmpp.get_roster,
-                             kwargs={str('block'): False,
-                                     str('callback'): roster_callback})
-        t.start()
+        self.xmpp.get_roster(callback=roster_callback)
 
         self.send("""
           <iq type="get" id="1">
@@ -213,12 +188,6 @@ class TestStreamRoster(SlixTest):
           </iq>
         """)
 
-        # Wait for get_roster to return.
-        t.join()
-
-        # Give the event queue time to process.
-        time.sleep(.1)
-
         self.failUnless(events == ['roster_callback'],
                  "Roster timeout event not triggered: %s." % events)
 
@@ -235,9 +204,6 @@ class TestStreamRoster(SlixTest):
           </iq>
         """)
 
-        # Give the event queue time to process.
-        time.sleep(.1)
-
         self.check_roster('tester@localhost', 'andré@foo',
                           subscription='both',
                           groups=['Unicode'])
@@ -252,9 +218,6 @@ class TestStreamRoster(SlixTest):
             <status>Testing</status>
           </presence>
         """)
-
-        # Give the event queue time to process.
-        time.sleep(.1)
 
         result = self.xmpp.client_roster['andré@foo'].resources
         expected = {'bar': {'status':'Testing',
@@ -298,8 +261,8 @@ class TestStreamRoster(SlixTest):
         self.stream_start()
         self.assertTrue('rosterver' not in self.xmpp.features)
 
-        t = threading.Thread(name='get_roster', target=self.xmpp.get_roster)
-        t.start()
+        self.xmpp.get_roster()
+
         self.send("""
           <iq type="get" id="1">
             <query xmlns="jabber:iq:roster" />
@@ -309,16 +272,14 @@ class TestStreamRoster(SlixTest):
           <iq to="tester@localhost" type="result" id="1" />
         """)
 
-        t.join()
-
     def testBootstrapRosterVer(self):
         """Test bootstrapping with roster versioning."""
         self.stream_start()
         self.xmpp.features.add('rosterver')
         self.xmpp.client_roster.version = ''
 
-        t = threading.Thread(name='get_roster', target=self.xmpp.get_roster)
-        t.start()
+        self.xmpp.get_roster()
+
         self.send("""
           <iq type="get" id="1">
             <query xmlns="jabber:iq:roster" ver="" />
@@ -328,8 +289,6 @@ class TestStreamRoster(SlixTest):
           <iq to="tester@localhost" type="result" id="1" />
         """)
 
-        t.join()
-
 
     def testExistingRosterVer(self):
         """Test using a stored roster version."""
@@ -337,8 +296,8 @@ class TestStreamRoster(SlixTest):
         self.xmpp.features.add('rosterver')
         self.xmpp.client_roster.version = '42'
 
-        t = threading.Thread(name='get_roster', target=self.xmpp.get_roster)
-        t.start()
+        self.xmpp.get_roster()
+
         self.send("""
           <iq type="get" id="1">
             <query xmlns="jabber:iq:roster" ver="42" />
@@ -347,8 +306,6 @@ class TestStreamRoster(SlixTest):
         self.recv("""
           <iq to="tester@localhost" type="result" id="1" />
         """)
-
-        t.join()
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestStreamRoster)

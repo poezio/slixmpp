@@ -150,3 +150,92 @@ class TestSocket(object):
             return self.recv_queue.get(block, timeout)
         except:
             return None
+
+class TestTransport(object):
+
+    """
+    A transport socket that reads and writes to queues instead
+    of an actual networking socket.
+
+    Methods:
+        next_sent -- Return the next sent stanza.
+        recv_data -- Make a stanza available to read next.
+        recv      -- Read the next stanza from the socket.
+        send      -- Write a stanza to the socket.
+        makefile  -- Dummy call, returns self.
+        read      -- Read the next stanza from the socket.
+    """
+
+    def __init__(self, xmpp):
+        self.xmpp = xmpp
+        self.socket = TestSocket()
+    # ------------------------------------------------------------------
+    # Testing Interface
+
+    def next_sent(self, timeout=None):
+        """
+        Get the next stanza that has been 'sent'.
+
+        Arguments:
+            timeout -- Optional timeout for waiting for a new value.
+        """
+        return self.socket.next_sent()
+
+    def disconnect_error(self):
+        """
+        Simulate a disconnect error by raising a socket.error exception
+        for any current or further socket operations.
+        """
+        self.socket.disconnect_error()
+
+    # ------------------------------------------------------------------
+    # Socket Interface
+
+    def recv(self, *args, **kwargs):
+        """
+        Read a value from the received queue.
+
+        Arguments:
+            Placeholders. Same as for socket.Socket.recv.
+        """
+        return 
+
+    def write(self, data):
+        """
+        Send data by placing it in the send queue.
+
+        Arguments:
+            data -- String value to write.
+        """
+        self.socket.send(data)
+        return len(data)
+
+    # ------------------------------------------------------------------
+    # File Socket
+
+    def makefile(self, *args, **kwargs):
+        """
+        File socket version to use with ElementTree.
+
+        Arguments:
+            Placeholders, same as socket.Socket.makefile()
+        """
+        return self
+
+    def read(self, block=True, timeout=None, **kwargs):
+        """
+        Implement the file socket interface.
+
+        Arguments:
+            block   -- Indicate if the read should block until a
+                       value is ready.
+            timeout -- Time in seconds a block should last before
+                       returning None.
+        """
+        return self.socket.recv(block, timeout, **kwargs)
+
+    def get_extra_info(self, *args, **kwargs):
+        return self.socket
+
+    def abort(self, *args, **kwargs):
+        return

@@ -455,8 +455,6 @@ class TestStreamSensorData(SlixTest):
             </iq>
             """)
 
-        time.sleep(.1)
-
         self.failUnless(results == ["rejected"],
                 "Rejected callback was not properly executed");
 
@@ -494,8 +492,6 @@ class TestStreamSensorData(SlixTest):
             </iq>
             """)
 
-        time.sleep(.1)
-
         self.failUnless(results == ["accepted"],
                 "Accepted callback was not properly executed");
 
@@ -517,13 +513,10 @@ class TestStreamSensorData(SlixTest):
                 for f in fields:
                     callback_data["field_" + f['name']] = f;
 
-        t1= threading.Thread(name="request_data",
-                         target=self.xmpp['xep_0323'].request_data,
-                         kwargs={"from_jid": "tester@localhost",
-                                    "to_jid": "you@google.com",
-                                    "nodeIds": ['Device33'],
-                                    "callback": my_callback});
-        t1.start();
+        self.xmpp['xep_0323'].request_data(from_jid="tester@localhost",
+                                            to_jid="you@google.com",
+                                            nodeIds=['Device33'],
+                                            callback=my_callback)
         #self.xmpp['xep_0323'].request_data(from_jid="tester@localhost", to_jid="you@google.com", nodeIds=['Device33'], callback=my_callback);
 
         self.send("""
@@ -566,9 +559,6 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1' done='true'/>
             </message>
             """)
-
-        t1.join();
-        time.sleep(.5)
 
         self.failUnlessEqual(results, ["accepted","fields","done"]);
         # self.assertIn("nodeId", callback_data);
@@ -651,13 +641,10 @@ class TestStreamSensorData(SlixTest):
                 callback_data["timestamp"] = timestamp;
                 callback_data["error_msg"] = error_msg;
 
-        t1= threading.Thread(name="request_data",
-                         target=self.xmpp['xep_0323'].request_data,
-                         kwargs={"from_jid": "tester@localhost",
-                                    "to_jid": "you@google.com",
-                                    "nodeIds": ['Device33'],
-                                    "callback": my_callback});
-        t1.start();
+        self.xmpp['xep_0323'].request_data(from_jid="tester@localhost",
+                                           to_jid="you@google.com",
+                                           nodeIds=['Device33'],
+                                           callback=my_callback)
 
         self.send("""
             <iq type='get'
@@ -687,9 +674,6 @@ class TestStreamSensorData(SlixTest):
                 </failure>
             </message>
             """)
-
-        t1.join();
-        time.sleep(.5)
 
         self.failUnlessEqual(results, ["accepted","failure"]);
         # self.assertIn("nodeId", callback_data);
@@ -737,7 +721,7 @@ class TestStreamSensorData(SlixTest):
             </iq>
             """)
 
-        time.sleep(2)
+        time.sleep(1)
 
         self.send("""
             <message from='device@clayster.com'
@@ -1033,13 +1017,10 @@ class TestStreamSensorData(SlixTest):
                 for f in fields:
                     callback_data["field_" + f['name']] = f;
 
-        t1= threading.Thread(name="request_data",
-                         target=self.xmpp['xep_0323'].request_data,
-                         kwargs={"from_jid": "tester@localhost",
-                                    "to_jid": "you@google.com",
-                                    "nodeIds": ['Device33'],
-                                    "callback": my_callback});
-        t1.start();
+        self.xmpp['xep_0323'].request_data(from_jid="tester@localhost",
+                                           to_jid="you@google.com",
+                                           nodeIds=['Device33'],
+                                           callback=my_callback)
         #self.xmpp['xep_0323'].request_data(from_jid="tester@localhost", to_jid="you@google.com", nodeIds=['Device33'], callback=my_callback);
 
         self.send("""
@@ -1089,9 +1070,6 @@ class TestStreamSensorData(SlixTest):
                 <fields xmlns='urn:xmpp:iot:sensordata' seqnr='1' done='true'/>
             </message>
             """)
-
-        t1.join();
-        time.sleep(.5)
 
         self.failUnlessEqual(results, ["queued","started","fields","done"]);
         # self.assertIn("nodeId", callback_data);
@@ -1160,8 +1138,6 @@ class TestStreamSensorData(SlixTest):
                 <cancelled xmlns='urn:xmpp:iot:sensordata' seqnr='1' />
             </iq>
             """)
-
-        time.sleep(.5)
 
         self.failUnlessEqual(results, ["accepted","cancelled"]);
 
@@ -1238,8 +1214,6 @@ class TestStreamSensorData(SlixTest):
                 </rejected>
             </iq>
             """)
-
-        time.sleep(2)
 
         # Ensure we don't get anything after cancellation
         self.send(None)

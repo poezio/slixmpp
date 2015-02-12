@@ -82,7 +82,7 @@ class TestIqStanzas(SlixTest):
         iq = self.Iq()
         iq['to'] = 'user@localhost'
         iq['type'] = 'get'
-        iq.reply()
+        iq = iq.reply()
 
         self.check(iq, """
           <iq id="0" type="result" />

@@ -35,16 +35,14 @@ class TestStreamSet(SlixTest):
     def testMakeSoftwareVersionRequest(self):
         results = []
 
-        def query():
-            r = self.xmpp['xep_0092'].get_version('foo@bar')
-            results.append((r['software_version']['name'],
-                            r['software_version']['version'],
-                            r['software_version']['os']))
+        def callback(result):
+            results.append((result['software_version']['name'],
+                            result['software_version']['version'],
+                            result['software_version']['os']))
 
         self.stream_start(mode='client', plugins=['xep_0030', 'xep_0092'])
 
-        t = threading.Thread(target=query)
-        t.start()
+        self.xmpp['xep_0092'].get_version('foo@bar', callback=callback)
 
         self.send("""
           <iq type="get" id="1" to="foo@bar">
@@ -61,8 +59,6 @@ class TestStreamSet(SlixTest):
             </query>
           </iq>
         """)
-
-        t.join()
 
         expected = [('Foo', '1.0', 'Linux')]
         self.assertEqual(results, expected,

@@ -61,7 +61,7 @@ class TestStanzaBase(SlixTest):
         stanza['from'] = "sender@example.com"
         stanza['payload'] = ET.Element("{foo}foo")
 
-        stanza.reply()
+        stanza = stanza.reply()
 
         self.failUnless(str(stanza['to'] == "sender@example.com"),
             "Stanza reply did not change 'to' attribute.")

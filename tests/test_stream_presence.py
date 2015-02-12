@@ -38,9 +38,6 @@ class TestStreamPresence(SlixTest):
                     to="tester@localhost"/>
         """)
 
-        # Give event queue time to process.
-        time.sleep(0.1)
-
         self.assertEqual(events, set(('unavailable',)),
                 "Got offline incorrectly triggered: %s." % events)
 
@@ -83,9 +80,6 @@ class TestStreamPresence(SlixTest):
                     type="unavailable" />
         """)
 
-        # Give event queue time to process.
-        time.sleep(0.1)
-
         self.assertEqual(events, ['got_offline'],
                 "Got offline incorrectly triggered: %s" % events)
 
@@ -107,9 +101,6 @@ class TestStreamPresence(SlixTest):
           <presence from="user@localhost"
                     to="tester@localhost" />
         """)
-
-        # Give event queue time to process.
-        time.sleep(0.1)
 
         expected = set(('presence_available', 'got_online'))
         self.assertEqual(events, expected,
@@ -242,8 +233,6 @@ class TestStreamPresence(SlixTest):
           <presence type="unsubscribed" />
         """)
 
-        time.sleep(.5)
-
         self.assertEqual(events, ptypes,
             "Not all events raised: %s" % events)
 
@@ -363,8 +352,6 @@ class TestStreamPresence(SlixTest):
             <status>Testing!</status>
           </presence>
         """)
-
-        time.sleep(0.3)
 
         self.assertEqual(events, ['available', 'away', 'dnd', 'chat',
                                   'xa', 'unavailable', 'available',
