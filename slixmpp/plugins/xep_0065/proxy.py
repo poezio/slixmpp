@@ -178,7 +178,7 @@ class XEP_0065(BasePlugin):
         else:
             raise XMPPError(etype='cancel', condition='item-not-found')
 
-        iq.reply()
+        iq = iq.reply()
         with self._sessions_lock:
             self._sessions[sid] = conn
         iq['socks']['sid'] = sid

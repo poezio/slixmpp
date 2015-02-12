@@ -46,37 +46,37 @@ class RootStanza(StanzaBase):
             # locally. Using the condition/text from that error
             # response could leak too much information, so we'll
             # only use a generic error here.
-            self.reply()
-            self['error']['condition'] = 'undefined-condition'
-            self['error']['text'] = 'External error'
-            self['error']['type'] = 'cancel'
+            reply = self.reply()
+            reply['error']['condition'] = 'undefined-condition'
+            reply['error']['text'] = 'External error'
+            reply['error']['type'] = 'cancel'
             log.warning('You should catch IqError exceptions')
-            self.send()
+            reply.send()
         elif isinstance(e, IqTimeout):
-            self.reply()
-            self['error']['condition'] = 'remote-server-timeout'
-            self['error']['type'] = 'wait'
+            reply = self.reply()
+            reply['error']['condition'] = 'remote-server-timeout'
+            reply['error']['type'] = 'wait'
             log.warning('You should catch IqTimeout exceptions')
-            self.send()
+            reply.send()
         elif isinstance(e, XMPPError):
             # We raised this deliberately
-            self.reply(clear=e.clear)
-            self['error']['condition'] = e.condition
-            self['error']['text'] = e.text
-            self['error']['type'] = e.etype
+            reply = self.reply(clear=e.clear)
+            reply['error']['condition'] = e.condition
+            reply['error']['text'] = e.text
+            reply['error']['type'] = e.etype
             if e.extension is not None:
                 # Extended error tag
                 extxml = ET.Element("{%s}%s" % (e.extension_ns, e.extension),
                                     e.extension_args)
-                self['error'].append(extxml)
-            self.send()
+                reply['error'].append(extxml)
+            reply.send()
         else:
             # We probably didn't raise this on purpose, so send an error stanza
-            self.reply()
-            self['error']['condition'] = 'undefined-condition'
-            self['error']['text'] = "Slixmpp got into trouble."
-            self['error']['type'] = 'cancel'
-            self.send()
+            reply = self.reply()
+            reply['error']['condition'] = 'undefined-condition'
+            reply['error']['text'] = "Slixmpp got into trouble."
+            reply['error']['type'] = 'cancel'
+            reply.send()
             # log the error
             log.exception('Error handling {%s}%s stanza',
                           self.namespace, self.name)

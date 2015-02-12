@@ -67,8 +67,7 @@ class XEP_0027(BasePlugin):
         register_stanza_plugin(Message, Encrypted)
 
         self.xmpp.add_event_handler('unverified_signed_presence',
-                self._handle_unverified_signed_presence,
-                threaded=True)
+                self._handle_unverified_signed_presence)
 
         self.xmpp.register_handler(
                 Callback('Signed Presence',

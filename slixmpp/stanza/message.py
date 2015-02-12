@@ -133,21 +133,19 @@ class Message(RootStanza):
             clear -- Indicates if existing content should be removed
                      before replying. Defaults to True.
         """
-        thread = self['thread']
-        parent = self['parent_thread']
+        new_message = StanzaBase.reply(self, clear)
 
-        StanzaBase.reply(self, clear)
         if self['type'] == 'groupchat':
-            self['to'] = self['to'].bare
+            new_message['to'] = new_message['to'].bare
 
-        self['thread'] = thread
-        self['parent_thread'] = parent
+        new_message['thread'] = self['thread']
+        new_message['parent_thread'] = self['parent_thread']
 
-        del self['id']
+        del new_message['id']
 
         if body is not None:
-            self['body'] = body
-        return self
+            new_message['body'] = body
+        return new_message
 
     def get_mucroom(self):
         """

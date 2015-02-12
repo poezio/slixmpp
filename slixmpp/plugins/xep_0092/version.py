@@ -64,7 +64,7 @@ class XEP_0092(BasePlugin):
         Arguments:
             iq -- The Iq stanza containing the software version query.
         """
-        iq.reply()
+        iq = iq.reply()
         iq['software_version']['name'] = self.software_name
         iq['software_version']['version'] = self.version
         iq['software_version']['os'] = self.os

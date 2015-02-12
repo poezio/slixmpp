@@ -88,10 +88,10 @@ class Iq(RootStanza):
         Overrides StanzaBase.unhandled.
         """
         if self['type'] in ('get', 'set'):
-            self.reply()
-            self['error']['condition'] = 'feature-not-implemented'
-            self['error']['text'] = 'No handlers registered for this request.'
-            self.send()
+            reply = self.reply()
+            reply['error']['condition'] = 'feature-not-implemented'
+            reply['error']['text'] = 'No handlers registered for this request.'
+            reply.send()
 
     def set_payload(self, value):
         """
@@ -154,9 +154,9 @@ class Iq(RootStanza):
             clear -- Indicates if existing content should be
                      removed before replying. Defaults to True.
         """
-        self['type'] = 'result'
-        StanzaBase.reply(self, clear)
-        return self
+        new_iq = StanzaBase.reply(self, clear=clear)
+        new_iq['type'] = 'result'
+        return new_iq
 
     def send(self, callback=None, timeout=None, timeout_callback=None):
         """Send an <iq> stanza over the XML stream.

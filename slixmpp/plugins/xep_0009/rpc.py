@@ -93,7 +93,8 @@ class XEP_0009(BasePlugin):
 
     def _item_not_found(self, iq):
         payload = iq.get_payload()
-        iq.reply().error().set_payload(payload)
+        iq = iq.reply()
+        iq.error().set_payload(payload)
         iq['error']['code'] = '404'
         iq['error']['type'] = 'cancel'
         iq['error']['condition'] = 'item-not-found'
@@ -101,7 +102,8 @@ class XEP_0009(BasePlugin):
 
     def _undefined_condition(self, iq):
         payload = iq.get_payload()
-        iq.reply().error().set_payload(payload)
+        iq = iq.reply()
+        iq.error().set_payload(payload)
         iq['error']['code'] = '500'
         iq['error']['type'] = 'cancel'
         iq['error']['condition'] = 'undefined-condition'
@@ -109,7 +111,8 @@ class XEP_0009(BasePlugin):
 
     def _forbidden(self, iq):
         payload = iq.get_payload()
-        iq.reply().error().set_payload(payload)
+        iq = iq.reply()
+        iq.error().set_payload(payload)
         iq['error']['code'] = '403'
         iq['error']['type'] = 'auth'
         iq['error']['condition'] = 'forbidden'
@@ -117,7 +120,8 @@ class XEP_0009(BasePlugin):
 
     def _recipient_unvailable(self, iq):
         payload = iq.get_payload()
-        iq.reply().error().set_payload(payload)
+        iq = iq.reply()
+        error().set_payload(payload)
         iq['error']['code'] = '404'
         iq['error']['type'] = 'wait'
         iq['error']['condition'] = 'recipient-unavailable'

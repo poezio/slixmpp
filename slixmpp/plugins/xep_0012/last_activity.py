@@ -132,8 +132,7 @@ class XEP_0012(BasePlugin):
         if not isinstance(iq, Iq):
             reply = self.xmpp.Iq()
         else:
-            iq.reply()
-            reply = iq
+            reply = iq.reply()
 
         if jid not in self._last_activities:
             raise XMPPError('service-unavailable')

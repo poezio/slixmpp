@@ -191,8 +191,7 @@ class XEP_0047(BasePlugin):
                               self.window_size)
         stream.stream_started.set()
         self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
-        iq.reply()
-        iq.send()
+        iq.reply().send()
 
         self.xmpp.event('ibb_stream_start', stream)
         self.xmpp.event('stream:%s:%s' % (sid, stream.peer_jid), stream)

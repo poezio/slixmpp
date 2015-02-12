@@ -174,8 +174,9 @@ class Presence(RootStanza):
             clear -- Indicates if the stanza contents should be removed
                      before replying. Defaults to True.
         """
+        new_presence = StanzaBase.reply(self, clear)
         if self['type'] == 'unsubscribe':
-            self['type'] = 'unsubscribed'
+            new_presence['type'] = 'unsubscribed'
         elif self['type'] == 'subscribe':
-            self['type'] = 'subscribed'
-        return StanzaBase.reply(self, clear)
+            new_presence['type'] = 'subscribed'
+        return new_presence

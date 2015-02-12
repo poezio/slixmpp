@@ -303,11 +303,11 @@ class XEP_0323(BasePlugin):
 
             #print("added session: " + str(self.sessions))
 
-            iq.reply()
+            iq = iq.reply()
             iq['accepted']['seqnr'] = seqnr
             if not request_delay_sec is None:
                 iq['accepted']['queued'] = "true"
-            iq.send(block=False)
+            iq.send()
 
             self.sessions[session]["node_list"] = process_nodes
 
@@ -327,11 +327,11 @@ class XEP_0323(BasePlugin):
                 self._threaded_node_request(session, process_fields, req_flags)
 
         else:
-            iq.reply()
+            iq = iq.reply()
             iq['type'] = 'error'
             iq['rejected']['seqnr'] = seqnr
             iq['rejected']['error'] = error_msg
-            iq.send(block=False)
+            iq.send()
 
     def _threaded_node_request(self, session, process_fields, flags):
         """
@@ -515,21 +515,21 @@ class XEP_0323(BasePlugin):
                     self.sessions[s]["commTimers"][n].cancel()
 
                 # Confirm
-                iq.reply()
+                iq = iq.reply()
                 iq['type'] = 'result'
                 iq['cancelled']['seqnr'] = seqnr
-                iq.send(block=False)
+                iq.send()
 
                 # Delete session
                 del self.sessions[s]
                 return
 
         # Could not find session, send reject
-        iq.reply()
+        iq = iq.reply()
         iq['type'] = 'error'
         iq['rejected']['seqnr'] = seqnr
         iq['rejected']['error'] = "Cancel request received, no matching request is active."
-        iq.send(block=False)
+        iq.send()
 
     # =================================================================
     # Client side (data retriever) API
@@ -610,7 +610,7 @@ class XEP_0323(BasePlugin):
         iq['req']._set_flags(flags)
 
         self.sessions[seqnr] = {"from": iq['from'], "to": iq['to'], "seqnr": seqnr, "callback": callback}
-        iq.send(block=False)
+        iq.send()
 
         return seqnr
 
@@ -631,7 +631,7 @@ class XEP_0323(BasePlugin):
         iq['type'] = "get"
         iq['id'] = seqnr
         iq['cancel']['seqnr'] = seqnr
-        iq.send(block=False)
+        iq.send()
 
     def _get_new_seqnr(self):
         """ Returns a unique sequence number (unique across threads) """

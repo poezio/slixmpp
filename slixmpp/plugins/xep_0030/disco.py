@@ -634,7 +634,7 @@ class XEP_0030(BasePlugin):
                 info['id'] = iq['id']
                 info.send()
             else:
-                iq.reply()
+                iq = iq.reply()
                 if info:
                     info = self._fix_default_info(info)
                     iq.set_payload(info.xml)
@@ -674,7 +674,7 @@ class XEP_0030(BasePlugin):
             if isinstance(items, Iq):
                 items.send()
             else:
-                iq.reply()
+                iq = iq.reply()
                 if items:
                     iq.set_payload(items.xml)
                 iq.send()

@@ -273,7 +273,7 @@ class XEP_0325(BasePlugin):
                 self._threaded_node_request(session, process_fields)
 
         else:
-            iq.reply()
+            iq = iq.reply()
             iq['type'] = 'error'
             iq['setResponse']['responseCode'] = "NotFound"
             if missing_node is not None:
@@ -282,7 +282,7 @@ class XEP_0325(BasePlugin):
                 iq['setResponse'].add_data(missing_field)
             iq['setResponse']['error']['var'] = "Output"
             iq['setResponse']['error']['text'] = error_msg
-            iq.send(block=False)
+            iq.send()
 
     def _handle_direct_set(self, msg):
         """
@@ -382,7 +382,7 @@ class XEP_0325(BasePlugin):
             iq['setResponse'].add_node(nodeId)
             iq['setResponse']['error']['var'] = "Output"
             iq['setResponse']['error']['text'] = "Timeout."
-            iq.send(block=False)
+            iq.send()
 
         ## TODO - should we send one timeout per node??
 
@@ -443,7 +443,7 @@ class XEP_0325(BasePlugin):
                     iq['setResponse'].add_data(error_field)
                 iq['setResponse']['error']['var'] = error_field
                 iq['setResponse']['error']['text'] = error_msg
-                iq.send(block=False)
+                iq.send()
 
                 # Drop communication with this device and check if we are done
                 self.sessions[session]["nodeDone"][nodeId] = True
@@ -463,7 +463,7 @@ class XEP_0325(BasePlugin):
                     iq['type'] = "result"
                     iq['id'] = self.sessions[session]['seqnr']
                     iq['setResponse']['responseCode'] = "OK"
-                    iq.send(block=False)
+                    iq.send()
 
                 # The session is complete, delete it
                 del self.sessions[session]
@@ -526,7 +526,7 @@ class XEP_0325(BasePlugin):
                 iq['set'].add_data(name=name, typename=typename, value=value)
 
         self.sessions[seqnr] = {"from": iq['from'], "to": iq['to'], "callback": callback}
-        iq.send(block=False)
+        iq.send()
 
     def set_command(self, from_jid, to_jid, fields, nodeIds=None):
         """

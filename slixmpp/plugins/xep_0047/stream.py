@@ -103,8 +103,7 @@ class IBBytestream(object):
         self.xmpp.event('ibb_stream_data', {'stream': self, 'data': data})
 
         if isinstance(stanza, Iq):
-            stanza.reply()
-            stanza.send()
+            stanza.reply().send()
 
     def recv(self, *args, **kwargs):
         return self.read(block=True)
@@ -134,8 +133,7 @@ class IBBytestream(object):
     def _closed(self, iq):
         self.stream_in_closed.set()
         self.stream_out_closed.set()
-        iq.reply()
-        iq.send()
+        iq.reply().send()
         self.xmpp.event('ibb_stream_end', self)
 
     def makefile(self, *args, **kwargs):

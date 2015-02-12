@@ -115,7 +115,7 @@ class XEP_0231(BasePlugin):
                 data.send()
                 return
 
-            iq.reply()
+            iq = iq.reply()
             iq.append(data)
             iq.send()
 

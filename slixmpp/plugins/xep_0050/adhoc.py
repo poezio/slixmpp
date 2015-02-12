@@ -339,7 +339,7 @@ class XEP_0050(BasePlugin):
         for item in payload:
             register_stanza_plugin(Command, item.__class__, iterable=True)
 
-        iq.reply()
+        iq = iq.reply()
         iq['command']['node'] = session['node']
         iq['command']['sessionid'] = session['id']
 
@@ -382,7 +382,7 @@ class XEP_0050(BasePlugin):
             if handler:
                 handler(iq, session)
             del self.sessions[sessionid]
-            iq.reply()
+            iq = iq.reply()
             iq['command']['node'] = node
             iq['command']['sessionid'] = sessionid
             iq['command']['status'] = 'canceled'
@@ -421,7 +421,7 @@ class XEP_0050(BasePlugin):
 
             del self.sessions[sessionid]
 
-            iq.reply()
+            iq = iq.reply()
             iq['command']['node'] = node
             iq['command']['sessionid'] = sessionid
             iq['command']['actions'] = []

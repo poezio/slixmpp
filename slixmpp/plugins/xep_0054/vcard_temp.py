@@ -127,7 +127,7 @@ class XEP_0054(BasePlugin):
             if isinstance(vcard, Iq):
                 vcard.send()
             else:
-                iq.reply()
+                iq = iq.reply()
                 iq.append(vcard)
                 iq.send()
         elif iq['type'] == 'set':

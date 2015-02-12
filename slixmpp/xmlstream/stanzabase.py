@@ -1538,16 +1538,17 @@ class StanzaBase(ElementBase):
         :param bool clear: Indicates if the stanza's contents should be
                            removed. Defaults to ``True``.
         """
+        new_stanza = copy.copy(self)
         # if it's a component, use from
         if self.stream and hasattr(self.stream, "is_component") and \
             self.stream.is_component:
-            self['from'], self['to'] = self['to'], self['from']
+            new_stanza['from'], new_stanza['to'] = self['to'], self['from']
         else:
-            self['to'] = self['from']
-            del self['from']
+            new_stanza['to'] = self['from']
+            del new_stanza['from']
         if clear:
-            self.clear()
-        return self
+            new_stanza.clear()
+        return new_stanza
 
     def error(self):
         """Set the stanza's type to ``'error'``."""
