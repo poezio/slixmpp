@@ -45,14 +45,14 @@ class XEP_0191(BasePlugin):
         self.xmpp.remove_handler('Blocked Contact')
         self.xmpp.remove_handler('Unblocked Contact')
 
-    def get_blocked(self, ifrom=None, block=True, timeout=None, callback=None):
+    def get_blocked(self, ifrom=None, timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'get'
         iq['from'] = ifrom
         iq.enable('blocklist')
-        return iq.send(block=block, timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback)
 
-    def block(self, jids, ifrom=None, block=True, timeout=None, callback=None):
+    def block(self, jids, ifrom=None, timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
@@ -61,9 +61,9 @@ class XEP_0191(BasePlugin):
             jids = [jids]
 
         iq['block']['items'] = jids
-        return iq.send(block=block, timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback)
 
-    def unblock(self, jids=None, ifrom=None, block=True, timeout=None, callback=None):
+    def unblock(self, jids=None, ifrom=None, timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
@@ -74,7 +74,7 @@ class XEP_0191(BasePlugin):
             jids = [jids]
 
         iq['unblock']['items'] = jids
-        return iq.send(block=block, timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback)
 
     def _handle_blocked(self, iq):
         self.xmpp.event('blocked', iq)

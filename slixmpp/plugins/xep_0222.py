@@ -40,12 +40,11 @@ class XEP_0222(BasePlugin):
 
         return self.xmpp['xep_0060'].set_node_config(None, node, config,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 
     def store(self, stanza, node=None, id=None, ifrom=None, options=None,
-              block=True, callback=None, timeout=None):
+              callback=None, timeout=None):
         """
         Store public data via PEP.
 
@@ -60,8 +59,6 @@ class XEP_0222(BasePlugin):
             options  -- Publish options to use, which will be modified to
                         fit the persistent storage option profile.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -85,12 +82,11 @@ class XEP_0222(BasePlugin):
         return self.xmpp['xep_0163'].publish(stanza, node,
                 options=options,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 
     def retrieve(self, node, id=None, item_ids=None, ifrom=None,
-                 block=True, callback=None, timeout=None):
+                 callback=None, timeout=None):
         """
         Retrieve public data via PEP.
 
@@ -103,8 +99,6 @@ class XEP_0222(BasePlugin):
             item_ids -- Specify a group of IDs. If id is also specified, it
                         will be included in item_ids.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -119,7 +113,6 @@ class XEP_0222(BasePlugin):
         return self.xmpp['xep_0060'].get_items(None, node,
                 item_ids=item_ids,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 

@@ -116,7 +116,7 @@ class XEP_0047(BasePlugin):
             self._preauthed_sids[(jid, sid, ifrom)] = True
 
     def open_stream(self, jid, block_size=None, sid=None, window=1, use_messages=False,
-                    ifrom=None, block=True, timeout=None, callback=None):
+                    ifrom=None, timeout=None, callback=None):
         if sid is None:
             sid = str(uuid.uuid4())
         if block_size is None:
@@ -139,20 +139,15 @@ class XEP_0047(BasePlugin):
 
         self._pending_streams[iq['id']] = stream
 
-        if block:
-            resp = iq.send(timeout=timeout)
-            self._handle_opened_stream(resp)
-            return stream
+        cb = None
+        if callback is not None:
+            def chained(resp):
+                self._handle_opened_stream(resp)
+                callback(resp)
+            cb = chained
         else:
-            cb = None
-            if callback is not None:
-                def chained(resp):
-                    self._handle_opened_stream(resp)
-                    callback(resp)
-                cb = chained
-            else:
-                cb = self._handle_opened_stream
-            return iq.send(block=block, timeout=timeout, callback=cb)
+            cb = self._handle_opened_stream
+        return iq.send(timeout=timeout, callback=cb)
 
     def _handle_opened_stream(self, iq):
         if iq['type'] == 'result':

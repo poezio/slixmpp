@@ -34,7 +34,7 @@ class XEP_0152(BasePlugin):
         self.xmpp['xep_0163'].register_pep('reachability', Reachability)
 
     def publish_reachability(self, addresses, options=None,
-                        ifrom=None, block=True, callback=None, timeout=None):
+                        ifrom=None, callback=None, timeout=None):
         """
         Publish alternative addresses where the user can be reached.
 
@@ -43,8 +43,6 @@ class XEP_0152(BasePlugin):
                          optional description for each address.
             options   -- Optional form of publish options.
             ifrom     -- Specify the sender's JID.
-            block     -- Specify if the send call will block until a response
-                         is received, or a timeout occurs. Defaults to True.
             timeout   -- The length of time (in seconds) to wait for a response
                          before exiting the send call if blocking is used.
                          Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -66,18 +64,15 @@ class XEP_0152(BasePlugin):
                 node=Reachability.namespace,
                 options=options,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 
-    def stop(self, ifrom=None, block=True, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None):
         """
         Clear existing user activity information to stop notifications.
 
         Arguments:
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -88,6 +83,5 @@ class XEP_0152(BasePlugin):
         return self.xmpp['xep_0163'].publish(reach,
                 node=Reachability.namespace,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)

@@ -70,7 +70,7 @@ class IBBytestream(object):
             iq['ibb_data']['data'] = data
             self.window_empty.clear()
             self.window_ids.add(iq['id'])
-            iq.send(block=False, callback=self._recv_ack)
+            iq.send(callback=self._recv_ack)
         return len(data)
 
     def sendall(self, data):

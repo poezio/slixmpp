@@ -182,7 +182,6 @@ class XEP_0095(BasePlugin):
         if stream_handler:
             self.xmpp.add_event_handler('stream:%s:%s' % (sid, jid),
                     stream_handler,
-                    threaded=True,
                     disposable=True)
         return iq.send()
 

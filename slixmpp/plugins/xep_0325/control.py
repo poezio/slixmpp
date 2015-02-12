@@ -145,7 +145,7 @@ class XEP_0325(BasePlugin):
         self.test_authenticated_from = ""
 
     def post_init(self):
-        """ Init complete. Register our features in Serivce discovery. """
+        """ Init complete. Register our features in Service discovery. """
         BasePlugin.post_init(self)
         self.xmpp['xep_0030'].add_feature(Control.namespace)
         self.xmpp['xep_0030'].set_items(node=Control.namespace, items=tuple())

@@ -60,7 +60,7 @@ class XEP_0054(BasePlugin):
         return VCardTemp()
 
     def get_vcard(self, jid=None, ifrom=None, local=None, cached=False,
-                  block=True, callback=None, timeout=None):
+                  callback=None, timeout=None):
         if local is None:
             if jid is not None and not isinstance(jid, JID):
                 jid = JID(jid)
@@ -99,13 +99,9 @@ class XEP_0054(BasePlugin):
         iq['type'] = 'get'
         iq.enable('vcard_temp')
 
-        vcard = iq.send(block=block, callback=callback, timeout=timeout)
+        iq.send(callback=callback, timeout=timeout)
 
-        if block:
-            self.api['set_vcard'](vcard['from'], args=vcard['vcard_temp'])
-            return vcard
-
-    def publish_vcard(self, vcard=None, jid=None, block=True, ifrom=None,
+    def publish_vcard(self, vcard=None, jid=None, ifrom=None,
                       callback=None, timeout=None):
         self.api['set_vcard'](jid, None, ifrom, vcard)
         if self.xmpp.is_component:
@@ -116,7 +112,7 @@ class XEP_0054(BasePlugin):
         iq['from'] = ifrom
         iq['type'] = 'set'
         iq.append(vcard)
-        return iq.send(block=block, callback=callback, timeout=timeout)
+        return iq.send(callback=callback, timeout=timeout)
 
     def _handle_get_vcard(self, iq):
         if iq['type'] == 'result':

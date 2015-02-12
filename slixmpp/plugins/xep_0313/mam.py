@@ -41,7 +41,7 @@ class XEP_0313(BasePlugin):
         register_stanza_plugin(stanza.MAM, self.xmpp['xep_0059'].stanza.Set)
 
     def retrieve(self, jid=None, start=None, end=None, with_jid=None, ifrom=None,
-                 block=True, timeout=None, callback=None, iterator=False):
+                 timeout=None, callback=None, iterator=False):
         iq = self.xmpp.Iq()
         query_id = iq['id']
 
@@ -60,21 +60,12 @@ class XEP_0313(BasePlugin):
 
         if iterator:
             return self.xmpp['xep_0059'].iterate(iq, 'mam', 'results')
-        elif not block and callback is not None:
-            def wrapped_cb(iq):
-                results = collector.stop()
-                if iq['type'] == 'result':
-                    iq['mam']['results'] = results
-                callback(iq)
-            return iq.send(block=block, timeout=timeout, callback=wrapped_cb)
-        else:
-            try:
-                resp = iq.send(block=block, timeout=timeout, callback=callback)
-                resp['mam']['results'] = collector.stop()
-                return resp
-            except XMPPError as e:
-                collector.stop()
-                raise e
+        def wrapped_cb(iq):
+            results = collector.stop()
+            if iq['type'] == 'result':
+                iq['mam']['results'] = results
+            callback(iq)
+        return iq.send(timeout=timeout, callback=wrapped_cb)
 
     def set_preferences(self, jid=None, default=None, always=None, never=None,
                         ifrom=None, block=True, timeout=None, callback=None):

@@ -44,27 +44,25 @@ class XEP_0084(BasePlugin):
     def generate_id(self, data):
         return hashlib.sha1(data).hexdigest()
 
-    def retrieve_avatar(self, jid, id, url=None, ifrom=None, block=True,
+    def retrieve_avatar(self, jid, id, url=None, ifrom=None,
                               callback=None, timeout=None):
         return self.xmpp['xep_0060'].get_item(jid, Data.namespace, id,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 
-    def publish_avatar(self, data, ifrom=None, block=True, callback=None,
+    def publish_avatar(self, data, ifrom=None, callback=None,
                              timeout=None):
         payload = Data()
         payload['value'] = data
         return self.xmpp['xep_0163'].publish(payload,
                 id=self.generate_id(data),
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 
     def publish_avatar_metadata(self, items=None, pointers=None,
-                                      ifrom=None, block=True,
+                                      ifrom=None,
                                       callback=None, timeout=None):
         metadata = MetaData()
         if items is None:
@@ -84,18 +82,15 @@ class XEP_0084(BasePlugin):
         return self.xmpp['xep_0163'].publish(metadata,
                 id=info['id'],
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 
-    def stop(self, ifrom=None, block=True, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None):
         """
         Clear existing avatar metadata information to stop notifications.
 
         Arguments:
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -106,6 +101,5 @@ class XEP_0084(BasePlugin):
         return self.xmpp['xep_0163'].publish(metadata,
                 node=MetaData.namespace,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)

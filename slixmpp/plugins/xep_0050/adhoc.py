@@ -37,10 +37,6 @@ class XEP_0050(BasePlugin):
 
     Also see <http://xmpp.org/extensions/xep-0050.html>
 
-    Configuration Values:
-        threaded -- Indicates if command events should be threaded.
-                    Defaults to True.
-
     Events:
         command_execute  -- Received a command with action="execute"
         command_next     -- Received a command with action="next"
@@ -48,8 +44,6 @@ class XEP_0050(BasePlugin):
         command_cancel   -- Received a command with action="cancel"
 
     Attributes:
-        threaded -- Indicates if command events should be threaded.
-                    Defaults to True.
         commands -- A dictionary mapping JID/node pairs to command
                     names and handlers.
         sessions -- A dictionary or equivalent backend mapping
@@ -83,7 +77,6 @@ class XEP_0050(BasePlugin):
     dependencies = set(['xep_0030', 'xep_0004'])
     stanza = stanza
     default_config = {
-        'threaded': True,
         'session_db': None
     }
 

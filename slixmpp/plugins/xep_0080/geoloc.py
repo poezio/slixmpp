@@ -76,8 +76,6 @@ class XEP_0080(BasePlugin):
 
             options  -- Optional form of publish options.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -86,7 +84,6 @@ class XEP_0080(BasePlugin):
         """
         options = kwargs.get('options', None)
         ifrom = kwargs.get('ifrom', None)
-        block = kwargs.get('block', None)
         callback = kwargs.get('callback', None)
         timeout = kwargs.get('timeout', None)
         for param in ('ifrom', 'block', 'callback', 'timeout', 'options'):
@@ -99,18 +96,15 @@ class XEP_0080(BasePlugin):
         return self.xmpp['xep_0163'].publish(geoloc,
                 options=options,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 
-    def stop(self, ifrom=None, block=True, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None):
         """
         Clear existing user location information to stop notifications.
 
         Arguments:
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -120,6 +114,5 @@ class XEP_0080(BasePlugin):
         geoloc = Geoloc()
         return self.xmpp['xep_0163'].publish(geoloc,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)

@@ -71,8 +71,7 @@ class XEP_0199(BasePlugin):
 
         if self.keepalive:
             self.xmpp.add_event_handler('session_start',
-                                        self.enable_keepalive,
-                                        threaded=True)
+                                        self.enable_keepalive)
             self.xmpp.add_event_handler('session_end',
                                         self.disable_keepalive)
 
@@ -129,8 +128,7 @@ class XEP_0199(BasePlugin):
             timeout    -- Time in seconds to wait for a response.
                           Defaults to self.timeout.
             callback   -- Optional handler to execute when a pong
-                          is received. Useful in conjunction with
-                          the option block=False.
+                          is received.
         """
         if not timeout:
             timeout = self.timeout

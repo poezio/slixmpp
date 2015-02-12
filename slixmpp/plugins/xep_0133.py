@@ -35,15 +35,14 @@ class XEP_0133(BasePlugin):
 
 
 def create_command(name):
-    def admin_command(self, jid=None, session=None, ifrom=None, block=False):
+    def admin_command(self, jid=None, session=None, ifrom=None):
         if jid is None:
             jid = self.xmpp.boundjid.server
         self.xmpp['xep_0050'].start_command(
                 jid=jid,
                 node='http://jabber.org/protocol/admin#%s' % name,
                 session=session,
-                ifrom=ifrom,
-                block=block)
+                ifrom=ifrom)
     return admin_command
 
 

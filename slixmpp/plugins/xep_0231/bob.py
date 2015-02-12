@@ -82,7 +82,7 @@ class XEP_0231(BasePlugin):
         return cid
 
     def get_bob(self, jid=None, cid=None, cached=True, ifrom=None,
-                block=True, timeout=None, callback=None):
+                timeout=None, callback=None):
         if cached:
             data = self.api['get_bob'](None, None, ifrom, args=cid)
             if data is not None:
@@ -97,7 +97,7 @@ class XEP_0231(BasePlugin):
         iq['from'] = ifrom
         iq['type'] = 'get'
         iq['bob']['cid'] = cid
-        return iq.send(block=block, timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback)
 
     def del_bob(self, cid):
         self.api['del_bob'](args=cid)

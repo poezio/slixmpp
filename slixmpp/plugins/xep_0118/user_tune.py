@@ -35,7 +35,7 @@ class XEP_0118(BasePlugin):
 
     def publish_tune(self, artist=None, length=None, rating=None, source=None,
                      title=None, track=None, uri=None, options=None,
-                     ifrom=None, block=True, callback=None, timeout=None):
+                     ifrom=None, callback=None, timeout=None):
         """
         Publish the user's current tune.
 
@@ -49,8 +49,6 @@ class XEP_0118(BasePlugin):
             uri      -- A URL to more information about the song.
             options  -- Optional form of publish options.
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -69,18 +67,15 @@ class XEP_0118(BasePlugin):
                 node=UserTune.namespace,
                 options=options,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
 
-    def stop(self, ifrom=None, block=True, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None):
         """
         Clear existing user tune information to stop notifications.
 
         Arguments:
             ifrom    -- Specify the sender's JID.
-            block    -- Specify if the send call will block until a response
-                        is received, or a timeout occurs. Defaults to True.
             timeout  -- The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
@@ -91,6 +86,5 @@ class XEP_0118(BasePlugin):
         return self.xmpp['xep_0163'].publish(tune,
                 node=UserTune.namespace,
                 ifrom=ifrom,
-                block=block,
                 callback=callback,
                 timeout=timeout)
