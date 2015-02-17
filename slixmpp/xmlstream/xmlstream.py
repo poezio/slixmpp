@@ -473,7 +473,8 @@ class XMLStream(asyncio.BaseProtocol):
         loop = asyncio.get_event_loop()
         self.event_when_connected = "tls_success"
 
-        self.ssl_context.set_ciphers(self.ciphers)
+        if self.ciphers is not None:
+            self.ssl_context.set_ciphers(self.ciphers)
         if self.keyfile and self.certfile:
             try:
                 self.ssl_context.load_cert_chain(self.certfile, self.keyfile)
