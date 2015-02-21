@@ -9,6 +9,7 @@
 from slixmpp.stanza.rootstanza import RootStanza
 from slixmpp.xmlstream import StanzaBase, ET
 from slixmpp.xmlstream.handler import Waiter, Callback
+from slixmpp.xmlstream.asyncio import asyncio
 from slixmpp.xmlstream.matcher import MatchIDSender, MatcherId
 from slixmpp.exceptions import IqTimeout, IqError
 
@@ -157,6 +158,64 @@ class Iq(RootStanza):
         new_iq = StanzaBase.reply(self, clear=clear)
         new_iq['type'] = 'result'
         return new_iq
+
+    @asyncio.coroutine
+    def send_coroutine(self, timeout=None):
+        """Send an <iq> stanza over the XML stream.
+
+        Blocks (with asyncio) until a the reply is received.
+        Use with yield from iq.send_coroutine().
+
+        Overrides StanzaBase.send
+
+        Arguments:
+
+            timeout -- The length of time (in seconds) to wait for a
+                       response before an IqTimeout is raised
+        """
+
+        if self.stream.session_bind_event.is_set():
+            matcher = MatchIDSender({
+                'id': self['id'],
+                'self': self.stream.boundjid,
+                'peer': self['to']
+            })
+        else:
+            matcher = MatcherId(self['id'])
+
+        future = asyncio.Future()
+
+        def callback(result):
+            future.set_result(result)
+
+        def callback_timeout():
+            future.set_result(None)
+
+        handler_name = 'IqCallback_%s' % self['id']
+
+        if timeout:
+            self.callback = callback
+            self.stream.schedule('IqTimeout_%s' % self['id'],
+                                 timeout,
+                                 callback_timeout,
+                                 repeat=False)
+            handler = Callback(handler_name,
+                               matcher,
+                               self._handle_result,
+                               once=True)
+        else:
+            handler = Callback(handler_name,
+                               matcher,
+                               callback,
+                               once=True)
+        self.stream.register_handler(handler)
+        StanzaBase.send(self)
+        result = yield from future
+        if result is None:
+            raise IqTimeout(self)
+        if result['type'] == 'error':
+            raise IqError(result)
+        return result
 
     def send(self, callback=None, timeout=None, timeout_callback=None):
         """Send an <iq> stanza over the XML stream.
