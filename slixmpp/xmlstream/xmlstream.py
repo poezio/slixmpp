@@ -489,6 +489,7 @@ class XMLStream(asyncio.BaseProtocol):
         ssl_connect_routine = loop.create_connection(lambda: self, ssl=self.ssl_context,
                                                      sock=self.socket,
                                                      server_hostname=self.address[0])
+        @asyncio.coroutine
         def ssl_coro():
             try:
                 transp, prot = yield from ssl_connect_routine

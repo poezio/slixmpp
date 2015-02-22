@@ -8,7 +8,7 @@
 
 from slixmpp.stanza.rootstanza import RootStanza
 from slixmpp.xmlstream import StanzaBase, ET
-from slixmpp.xmlstream.handler import Waiter, Callback
+from slixmpp.xmlstream.handler import Waiter, Callback, CoroutineCallback
 from slixmpp.xmlstream.asyncio import asyncio
 from slixmpp.xmlstream.matcher import MatchIDSender, MatcherId
 from slixmpp.exceptions import IqTimeout, IqError
@@ -249,6 +249,10 @@ class Iq(RootStanza):
 
         if callback is not None and self['type'] in ('get', 'set'):
             handler_name = 'IqCallback_%s' % self['id']
+            if asyncio.iscoroutinefunction(callback):
+                constr = CoroutineCallback
+            else:
+                constr = Callback
             if timeout_callback:
                 self.callback = callback
                 self.timeout_callback = timeout_callback
@@ -256,15 +260,15 @@ class Iq(RootStanza):
                                      timeout,
                                      self._fire_timeout,
                                      repeat=False)
-                handler = Callback(handler_name,
-                                   matcher,
-                                   self._handle_result,
-                                   once=True)
+                handler = constr(handler_name,
+                                 matcher,
+                                 self._handle_result,
+                                 once=True)
             else:
-                handler = Callback(handler_name,
-                                   matcher,
-                                   callback,
-                                   once=True)
+                handler = constr(handler_name,
+                                 matcher,
+                                 callback,
+                                 once=True)
             self.stream.register_handler(handler)
             StanzaBase.send(self)
             return handler_name
