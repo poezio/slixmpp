@@ -13,7 +13,6 @@
 """
 
 import functools
-import copy
 import logging
 import socket as Socket
 import ssl
@@ -705,18 +704,22 @@ class XMLStream(asyncio.BaseProtocol):
 
         handlers = self.__event_handlers.get(name, [])
         for handler in handlers:
-            #TODO:  Data should not be copied, but should be read only,
-            #       but this might break current code so it's left for future.
             handler_callback, disposable = handler
 
-            out_data = copy.copy(data) if len(handlers) > 1 else data
-            old_exception = getattr(data, 'exception', None)
-            try:
-                handler_callback(out_data)
-            except Exception as e:
-                if old_exception:
-                    old_exception(e)
-                else:
+            # If the callback is a coroutine, schedule it instead of
+            # running it directly
+            if asyncio.iscoroutinefunction(handler_callback):
+                @asyncio.coroutine
+                def handler_callback_routine(cb):
+                    try:
+                        yield from cb(data)
+                    except Exception as e:
+                        self.exception(e)
+                asyncio.async(handler_callback_routine(handler_callback))
+            else:
+                try:
+                    handler_callback(data)
+                except Exception as e:
                     self.exception(e)
             if disposable:
                 # If the handler is disposable, we will go ahead and
