@@ -9,6 +9,7 @@
 import logging
 
 from slixmpp import Iq
+from slixmpp import coroutine_wrapper
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -32,8 +33,9 @@ class XEP_0049(BasePlugin):
     def register(self, stanza):
         register_stanza_plugin(PrivateXML, stanza, iterable=True)
 
+    @coroutine_wrapper
     def store(self, data, ifrom=None, timeout=None, callback=None,
-              timeout_callback=None):
+              timeout_callback=None, coroutine=False):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
@@ -44,14 +46,15 @@ class XEP_0049(BasePlugin):
         for elem in data:
             iq['private'].append(elem)
 
-        return iq.send(timeout=timeout, callback=callback,
+        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine,
                        timeout_callback=timeout_callback)
 
+    @coroutine_wrapper
     def retrieve(self, name, ifrom=None, timeout=None, callback=None,
-                 timeout_callback=None):
+                 timeout_callback=None, coroutine=False):
         iq = self.xmpp.Iq()
         iq['type'] = 'get'
         iq['from'] = ifrom
         iq['private'].enable(name)
-        return iq.send(timeout=timeout, callback=callback,
-                timeout_callback=timeout_callback)
+        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine,
+                       timeout_callback=timeout_callback)
