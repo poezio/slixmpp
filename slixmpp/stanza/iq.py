@@ -160,11 +160,11 @@ class Iq(RootStanza):
         return new_iq
 
     @asyncio.coroutine
-    def send_coroutine(self, timeout=None):
+    def _send_coroutine(self, matcher=None, timeout=None):
         """Send an <iq> stanza over the XML stream.
 
         Blocks (with asyncio) until a the reply is received.
-        Use with yield from iq.send_coroutine().
+        Use with yield from iq.send(coroutine=True).
 
         Overrides StanzaBase.send
 
@@ -173,15 +173,6 @@ class Iq(RootStanza):
             timeout -- The length of time (in seconds) to wait for a
                        response before an IqTimeout is raised
         """
-
-        if self.stream.session_bind_event.is_set():
-            matcher = MatchIDSender({
-                'id': self['id'],
-                'self': self.stream.boundjid,
-                'peer': self['to']
-            })
-        else:
-            matcher = MatcherId(self['id'])
 
         future = asyncio.Future()
 
@@ -217,7 +208,7 @@ class Iq(RootStanza):
             raise IqError(result)
         return result
 
-    def send(self, callback=None, timeout=None, timeout_callback=None):
+    def send(self, callback=None, timeout=None, timeout_callback=None, coroutine=False):
         """Send an <iq> stanza over the XML stream.
 
         A callback handler can be provided that will be executed when the Iq
@@ -237,6 +228,8 @@ class Iq(RootStanza):
                         function.  Will be executed when the timeout expires
                         before a response has been received with the
                         originally-sent IQ stanza.
+            coroutine -- This function will return a coroutine if this argument
+                         is True.
         """
         if self.stream.session_bind_event.is_set():
             matcher = MatchIDSender({
@@ -247,33 +240,36 @@ class Iq(RootStanza):
         else:
             matcher = MatcherId(self['id'])
 
-        if callback is not None and self['type'] in ('get', 'set'):
-            handler_name = 'IqCallback_%s' % self['id']
-            if asyncio.iscoroutinefunction(callback):
-                constr = CoroutineCallback
+        if not coroutine:
+            if callback is not None and self['type'] in ('get', 'set'):
+                handler_name = 'IqCallback_%s' % self['id']
+                if asyncio.iscoroutinefunction(callback):
+                    constr = CoroutineCallback
+                else:
+                    constr = Callback
+                if timeout_callback:
+                    self.callback = callback
+                    self.timeout_callback = timeout_callback
+                    self.stream.schedule('IqTimeout_%s' % self['id'],
+                                         timeout,
+                                         self._fire_timeout,
+                                         repeat=False)
+                    handler = constr(handler_name,
+                                     matcher,
+                                     self._handle_result,
+                                     once=True)
+                else:
+                    handler = constr(handler_name,
+                                     matcher,
+                                     callback,
+                                     once=True)
+                self.stream.register_handler(handler)
+                StanzaBase.send(self)
+                return handler_name
             else:
-                constr = Callback
-            if timeout_callback:
-                self.callback = callback
-                self.timeout_callback = timeout_callback
-                self.stream.schedule('IqTimeout_%s' % self['id'],
-                                     timeout,
-                                     self._fire_timeout,
-                                     repeat=False)
-                handler = constr(handler_name,
-                                 matcher,
-                                 self._handle_result,
-                                 once=True)
-            else:
-                handler = constr(handler_name,
-                                 matcher,
-                                 callback,
-                                 once=True)
-            self.stream.register_handler(handler)
-            StanzaBase.send(self)
-            return handler_name
+                return StanzaBase.send(self)
         else:
-            return StanzaBase.send(self)
+            return self._send_coroutine(timeout=timeout, matcher=matcher)
 
     def _handle_result(self, iq):
         # we got the IQ, so don't fire the timeout
