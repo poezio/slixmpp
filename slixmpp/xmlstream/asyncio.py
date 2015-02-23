@@ -8,6 +8,7 @@ call_soon() ones. These callback are called only once each.
 
 import asyncio
 from asyncio import events
+from functools import wraps
 
 import collections
 
@@ -32,3 +33,23 @@ cls.idle_call = idle_call
 real_run_once = cls._run_once
 cls._run_once = my_run_once
 
+
+def coroutine_wrapper(func):
+    """
+    Make sure the result of a function call is a coroutine
+    if the ``coroutine`` keyword argument is true.
+    """
+    def wrap_coro(result):
+        if asyncio.iscoroutinefunction(result):
+            return result
+        else:
+            return asyncio.coroutine(lambda: result)()
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if kwargs.get('coroutine', False):
+            return wrap_coro(func(*args, **kwargs))
+        else:
+            return func(*args, **kwargs)
+
+    return wrapper
