@@ -15,6 +15,7 @@ from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0054 import VCardTemp, stanza
+from slixmpp import coroutine_wrapper
 
 
 log = logging.getLogger(__name__)
@@ -59,8 +60,9 @@ class XEP_0054(BasePlugin):
     def make_vcard(self):
         return VCardTemp()
 
+    @coroutine_wrapper
     def get_vcard(self, jid=None, ifrom=None, local=None, cached=False,
-                  callback=None, timeout=None):
+                  callback=None, timeout=None, coroutine=False):
         if local is None:
             if jid is not None and not isinstance(jid, JID):
                 jid = JID(jid)
@@ -99,10 +101,11 @@ class XEP_0054(BasePlugin):
         iq['type'] = 'get'
         iq.enable('vcard_temp')
 
-        iq.send(callback=callback, timeout=timeout)
+        return iq.send(callback=callback, timeout=timeout, coroutine=coroutine)
 
+    @coroutine_wrapper
     def publish_vcard(self, vcard=None, jid=None, ifrom=None,
-                      callback=None, timeout=None):
+                      callback=None, timeout=None, coroutine=False):
         self.api['set_vcard'](jid, None, ifrom, vcard)
         if self.xmpp.is_component:
             return
@@ -112,7 +115,7 @@ class XEP_0054(BasePlugin):
         iq['from'] = ifrom
         iq['type'] = 'set'
         iq.append(vcard)
-        return iq.send(callback=callback, timeout=timeout)
+        return iq.send(callback=callback, timeout=timeout, coroutine=coroutine)
 
     def _handle_get_vcard(self, iq):
         if iq['type'] == 'result':
