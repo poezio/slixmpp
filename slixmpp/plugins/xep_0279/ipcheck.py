@@ -10,6 +10,7 @@
 import logging
 
 from slixmpp import Iq
+from slixmpp import coroutine_wrapper
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.xep_0279 import stanza, IPCheck
@@ -31,9 +32,10 @@ class XEP_0279(BasePlugin):
     def plugin_end(self):
         self.xmpp['xep_0030'].del_feature(feature='urn:xmpp:sic:0')
 
-    def check_ip(self, ifrom=None, block=True, timeout=None, callback=None):
+    @coroutine_wrapper
+    def check_ip(self, ifrom=None, timeout=None, callback=None, coroutine=False):
         iq = self.xmpp.Iq()
         iq['type'] = 'get'
         iq['from'] = ifrom
         iq.enable('ip_check')
-        return iq.send(block=block, timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
