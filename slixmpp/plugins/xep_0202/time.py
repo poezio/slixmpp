@@ -9,6 +9,7 @@
 import logging
 
 from slixmpp.stanza.iq import Iq
+from slixmpp import coroutine_wrapper
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -76,6 +77,7 @@ class XEP_0202(BasePlugin):
         iq['entity_time']['time'] = self.local_time(iq['to'])
         iq.send()
 
+    @coroutine_wrapper
     def get_entity_time(self, to, ifrom=None, **iqargs):
         """
         Request the time from another entity.
