@@ -9,6 +9,7 @@
 import logging
 
 from slixmpp import Iq, Message
+from slixmpp import coroutine_wrapper
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.xep_0258 import stanza, SecurityLabel, Catalog
@@ -34,11 +35,12 @@ class XEP_0258(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature(SecurityLabel.namespace)
 
-    def get_catalog(self, jid, ifrom=None,
+    @coroutine_wrapper
+    def get_catalog(self, jid, ifrom=None, coroutine=False,
                           callback=None, timeout=None):
         iq = self.xmpp.Iq()
         iq['to'] = jid
         iq['from'] = ifrom
         iq['type'] = 'get'
         iq.enable('security_label_catalog')
-        return iq.send(callback=callback, timeout=timeout)
+        return iq.send(callback=callback, timeout=timeout, coroutine=coroutine)
