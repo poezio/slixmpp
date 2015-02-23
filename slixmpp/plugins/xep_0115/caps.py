@@ -15,6 +15,7 @@ from slixmpp.stanza import StreamFeatures, Presence, Iq
 from slixmpp.xmlstream import register_stanza_plugin, JID
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
+from slixmpp import asyncio
 from slixmpp.exceptions import XMPPError, IqError, IqTimeout
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0115 import stanza, StaticCaps
@@ -131,6 +132,7 @@ class XEP_0115(BasePlugin):
 
         self.xmpp.event('entity_caps', p)
 
+    @asyncio.coroutine
     def _process_caps(self, pres):
         if not pres['caps']['hash']:
             log.debug("Received unsupported legacy caps: %s, %s, %s",
@@ -162,7 +164,8 @@ class XEP_0115(BasePlugin):
         log.debug("New caps verification string: %s", ver)
         try:
             node = '%s#%s' % (pres['caps']['node'], ver)
-            caps = self.xmpp['xep_0030'].get_info(pres['from'], node)
+            caps = yield from self.xmpp['xep_0030'].get_info(pres['from'], node,
+                                                             coroutine=True)
 
             if isinstance(caps, Iq):
                 caps = caps['disco_info']
