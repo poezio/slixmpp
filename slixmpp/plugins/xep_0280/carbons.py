@@ -9,6 +9,7 @@
 import logging
 
 import slixmpp
+from slixmpp import coroutine_wrapper
 from slixmpp.stanza import Message, Iq
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -66,20 +67,22 @@ class XEP_0280(BasePlugin):
     def _handle_carbon_sent(self, msg):
         self.xmpp.event('carbon_sent', msg)
 
+    @coroutine_wrapper
     def enable(self, ifrom=None, timeout=None, callback=None,
-               timeout_callback=None):
+               timeout_callback=None, coroutine=False):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq.enable('carbon_enable')
         return iq.send(timeout_callback=timeout_callback, timeout=timeout,
-                       callback=callback)
+                       callback=callback, coroutine=coroutine)
 
+    @coroutine_wrapper
     def disable(self, ifrom=None, timeout=None, callback=None,
-                timeout_callback=None):
+                timeout_callback=None, coroutine=False):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq.enable('carbon_disable')
         return iq.send(timeout_callback=timeout_callback, timeout=timeout,
-                       callback=callback)
+                       callback=callback, coroutine=coroutine)
