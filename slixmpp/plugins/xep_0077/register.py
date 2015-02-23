@@ -9,6 +9,7 @@
 import logging
 import ssl
 
+from slixmpp import coroutine_wrapper
 from slixmpp.stanza import StreamFeatures, Iq
 from slixmpp.xmlstream import register_stanza_plugin, JID
 from slixmpp.plugins import BasePlugin
@@ -81,26 +82,29 @@ class XEP_0077(BasePlugin):
             return True
         return False
 
+    @coroutine_wrapper
     def get_registration(self, jid=None, ifrom=None,
-                         timeout=None, callback=None):
+                         timeout=None, callback=None, coroutine=False):
         iq = self.xmpp.Iq()
         iq['type'] = 'get'
         iq['to'] = jid
         iq['from'] = ifrom
         iq.enable('register')
-        return iq.send(timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
 
+    @coroutine_wrapper
     def cancel_registration(self, jid=None, ifrom=None,
-                            timeout=None, callback=None):
+                            timeout=None, callback=None, coroutine=False):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['to'] = jid
         iq['from'] = ifrom
         iq['register']['remove'] = True
-        return iq.send(timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
 
+    @coroutine_wrapper
     def change_password(self, password, jid=None, ifrom=None,
-                        timeout=None, callback=None):
+                        timeout=None, callback=None, coroutine=False):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['to'] = jid
@@ -111,4 +115,4 @@ class XEP_0077(BasePlugin):
         else:
             iq['register']['username'] = self.xmpp.boundjid.user
         iq['register']['password'] = password
-        return iq.send(timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
