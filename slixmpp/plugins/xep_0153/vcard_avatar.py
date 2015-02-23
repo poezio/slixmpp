@@ -15,6 +15,7 @@ from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0153 import stanza, VCardTempUpdate
+from slixmpp import asyncio, coroutine_wrapper
 
 
 log = logging.getLogger(__name__)
@@ -59,24 +60,47 @@ class XEP_0153(BasePlugin):
         self.xmpp.del_event_handler('presence_chat', self._recv_presence)
         self.xmpp.del_event_handler('presence_away', self._recv_presence)
 
-    def set_avatar(self, jid=None, avatar=None, mtype=None,
-                   timeout=None, callback=None):
-        if jid is None:
-            jid = self.xmpp.boundjid.bare
-
-        vcard = self.xmpp['xep_0054'].get_vcard(jid, cached=True)
+    @asyncio.coroutine
+    def _set_avatar_coroutine(self, jid, mtype, avatar):
+        vcard = yield from self.xmpp['xep_0054'].get_vcard(jid, cached=True, coroutine=True)
         vcard = vcard['vcard_temp']
         vcard['PHOTO']['TYPE'] = mtype
         vcard['PHOTO']['BINVAL'] = avatar
 
-        self.xmpp['xep_0054'].publish_vcard(jid=jid, vcard=vcard)
+        result = yield from self.xmpp['xep_0054'].publish_vcard(jid=jid, vcard=vcard)
 
         self.api['reset_hash'](jid)
         self.xmpp.roster[jid].send_last_presence()
 
+        return result
+
+    @coroutine_wrapper
+    def set_avatar(self, jid=None, avatar=None, mtype=None, timeout=None,
+                   callback=None, coroutine=False):
+        if jid is None:
+            jid = self.xmpp.boundjid.bare
+
+        if coroutine:
+            return self._set_avatar_coroutine(jid, mtype, avatar)
+        else:
+            def custom_callback(result):
+                vcard = result['vcard_temp']
+                vcard['PHOTO']['TYPE'] = mtype
+                vcard['PHOTO']['BINVAL'] = avatar
+
+                self.xmpp['xep_0054'].publish_vcard(jid=jid, vcard=vcard, callback=callback)
+
+                self.api['reset_hash'](jid)
+                self.xmpp.roster[jid].send_last_presence()
+                callback(result)
+
+            self.xmpp['xep_0054'].get_vcard(jid, cached=True, callback=custom_callback)
+
+    @asyncio.coroutine
     def _start(self, event):
         try:
-            vcard = self.xmpp['xep_0054'].get_vcard(self.xmpp.boundjid.bare)
+            vcard = yield from self.xmpp['xep_0054'].get_vcard(self.xmpp.boundjid.bare,
+                                                               coroutine=True)
             data = vcard['vcard_temp']['PHOTO']['BINVAL']
             if not data:
                 new_hash = ''
@@ -110,9 +134,10 @@ class XEP_0153(BasePlugin):
         if own_jid:
             self.xmpp.roster[jid].send_last_presence()
 
-        try:
-            iq = self.xmpp['xep_0054'].get_vcard(jid=jid.bare, ifrom=ifrom)
-
+        def callback(iq):
+            if iq['type'] == 'error':
+                log.debug('Could not retrieve vCard for %s' % jid)
+                return
             data = iq['vcard_temp']['PHOTO']['BINVAL']
             if not data:
                 new_hash = ''
@@ -120,8 +145,9 @@ class XEP_0153(BasePlugin):
                 new_hash = hashlib.sha1(data).hexdigest()
 
             self.api['set_hash'](jid, args=new_hash)
-        except XMPPError:
-            log.debug('Could not retrieve vCard for %s' % jid)
+
+        self.xmpp['xep_0054'].get_vcard(jid=jid.bare, ifrom=ifrom,
+                                        callback=callback)
 
     def _recv_presence(self, pres):
         try:
