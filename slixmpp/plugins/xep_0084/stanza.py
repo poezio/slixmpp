@@ -21,11 +21,11 @@ class Data(ElementBase):
     def get_value(self):
         if self.xml.text:
             return b64decode(bytes(self.xml.text))
-        return ''
+        return b''
 
     def set_value(self, value):
         if value:
-            self.xml.text = b64encode(bytes(value))
+            self.xml.text = b64encode(bytes(value)).decode()
         else:
             self.xml.text = ''
 
