@@ -11,6 +11,7 @@ import logging
 
 from slixmpp.jid import JID
 from slixmpp.stanza import Iq
+from slixmpp import asyncio, coroutine_wrapper
 from slixmpp.exceptions import IqError, IqTimeout
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -118,8 +119,9 @@ class XEP_0199(BasePlugin):
         log.debug("Pinged by %s", iq['from'])
         iq.reply().send()
 
+    @coroutine_wrapper
     def send_ping(self, jid, ifrom=None, timeout=None, callback=None,
-                  timeout_callback=None):
+                  timeout_callback=None, coroutine=False):
         """Send a ping request.
 
         Arguments:
@@ -139,11 +141,13 @@ class XEP_0199(BasePlugin):
         iq['from'] = ifrom
         iq.enable('ping')
 
-        return iq.send(timeout=timeout, callback=callback,
+        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine,
                        timeout_callback=timeout_callback)
 
+    @asyncio.coroutine
     def ping(self, jid=None, ifrom=None, timeout=None):
         """Send a ping request and calculate RTT.
+        This is a coroutine.
 
         Arguments:
             jid        -- The JID that will receive the ping.
@@ -169,7 +173,8 @@ class XEP_0199(BasePlugin):
 
         log.debug('Pinging %s' % jid)
         try:
-            self.send_ping(jid, ifrom=ifrom, timeout=timeout)
+            yield from self.send_ping(jid, ifrom=ifrom, timeout=timeout,
+                                      coroutine=True)
         except IqError as e:
             if own_host:
                 rtt = time.time() - start
