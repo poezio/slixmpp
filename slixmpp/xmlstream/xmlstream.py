@@ -706,6 +706,7 @@ class XMLStream(asyncio.BaseProtocol):
         handlers = self.__event_handlers.get(name, [])
         for handler in handlers:
             handler_callback, disposable = handler
+            old_exception = getattr(data, 'exception', None)
 
             # If the callback is a coroutine, schedule it instead of
             # running it directly
@@ -715,13 +716,19 @@ class XMLStream(asyncio.BaseProtocol):
                     try:
                         yield from cb(data)
                     except Exception as e:
-                        self.exception(e)
+                        if old_exception:
+                            old_exception(e)
+                        else:
+                            self.exception(e)
                 asyncio.async(handler_callback_routine(handler_callback))
             else:
                 try:
                     handler_callback(data)
                 except Exception as e:
-                    self.exception(e)
+                    if old_exception:
+                        old_exception(e)
+                    else:
+                        self.exception(e)
             if disposable:
                 # If the handler is disposable, we will go ahead and
                 # remove it now instead of waiting for it to be
