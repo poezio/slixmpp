@@ -16,6 +16,7 @@ from slixmpp.xmlstream.stanzabase import ET, ElementBase, register_stanza_plugin
 from slixmpp.xmlstream.handler import *
 from slixmpp.xmlstream import XMLStream
 from slixmpp.xmlstream.matcher import *
+from slixmpp.xmlstream.asyncio import asyncio, coroutine_wrapper
 from slixmpp.basexmpp import BaseXMPP
 from slixmpp.clientxmpp import ClientXMPP
 from slixmpp.componentxmpp import ComponentXMPP
