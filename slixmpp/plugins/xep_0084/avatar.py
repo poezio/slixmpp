@@ -15,6 +15,7 @@ from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.xmlstream import register_stanza_plugin, JID
 from slixmpp.plugins.xep_0084 import stanza, Data, MetaData
+from slixmpp import coroutine_wrapper
 
 
 log = logging.getLogger(__name__)
@@ -44,26 +45,30 @@ class XEP_0084(BasePlugin):
     def generate_id(self, data):
         return hashlib.sha1(data).hexdigest()
 
-    def retrieve_avatar(self, jid, id, url=None, ifrom=None,
-                              callback=None, timeout=None):
+    @coroutine_wrapper
+    def retrieve_avatar(self, jid, id, url=None, ifrom=None, callback=None,
+                        timeout=None, coroutine=False):
         return self.xmpp['xep_0060'].get_item(jid, Data.namespace, id,
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout)
+                                              ifrom=ifrom, callback=callback,
+                                              timeout=timeout,
+                                              coroutine=coroutine)
 
+    @coroutine_wrapper
     def publish_avatar(self, data, ifrom=None, callback=None,
-                             timeout=None):
+                       timeout=None, coroutine=False):
         payload = Data()
         payload['value'] = data
         return self.xmpp['xep_0163'].publish(payload,
                 id=self.generate_id(data),
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                coroutine=coroutine)
 
+    @coroutine_wrapper
     def publish_avatar_metadata(self, items=None, pointers=None,
-                                      ifrom=None,
-                                      callback=None, timeout=None):
+                                ifrom=None, callback=None, timeout=None,
+                                coroutine=False):
         metadata = MetaData()
         if items is None:
             items = []
@@ -83,9 +88,11 @@ class XEP_0084(BasePlugin):
                 id=info['id'],
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                coroutine=coroutine)
 
-    def stop(self, ifrom=None, callback=None, timeout=None):
+    @coroutine_wrapper
+    def stop(self, ifrom=None, callback=None, timeout=None, coroutine=False):
         """
         Clear existing avatar metadata information to stop notifications.
 
@@ -102,4 +109,5 @@ class XEP_0084(BasePlugin):
                 node=MetaData.namespace,
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                coroutine=coroutine)
