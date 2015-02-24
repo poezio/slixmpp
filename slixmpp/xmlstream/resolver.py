@@ -177,9 +177,11 @@ def get_A(host, resolver=None, use_aiodns=True):
     # If not using aiodns, attempt lookup using the OS level
     # getaddrinfo() method.
     if resolver is None or not use_aiodns:
+        loop = asyncio.get_event_loop()
         try:
-            recs = socket.getaddrinfo(host, None, socket.AF_INET,
-                                                  socket.SOCK_STREAM)
+            recs = yield from loop.getaddrinfo(host, None,
+                                               family=socket.AF_INET,
+                                               type=socket.SOCK_STREAM)
             return [rec[4][0] for rec in recs]
         except socket.gaierror:
             log.debug("DNS: Error retrieving A address info for %s." % host)
@@ -222,9 +224,11 @@ def get_AAAA(host, resolver=None, use_aiodns=True):
         if not socket.has_ipv6:
             log.debug("DNS: Unable to query %s for AAAA records: IPv6 is not supported", host)
             return []
+        loop = asyncio.get_event_loop()
         try:
-            recs = socket.getaddrinfo(host, None, socket.AF_INET6,
-                                                  socket.SOCK_STREAM)
+            recs = yield from loop.getaddrinfo(host, None,
+                                               family=socket.AF_INET6,
+                                               type=socket.SOCK_STREAM)
             return [rec[4][0] for rec in recs]
         except (OSError, socket.gaierror):
             log.debug("DNS: Error retreiving AAAA address " + \
