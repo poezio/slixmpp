@@ -11,20 +11,12 @@
     See the file LICENSE for copying permission.
 """
 
-import os
-import sys
-# This can be used when you are in a test environment and need to make paths right
-sys.path=['/Users/jocke/Dropbox/06_dev/Slixmpp']+sys.path
-
 import logging
-import unittest
-import distutils.core
-import datetime
 
-from glob import glob
-from os.path import splitext, basename, join as pjoin
+from os.path import basename, join as pjoin
 from argparse import ArgumentParser
 from urllib import urlopen
+from getpass import getpass
 
 import slixmpp
 from slixmpp.plugins.xep_0323.device import Device
@@ -186,5 +178,5 @@ if __name__ == '__main__':
         logging.debug("ready ending")
 
     else:
-       print "noopp didn't happen"
+       print("noopp didn't happen")
 

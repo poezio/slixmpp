@@ -11,11 +11,11 @@
 
 import logging
 from getpass import getpass
-import threading
 from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.exceptions import IqError, IqTimeout
+from slixmpp.xmlstream.asyncio import asyncio
 
 
 class RosterBrowser(slixmpp.ClientXMPP):
@@ -36,8 +36,9 @@ class RosterBrowser(slixmpp.ClientXMPP):
         self.add_event_handler("changed_status", self.wait_for_presences)
 
         self.received = set()
-        self.presences_received = threading.Event()
+        self.presences_received = asyncio.Event()
 
+    @asyncio.coroutine
     def start(self, event):
         """
         Process the session_start event.
@@ -51,8 +52,12 @@ class RosterBrowser(slixmpp.ClientXMPP):
                      event does not provide any additional
                      data.
         """
+        future = asyncio.Future()
+        def callback(result):
+            future.set_result(None)
         try:
-            self.get_roster()
+            self.get_roster(callback=callback)
+            yield from future
         except IqError as err:
             print('Error: %' % err.iq['error']['condition'])
         except IqTimeout:
@@ -61,7 +66,7 @@ class RosterBrowser(slixmpp.ClientXMPP):
 
 
         print('Waiting for presence updates...\n')
-        self.presences_received.wait(5)
+        yield from asyncio.sleep(10)
 
         print('Roster for %s' % self.boundjid.bare)
         groups = self.client_roster.groups()

@@ -105,7 +105,7 @@ html_theme = 'haiku'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'Slixmpp'
+html_title = 'slixmpp'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 html_short_title = '%s Documentation' % release
@@ -219,4 +219,4 @@ man_pages = [
      [u'Nathan Fritz, Lance Stout'], 1)
 ]
 
-intersphinx_mapping = {'python': ('http://docs.python.org/3.2', 'python-objects.inv')}
+intersphinx_mapping = {'python': ('http://docs.python.org/3.4', 'python-objects.inv')}

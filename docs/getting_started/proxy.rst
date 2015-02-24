@@ -7,10 +7,8 @@ Enable HTTP Proxy Support
 .. note::
 
     If you have any issues working through this quickstart guide
-    or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
-    or join the chat room at `sleek@conference.jabber.org
-    <xmpp:sleek@conference.jabber.org?join>`_.
+    join the chat room at `slixmpp@muc.poez.io
+    <xmpp:slixmpp@muc.poez.io?join>`_.
 
 In some instances, you may wish to route XMPP traffic through
 an HTTP proxy, probably to get around restrictive firewalls.

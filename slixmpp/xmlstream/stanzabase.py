@@ -1474,7 +1474,7 @@ class StanzaBase(ElementBase):
 
         Only type values contained in :attr:`types` are accepted.
 
-        :param string value: One of the values contained in :attr:`types`
+        :param str value: One of the values contained in :attr:`types`
         """
         if value in self.types:
             self.xml.attrib['type'] = value
@@ -1499,8 +1499,8 @@ class StanzaBase(ElementBase):
     def set_from(self, value):
         """Set the 'from' attribute of the stanza.
 
-        Arguments:
-            from -- A string or JID object representing the sender's JID.
+        :param from: A string or JID object representing the sender's JID.
+        :type from: str or :class:`.JID`
         """
         return self._set_attr('from', str(value))
 

@@ -32,6 +32,9 @@ class Iq(RootStanza):
     as a carrier stanza for an application-specific protocol instead.
 
     Example <iq> Stanzas:
+
+    .. code-block:: xml
+
         <iq to="user@example.com" type="get" id="314">
           <query xmlns="http://jabber.org/protocol/disco#items" />
         </iq>
@@ -47,20 +50,9 @@ class Iq(RootStanza):
         </iq>
 
     Stanza Interface:
-        query -- The namespace of the <query> element if one exists.
-
+        - **query**: The namespace of the <query> element if one exists.
     Attributes:
-        types -- May be one of: get, set, result, or error.
-
-    Methods:
-        __init__    -- Overrides StanzaBase.__init__.
-        unhandled   -- Send error if there are no handlers.
-        set_payload -- Overrides StanzaBase.set_payload.
-        set_query   -- Add or modify a <query> element.
-        get_query   -- Return the namespace of the <query> element.
-        del_query   -- Remove the <query> element.
-        reply       -- Overrides StanzaBase.reply
-        send        -- Overrides StanzaBase.send
+        - **types**: May be one of: get, set, result, or error.
     """
 
     namespace = 'jabber:client'
@@ -98,8 +90,9 @@ class Iq(RootStanza):
         """
         Set the XML contents of the <iq> stanza.
 
-        Arguments:
-            value -- An XML object to use as the <iq> stanza's contents
+        :param value: An XML object or a list of XML objects to use as the <iq>
+                      stanza's contents
+        :type value: list or XML object
         """
         self.clear()
         StanzaBase.set_payload(self, value)
@@ -111,8 +104,7 @@ class Iq(RootStanza):
 
         Query elements are differentiated by their namespace.
 
-        Arguments:
-            value -- The namespace of the <query> element.
+        :param str value: The namespace of the <query> element.
         """
         query = self.xml.find("{%s}query" % value)
         if query is None and value:
@@ -126,7 +118,9 @@ class Iq(RootStanza):
         return self
 
     def get_query(self):
-        """Return the namespace of the <query> element."""
+        """Return the namespace of the <query> element.
+
+        :rtype: str"""
         for child in self.xml:
             if child.tag.endswith('query'):
                 ns = child.tag.split('}')[0]
@@ -144,16 +138,15 @@ class Iq(RootStanza):
 
     def reply(self, clear=True):
         """
-        Send a reply <iq> stanza.
+        Create a new <iq> stanza replying to ``self``.
 
         Overrides StanzaBase.reply
 
         Sets the 'type' to 'result' in addition to the default
         StanzaBase.reply behavior.
 
-        Arguments:
-            clear -- Indicates if existing content should be
-                     removed before replying. Defaults to True.
+        :param bool clear: Indicates if existing content should be
+                           removed before replying. Defaults to True.
         """
         new_iq = StanzaBase.reply(self, clear=clear)
         new_iq['type'] = 'result'
@@ -168,10 +161,8 @@ class Iq(RootStanza):
 
         Overrides StanzaBase.send
 
-        Arguments:
-
-            timeout -- The length of time (in seconds) to wait for a
-                       response before an IqTimeout is raised
+        :param int timeout:  The length of time (in seconds) to wait for a
+                               response before an IqTimeout is raised
         """
 
         future = asyncio.Future()
@@ -216,20 +207,19 @@ class Iq(RootStanza):
 
         Overrides StanzaBase.send
 
-        Arguments:
-
-            callback -- Optional reference to a stream handler
-                        function. Will be executed when a reply stanza is
-                        received.
-            timeout -- The length of time (in seconds) to wait for a
-                        response before the timeout_callback is called,
-                        instead of the regular callback
-            timeout_callback -- Optional reference to a stream handler
-                        function.  Will be executed when the timeout expires
-                        before a response has been received with the
-                        originally-sent IQ stanza.
-            coroutine -- This function will return a coroutine if this argument
-                         is True.
+        :param function callback: Optional reference to a stream handler
+                                  function. Will be executed when a reply
+                                  stanza is received.
+        :param int timeout: The length of time (in seconds) to wait for a
+                            response before the timeout_callback is called,
+                            instead of the regular callback
+        :param function timeout_callback: Optional reference to a stream handler
+                                          function.  Will be executed when the
+                                          timeout expires before a response has
+                                          been received for the originally-sent
+                                          IQ stanza.
+        :param bool coroutine: This function will return a coroutine if this
+                               argument is True.
         """
         if self.stream.session_bind_event.is_set():
             matcher = MatchIDSender({

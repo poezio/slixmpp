@@ -3,38 +3,25 @@ Slixmpp
 
 .. sidebar:: Get the Code
 
-    .. code-block:: sh
+    The latest source code for Slixmpp may be found on the `Git repo
+    <http://git.poez.io/slixmpp>`_. ::
 
-        pip install slixmpp
+        git clone git://git.poez.io/slixmpp
 
-    The latest source code for Slixmpp may be found on `Github
-    <http://github.com/fritzy/Slixmpp>`_. Releases can be found in the
-    ``master`` branch, while the latest development version is in the
-    ``develop`` branch.
-
-    **Latest Stable Release**
-        - `1.0 <http://github.com/fritzy/Slixmpp/zipball/1.0>`_
-
-    **Develop Releases**
-        - `Latest Develop Version <http://github.com/fritzy/Slixmpp/zipball/develop>`_
-
-
-    A mailing list and XMPP chat room are available for discussing and getting
-    help with Slixmpp.
-
-    **Mailing List**
-        `Slixmpp Discussion on Google Groups <http://groups.google.com/group/slixmpp-discussion>`_
+    An XMPP chat room is available for discussing and getting help with slixmpp.
 
     **Chat**
-        `sleek@conference.jabber.org <xmpp:sleek@conference.jabber.org?join>`_
+        `slixmpp@muc.poez.io <xmpp:slixmpp@muc.poez.io?join>`_
 
+    **Reporting bugs**
+        You can report bugs at http://dev.louiz.org/projects/slixmpp/issues.
 
-Slixmpp is an :ref:`MIT licensed <license>` XMPP library for Python 2.6/3.1+,
-and is featured in examples in
-`XMPP: The Definitive Guide <http://oreilly.com/catalog/9780596521271>`_
-by Kevin Smith, Remko Tronçon, and Peter Saint-Andre. If you've arrived
-here from reading the Definitive Guide, please see the notes on updating
-the examples to the latest version of Slixmpp.
+.. note::
+    slixmpp is a friendly fork of `SleekXMPP <https://github.com/fritzy/SleekXMPP>`_
+    which goal is to use asyncio instead of threads to handle networking. See
+    :ref:`differences`.
+
+Slixmpp is an :ref:`MIT licensed <license>` XMPP library for Python 3.4+,
 
 Slixmpp's design goals and philosphy are:
 
@@ -59,11 +46,13 @@ Slixmpp's design goals and philosphy are:
     sensible defaults and appropriate abstractions. XML can be ugly to work
     with, but it doesn't have to be that way.
 
+
 Here's your first Slixmpp Bot:
 --------------------------------
 
 .. code-block:: python
 
+    import asyncio
     import logging
 
     from slixmpp import ClientXMPP
@@ -85,27 +74,13 @@ Here's your first Slixmpp Bot:
             # Here's how to access plugins once you've registered them:
             # self['xep_0030'].add_feature('echo_demo')
 
-            # If you are working with an OpenFire server, you will
-            # need to use a different SSL version:
-            # import ssl
-            # self.ssl_version = ssl.PROTOCOL_SSLv3
-
         def session_start(self, event):
             self.send_presence()
             self.get_roster()
 
             # Most get_*/set_* methods from plugins use Iq stanzas, which
-            # can generate IqError and IqTimeout exceptions
-            #
-            # try:
-            #     self.get_roster()
-            # except IqError as err:
-            #     logging.error('There was an error getting the roster')
-            #     logging.error(err.iq['error']['condition'])
-            #     self.disconnect()
-            # except IqTimeout:
-            #     logging.error('Server is taking too long to respond')
-            #     self.disconnect()
+            # are sent asynchronously. You can almost always provide a
+            # callback that will be executed when the reply is received.
 
         def message(self, msg):
             if msg['type'] in ('chat', 'normal'):
@@ -121,8 +96,17 @@ Here's your first Slixmpp Bot:
 
         xmpp = EchoBot('somejid@example.com', 'use_getpass')
         xmpp.connect()
-        xmpp.process(block=True)
+        xmpp.process()
 
+
+To read if you come from SleekXMPP
+----------------------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    differences
+    using_asyncio
 
 
 Getting Started (with Examples)
@@ -145,7 +129,6 @@ Tutorials, FAQs, and How To Guides
 .. toctree::
     :maxdepth: 1
 
-    faq
     xeps
     xmpp_tdg
     howto/stanzas
@@ -184,9 +167,7 @@ API Reference
     api/xmlstream/handler
     api/xmlstream/matcher
     api/xmlstream/xmlstream
-    api/xmlstream/scheduler
     api/xmlstream/tostring
-    api/xmlstream/filesocket
 
 Core Stanzas
 ~~~~~~~~~~~~
@@ -197,8 +178,6 @@ Core Stanzas
     api/stanza/message
     api/stanza/presence
     api/stanza/iq
-    api/stanza/error
-    api/stanza/stream_error
 
 Plugins
 ~~~~~~~
@@ -220,8 +199,14 @@ Additional Info
 * :ref:`modindex`
 * :ref:`search`
 
-Credits
--------
+SleekXMPP Credits
+-----------------
+
+.. note::
+    Those people made SleekXMPP, so you should not bother them if
+    you have an issue with slixmpp. But it’s still fair to credit
+    them for their work.
+
 
 **Main Author:** `Nathan Fritz <http://andyet.net/team/fritzy>`_
      `fritzy@netflint.net <xmpp:fritzy@netflint.net?message>`_,

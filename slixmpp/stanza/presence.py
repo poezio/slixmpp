@@ -27,6 +27,9 @@ class Presence(RootStanza):
     to help keep the network running smoothly.
 
     Example <presence> stanzas:
+
+    .. code-block:: xml
+
         <presence />
 
         <presence from="user@example.com">
@@ -40,24 +43,14 @@ class Presence(RootStanza):
         <presence to="user@otherhost.com" type="subscribe" />
 
     Stanza Interface:
-        priority -- A value used by servers to determine message routing.
-        show     -- The type of status, such as away or available for chat.
-        status   -- Custom, human readable status message.
+        - **priority**: A value used by servers to determine message routing.
+        - **show**: The type of status, such as away or available for chat.
+        - **status**: Custom, human readable status message.
 
     Attributes:
-        types     -- One of: available, unavailable, error, probe,
-                         subscribe, subscribed, unsubscribe,
-                         and unsubscribed.
-        showtypes -- One of: away, chat, dnd, and xa.
-
-    Methods:
-        setup        -- Overrides StanzaBase.setup
-        reply        -- Overrides StanzaBase.reply
-        set_show     -- Set the value of the <show> element.
-        get_type     -- Get the value of the type attribute or <show> element.
-        set_type     -- Set the value of the type attribute or <show> element.
-        get_priority -- Get the value of the <priority> element.
-        set_priority -- Set the value of the <priority> element.
+        - **types**: One of: available, unavailable, error, probe,
+          subscribe, subscribed, unsubscribe, and unsubscribed.
+        - **showtypes**: One of: away, chat, dnd, and xa.
     """
 
     name = 'presence'
@@ -93,8 +86,7 @@ class Presence(RootStanza):
         """
         Set the value of the <show> element.
 
-        Arguments:
-            show -- Must be one of: away, chat, dnd, or xa.
+        :param str show: Must be one of: away, chat, dnd, or xa.
         """
         if show is None:
             self._del_sub('show')
@@ -119,8 +111,7 @@ class Presence(RootStanza):
         Set the type attribute's value, and the <show> element
         if applicable.
 
-        Arguments:
-            value -- Must be in either self.types or self.showtypes.
+        :param str value: Must be in either self.types or self.showtypes.
         """
         if value in self.types:
             self['show'] = None
@@ -146,14 +137,15 @@ class Presence(RootStanza):
         Bot clients should typically use a priority of 0 if the same
         JID is used elsewhere by a human-interacting client.
 
-        Arguments:
-            value -- An integer value greater than or equal to 0.
+        :param int value: An integer value greater than or equal to 0.
         """
         self._set_sub_text('priority', text=str(value))
 
     def get_priority(self):
         """
         Return the value of the <presence> element as an integer.
+
+        :rtype: int
         """
         p = self._get_sub_text('priority')
         if not p:
@@ -166,13 +158,12 @@ class Presence(RootStanza):
 
     def reply(self, clear=True):
         """
-        Set the appropriate presence reply type.
+        Create a new reply <presence/> stanza from ``self``.
 
         Overrides StanzaBase.reply.
 
-        Arguments:
-            clear -- Indicates if the stanza contents should be removed
-                     before replying. Defaults to True.
+        :param bool clear: Indicates if the stanza contents should be removed
+                           before replying. Defaults to True.
         """
         new_presence = StanzaBase.reply(self, clear)
         if self['type'] == 'unsubscribe':

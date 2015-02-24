@@ -12,6 +12,8 @@
 import logging
 from getpass import getpass
 from argparse import ArgumentParser
+from slixmpp.exceptions import IqError, IqTimeout
+from slixmpp import asyncio
 
 import slixmpp
 
@@ -36,6 +38,7 @@ class PingTest(slixmpp.ClientXMPP):
         # our roster.
         self.add_event_handler("session_start", self.start)
 
+    @asyncio.coroutine
     def start(self, event):
         """
         Process the session_start event.
@@ -53,8 +56,8 @@ class PingTest(slixmpp.ClientXMPP):
         self.get_roster()
 
         try:
-            rtt = self['xep_0199'].ping(self.pingjid,
-                                        timeout=10)
+            rtt = yield from self['xep_0199'].ping(self.pingjid,
+                                                   timeout=10)
             logging.info("Success! RTT: %s", rtt)
         except IqError as e:
             logging.info("Error pinging %s: %s",
@@ -78,8 +81,7 @@ if __name__ == '__main__':
                         action="store_const", dest="loglevel",
                         const=logging.DEBUG, default=logging.INFO)
     parser.add_argument("-t", "--pingto", help="set jid to ping",
-                        action="store", type="string", dest="pingjid",
-                        default=None)
+                        dest="pingjid", default=None)
 
     # JID and password options.
     parser.add_argument("-j", "--jid", dest="jid",

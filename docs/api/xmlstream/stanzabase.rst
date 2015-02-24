@@ -61,8 +61,8 @@ interacting with a given :term:`stanza` a :term:`stanza object`.
 To make dealing with more complicated and nested :term:`stanzas <stanza>`
 or XML chunks easier, :term:`stanza objects <stanza object>` can be
 composed in two ways: as iterable child objects or as plugins. Iterable
-child stanzas, or :term:`substanzas`, are accessible through a special
-``'substanzas'`` interface. This option is useful for stanzas which
+child stanzas, or :term:`substanzas <substanza>`, are accessible through a
+special ``'substanzas'`` interface. This option is useful for stanzas which
 may contain more than one of the same kind of element. When there is
 only one child element, the plugin method is more useful. For plugins,
 a parent stanza object delegates one of its XML child elements to the

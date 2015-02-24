@@ -20,7 +20,7 @@ class Boomerang(Endpoint):
 
     @remote
     def throw(self):
-        print "Duck!"
+        print("Duck!")
 
 
 

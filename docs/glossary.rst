@@ -9,21 +9,20 @@ Glossary
     stream handler
         A callback function that accepts stanza objects pulled directly
         from the XML stream. A stream handler is encapsulated in a
-        object that includes a :term:`Matcher` object, and which provides
-        additional semantics. For example, the ``Waiter`` handler wrapper
-        blocks thread execution until a matching stanza is received.
+        object that includes a :class:`Matcher <.MatcherBase>` object, and
+        which provides additional semantics. For example, the
+        :class:`.Waiter` handler wrapper blocks thread execution until a
+        matching stanza is received.
 
     event handler
         A callback function that responds to events raised by
-        ``XMLStream.event``. An event handler may be marked as
-        threaded, allowing it to execute outside of the main processing
-        loop.
+        :meth:`.XMLStream.event`.
 
     stanza object
-        Informally may refer both to classes which extend ``ElementBase``
-        or ``StanzaBase``, and to objects of such classes.
+        Informally may refer both to classes which extend :class:`.ElementBase`
+        or :class:`.StanzaBase`, and to objects of such classes.
 
-        A stanza object is a wrapper for an XML object which exposes ``dict``
+        A stanza object is a wrapper for an XML object which exposes :class:`dict`
         like interfaces which may be assigned to, read from, or deleted.
 
     stanza plugin

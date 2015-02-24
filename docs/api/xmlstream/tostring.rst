@@ -28,7 +28,7 @@ namespace because that is already declared by the stream header. But, if
 you create a :class:`~slixmpp.stanza.message.Message` instance and dump
 it to the terminal, the ``jabber:client`` namespace will appear.
 
-.. autofunction:: tostring
+.. autofunction:: slixmpp.xmlstream.tostring
 
 Escaping Special Characters
 ---------------------------
@@ -43,4 +43,5 @@ In the future, the use of CDATA sections may be allowed to reduce the
 size of escaped text or for when other XMPP processing agents do not
 undertand these entities.
 
-.. autofunction:: xml_escape
+..
+    autofunction:: xml_escape

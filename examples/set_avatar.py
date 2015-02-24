@@ -18,7 +18,7 @@ from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.exceptions import XMPPError
-
+from slixmpp import asyncio
 
 class AvatarSetter(slixmpp.ClientXMPP):
 
@@ -33,6 +33,7 @@ class AvatarSetter(slixmpp.ClientXMPP):
 
         self.filepath = filepath
 
+    @asyncio.coroutine
     def start(self, event):
         """
         Process the session_start event.
@@ -51,7 +52,7 @@ class AvatarSetter(slixmpp.ClientXMPP):
 
         avatar_file = None
         try:
-            avatar_file = open(os.path.expanduser(self.filepath))
+            avatar_file = open(os.path.expanduser(self.filepath), 'rb')
         except IOError:
             print('Could not find file: %s' % self.filepath)
             return self.disconnect()
@@ -65,32 +66,31 @@ class AvatarSetter(slixmpp.ClientXMPP):
         avatar_file.close()
 
         used_xep84 = False
-        try:
-            print('Publish XEP-0084 avatar data')
-            self['xep_0084'].publish_avatar(avatar)
-            used_xep84 = True
-        except XMPPError:
-            print('Could not publish XEP-0084 avatar')
 
-        try:
-            print('Update vCard with avatar')
-            self['xep_0153'].set_avatar(avatar=avatar, mtype=avatar_type)
-        except XMPPError:
+        print('Publish XEP-0084 avatar data')
+        result = yield from self['xep_0084'].publish_avatar(avatar, coroutine=True)
+        if isinstance(result, XMPPError):
+            print('Could not publish XEP-0084 avatar')
+        else:
+            used_xep84 = True
+
+        print('Update vCard with avatar')
+        result = yield from self['xep_0153'].set_avatar(avatar=avatar, mtype=avatar_type, coroutine=True)
+        if isinstance(result, XMPPError):
             print('Could not set vCard avatar')
 
         if used_xep84:
-            try:
-                print('Advertise XEP-0084 avatar metadata')
-                self['xep_0084'].publish_avatar_metadata([
-                    {'id': avatar_id,
-                     'type': avatar_type,
-                     'bytes': avatar_bytes}
-                    # We could advertise multiple avatars to provide
-                    # options in image type, source (HTTP vs pubsub),
-                    # size, etc.
-                    # {'id': ....}
-                ])
-            except XMPPError:
+            print('Advertise XEP-0084 avatar metadata')
+            result = yield from self['xep_0084'].publish_avatar_metadata([
+                {'id': avatar_id,
+                 'type': avatar_type,
+                 'bytes': avatar_bytes}
+                # We could advertise multiple avatars to provide
+                # options in image type, source (HTTP vs pubsub),
+                # size, etc.
+                # {'id': ....}
+            ], coroutine=True)
+            if isinstance(result, XMPPError):
                 print('Could not publish XEP-0084 metadata')
 
         print('Wait for presence updates to propagate...')

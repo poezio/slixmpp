@@ -7,19 +7,11 @@ Mulit-User Chat (MUC) Bot
 .. note::
 
     If you have any issues working through this quickstart guide
-    or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
-    or join the chat room at `sleek@conference.jabber.org
-    <xmpp:sleek@conference.jabber.org?join>`_.
+    join the chat room at `slixmpp@muc.poez.io
+    <xmpp:slixmpp@muc.poez.io?join>`_.
 
 If you have not yet installed Slixmpp, do so now by either checking out a version
-from `Github <http://github.com/fritzy/Slixmpp>`_, or installing it using ``pip``
-or ``easy_install``.
-
-.. code-block:: sh
-
-    pip install slixmpp  # Or: easy_install slixmpp
-
+from `Git <http://git.poez.io/slixmpp>`_.
 
 Now that you've got the basic gist of using Slixmpp by following the
 echobot example (:ref:`echobot`), we can use one of the bundled plugins

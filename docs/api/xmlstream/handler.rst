@@ -10,15 +10,19 @@ The Basic Handler
 
 Callback
 --------
-.. module:: slixmpp.xmlstream.handler.callback
+.. module:: slixmpp.xmlstream.handler
 
 .. autoclass:: Callback
     :members:
 
+CoroutineCallback
+-----------------
+
+.. autoclass:: CoroutineCallback
+    :members:
 
 Waiter
 ------
-.. module:: slixmpp.xmlstream.handler.waiter
 
 .. autoclass:: Waiter
     :members:

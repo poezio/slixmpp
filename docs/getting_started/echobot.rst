@@ -7,19 +7,11 @@ Slixmpp Quickstart - Echo Bot
 .. note::
 
     If you have any issues working through this quickstart guide
-    or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
-    or join the chat room at `sleek@conference.jabber.org
-    <xmpp:sleek@conference.jabber.org?join>`_.
+    join the chat room at `slixmpp@muc.poez.io
+    <xmpp:slixmpp@muc.poez.io?join>`_.
 
 If you have not yet installed Slixmpp, do so now by either checking out a version
-from `Github <http://github.com/fritzy/Slixmpp>`_, or installing it using ``pip``
-or ``easy_install``.
-
-.. code-block:: sh
-
-    pip install slixmpp  # Or: easy_install slixmpp
-
+with `Git <http://git.poez.io/slixmpp>`_.
 
 As a basic starting project, we will create an echo bot which will reply to any
 messages sent to it. We will also go through adding some basic command line configuration
@@ -44,6 +36,7 @@ To get started, here is a brief outline of the structure that the final project 
     # -*- coding: utf-8 -*-
 
     import sys
+    import asyncio
     import logging
     import getpass
     from optparse import OptionParser
@@ -58,24 +51,6 @@ To get started, here is a brief outline of the structure that the final project 
         '''Here we will instantiate our echo bot'''
 
         '''Finally, we connect the bot and start listening for messages'''
-
-Default Encoding
-----------------
-XMPP requires support for UTF-8 and so Slixmpp must use UTF-8 as well. In
-Python3 this is simple because Unicode is the default string type. For Python2.6+
-the situation is not as easy because standard strings are simply byte arrays and
-use ASCII. We can get Python to use UTF-8 as the default encoding by including:
-
-.. code-block:: python
-
-    if sys.version_info < (3, 0):
-        from slixmpp.util.misc_ops import setdefaultencoding
-        setdefaultencoding('utf8')
-
-.. warning::
-
-    Until we are able to ensure that Slixmpp will always use Unicode in Python2.6+, this
-    may cause issues embedding Slixmpp into other applications which assume ASCII encoding.
 
 Creating the EchoBot Class
 --------------------------
@@ -313,9 +288,9 @@ the ``EchoBot.__init__`` method instead.
         xmpp.ssl_version = ssl.PROTOCOL_SSLv3
 
 Now we're ready to connect and begin echoing messages. If you have the package
-``dnspython`` installed, then the :meth:`slixmpp.clientxmpp.ClientXMPP` method
+``aiodns`` installed, then the :meth:`slixmpp.clientxmpp.ClientXMPP` method
 will perform a DNS query to find the appropriate server to connect to for the
-given JID. If you do not have ``dnspython``, then Slixmpp will attempt to
+given JID. If you do not have ``aiodns``, then Slixmpp will attempt to
 connect to the hostname used by the JID, unless an address tuple is supplied
 to :meth:`slixmpp.clientxmpp.ClientXMPP`.
 
@@ -329,22 +304,6 @@ to :meth:`slixmpp.clientxmpp.ClientXMPP`.
             xmpp.process(block=True)
         else:
             print('Unable to connect')
-
-.. note::
-
-    For Google Talk users withouth ``dnspython`` installed, the above code
-    should look like:
-
-    .. code-block:: python
-
-        if __name__ == '__main__':
-
-            # .. option parsing & echo bot configuration
-
-            if xmpp.connect(('talk.google.com', 5222)):
-                xmpp.process(block=True)
-            else:
-                print('Unable to connect')
 
 To begin responding to messages, you'll see we called :meth:`slixmpp.basexmpp.BaseXMPP.process`
 which will start the event handling, send queue, and XML reader threads. It will also call

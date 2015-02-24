@@ -15,6 +15,7 @@ from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.exceptions import IqError, IqTimeout
+from slixmpp.xmlstream.asyncio import asyncio
 
 
 class Disco(slixmpp.ClientXMPP):
@@ -53,6 +54,7 @@ class Disco(slixmpp.ClientXMPP):
         # our roster.
         self.add_event_handler("session_start", self.start)
 
+    @asyncio.coroutine
     def start(self, event):
         """
         Process the session_start event.
@@ -79,17 +81,17 @@ class Disco(slixmpp.ClientXMPP):
                 # received. Non-blocking options would be to listen
                 # for the disco_info event, or passing a handler
                 # function using the callback parameter.
-                info = self['xep_0030'].get_info(jid=self.target_jid,
-                                                 node=self.target_node,
-                                                 block=True)
-            elif self.get in self.items_types:
+                info = yield from self['xep_0030'].get_info(jid=self.target_jid,
+                                                            node=self.target_node,
+                                                            coroutine=True)
+            if self.get in self.items_types:
                 # The same applies from above. Listen for the
                 # disco_items event or pass a callback function
                 # if you need to process a non-blocking request.
-                items = self['xep_0030'].get_items(jid=self.target_jid,
-                                                   node=self.target_node,
-                                                   block=True)
-            else:
+                items = yield from self['xep_0030'].get_items(jid=self.target_jid,
+                                                              node=self.target_node,
+                                                              coroutine=True)
+            if self.get not in self.info_types and self.get not in self.items_types:
                 logging.error("Invalid disco request type.")
                 return
         except IqError as e:
@@ -143,7 +145,7 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--password", dest="password",
                         help="password to use")
     parser.add_argument("query", choices=["all", "info", "items", "identities", "features"])
-    parser.add_argument("target-jid")
+    parser.add_argument("target_jid")
     parser.add_argument("node", nargs='?')
 
     args = parser.parse_args()

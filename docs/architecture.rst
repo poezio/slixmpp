@@ -24,21 +24,20 @@ patterns is received; these callbacks are also referred to as :term:`stream
 handlers <stream handler>`. The class also provides a basic eventing system
 which can be triggered either manually or on a timed schedule.
 
-The Main Threads
-~~~~~~~~~~~~~~~~
-:class:`~slixmpp.xmlstream.xmlstream.XMLStream` instances run using at
-least three background threads: the send thread, the read thread, and the
-scheduler thread. The send thread is in charge of monitoring the send queue
-and writing text to the outgoing XML stream. The read thread pulls text off
-of the incoming XML stream and stores the results in an event queue. The
-scheduler thread is used to emit events after a given period of time.
+The event loop
+~~~~~~~~~~~~~~
+:class:`~slixmpp.xmlstream.xmlstream.XMLStream` instances inherit the
+:class:`asyncio.BaseProtocol` class, and therefore do not have to handle
+reads and writes directly, but receive data through
+:meth:`~slixmpp.xmlstream.xmlstream.XMLStream.data_received` and write
+data in the socket transport.
 
-Additionally, the main event processing loop may be executed in its
-own thread if Slixmpp is being used in the background for another
-application.
+Upon receiving data, :term:`stream handlers <stream handler>` are run
+immediately, except if they are coroutines, in which case they are
+scheduled using :meth:`asyncio.async`.
 
-Short-lived threads may also be spawned as requested for threaded
-:term:`event handlers <event handler>`.
+:term:`Event handlers <event handler>` (which are called inside
+:term:`stream handlers <stream handler>`) work the same way.
 
 How XML Text is Turned into Action
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -53,7 +52,7 @@ when this bit of XML is received (with an assumed namespace of
     </message>
 
 
-1. **Convert XML strings into objects.**
+#. **Convert XML strings into objects.**
 
    Incoming text is parsed and converted into XML objects (using
    ElementTree) which are then wrapped into what are referred to as
@@ -66,65 +65,43 @@ when this bit of XML is received (with an assumed namespace of
    ``{jabber:client}message`` is associated with the class
    :class:`~slixmpp.stanza.Message`.
 
-2. **Match stanza objects to callbacks.**
+#. **Match stanza objects to callbacks.**
 
    These objects are then compared against the stored patterns associated
-   with the registered callback handlers. For each match, a copy of the
-   :term:`stanza object` is paired with a reference to the handler and
-   placed into the event queue.
+   with the registered callback handlers.
 
-   Our :class:`~slixmpp.stanza.Message` object is thus paired with the message stanza handler
-   :meth:`BaseXMPP._handle_message` to create the tuple::
+   Each handler matching our :term:`stanza object` is then added to a list.
 
-       ('stanza', stanza_obj, handler)
+#. **Processing callbacks**
 
-3. **Process the event queue.**
+   Every handler in the list is then called with the :term:`stanza object`
+   as a parameter; if the handler is a
+   :class:`~slixmpp.xmlstream.handler.CoroutineCallback`
+   then it will be scheduled in the event loop using :meth:`asyncio.async`
+   instead of run.
 
-   The event queue is the heart of Slixmpp. Nearly every action that
-   takes place is first inserted into this queue, whether that be received
-   stanzas, custom events, or scheduled events.
-
-   When the stanza is pulled out of the event queue with an associated
-   callback, the callback function is executed with the stanza as its only
-   parameter.
-
-   .. warning::
-       The callback, aka :term:`stream handler`, is executed in the main event
-       processing thread. If the handler blocks, event processing will also
-       block.
-
-4. **Raise Custom Events**
+#. **Raise Custom Events**
 
    Since a :term:`stream handler` shouldn't block, if extensive processing
    for a stanza is required (such as needing to send and receive an
    :class:`~slixmpp.stanza.Iq` stanza), then custom events must be used.
    These events are not explicitly tied to the incoming XML stream and may
-   be raised at any time. Importantly, these events may be handled in their
-   own thread.
+   be raised at any time.
 
-   When the event is raised, a copy of the stanza is created for each
-   handler registered for the event. In contrast to :term:`stream handlers
-   <stream handler>`, these functions are referred to as :term:`event
-   handlers <event handler>`. Each stanza/handler pair is then put into the
-   event queue.
+   In contrast to :term:`stream handlers <stream handler>`, these functions
+   are referred to as :term:`event handlers <event handler>`.
 
    The code for :meth:`BaseXMPP._handle_message` follows this pattern, and
-   raises a ``'message'`` event::
+   raises a ``'message'`` event
 
-       self.event('message', msg)
+   .. code-block:: python
 
-   The event call then places the message object back into the event queue
-   paired with an :term:`event handler`::
+        self.event('message', msg)
 
-       ('event', 'message', msg_copy1, custom_event_handler_1)
-       ('event', 'message', msg_copy2, custom_evetn_handler_2)
+#. **Process Custom Events**
 
-5. **Process Custom Events**
-
-   The stanza and :term:`event handler` are then pulled from the event
-   queue, and the handler is executed, passing the stanza as its only
-   argument. If the handler was registered as threaded, then a new thread
-   will be spawned for it.
+   The :term:`event handlers <event handler>` are then executed, passing
+   the stanza as the only argument.
 
    .. note::
        Events may be raised without needing :term:`stanza objects <stanza object>`.
@@ -135,9 +112,9 @@ when this bit of XML is received (with an assumed namespace of
    Finally, after a long trek, our message is handed off to the user's
    custom handler in order to do awesome stuff::
 
-       msg.reply()
-       msg['body'] = "Hey! This is awesome!"
-       msg.send()
+       reply = msg.reply()
+       reply['body'] = "Hey! This is awesome!"
+       reply.send()
 
 
 .. index:: BaseXMPP, XMLStream

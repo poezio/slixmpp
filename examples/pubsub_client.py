@@ -7,7 +7,13 @@ from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.xmlstream import ET, tostring
+from slixmpp.xmlstream.asyncio import asyncio
 
+def make_callback():
+    future = asyncio.Future()
+    def callback(result):
+        future.set_result(result)
+    return future, callback
 
 class PubsubClient(slixmpp.ClientXMPP):
 
@@ -41,8 +47,10 @@ class PubsubClient(slixmpp.ClientXMPP):
         self.disconnect()
 
     def nodes(self):
+        future, callback = make_callback()
         try:
-            result = self['xep_0060'].get_nodes(self.pubsub_server, self.node)
+            self['xep_0060'].get_nodes(self.pubsub_server, self.node, callback=callback)
+            result = yield from future
             for item in result['disco_items']['items']:
                 print('  - %s' % str(item))
         except:
@@ -63,16 +71,20 @@ class PubsubClient(slixmpp.ClientXMPP):
 
     def publish(self):
         payload = ET.fromstring("<test xmlns='test'>%s</test>" % self.data)
+        future, callback = make_callback()
         try:
-            result = self['xep_0060'].publish(self.pubsub_server, self.node, payload=payload)
+            self['xep_0060'].publish(self.pubsub_server, self.node, payload=payload, callback=callback)
+            result = yield from future
             id = result['pubsub']['publish']['item']['id']
             print('Published at item id: %s' % id)
         except:
             logging.error('Could not publish to: %s' % self.node)
 
     def get(self):
+        future, callback = make_callback()
         try:
-            result = self['xep_0060'].get_item(self.pubsub_server, self.node, self.data)
+            self['xep_0060'].get_item(self.pubsub_server, self.node, self.data, callback=callback)
+            result = yield from future
             for item in result['pubsub']['items']['substanzas']:
                 print('Retrieved item %s: %s' % (item['id'], tostring(item['payload'])))
         except:
@@ -80,28 +92,28 @@ class PubsubClient(slixmpp.ClientXMPP):
 
     def retract(self):
         try:
-            result = self['xep_0060'].retract(self.pubsub_server, self.node, self.data)
+            self['xep_0060'].retract(self.pubsub_server, self.node, self.data)
             print('Retracted item %s from node %s' % (self.data, self.node))
         except:
             logging.error('Could not retract item %s from node %s' % (self.data, self.node))
 
     def purge(self):
         try:
-            result = self['xep_0060'].purge(self.pubsub_server, self.node)
+            self['xep_0060'].purge(self.pubsub_server, self.node)
             print('Purged all items from node %s' % self.node)
         except:
             logging.error('Could not purge items from node %s' % self.node)
 
     def subscribe(self):
         try:
-            result = self['xep_0060'].subscribe(self.pubsub_server, self.node)
+            self['xep_0060'].subscribe(self.pubsub_server, self.node)
             print('Subscribed %s to node %s' % (self.boundjid.bare, self.node))
         except:
             logging.error('Could not subscribe %s to node %s' % (self.boundjid.bare, self.node))
 
     def unsubscribe(self):
         try:
-            result = self['xep_0060'].unsubscribe(self.pubsub_server, self.node)
+            self['xep_0060'].unsubscribe(self.pubsub_server, self.node)
             print('Unsubscribed %s from node %s' % (self.boundjid.bare, self.node))
         except:
             logging.error('Could not unsubscribe %s from node %s' % (self.boundjid.bare, self.node))

@@ -4,10 +4,8 @@ Sign in, Send a Message, and Disconnect
 .. note::
 
     If you have any issues working through this quickstart guide
-    or the other tutorials here, please either send a message to the
-    `mailing list <http://groups.google.com/group/slixmpp-discussion>`_
-    or join the chat room at `sleek@conference.jabber.org
-    <xmpp:sleek@conference.jabber.org?join>`_.
+    join the chat room at `slixmpp@muc.poez.io
+    <xmpp:slixmpp@muc.poez.io?join>`_.
 
 A common use case for Slixmpp is to send one-off messages from
 time to time. For example, one use case could be sending out a notice when

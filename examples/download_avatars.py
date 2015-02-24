@@ -11,11 +11,11 @@
 
 import logging
 from getpass import getpass
-import threading
 from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.exceptions import XMPPError
+from slixmpp import asyncio
 
 
 FILE_TYPES = {
@@ -40,8 +40,14 @@ class AvatarDownloader(slixmpp.ClientXMPP):
         self.add_event_handler('avatar_metadata_publish', self.on_avatar)
 
         self.received = set()
-        self.presences_received = threading.Event()
+        self.presences_received = asyncio.Event()
+        self.roster_received = asyncio.Event()
 
+    def roster_received_cb(self, event):
+        self.roster_received.set()
+        self.presences_received.clear()
+
+    @asyncio.coroutine
     def start(self, event):
         """
         Process the session_start event.
@@ -56,16 +62,20 @@ class AvatarDownloader(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        self.get_roster(callback=self.roster_received_cb)
 
         print('Waiting for presence updates...\n')
-        self.presences_received.wait(15)
+        yield from self.roster_received.wait()
+        print('Roster received')
+        yield from self.presences_received.wait()
         self.disconnect()
 
+    @asyncio.coroutine
     def on_vcard_avatar(self, pres):
         print("Received vCard avatar update from %s" % pres['from'].bare)
         try:
-            result = self['xep_0054'].get_vcard(pres['from'], cached=True)
+            result = yield from self['xep_0054'].get_vcard(pres['from'].bare, cached=True,
+                                                           coroutine=True, timeout=5)
         except XMPPError:
             print("Error retrieving avatar for %s" % pres['from'])
             return
@@ -76,16 +86,18 @@ class AvatarDownloader(slixmpp.ClientXMPP):
                 pres['from'].bare,
                 pres['vcard_temp_update']['photo'],
                 filetype)
-        with open(filename, 'w+') as img:
+        with open(filename, 'wb+') as img:
             img.write(avatar['BINVAL'])
 
+    @asyncio.coroutine
     def on_avatar(self, msg):
         print("Received avatar update from %s" % msg['from'])
         metadata = msg['pubsub_event']['items']['item']['avatar_metadata']
         for info in metadata['items']:
             if not info['url']:
                 try:
-                    result = self['xep_0084'].retrieve_avatar(msg['from'], info['id'])
+                    result = yield from self['xep_0084'].retrieve_avatar(msg['from'].bare, info['id'],
+                                                                         coroutine=True, timeout=5)
                 except XMPPError:
                     print("Error retrieving avatar for %s" % msg['from'])
                     return
@@ -94,7 +106,7 @@ class AvatarDownloader(slixmpp.ClientXMPP):
 
                 filetype = FILE_TYPES.get(metadata['type'], 'png')
                 filename = 'avatar_%s_%s.%s' % (msg['from'].bare, info['id'], filetype)
-                with open(filename, 'w+') as img:
+                with open(filename, 'wb+') as img:
                     img.write(avatar['value'])
             else:
                 # We could retrieve the avatar via HTTP, etc here instead.
@@ -105,6 +117,7 @@ class AvatarDownloader(slixmpp.ClientXMPP):
         Wait to receive updates from all roster contacts.
         """
         self.received.add(pres['from'].bare)
+        print((len(self.received), len(self.client_roster.keys())))
         if len(self.received) >= len(self.client_roster.keys()):
             self.presences_received.set()
         else:

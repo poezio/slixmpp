@@ -23,6 +23,9 @@ class Message(RootStanza):
     an error response.
 
     Example <message> stanzas:
+
+    .. code-block:: xml
+
         <message to="user1@example.com" from="user2@example.com">
           <body>Hi!</body>
         </message>
@@ -32,26 +35,13 @@ class Message(RootStanza):
         </message>
 
     Stanza Interface:
-        body    -- The main contents of the message.
-        subject -- An optional description of the message's contents.
-        mucroom -- (Read-only) The name of the MUC room that sent the message.
-        mucnick -- (Read-only) The MUC nickname of message's sender.
+        - **body**: The main contents of the message.
+        - **subject**: An optional description of the message's contents.
+        - **mucroom**: (Read-only) The name of the MUC room that sent the message.
+        - **mucnick**: (Read-only) The MUC nickname of message's sender.
 
     Attributes:
-        types -- May be one of: normal, chat, headline, groupchat, or error.
-
-    Methods:
-        setup       -- Overrides StanzaBase.setup.
-        chat        -- Set the message type to 'chat'.
-        normal      -- Set the message type to 'normal'.
-        reply       -- Overrides StanzaBase.reply
-        get_type    -- Overrides StanzaBase interface
-        get_mucroom -- Return the name of the MUC room of the message.
-        set_mucroom -- Dummy method to prevent assignment.
-        del_mucroom -- Dummy method to prevent deletion.
-        get_mucnick -- Return the MUC nickname of the message's sender.
-        set_mucnick -- Dummy method to prevent assignment.
-        del_mucnick -- Dummy method to prevent deletion.
+        - **types**: May be one of: normal, chat, headline, groupchat, or error.
     """
 
     name = 'message'
@@ -81,18 +71,25 @@ class Message(RootStanza):
         Overrides default stanza interface behavior.
 
         Returns 'normal' if no type attribute is present.
+
+        :rtype: str
         """
         return self._get_attr('type', 'normal')
 
     def get_parent_thread(self):
-        """Return the message thread's parent thread."""
+        """Return the message thread's parent thread.
+
+        :rtype: str
+        """
         thread = self.xml.find('{%s}thread' % self.namespace)
         if thread is not None:
             return thread.attrib.get('parent', '')
         return ''
 
     def set_parent_thread(self, value):
-        """Add or change the message thread's parent thread."""
+        """Add or change the message thread's parent thread.
+
+        :param str value: identifier of the thread"""
         thread = self.xml.find('{%s}thread' % self.namespace)
         if value:
             if thread is None:
@@ -128,10 +125,11 @@ class Message(RootStanza):
         Sets proper 'to' attribute if the message is from a MUC, and
         adds a message body if one is given.
 
-        Arguments:
-            body  -- Optional text content for the message.
-            clear -- Indicates if existing content should be removed
-                     before replying. Defaults to True.
+        :param str body:  Optional text content for the message.
+        :param bool clear: Indicates if existing content should be removed
+                           before replying. Defaults to True.
+
+        :rtype: :class:`~.Message`
         """
         new_message = StanzaBase.reply(self, clear)
 
@@ -152,6 +150,8 @@ class Message(RootStanza):
         Return the name of the MUC room where the message originated.
 
         Read-only stanza interface.
+
+        :rtype: str
         """
         if self['type'] == 'groupchat':
             return self['from'].bare
@@ -163,6 +163,8 @@ class Message(RootStanza):
         Return the nickname of the MUC user that sent the message.
 
         Read-only stanza interface.
+
+        :rtype: str
         """
         if self['type'] == 'groupchat':
             return self['from'].resource

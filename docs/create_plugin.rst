@@ -634,8 +634,9 @@ with some additional registration fields implemented.
                 if self.backend.register(iq['from'].bare, iq['register']):
                     # Successful registration
                     self.xmpp.event('registered_user', iq)
-                    iq.reply().set_payload(iq['register'].xml)
-                    iq.send()
+                    reply = iq.reply()
+                    reply.set_payload(iq['register'].xml)
+                    reply.send()
                 else:
                     # Conflicting registration
                     self._sendError(iq, '409', 'cancel', 'conflict',
@@ -666,14 +667,16 @@ with some additional registration fields implemented.
                     # Add a blank field
                     reg.addField(field)
 
-            iq.reply().set_payload(reg.xml)
-            iq.send()
+            reply = iq.reply()
+            reply.set_payload(reg.xml)
+            reply.send()
 
         def _sendError(self, iq, code, error_type, name, text=''):
-            iq.reply().set_payload(iq['register'].xml)
-            iq.error()
-            iq['error']['code'] = code
-            iq['error']['type'] = error_type
-            iq['error']['condition'] = name
-            iq['error']['text'] = text
-            iq.send()
+            reply = iq.reply()
+            reply.set_payload(iq['register'].xml)
+            reply.error()
+            reply['error']['code'] = code
+            reply['error']['type'] = error_type
+            reply['error']['condition'] = name
+            reply['error']['text'] = text
+            reply.send()

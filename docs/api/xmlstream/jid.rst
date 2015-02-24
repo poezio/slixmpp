@@ -1,7 +1,7 @@
 Jabber IDs (JID)
 =================
 
-.. module:: slixmpp.xmlstream.jid
+.. module:: slixmpp.jid
 
 .. autoclass:: JID
     :members:

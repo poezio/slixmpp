@@ -103,5 +103,5 @@ def on_session2(event):
         new_xmpp.disconnect()
 new_xmpp.add_event_handler('session_start', on_session2)
 
-if new_xmpp.connect():
-    new_xmpp.process(block=True)
+new_xmpp.connect()
+new_xmpp.process()
