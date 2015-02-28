@@ -7,23 +7,46 @@ Using asyncio
 Block on IQ sending
 ~~~~~~~~~~~~~~~~~~~
 
-:meth:`.Iq.send` now accepts a ``coroutine`` parameter which, if ``True``,
-will return a coroutine waiting for the IQ reply to be received.
+:meth:`.Iq.send` now returns a :class:`~.Future` so you can easily block with:
 
 .. code-block:: python
 
-    result = yield from iq.send(coroutine=True)
+    result = yield from iq.send()
+
+.. warning::
+
+    If the reply is an IQ with an ``error`` type, this will raise an
+    :class:`.IqError`, and if it timeouts, it will raise an
+    :class:`.IqTimeout`. Don't forget to catch it.
+
+You can still use callbacks instead.
 
 XEP plugin integration
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Many XEP plugins have been modified to accept this ``coroutine`` parameter as
-well, so you can do things like:
+The same changes from the SleekXMPP API apply, so you can do:
 
 .. code-block:: python
 
-    iq_info = yield from self.xmpp['xep_0030'].get_info(jid, coroutine=True)
+    iq_info = yield from self.xmpp['xep_0030'].get_info(jid)
 
+But the following will only return a Future:
+
+.. code-block:: python
+
+    iq_info = self.xmpp['xep_0030'].get_info(jid)
+
+
+Callbacks, Event Handlers, and Stream Handlers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+IQ callbacks and :term:`Event Handlers <event handler>` can be coroutine
+functions; in this case, they will be scheduled in the event loop using
+:meth:`.asyncio.async` and not ran immediately.
+
+A :class:`.CoroutineCallback` class has been added as well for
+:term:`Stream Handlers <stream handler>`, which will use
+:meth:`.asyncio.async` to schedule the callback.
 
 Running the event loop
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -52,7 +75,7 @@ callbacks while everything is not ready.
 
     client = slixmpp.ClientXMPP('jid@example', 'password')
     client.connected_event = asyncio.Event()
-    callback = lambda event: client.connected_event.set()
+    callback = lambda _: client.connected_event.set()
     client.add_event_handler('session_start', callback)
     client.connect()
     loop.run_until_complete(event.wait())
@@ -112,8 +135,7 @@ JID indicating its findings.
         def on_message(self, event):
             # You should probably handle IqError and IqTimeout exceptions here
             # but this is an example.
-            version = yield from self['xep_0092'].get_version(message['from'],
-                                                              coroutine=True)
+            version = yield from self['xep_0092'].get_version(message['from'])
             text = "%s sent me a message, he runs %s" % (message['from'],
                                                          version['software_version']['name'])
             self.send_message(mto='master@example.tld', mbody=text)

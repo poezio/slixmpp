@@ -33,23 +33,18 @@ cls.idle_call = idle_call
 real_run_once = cls._run_once
 cls._run_once = my_run_once
 
-
-def coroutine_wrapper(func):
+def future_wrapper(func):
     """
-    Make sure the result of a function call is a coroutine
-    if the ``coroutine`` keyword argument is true.
+    Make sure the result of a function call is an asyncio.Future()
+    object.
     """
-    def wrap_coro(result):
-        if asyncio.iscoroutinefunction(result):
-            return result
-        else:
-            return asyncio.coroutine(lambda: result)()
-
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if kwargs.get('coroutine', False):
-            return wrap_coro(func(*args, **kwargs))
-        else:
-            return func(*args, **kwargs)
+        result = func(*args, **kwargs)
+        if isinstance(result, asyncio.Future):
+            return result
+        future = asyncio.Future()
+        future.set_result(result)
+        return future
 
     return wrapper

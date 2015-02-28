@@ -32,12 +32,12 @@ Differences from SleekXMPP
     handlers, which will be also handled in the event loop.
 
     The :class:`~.slixmpp.stanza.Iq` object’s :meth:`~.slixmpp.stanza.Iq.send`
-    method now takes a *coroutine* parameter which, if set to ``True``,
-    will return a coroutine which will (asyncio-)block until the reply
-    is received.
+    method now **always** return a :class:`~.asyncio.Future` which result will be set
+    to the IQ reply when it is received, or to ``None`` if the IQ is not of
+    type ``get`` or ``set``.
 
-    Many plugins (WIP) calls which retrieve information also accept this
-    ``coroutine`` parameter.
+    Many plugins (WIP) calls which retrieve information also return the same
+    future.
 
 **Architectural differences**
     slixmpp does not have an event queue anymore, and instead processes
