@@ -293,7 +293,7 @@ class SlixTest(unittest.TestCase):
             self.xmpp.socket.disconnect_error()
 
     def stream_start(self, mode='client', skip=True, header=None,
-                           socket='mock', jid='tester@localhost',
+                           socket='mock', jid='tester@localhost/resource',
                            password='test', server='localhost',
                            port=5222, sasl_mech=None,
                            plugins=None, plugin_config={}):
@@ -310,7 +310,7 @@ class SlixTest(unittest.TestCase):
                         should be a dummy, mock socket or a live, functioning
                         socket. Defaults to 'mock'.
             jid      -- The JID to use for the connection.
-                        Defaults to 'tester@localhost'.
+                        Defaults to 'tester@localhost/resource'.
             password -- The password to use for the connection.
                         Defaults to 'test'.
             server   -- The name of the XMPP server. Defaults to 'localhost'.
