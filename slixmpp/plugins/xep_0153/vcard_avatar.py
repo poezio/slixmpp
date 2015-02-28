@@ -8,14 +8,13 @@
 
 import hashlib
 import logging
-import threading
 
 from slixmpp.stanza import Presence
-from slixmpp.exceptions import XMPPError
+from slixmpp.exceptions import XMPPError, IqTimeout
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0153 import stanza, VCardTempUpdate
-from slixmpp import asyncio, coroutine_wrapper
+from slixmpp import asyncio, future_wrapper
 
 
 log = logging.getLogger(__name__)
@@ -30,8 +29,6 @@ class XEP_0153(BasePlugin):
 
     def plugin_init(self):
         self._hashes = {}
-
-        self._allow_advertising = threading.Event()
 
         register_stanza_plugin(Presence, VCardTempUpdate)
 
@@ -60,59 +57,60 @@ class XEP_0153(BasePlugin):
         self.xmpp.del_event_handler('presence_chat', self._recv_presence)
         self.xmpp.del_event_handler('presence_away', self._recv_presence)
 
-    @asyncio.coroutine
-    def _set_avatar_coroutine(self, jid, mtype, avatar):
-        vcard = yield from self.xmpp['xep_0054'].get_vcard(jid, cached=True, coroutine=True)
-        vcard = vcard['vcard_temp']
-        vcard['PHOTO']['TYPE'] = mtype
-        vcard['PHOTO']['BINVAL'] = avatar
-
-        result = yield from self.xmpp['xep_0054'].publish_vcard(jid=jid, vcard=vcard)
-
-        self.api['reset_hash'](jid)
-        self.xmpp.roster[jid].send_last_presence()
-
-        return result
-
-    @coroutine_wrapper
+    @future_wrapper
     def set_avatar(self, jid=None, avatar=None, mtype=None, timeout=None,
-                   callback=None, coroutine=False):
+                   callback=None):
         if jid is None:
             jid = self.xmpp.boundjid.bare
 
-        if coroutine:
-            return self._set_avatar_coroutine(jid, mtype, avatar)
-        else:
-            def custom_callback(result):
-                vcard = result['vcard_temp']
-                vcard['PHOTO']['TYPE'] = mtype
-                vcard['PHOTO']['BINVAL'] = avatar
+        future = asyncio.Future()
 
-                self.xmpp['xep_0054'].publish_vcard(jid=jid, vcard=vcard, callback=callback)
+        def propagate_timeout_exception(fut):
+            try:
+                fut.done()
+            except IqTimeout as e:
+                future.set_exception(e)
 
+        def custom_callback(result):
+            vcard = result['vcard_temp']
+            vcard['PHOTO']['TYPE'] = mtype
+            vcard['PHOTO']['BINVAL'] = avatar
+
+            new_future = self.xmpp['xep_0054'].publish_vcard(jid=jid,
+                                                             vcard=vcard,
+                                                             timeout=timeout,
+                                                             callback=next_callback)
+            new_future.add_done_callback(propagate_timeout_exception)
+
+        def next_callback(result):
+            if result['type'] == 'error':
+                future.set_exception(result)
+            else:
                 self.api['reset_hash'](jid)
                 self.xmpp.roster[jid].send_last_presence()
-                callback(result)
 
-            self.xmpp['xep_0054'].get_vcard(jid, cached=True, callback=custom_callback)
+                future.set_result(result)
+
+        first_future = self.xmpp['xep_0054'].get_vcard(jid, cached=False, timeout=timeout,
+                                                       callback=custom_callback)
+        first_future.add_done_callback(propagate_timeout_exception)
+        return future
 
     @asyncio.coroutine
     def _start(self, event):
         try:
-            vcard = yield from self.xmpp['xep_0054'].get_vcard(self.xmpp.boundjid.bare,
-                                                               coroutine=True)
+            vcard = yield from self.xmpp['xep_0054'].get_vcard(self.xmpp.boundjid.bare)
             data = vcard['vcard_temp']['PHOTO']['BINVAL']
             if not data:
                 new_hash = ''
             else:
                 new_hash = hashlib.sha1(data).hexdigest()
             self.api['set_hash'](self.xmpp.boundjid, args=new_hash)
-            self._allow_advertising.set()
         except XMPPError:
-            log.debug('Could not retrieve vCard for %s' % self.xmpp.boundjid.bare)
+            log.debug('Could not retrieve vCard for %s', self.xmpp.boundjid.bare)
 
     def _end(self, event):
-        self._allow_advertising.clear()
+        pass
 
     def _update_presence(self, stanza):
         if not isinstance(stanza, Presence):
@@ -136,7 +134,7 @@ class XEP_0153(BasePlugin):
 
         def callback(iq):
             if iq['type'] == 'error':
-                log.debug('Could not retrieve vCard for %s' % jid)
+                log.debug('Could not retrieve vCard for %s', jid)
                 return
             data = iq['vcard_temp']['PHOTO']['BINVAL']
             if not data:

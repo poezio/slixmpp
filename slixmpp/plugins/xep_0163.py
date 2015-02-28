@@ -10,7 +10,6 @@ import logging
 
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.base import BasePlugin, register_plugin
-from slixmpp import coroutine_wrapper
 
 
 log = logging.getLogger(__name__)
@@ -83,9 +82,8 @@ class XEP_0163(BasePlugin):
                                               feature='%s+notify' % namespace)
         self.xmpp['xep_0115'].update_caps(jid)
 
-    @coroutine_wrapper
     def publish(self, stanza, node=None, id=None, options=None, ifrom=None,
-                timeout_callback=None, callback=None, timeout=None, coroutine=False):
+                timeout_callback=None, callback=None, timeout=None):
         """
         Publish a PEP update.
 
@@ -115,8 +113,7 @@ class XEP_0163(BasePlugin):
                                              options=options, ifrom=ifrom,
                                              callback=callback,
                                              timeout=timeout,
-                                             timeout_callback=timeout_callback,
-                                             coroutine=coroutine)
+                                             timeout_callback=timeout_callback)
 
 
 register_plugin(XEP_0163)

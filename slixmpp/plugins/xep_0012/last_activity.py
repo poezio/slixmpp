@@ -10,13 +10,12 @@ import logging
 from datetime import datetime, timedelta
 
 from slixmpp.plugins import BasePlugin, register_plugin
-from slixmpp import Iq
+from slixmpp import future_wrapper, Iq
 from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import JID, register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins.xep_0012 import stanza, LastActivity
-from slixmpp import coroutine_wrapper
 
 
 log = logging.getLogger(__name__)
@@ -77,9 +76,9 @@ class XEP_0012(BasePlugin):
     def del_last_activity(self, jid):
         self.api['del_last_activity'](jid)
 
-    @coroutine_wrapper
+    @future_wrapper
     def get_last_activity(self, jid, local=False, ifrom=None, timeout=None,
-                          callback=None, timeout_callback=None, coroutine=False):
+                          callback=None, timeout_callback=None):
         if jid is not None and not isinstance(jid, JID):
             jid = JID(jid)
 
@@ -100,7 +99,7 @@ class XEP_0012(BasePlugin):
         iq['to'] = jid
         iq['type'] = 'get'
         iq.enable('last_activity')
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine,
+        return iq.send(timeout=timeout, callback=callback,
                        timeout_callback=timeout_callback)
 
     def _handle_get_last_activity(self, iq):

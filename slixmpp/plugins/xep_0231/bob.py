@@ -10,7 +10,7 @@
 import logging
 import hashlib
 
-from slixmpp import coroutine_wrapper
+from slixmpp import future_wrapper
 from slixmpp.stanza import Iq, Message, Presence
 from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream.handler import Callback
@@ -82,9 +82,9 @@ class XEP_0231(BasePlugin):
 
         return cid
 
-    @coroutine_wrapper
+    @future_wrapper
     def get_bob(self, jid=None, cid=None, cached=True, ifrom=None,
-                timeout=None, callback=None, coroutine=False):
+                timeout=None, callback=None):
         if cached:
             data = self.api['get_bob'](None, None, ifrom, args=cid)
             if data is not None:
@@ -99,7 +99,7 @@ class XEP_0231(BasePlugin):
         iq['from'] = ifrom
         iq['type'] = 'get'
         iq['bob']['cid'] = cid
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)
 
     def del_bob(self, cid):
         self.api['del_bob'](args=cid)

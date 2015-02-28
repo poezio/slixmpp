@@ -10,7 +10,6 @@ import logging
 
 from slixmpp import Iq
 from slixmpp.plugins import BasePlugin
-from slixmpp import coroutine_wrapper
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.xep_0257 import stanza, Certs
 from slixmpp.plugins.xep_0257 import AppendCert, DisableCert, RevokeCert
@@ -32,39 +31,35 @@ class XEP_0257(BasePlugin):
         register_stanza_plugin(Iq, DisableCert)
         register_stanza_plugin(Iq, RevokeCert)
 
-    @coroutine_wrapper
-    def get_certs(self, ifrom=None, timeout=None, callback=None, coroutine=False):
+    def get_certs(self, ifrom=None, timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'get'
         iq['from'] = ifrom
         iq.enable('sasl_certs')
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)
 
-    @coroutine_wrapper
     def add_cert(self, name, cert, allow_management=True, ifrom=None,
-                       timeout=None, callback=None, coroutine=False):
+                       timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq['sasl_cert_append']['name'] = name
         iq['sasl_cert_append']['x509cert'] = cert
         iq['sasl_cert_append']['cert_management'] = allow_management
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)
 
-    @coroutine_wrapper
-    def disable_cert(self, name, ifrom=None, coroutine=False,
+    def disable_cert(self, name, ifrom=None,
                            timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq['sasl_cert_disable']['name'] = name
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)
 
-    @coroutine_wrapper
-    def revoke_cert(self, name, ifrom=None, coroutine=False,
+    def revoke_cert(self, name, ifrom=None,
                            timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq['sasl_cert_revoke']['name'] = name
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)

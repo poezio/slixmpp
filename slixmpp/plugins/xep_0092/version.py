@@ -15,7 +15,6 @@ from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0092 import Version, stanza
-from slixmpp import coroutine_wrapper
 
 
 log = logging.getLogger(__name__)
@@ -71,9 +70,7 @@ class XEP_0092(BasePlugin):
         iq['software_version']['os'] = self.os
         iq.send()
 
-    @coroutine_wrapper
-    def get_version(self, jid, ifrom=None, timeout=None, callback=None,
-                    coroutine=False):
+    def get_version(self, jid, ifrom=None, timeout=None, callback=None):
         """
         Retrieve the software version of a remote agent.
 
@@ -85,4 +82,4 @@ class XEP_0092(BasePlugin):
         iq['from'] = ifrom
         iq['type'] = 'get'
         iq['query'] = Version.namespace
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)

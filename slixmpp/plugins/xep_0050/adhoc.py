@@ -18,7 +18,6 @@ from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0050 import stanza
 from slixmpp.plugins.xep_0050 import Command
 from slixmpp.plugins.xep_0004 import Form
-from slixmpp import coroutine_wrapper
 
 
 log = logging.getLogger(__name__)
@@ -428,7 +427,6 @@ class XEP_0050(BasePlugin):
     # =================================================================
     # Client side (command user) API
 
-    @coroutine_wrapper
     def get_commands(self, jid, **kwargs):
         """
         Return a list of commands provided by a given JID.
@@ -454,7 +452,6 @@ class XEP_0050(BasePlugin):
                                                node=Command.namespace,
                                                **kwargs)
 
-    @coroutine_wrapper
     def send_command(self, jid, node, ifrom=None, action='execute',
                     payload=None, sessionid=None, flow=False, **kwargs):
         """

@@ -10,7 +10,6 @@ import logging
 
 from slixmpp import Iq
 from slixmpp.plugins import BasePlugin
-from slixmpp import coroutine_wrapper
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.xmlstream import register_stanza_plugin, JID
@@ -289,7 +288,6 @@ class XEP_0030(BasePlugin):
                 'cached': cached}
         return self.api['has_identity'](jid, node, ifrom, data)
 
-    @coroutine_wrapper
     def get_info(self, jid=None, node=None, local=None,
                        cached=None, **kwargs):
         """
@@ -364,10 +362,9 @@ class XEP_0030(BasePlugin):
         iq['to'] = jid
         iq['type'] = 'get'
         iq['disco_info']['node'] = node if node else ''
-        return iq.send(timeout=kwargs.get('timeout', None),
-                       callback=kwargs.get('callback', None),
-                       coroutine=kwargs.get('coroutine', False),
-                       timeout_callback=kwargs.get('timeout_callback', None))
+        iq.send(timeout=kwargs.get('timeout', None),
+                callback=kwargs.get('callback', None),
+                timeout_callback=kwargs.get('timeout_callback', None))
 
     def set_info(self, jid=None, node=None, info=None):
         """
@@ -378,7 +375,6 @@ class XEP_0030(BasePlugin):
             info = info['disco_info']
         self.api['set_info'](jid, node, None, info)
 
-    @coroutine_wrapper
     def get_items(self, jid=None, node=None, local=False, **kwargs):
         """
         Retrieve the disco#items results from a given JID/node combination.
@@ -427,10 +423,9 @@ class XEP_0030(BasePlugin):
             raise NotImplementedError("XEP 0059 has not yet been fixed")
             return self.xmpp['xep_0059'].iterate(iq, 'disco_items')
         else:
-            return iq.send(timeout=kwargs.get('timeout', None),
-                           callback=kwargs.get('callback', None),
-                           coroutine=kwargs.get('coroutine', False),
-                           timeout_callback=kwargs.get('timeout_callback', None))
+            iq.send(timeout=kwargs.get('timeout', None),
+                    callback=kwargs.get('callback', None),
+                    timeout_callback=kwargs.get('timeout_callback', None))
 
     def set_items(self, jid=None, node=None, **kwargs):
         """

@@ -9,7 +9,6 @@
 import logging
 
 from slixmpp import Iq
-from slixmpp import coroutine_wrapper
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -46,18 +45,14 @@ class XEP_0191(BasePlugin):
         self.xmpp.remove_handler('Blocked Contact')
         self.xmpp.remove_handler('Unblocked Contact')
 
-    @coroutine_wrapper
-    def get_blocked(self, ifrom=None, timeout=None, callback=None,
-                    coroutine=False):
+    def get_blocked(self, ifrom=None, timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'get'
         iq['from'] = ifrom
         iq.enable('blocklist')
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)
 
-    @coroutine_wrapper
-    def block(self, jids, ifrom=None, timeout=None, callback=None,
-              coroutine=False):
+    def block(self, jids, ifrom=None, timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
@@ -66,11 +61,9 @@ class XEP_0191(BasePlugin):
             jids = [jids]
 
         iq['block']['items'] = jids
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)
 
-    @coroutine_wrapper
-    def unblock(self, jids=None, ifrom=None, timeout=None, callback=None,
-                coroutine=False):
+    def unblock(self, jids=None, ifrom=None, timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
@@ -81,7 +74,7 @@ class XEP_0191(BasePlugin):
             jids = [jids]
 
         iq['unblock']['items'] = jids
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine)
+        return iq.send(timeout=timeout, callback=callback)
 
     def _handle_blocked(self, iq):
         self.xmpp.event('blocked', iq)

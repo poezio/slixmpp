@@ -11,7 +11,7 @@ import logging
 
 from slixmpp.jid import JID
 from slixmpp.stanza import Iq
-from slixmpp import asyncio, coroutine_wrapper
+from slixmpp import asyncio
 from slixmpp.exceptions import IqError, IqTimeout
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -119,9 +119,8 @@ class XEP_0199(BasePlugin):
         log.debug("Pinged by %s", iq['from'])
         iq.reply().send()
 
-    @coroutine_wrapper
     def send_ping(self, jid, ifrom=None, timeout=None, callback=None,
-                  timeout_callback=None, coroutine=False):
+                  timeout_callback=None):
         """Send a ping request.
 
         Arguments:
@@ -141,7 +140,7 @@ class XEP_0199(BasePlugin):
         iq['from'] = ifrom
         iq.enable('ping')
 
-        return iq.send(timeout=timeout, callback=callback, coroutine=coroutine,
+        return iq.send(timeout=timeout, callback=callback,
                        timeout_callback=timeout_callback)
 
     @asyncio.coroutine
