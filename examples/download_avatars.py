@@ -75,7 +75,7 @@ class AvatarDownloader(slixmpp.ClientXMPP):
         print("Received vCard avatar update from %s" % pres['from'].bare)
         try:
             result = yield from self['xep_0054'].get_vcard(pres['from'].bare, cached=True,
-                                                           coroutine=True, timeout=5)
+                                                           timeout=5)
         except XMPPError:
             print("Error retrieving avatar for %s" % pres['from'])
             return
@@ -97,7 +97,7 @@ class AvatarDownloader(slixmpp.ClientXMPP):
             if not info['url']:
                 try:
                     result = yield from self['xep_0084'].retrieve_avatar(msg['from'].bare, info['id'],
-                                                                         coroutine=True, timeout=5)
+                                                                         timeout=5)
                 except XMPPError:
                     print("Error retrieving avatar for %s" % msg['from'])
                     return

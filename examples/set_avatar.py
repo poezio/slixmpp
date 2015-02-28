@@ -68,14 +68,14 @@ class AvatarSetter(slixmpp.ClientXMPP):
         used_xep84 = False
 
         print('Publish XEP-0084 avatar data')
-        result = yield from self['xep_0084'].publish_avatar(avatar, coroutine=True)
+        result = yield from self['xep_0084'].publish_avatar(avatar)
         if isinstance(result, XMPPError):
             print('Could not publish XEP-0084 avatar')
         else:
             used_xep84 = True
 
         print('Update vCard with avatar')
-        result = yield from self['xep_0153'].set_avatar(avatar=avatar, mtype=avatar_type, coroutine=True)
+        result = yield from self['xep_0153'].set_avatar(avatar=avatar, mtype=avatar_type)
         if isinstance(result, XMPPError):
             print('Could not set vCard avatar')
 
@@ -89,7 +89,7 @@ class AvatarSetter(slixmpp.ClientXMPP):
                 # options in image type, source (HTTP vs pubsub),
                 # size, etc.
                 # {'id': ....}
-            ], coroutine=True)
+            ])
             if isinstance(result, XMPPError):
                 print('Could not publish XEP-0084 metadata')
 

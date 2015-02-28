@@ -82,15 +82,13 @@ class Disco(slixmpp.ClientXMPP):
                 # for the disco_info event, or passing a handler
                 # function using the callback parameter.
                 info = yield from self['xep_0030'].get_info(jid=self.target_jid,
-                                                            node=self.target_node,
-                                                            coroutine=True)
+                                                            node=self.target_node)
             if self.get in self.items_types:
                 # The same applies from above. Listen for the
                 # disco_items event or pass a callback function
                 # if you need to process a non-blocking request.
                 items = yield from self['xep_0030'].get_items(jid=self.target_jid,
-                                                              node=self.target_node,
-                                                              coroutine=True)
+                                                              node=self.target_node)
             if self.get not in self.info_types and self.get not in self.items_types:
                 logging.error("Invalid disco request type.")
                 return
