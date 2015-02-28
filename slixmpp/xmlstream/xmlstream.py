@@ -207,6 +207,9 @@ class XMLStream(asyncio.BaseProtocol):
         #: ``_xmpp-client._tcp`` service.
         self.dns_service = None
 
+        #: An asyncio Future being done when the stream is disconnected.
+        self.disconnected = asyncio.Future()
+
         self.add_event_handler('disconnected', self._remove_schedules)
         self.add_event_handler('session_start', self._start_keepalive)
 
@@ -299,7 +302,7 @@ class XMLStream(asyncio.BaseProtocol):
             self.event("connection_failed", e)
             asyncio.async(self._connect_routine())
 
-    def process(self, timeout=None):
+    def process(self, *, forever=True, timeout=None):
         """Process all the available XMPP events (receiving or sending data on the
         socket(s), calling various registered callbacks, calling expired
         timers, handling signal events, etc).  If timeout is None, this
@@ -308,10 +311,15 @@ class XMLStream(asyncio.BaseProtocol):
         """
         loop = asyncio.get_event_loop()
         if timeout is None:
-            loop.run_forever()
+            if forever:
+                loop.run_forever()
+            else:
+                loop.run_until_complete(self.disconnected)
         else:
-            future = asyncio.sleep(timeout)
-            loop.run_until_complete(future)
+            tasks = [asyncio.sleep(timeout)]
+            if not forever:
+                tasks.append(self.disconnected)
+            loop.run_until_complete(asyncio.wait(tasks))
 
     def init_parser(self):
         """init the XML parser. The parser must always be reset for each new
@@ -413,6 +421,7 @@ class XMLStream(asyncio.BaseProtocol):
         if self.transport:
             self.transport.abort()
             self.event("killed")
+            self.disconnected.set_result(True)
 
     def reconnect(self, wait=2.0):
         """Calls disconnect(), and once we are disconnected (after the timeout, or

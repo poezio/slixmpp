@@ -53,7 +53,8 @@ Running the event loop
 
 :meth:`.XMLStream.process` is only a thin wrapper on top of
 ``loop.run_forever()`` (if ``timeout`` is provided then it will
-only run for this amount of time).
+only run for this amount of time, and if ``forever`` is False it will
+run until disconnection).
 
 Therefore you can handle the event loop in any way you like
 instead of using ``process()``.
