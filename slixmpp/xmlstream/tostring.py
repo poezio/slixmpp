@@ -158,3 +158,19 @@ def escape(text, use_cdata=False):
             escaped = map(lambda x : "<![CDATA[%s]]>" % x, text.split("]]>"))
             return "<![CDATA[]]]><![CDATA[]>]]>".join(escaped)
         return text
+
+
+def _get_highlight():
+    try:
+        from pygments import highlight
+        from pygments.lexers import get_lexer_by_name
+        from pygments.formatters import Terminal256Formatter
+
+        LEXER = get_lexer_by_name('xml')
+        FORMATTER = Terminal256Formatter()
+
+        return lambda x: highlight(x, LEXER, FORMATTER)
+    except ImportError:
+        return lambda x: x
+
+highlight = _get_highlight()

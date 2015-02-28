@@ -22,26 +22,9 @@ import uuid
 import xml.etree.ElementTree
 
 from slixmpp.xmlstream.asyncio import asyncio
-from slixmpp.xmlstream import tostring
+from slixmpp.xmlstream import tostring, highlight
 from slixmpp.xmlstream.stanzabase import StanzaBase, ElementBase
 from slixmpp.xmlstream.resolver import resolve, default_resolver
-
-try:
-    from pygments import highlight
-    from pygments.lexers import get_lexer_by_name
-    from pygments.formatters import Terminal256Formatter
-
-    LEXER = get_lexer_by_name('xml')
-    FORMATTER = Terminal256Formatter()
-except ImportError:
-    def highlight(text, lexer, formatter, outfile=None):
-        if outfile is not None:
-            outfile.write(text)
-            return
-        return text
-
-    LEXER = None
-    FORMATTER = None
 
 #: The time in seconds to wait before timing out waiting for response stanzas.
 RESPONSE_TIMEOUT = 30
@@ -363,7 +346,7 @@ class XMLStream(asyncio.BaseProtocol):
                     log.debug('[33;1mRECV[0m: %s', highlight(tostring(self.xml_root, xmlns=self.default_ns,
                                                          stream=self,
                                                          top_level=True,
-                                                         open_only=True), LEXER, FORMATTER).strip())
+                                                         open_only=True)).strip())
                     self.start_stream_handler(self.xml_root)
                 self.xml_depth += 1
             if event == 'end':
@@ -853,7 +836,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         :param string data: Any bytes or utf-8 string value.
         """
-        log.debug("[36;1mSEND[0m: %s", highlight(data, LEXER, FORMATTER).strip())
+        log.debug("[36;1mSEND[0m: %s", highlight(data).strip())
         if not self.transport:
             raise NotConnectedError()
         if isinstance(data, str):
@@ -906,7 +889,7 @@ class XMLStream(asyncio.BaseProtocol):
         if stanza is None:
             return
 
-        log.debug("[33;1mRECV[0m: %s", highlight(str(stanza), LEXER, FORMATTER).strip())
+        log.debug("[33;1mRECV[0m: %s", highlight(str(stanza)).strip())
 
         # Match the stanza against registered handlers. Handlers marked
         # to run "in stream" will be executed immediately; the rest will

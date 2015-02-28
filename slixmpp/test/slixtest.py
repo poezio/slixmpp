@@ -15,7 +15,7 @@ from slixmpp import ClientXMPP, ComponentXMPP
 from slixmpp.stanza import Message, Iq, Presence
 from slixmpp.xmlstream import ET
 from slixmpp.xmlstream import ElementBase
-from slixmpp.xmlstream.tostring import tostring
+from slixmpp.xmlstream.tostring import tostring, highlight
 from slixmpp.xmlstream.matcher import StanzaPath, MatcherId, MatchIDSender
 from slixmpp.xmlstream.matcher import MatchXMLMask, MatchXPath
 
@@ -268,16 +268,16 @@ class SlixTest(unittest.TestCase):
                 stanza3.values = values
 
                 debug = "Three methods for creating stanzas do not match.\n"
-                debug += "Given XML:\n%s\n" % tostring(xml)
-                debug += "Given stanza:\n%s\n" % tostring(stanza.xml)
-                debug += "Generated stanza:\n%s\n" % tostring(stanza2.xml)
-                debug += "Second generated stanza:\n%s\n" % tostring(stanza3.xml)
+                debug += "Given XML:\n%s\n" % highlight(tostring(xml))
+                debug += "Given stanza:\n%s\n" % highlight(tostring(stanza.xml))
+                debug += "Generated stanza:\n%s\n" % highlight(tostring(stanza2.xml))
+                debug += "Second generated stanza:\n%s\n" % highlight(tostring(stanza3.xml))
                 result = self.compare(xml, stanza.xml, stanza2.xml, stanza3.xml)
             else:
                 debug = "Two methods for creating stanzas do not match.\n"
-                debug += "Given XML:\n%s\n" % tostring(xml)
-                debug += "Given stanza:\n%s\n" % tostring(stanza.xml)
-                debug += "Generated stanza:\n%s\n" % tostring(stanza2.xml)
+                debug += "Given XML:\n%s\n" % highlight(tostring(xml))
+                debug += "Given stanza:\n%s\n" % highlight(tostring(stanza.xml))
+                debug += "Generated stanza:\n%s\n" % highlight(tostring(stanza2.xml))
                 result = self.compare(xml, stanza.xml, stanza2.xml)
 
             self.failUnless(result, debug)
@@ -560,13 +560,13 @@ class SlixTest(unittest.TestCase):
         if method == 'exact':
             self.failUnless(self.compare(xml, sent_xml),
                 "Features do not match.\nDesired:\n%s\nReceived:\n%s" % (
-                    tostring(xml), tostring(sent_xml)))
+                    highlight(tostring(xml)), highlight(tostring(sent_xml))))
         elif method == 'mask':
             matcher = MatchXMLMask(xml)
             self.failUnless(matcher.match(sent_xml),
                 "Stanza did not match using %s method:\n" % method + \
-                "Criteria:\n%s\n" % tostring(xml) + \
-                "Stanza:\n%s" % tostring(sent_xml))
+                "Criteria:\n%s\n" % highlight(tostring(xml)) + \
+                "Stanza:\n%s" % highlight(tostring(sent_xml)))
         else:
             raise ValueError("Uknown matching method: %s" % method)
 
