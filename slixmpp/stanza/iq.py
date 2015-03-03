@@ -152,7 +152,7 @@ class Iq(RootStanza):
         new_iq['type'] = 'result'
         return new_iq
 
-    def send(self, callback=None, timeout=None, timeout_callback=None, coroutine=False):
+    def send(self, callback=None, timeout=None, timeout_callback=None):
         """Send an <iq> stanza over the XML stream.
 
         A callback handler can be provided that will be executed when the Iq
@@ -193,7 +193,7 @@ class Iq(RootStanza):
             else:
                 future.set_result(result)
 
-            if timeout_callback is not None and timeout is not None:
+            if timeout is not None:
                 self.stream.cancel_schedule('IqTimeout_%s' % self['id'])
             if callback is not None:
                 callback(result)
@@ -210,7 +210,7 @@ class Iq(RootStanza):
                 constr = CoroutineCallback
             else:
                 constr = Callback
-            if timeout_callback is not None and timeout is not None:
+            if timeout is not None:
                 self.stream.schedule('IqTimeout_%s' % self['id'],
                                      timeout,
                                      callback_timeout,
