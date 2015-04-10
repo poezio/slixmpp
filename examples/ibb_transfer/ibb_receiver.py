@@ -22,13 +22,10 @@ class IBBReceiver(slixmpp.ClientXMPP):
     A basic example of creating and using an in-band bytestream.
     """
 
-    def __init__(self, jid, password):
+    def __init__(self, jid, password, filename):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
-        self.register_plugin('xep_0030') # Service Discovery
-        self.register_plugin('xep_0047', {
-            'auto_accept': True
-        }) # In-band Bytestreams
+        self.file = open(filename, 'wb')
 
         # The session_start event will be triggered when
         # the bot establishes its connection with the server
@@ -39,6 +36,7 @@ class IBBReceiver(slixmpp.ClientXMPP):
 
         self.add_event_handler("ibb_stream_start", self.stream_opened)
         self.add_event_handler("ibb_stream_data", self.stream_data)
+        self.add_event_handler("ibb_stream_end", self.stream_closed)
 
     def start(self, event):
         """
@@ -56,29 +54,16 @@ class IBBReceiver(slixmpp.ClientXMPP):
         self.send_presence()
         self.get_roster()
 
-    def accept_stream(self, iq):
-        """
-        Check that it is ok to accept a stream request.
-
-        Controlling stream acceptance can be done via either:
-            - setting 'auto_accept' to False in the plugin
-              configuration. The default is True.
-            - setting 'accept_stream' to a function which accepts
-              an Iq stanza as its argument, like this one.
-
-        The accept_stream function will be used if it exists, and the
-        auto_accept value will be used otherwise.
-        """
-        return True
-
     def stream_opened(self, stream):
         print('Stream opened: %s from %s' % (stream.sid, stream.peer_jid))
 
-        # You could run a loop reading from the stream using stream.recv(),
-        # or use the ibb_stream_data event.
+    def stream_data(self, stream):
+        self.file.write(stream.read())
 
-    def stream_data(self, event):
-        print(event['data'])
+    def stream_closed(self, stream):
+        print('Stream closed: %s from %s' % (stream.sid, stream.peer_jid))
+        self.file.close()
+        self.disconnect()
 
 if __name__ == '__main__':
     # Setup the command line arguments.
@@ -97,6 +82,8 @@ if __name__ == '__main__':
                         help="JID to use")
     parser.add_argument("-p", "--password", dest="password",
                         help="password to use")
+    parser.add_argument("-o", "--out", dest="filename",
+                        help="file to save to")
 
     args = parser.parse_args()
 
@@ -108,9 +95,18 @@ if __name__ == '__main__':
         args.jid = input("Username: ")
     if args.password is None:
         args.password = getpass("Password: ")
+    if args.filename is None:
+        args.filename = input("File path: ")
 
-    xmpp = IBBReceiver(args.jid, args.password)
+    # Setup the IBBReceiver and register plugins. Note that while plugins may
+    # have interdependencies, the order in which you register them does
+    # not matter.
+    xmpp = IBBReceiver(args.jid, args.password, args.filename)
+    xmpp.register_plugin('xep_0030') # Service Discovery
+    xmpp.register_plugin('xep_0047', {
+        'auto_accept': True
+    }) # In-band Bytestreams
 
     # Connect to the XMPP server and start processing XMPP stanzas.
     xmpp.connect()
-    xmpp.process()
+    xmpp.process(forever=False)
