@@ -152,6 +152,13 @@ Event Index
         Makes the contents of message stanzas available whenever one is received. Be
         sure to check the message type in order to handle error messages.
 
+    message_error
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`BaseXMPP <slixmpp.BaseXMPP>`
+
+        Makes the contents of message stanzas available whenever one is received.
+        Only handler messages with an ``error`` type.
+
     message_form
         - **Data:** :py:class:`~slixmpp.plugins.xep_0004.Form`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0004.xep_0004`

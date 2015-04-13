@@ -143,6 +143,13 @@ class BaseXMPP(XMLStream):
                      MatchXPath('{%s}message/{%s}body' % (self.default_ns,
                                                           self.default_ns)),
                      self._handle_message))
+
+        self.register_handler(
+            Callback('IMError',
+                     MatchXPath('{%s}message/{%s}error' % (self.default_ns,
+                                                           self.default_ns)),
+                     self._handle_message_error))
+
         self.register_handler(
             Callback('Presence',
                      MatchXPath("{%s}presence" % self.default_ns),
@@ -689,6 +696,12 @@ class BaseXMPP(XMLStream):
         if not self.is_component and not msg['to'].bare:
             msg['to'] = self.boundjid
         self.event('message', msg)
+
+    def _handle_message_error(self, msg):
+        """Process incoming message error stanzas."""
+        if not self.is_component and not msg['to'].bare:
+            msg['to'] = self.boundjid
+        self.event('message_error', msg)
 
     def _handle_available(self, pres):
         self.roster[pres['to']][pres['from']].handle_available(pres)
