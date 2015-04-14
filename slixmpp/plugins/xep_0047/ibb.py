@@ -119,7 +119,7 @@ class XEP_0047(BasePlugin):
         iq['from'] = ifrom
         iq['ibb_open']['block_size'] = block_size
         iq['ibb_open']['sid'] = sid
-        iq['ibb_open']['stanza'] = 'iq'
+        iq['ibb_open']['stanza'] = 'message' if use_messages else 'iq'
 
         stream = IBBytestream(self.xmpp, sid, block_size,
                               iq['from'], iq['to'], window,
