@@ -24,7 +24,7 @@ class Open(ElementBase):
     interfaces = set(('block_size', 'sid', 'stanza'))
 
     def get_block_size(self):
-        return int(self._get_attr('block-size'))
+        return int(self._get_attr('block-size', '0'))
 
     def set_block_size(self, value):
         self._set_attr('block-size', str(value))
@@ -47,7 +47,10 @@ class Data(ElementBase):
         self._set_attr('seq', str(value))
 
     def get_data(self):
-        b64_data = self.xml.text.strip()
+        text = self.xml.text
+        if not text:
+            raise XMPPError('not-acceptable', 'IBB data element is empty.')
+        b64_data = text.strip()
         if VALID_B64.match(b64_data).group() == b64_data:
             return from_b64(b64_data)
         else:
