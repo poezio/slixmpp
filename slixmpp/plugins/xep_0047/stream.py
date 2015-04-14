@@ -34,7 +34,8 @@ class IBBytestream(object):
     def send(self, data):
         if not self.stream_started or self.stream_out_closed:
             raise socket.error
-        data = data[0:self.block_size]
+        if len(data) > self.block_size:
+            data = data[:self.block_size]
         self.send_seq = (self.send_seq + 1) % 65535
         seq = self.send_seq
         if self.use_messages:
@@ -60,7 +61,7 @@ class IBBytestream(object):
     def sendall(self, data):
         sent_len = 0
         while sent_len < len(data):
-            sent_len += self.send(data[sent_len:])
+            sent_len += self.send(data[sent_len:self.block_size])
 
     def _recv_ack(self, iq):
         if iq['type'] == 'error':
