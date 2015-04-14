@@ -142,7 +142,7 @@ class XEP_0047(BasePlugin):
                 log.debug('IBB stream (%s) accepted by %s', stream.sid, iq['from'])
                 stream.self_jid = iq['to']
                 stream.peer_jid = iq['from']
-                stream.stream_started.set()
+                stream.stream_started = True
                 self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
                 self.xmpp.event('ibb_stream_start', stream)
                 self.xmpp.event('stream:%s:%s' % (stream.sid, stream.peer_jid), stream)
@@ -167,7 +167,7 @@ class XEP_0047(BasePlugin):
 
         stream = IBBytestream(self.xmpp, sid, size,
                               iq['to'], iq['from'])
-        stream.stream_started.set()
+        stream.stream_started = True
         self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
         iq.reply().send()
 

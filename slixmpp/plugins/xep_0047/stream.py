@@ -1,5 +1,4 @@
 import socket
-import threading
 import logging
 from queue import Queue
 
@@ -26,15 +25,14 @@ class IBBytestream(object):
         self.send_seq = -1
         self.recv_seq = -1
 
-        self.stream_started = threading.Event()
-        self.stream_in_closed = threading.Event()
-        self.stream_out_closed = threading.Event()
+        self.stream_started = False
+        self.stream_in_closed = False
+        self.stream_out_closed = False
 
         self.recv_queue = Queue()
 
     def send(self, data):
-        if not self.stream_started.is_set() or \
-               self.stream_out_closed.is_set():
+        if not self.stream_started or self.stream_out_closed:
             raise socket.error
         data = data[0:self.block_size]
         self.send_seq = (self.send_seq + 1) % 65535
@@ -90,8 +88,7 @@ class IBBytestream(object):
         return self.read(block=True)
 
     def read(self, block=True, timeout=None, **kwargs):
-        if not self.stream_started.is_set() or \
-               self.stream_in_closed.is_set():
+        if not self.stream_started or self.stream_in_closed:
             raise socket.error
         if timeout is not None:
             block = True
@@ -106,14 +103,15 @@ class IBBytestream(object):
         iq['to'] = self.peer_jid
         iq['from'] = self.self_jid
         iq['ibb_close']['sid'] = self.sid
-        self.stream_out_closed.set()
-        iq.send(block=False,
-                callback=lambda x: self.stream_in_closed.set())
+        self.stream_out_closed = True
+        def _close_stream(_):
+            self.stream_in_closed = True
+        iq.send(block=False, callback=_close_stream)
         self.xmpp.event('ibb_stream_end', self)
 
     def _closed(self, iq):
-        self.stream_in_closed.set()
-        self.stream_out_closed.set()
+        self.stream_in_closed = True
+        self.stream_out_closed = True
         iq.reply().send()
         self.xmpp.event('ibb_stream_end', self)
 
