@@ -27,9 +27,6 @@ class IBBytestream(object):
         self.send_seq = -1
         self.recv_seq = -1
 
-        self._send_seq_lock = threading.Lock()
-        self._recv_seq_lock = threading.Lock()
-
         self.stream_started = threading.Event()
         self.stream_in_closed = threading.Event()
         self.stream_out_closed = threading.Event()
@@ -47,9 +44,8 @@ class IBBytestream(object):
             raise socket.error
         data = data[0:self.block_size]
         self.send_window.acquire()
-        with self._send_seq_lock:
-            self.send_seq = (self.send_seq + 1) % 65535
-            seq = self.send_seq
+        self.send_seq = (self.send_seq + 1) % 65535
+        seq = self.send_seq
         if self.use_messages:
             msg = self.xmpp.Message()
             msg['to'] = self.peer_jid
@@ -87,12 +83,11 @@ class IBBytestream(object):
             self.close()
 
     def _recv_data(self, stanza):
-        with self._recv_seq_lock:
-            new_seq = stanza['ibb_data']['seq']
-            if new_seq != (self.recv_seq + 1) % 65535:
-                self.close()
-                raise XMPPError('unexpected-request')
-            self.recv_seq = new_seq
+        new_seq = stanza['ibb_data']['seq']
+        if new_seq != (self.recv_seq + 1) % 65535:
+            self.close()
+            raise XMPPError('unexpected-request')
+        self.recv_seq = new_seq
 
         data = stanza['ibb_data']['data']
         if len(data) > self.block_size:

@@ -1,6 +1,5 @@
 import uuid
 import logging
-import threading
 
 from slixmpp import Message, Iq
 from slixmpp.exceptions import XMPPError
@@ -30,10 +29,6 @@ class XEP_0047(BasePlugin):
     def plugin_init(self):
         self._streams = {}
         self._pending_streams = {}
-        self._pending_lock = threading.Lock()
-        self._stream_lock = threading.Lock()
-
-        self._preauthed_sids_lock = threading.Lock()
         self._preauthed_sids = {}
 
         register_stanza_plugin(Iq, Open)
@@ -85,9 +80,8 @@ class XEP_0047(BasePlugin):
         self._streams[(jid, sid, peer_jid)] = stream
 
     def _del_stream(self, jid, sid, peer_jid, data):
-        with self._stream_lock:
-            if (jid, sid, peer_jid) in self._streams:
-                del self._streams[(jid, sid, peer_jid)]
+        if (jid, sid, peer_jid) in self._streams:
+            del self._streams[(jid, sid, peer_jid)]
 
     def _accept_stream(self, iq):
         receiver = iq['to']
@@ -105,15 +99,13 @@ class XEP_0047(BasePlugin):
         return False
 
     def _authorized_sid(self, jid, sid, ifrom, iq):
-        with self._preauthed_sids_lock:
-            if (jid, sid, ifrom) in self._preauthed_sids:
-                del self._preauthed_sids[(jid, sid, ifrom)]
-                return True
-            return False
+        if (jid, sid, ifrom) in self._preauthed_sids:
+            del self._preauthed_sids[(jid, sid, ifrom)]
+            return True
+        return False
 
     def _preauthorize_sid(self, jid, sid, ifrom, data):
-        with self._preauthed_sids_lock:
-            self._preauthed_sids[(jid, sid, ifrom)] = True
+        self._preauthed_sids[(jid, sid, ifrom)] = True
 
     def open_stream(self, jid, block_size=None, sid=None, window=1, use_messages=False,
                     ifrom=None, timeout=None, callback=None):
@@ -134,9 +126,6 @@ class XEP_0047(BasePlugin):
                               iq['from'], iq['to'], window,
                               use_messages)
 
-        with self._stream_lock:
-            self._pending_streams[iq['id']] = stream
-
         self._pending_streams[iq['id']] = stream
 
         cb = None
@@ -151,8 +140,7 @@ class XEP_0047(BasePlugin):
 
     def _handle_opened_stream(self, iq):
         if iq['type'] == 'result':
-            with self._stream_lock:
-                stream = self._pending_streams.get(iq['id'], None)
+            stream = self._pending_streams.get(iq['id'], None)
             if stream is not None:
                 log.debug('IBB stream (%s) accepted by %s', stream.sid, iq['from'])
                 stream.self_jid = iq['to']
@@ -162,9 +150,8 @@ class XEP_0047(BasePlugin):
                 self.xmpp.event('ibb_stream_start', stream)
                 self.xmpp.event('stream:%s:%s' % (stream.sid, stream.peer_jid), stream)
 
-        with self._stream_lock:
-            if iq['id'] in self._pending_streams:
-                del self._pending_streams[iq['id']]
+        if iq['id'] in self._pending_streams:
+            del self._pending_streams[iq['id']]
 
     def _handle_open_request(self, iq):
         sid = iq['ibb_open']['sid']
