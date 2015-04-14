@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 import logging
 
@@ -27,7 +28,6 @@ class XEP_0047(BasePlugin):
 
     def plugin_init(self):
         self._streams = {}
-        self._pending_streams = {}
         self._preauthed_sids = {}
 
         register_stanza_plugin(Iq, Open)
@@ -123,32 +123,23 @@ class XEP_0047(BasePlugin):
         stream = IBBytestream(self.xmpp, sid, block_size,
                               iq['from'], iq['to'], use_messages)
 
-        self._pending_streams[iq['id']] = stream
+        stream_future = asyncio.Future()
 
-        cb = None
-        if callback is not None:
-            def chained(resp):
-                self._handle_opened_stream(resp)
-                callback(resp)
-            cb = chained
-        else:
-            cb = self._handle_opened_stream
-        return iq.send(timeout=timeout, callback=cb)
+        def _handle_opened_stream(iq):
+            log.debug('IBB stream (%s) accepted by %s', stream.sid, iq['from'])
+            stream.self_jid = iq['to']
+            stream.peer_jid = iq['from']
+            stream.stream_started = True
+            self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
+            stream_future.set_result(stream)
+            if callback is not None:
+                callback(stream)
+            self.xmpp.event('ibb_stream_start', stream)
+            self.xmpp.event('stream:%s:%s' % (stream.sid, stream.peer_jid), stream)
 
-    def _handle_opened_stream(self, iq):
-        if iq['type'] == 'result':
-            stream = self._pending_streams.get(iq['id'], None)
-            if stream is not None:
-                log.debug('IBB stream (%s) accepted by %s', stream.sid, iq['from'])
-                stream.self_jid = iq['to']
-                stream.peer_jid = iq['from']
-                stream.stream_started = True
-                self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
-                self.xmpp.event('ibb_stream_start', stream)
-                self.xmpp.event('stream:%s:%s' % (stream.sid, stream.peer_jid), stream)
+        iq.send(timeout=timeout, callback=_handle_opened_stream)
 
-        if iq['id'] in self._pending_streams:
-            del self._pending_streams[iq['id']]
+        return stream_future
 
     def _handle_open_request(self, iq):
         sid = iq['ibb_open']['sid']
