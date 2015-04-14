@@ -94,8 +94,7 @@ class XEP_0047(BasePlugin):
 
     def _authorized(self, jid, sid, ifrom, iq):
         if self.auto_accept:
-            if iq['ibb_open']['block_size'] <= self.max_block_size:
-                return True
+            return True
         return False
 
     def _authorized_sid(self, jid, sid, ifrom, iq):
