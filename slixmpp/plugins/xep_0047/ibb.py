@@ -162,7 +162,7 @@ class XEP_0047(BasePlugin):
             raise XMPPError(etype='modify', condition='bad-request')
 
         if not self._accept_stream(iq):
-            raise XMPPError(etype='modify', condition='not-acceptable')
+            raise XMPPError(etype='cancel', condition='not-acceptable')
 
         if size > self.max_block_size:
             raise XMPPError('resource-constraint')
