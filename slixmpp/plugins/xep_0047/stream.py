@@ -12,11 +12,10 @@ log = logging.getLogger(__name__)
 
 class IBBytestream(object):
 
-    def __init__(self, xmpp, sid, block_size, jid, peer, window_size=1, use_messages=False):
+    def __init__(self, xmpp, sid, block_size, jid, peer, use_messages=False):
         self.xmpp = xmpp
         self.sid = sid
         self.block_size = block_size
-        self.window_size = window_size
         self.use_messages = use_messages
 
         if jid is None:
@@ -33,17 +32,11 @@ class IBBytestream(object):
 
         self.recv_queue = Queue()
 
-        self.send_window = threading.BoundedSemaphore(value=self.window_size)
-        self.window_ids = set()
-        self.window_empty = threading.Event()
-        self.window_empty.set()
-
     def send(self, data):
         if not self.stream_started.is_set() or \
                self.stream_out_closed.is_set():
             raise socket.error
         data = data[0:self.block_size]
-        self.send_window.acquire()
         self.send_seq = (self.send_seq + 1) % 65535
         seq = self.send_seq
         if self.use_messages:
@@ -55,7 +48,6 @@ class IBBytestream(object):
             msg['ibb_data']['seq'] = seq
             msg['ibb_data']['data'] = data
             msg.send()
-            self.send_window.release()
         else:
             iq = self.xmpp.Iq()
             iq['type'] = 'set'
@@ -64,8 +56,6 @@ class IBBytestream(object):
             iq['ibb_data']['sid'] = self.sid
             iq['ibb_data']['seq'] = seq
             iq['ibb_data']['data'] = data
-            self.window_empty.clear()
-            self.window_ids.add(iq['id'])
             iq.send(callback=self._recv_ack)
         return len(data)
 
@@ -75,10 +65,6 @@ class IBBytestream(object):
             sent_len += self.send(data[sent_len:])
 
     def _recv_ack(self, iq):
-        self.window_ids.remove(iq['id'])
-        if not self.window_ids:
-            self.window_empty.set()
-        self.send_window.release()
         if iq['type'] == 'error':
             self.close()
 

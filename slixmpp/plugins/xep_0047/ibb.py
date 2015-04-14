@@ -22,7 +22,6 @@ class XEP_0047(BasePlugin):
     default_config = {
         'block_size': 4096,
         'max_block_size': 8192,
-        'window_size': 1,
         'auto_accept': False,
     }
 
@@ -106,7 +105,7 @@ class XEP_0047(BasePlugin):
     def _preauthorize_sid(self, jid, sid, ifrom, data):
         self._preauthed_sids[(jid, sid, ifrom)] = True
 
-    def open_stream(self, jid, block_size=None, sid=None, window=1, use_messages=False,
+    def open_stream(self, jid, block_size=None, sid=None, use_messages=False,
                     ifrom=None, timeout=None, callback=None):
         if sid is None:
             sid = str(uuid.uuid4())
@@ -122,8 +121,7 @@ class XEP_0047(BasePlugin):
         iq['ibb_open']['stanza'] = 'message' if use_messages else 'iq'
 
         stream = IBBytestream(self.xmpp, sid, block_size,
-                              iq['from'], iq['to'], window,
-                              use_messages)
+                              iq['from'], iq['to'], use_messages)
 
         self._pending_streams[iq['id']] = stream
 
@@ -168,8 +166,7 @@ class XEP_0047(BasePlugin):
             raise XMPPError('resource-constraint')
 
         stream = IBBytestream(self.xmpp, sid, size,
-                              iq['to'], iq['from'],
-                              self.window_size)
+                              iq['to'], iq['from'])
         stream.stream_started.set()
         self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
         iq.reply().send()
