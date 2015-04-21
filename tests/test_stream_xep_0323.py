@@ -582,7 +582,7 @@ class TestStreamSensorData(SlixTest):
         self.recv("""
         <iq type='get'
                 from='master@clayster.com/amr'
-                to='tester@localhost'
+                to='tester@localhost/resource'
                 id='disco1'>
             <query xmlns='http://jabber.org/protocol/disco#info'/>
         </iq>
@@ -607,7 +607,7 @@ class TestStreamSensorData(SlixTest):
         self.recv("""
         <iq type='get'
                 from='master@clayster.com/amr'
-                to='tester@localhost'
+                to='tester@localhost/resource'
                 id='disco1'>
             <query xmlns='http://jabber.org/protocol/disco#info'/>
         </iq>
@@ -615,7 +615,7 @@ class TestStreamSensorData(SlixTest):
 
         self.send("""
         <iq type='result'
-            from='tester@localhost'
+            from='tester@localhost/resource'
             to='master@clayster.com/amr'
             id='disco1'>
             <query xmlns='http://jabber.org/protocol/disco#info'>

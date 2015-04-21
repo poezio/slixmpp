@@ -75,7 +75,7 @@ class TestStreamDisco(SlixTest):
         self.xmpp['xep_0030'].static.add_node(node='testing')
 
         self.recv("""
-          <iq to="tester@localhost" type="get" id="test">
+          <iq to="tester@localhost/resource" type="get" id="test">
             <query xmlns="http://jabber.org/protocol/disco#info"
                    node="testing" />
           </iq>
@@ -101,7 +101,7 @@ class TestStreamDisco(SlixTest):
         self.xmpp['xep_0030'].static.add_node(node='testing')
 
         self.recv("""
-          <iq to="tester@localhost" type="get" id="test">
+          <iq to="tester@localhost/resource" type="get" id="test">
             <query xmlns="http://jabber.org/protocol/disco#items"
                    node="testing" />
           </iq>
