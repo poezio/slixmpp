@@ -169,7 +169,14 @@ def _get_highlight():
         LEXER = get_lexer_by_name('xml')
         FORMATTER = Terminal256Formatter()
 
-        return lambda x: highlight(x, LEXER, FORMATTER)
+        class Highlighter:
+            __slots__ = ['string']
+            def __init__(self, string):
+                self.string = string
+            def __str__(self):
+                return highlight(str(self.string).strip(), LEXER, FORMATTER)
+
+        return Highlighter
     except ImportError:
         return lambda x: x
 

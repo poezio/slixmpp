@@ -354,7 +354,7 @@ class XMLStream(asyncio.BaseProtocol):
                     log.debug('[33;1mRECV[0m: %s', highlight(tostring(self.xml_root, xmlns=self.default_ns,
                                                          stream=self,
                                                          top_level=True,
-                                                         open_only=True)).strip())
+                                                         open_only=True)))
                     self.start_stream_handler(self.xml_root)
                 self.xml_depth += 1
             if event == 'end':
@@ -845,7 +845,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         :param string data: Any bytes or utf-8 string value.
         """
-        log.debug("[36;1mSEND[0m: %s", highlight(data).strip())
+        log.debug("[36;1mSEND[0m: %s", highlight(data))
         if not self.transport:
             raise NotConnectedError()
         if isinstance(data, str):
@@ -898,7 +898,7 @@ class XMLStream(asyncio.BaseProtocol):
         if stanza is None:
             return
 
-        log.debug("[33;1mRECV[0m: %s", highlight(str(stanza)).strip())
+        log.debug("[33;1mRECV[0m: %s", highlight(stanza))
 
         # Match the stanza against registered handlers. Handlers marked
         # to run "in stream" will be executed immediately; the rest will
