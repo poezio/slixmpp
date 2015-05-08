@@ -122,6 +122,12 @@ class XEP_0030(BasePlugin):
         for op in self._disco_ops:
             self.api.register(getattr(self.static, op), op, default=True)
 
+    def session_bind(self, jid):
+        self.add_feature('http://jabber.org/protocol/disco#info')
+
+    def plugin_end(self):
+        self.del_feature('http://jabber.org/protocol/disco#info')
+
     def _add_disco_op(self, op, default_handler):
         self.api.register(default_handler, op)
         self.api.register_default(default_handler, op)
