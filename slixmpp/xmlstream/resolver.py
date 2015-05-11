@@ -32,14 +32,14 @@ except ImportError as e:
               "Not all features will be available")
 
 
-def default_resolver():
+def default_resolver(loop):
     """Return a basic DNS resolver object.
 
     :returns: A :class:`aiodns.DNSResolver` object if aiodns
               is available. Otherwise, ``None``.
     """
     if AIODNS_AVAILABLE:
-        return aiodns.DNSResolver(loop=asyncio.get_event_loop(),
+        return aiodns.DNSResolver(loop=loop,
                                   tries=1,
                                   timeout=1.0)
     return None
@@ -47,7 +47,7 @@ def default_resolver():
 
 @asyncio.coroutine
 def resolve(host, port=None, service=None, proto='tcp',
-            resolver=None, use_ipv6=True, use_aiodns=True):
+            resolver=None, use_ipv6=True, use_aiodns=True, loop=None):
     """Peform DNS resolution for a given hostname.
 
     Resolution may perform SRV record lookups if a service and protocol
@@ -97,7 +97,7 @@ def resolve(host, port=None, service=None, proto='tcp',
         log.debug("DNS: Use of IPv6 has been disabled.")
 
     if resolver is None and AIODNS_AVAILABLE and use_aiodns:
-        resolver = aiodns.DNSResolver(loop=asyncio.get_event_loop())
+        resolver = aiodns.DNSResolver(loop=loop)
 
     # An IPv6 literal is allowed to be enclosed in square brackets, but
     # the brackets must be stripped in order to process the literal;
@@ -142,19 +142,19 @@ def resolve(host, port=None, service=None, proto='tcp',
 
         if use_ipv6:
             aaaa = yield from get_AAAA(host, resolver=resolver,
-                                       use_aiodns=use_aiodns)
+                                       use_aiodns=use_aiodns, loop=loop)
             for address in aaaa:
                 results.append((host, address, port))
 
         a = yield from get_A(host, resolver=resolver,
-                             use_aiodns=use_aiodns)
+                             use_aiodns=use_aiodns, loop=loop)
         for address in a:
             results.append((host, address, port))
 
     return results
 
 @asyncio.coroutine
-def get_A(host, resolver=None, use_aiodns=True):
+def get_A(host, resolver=None, use_aiodns=True, loop=None):
     """Lookup DNS A records for a given host.
 
     If ``resolver`` is not provided, or is ``None``, then resolution will
@@ -177,7 +177,6 @@ def get_A(host, resolver=None, use_aiodns=True):
     # If not using aiodns, attempt lookup using the OS level
     # getaddrinfo() method.
     if resolver is None or not use_aiodns:
-        loop = asyncio.get_event_loop()
         try:
             recs = yield from loop.getaddrinfo(host, None,
                                                family=socket.AF_INET,
@@ -198,7 +197,7 @@ def get_A(host, resolver=None, use_aiodns=True):
 
 
 @asyncio.coroutine
-def get_AAAA(host, resolver=None, use_aiodns=True):
+def get_AAAA(host, resolver=None, use_aiodns=True, loop=None):
     """Lookup DNS AAAA records for a given host.
 
     If ``resolver`` is not provided, or is ``None``, then resolution will
@@ -224,7 +223,6 @@ def get_AAAA(host, resolver=None, use_aiodns=True):
         if not socket.has_ipv6:
             log.debug("DNS: Unable to query %s for AAAA records: IPv6 is not supported", host)
             return []
-        loop = asyncio.get_event_loop()
         try:
             recs = yield from loop.getaddrinfo(host, None,
                                                family=socket.AF_INET6,

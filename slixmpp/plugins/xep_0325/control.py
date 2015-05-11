@@ -332,7 +332,7 @@ class XEP_0325(BasePlugin):
             self.sessions[session]["nodeDone"][node] = False
 
         for node in self.sessions[session]["node_list"]:
-            timer = asyncio.get_event_loop().call_later(self.nodes[node]['commTimeout'], partial(self._event_comm_timeout, args=(session, node)))
+            timer = self.xmpp.loop.call_later(self.nodes[node]['commTimeout'], partial(self._event_comm_timeout, args=(session, node)))
             self.sessions[session]["commTimers"][node] = timer
             self.nodes[node]['device'].set_control_fields(process_fields, session=session, callback=self._device_set_command_callback)
 
