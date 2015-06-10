@@ -52,7 +52,7 @@ class FeatureBind(BasePlugin):
         iq.send(callback=self._on_bind_response)
 
     def _on_bind_response(self, response):
-        self.xmpp.boundjid = JID(response['bind']['jid'], cache_lock=True)
+        self.xmpp.boundjid = JID(response['bind']['jid'])
         self.xmpp.bound = True
         self.xmpp.event('session_bind', self.xmpp.boundjid)
         self.xmpp.session_bind_event.set()

@@ -16,13 +16,11 @@ from __future__ import unicode_literals
 import re
 import socket
 import stringprep
-import threading
 import encodings.idna
 
 from copy import deepcopy
 
 from slixmpp.util import stringprep_profiles
-from collections import OrderedDict
 
 #: These characters are not allowed to appear in a JID.
 ILLEGAL_CHARS = '\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r' + \
@@ -68,25 +66,6 @@ JID_UNESCAPE_TRANSFORMATIONS = {'\\20': ' ',
                                 '\\3e': '>',
                                 '\\40': '@',
                                 '\\5c': '\\'}
-
-JID_CACHE = OrderedDict()
-JID_CACHE_LOCK = threading.Lock()
-JID_CACHE_MAX_SIZE = 1024
-
-def _cache(key, parts, locked):
-    JID_CACHE[key] = (parts, locked)
-    if len(JID_CACHE) > JID_CACHE_MAX_SIZE:
-        with JID_CACHE_LOCK:
-            while len(JID_CACHE) > JID_CACHE_MAX_SIZE:
-                found = None
-                for key, item in JID_CACHE.items():
-                    if not item[1]: # if not locked
-                        found = key
-                        break
-                if not found: # more than MAX_SIZE locked
-                    # warn?
-                    break
-                del JID_CACHE[found]
 
 # pylint: disable=c0103
 #: The nodeprep profile of stringprep used to validate the local,
@@ -436,7 +415,6 @@ class JID(object):
 
     # pylint: disable=W0212
     def __init__(self, jid=None, **kwargs):
-        locked = kwargs.get('cache_lock', False)
         in_local = kwargs.get('local', None)
         in_domain = kwargs.get('domain', None)
         in_resource = kwargs.get('resource', None)
@@ -444,40 +422,23 @@ class JID(object):
         if in_local or in_domain or in_resource:
             parts = (in_local, in_domain, in_resource)
 
-        # only check cache if there is a jid string, or parts, not if there
-        # are both
-        self._jid = None
-        key = None
-        if (jid is not None) and (parts is None):
-            if isinstance(jid, JID):
-                # it's already good to go, and there are no additions
-                self._jid = jid._jid
-                return
-            key = jid
-            self._jid, locked = JID_CACHE.get(jid, (None, locked))
-        elif jid is None and parts is not None:
-            key = parts
-            self._jid, locked = JID_CACHE.get(parts, (None, locked))
-        if not self._jid:
-            if not jid:
-                parsed_jid = (None, None, None)
-            elif not isinstance(jid, JID):
-                parsed_jid = _parse_jid(jid)
-            else:
-                parsed_jid = jid._jid
+        if not jid:
+            parsed_jid = (None, None, None)
+        elif not isinstance(jid, JID):
+            parsed_jid = _parse_jid(jid)
+        else:
+            parsed_jid = jid._jid
 
-            local, domain, resource = parsed_jid
+        local, domain, resource = parsed_jid
 
-            if 'local' in kwargs:
-                local = _escape_node(in_local)
-            if 'domain' in kwargs:
-                domain = _validate_domain(in_domain)
-            if 'resource' in kwargs:
-                resource = _validate_resource(in_resource)
+        if 'local' in kwargs:
+            local = _escape_node(in_local)
+        if 'domain' in kwargs:
+            domain = _validate_domain(in_domain)
+        if 'resource' in kwargs:
+            resource = _validate_resource(in_resource)
 
-            self._jid = (local, domain, resource)
-            if key:
-                _cache(key, self._jid, locked)
+        self._jid = (local, domain, resource)
 
     def unescape(self):
         """Return an unescaped JID object.

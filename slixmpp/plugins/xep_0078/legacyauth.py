@@ -128,9 +128,8 @@ class XEP_0078(BasePlugin):
 
         self.xmpp.authenticated = True
 
-        self.xmpp.boundjid = JID(self.xmpp.requested_jid,
-                resource=resource,
-                cache_lock=True)
+        self.xmpp.boundjid = JID(self.xmpp.requested_jid)
+        self.xmpp.boundjid.resource = resource
         self.xmpp.event('session_bind', self.xmpp.boundjid)
 
         log.debug("Established Session")

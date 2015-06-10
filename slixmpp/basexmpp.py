@@ -57,12 +57,12 @@ class BaseXMPP(XMLStream):
         self.stream_id = None
 
         #: The JabberID (JID) requested for this connection.
-        self.requested_jid = JID(jid, cache_lock=True)
+        self.requested_jid = JID(jid)
 
         #: The JabberID (JID) used by this connection,
         #: as set after session binding. This may even be a
         #: different bare JID than what was requested.
-        self.boundjid = JID(jid, cache_lock=True)
+        self.boundjid = JID(jid)
 
         self._expected_server_name = self.boundjid.host
         self._redirect_attempts = 0
@@ -638,7 +638,7 @@ class BaseXMPP(XMLStream):
     def set_jid(self, jid):
         """Rip a JID apart and claim it as our own."""
         log.debug("setting jid to %s", jid)
-        self.boundjid = JID(jid, cache_lock=True)
+        self.boundjid = JID(jid)
 
     def getjidresource(self, fulljid):
         if '/' in fulljid:
