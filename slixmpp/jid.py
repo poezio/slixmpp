@@ -30,6 +30,8 @@ ILLEGAL_CHARS = '\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r' + \
                 '\x1a\x1b\x1c\x1d\x1e\x1f' + \
                 ' !"#$%&\'()*+,./:;<=>?@[\\]^_`{|}~\x7f'
 
+HAVE_INET_PTON = hasattr(socket, 'inet_pton')
+
 #: The basic regex pattern that a JID must match in order to determine
 #: the local, domain, and resource parts. This regex does NOT do any
 #: validation, which requires application of nodeprep, resourceprep, etc.
@@ -199,10 +201,10 @@ def _validate_domain(domain):
         pass
 
     # Check if this is an IPv6 address
-    if not ip_addr and hasattr(socket, 'inet_pton'):
+    if not ip_addr and HAVE_INET_PTON and domain[0] == '[' and domain[-1] == ']':
         try:
-            socket.inet_pton(socket.AF_INET6, domain.strip('[]'))
-            domain = '[%s]' % domain.strip('[]')
+            ip = domain[1:-1]
+            socket.inet_pton(socket.AF_INET6, ip)
             ip_addr = True
         except (socket.error, ValueError):
             pass
