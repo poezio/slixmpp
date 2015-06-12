@@ -15,18 +15,10 @@ from __future__ import unicode_literals
 
 import re
 import socket
-import stringprep
-import encodings.idna
 
 from copy import deepcopy
 
-from slixmpp.util import stringprep_profiles
-
-#: These characters are not allowed to appear in a JID.
-ILLEGAL_CHARS = '\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r' + \
-                '\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19' + \
-                '\x1a\x1b\x1c\x1d\x1e\x1f' + \
-                ' !"#$%&\'()*+,./:;<=>?@[\\]^_`{|}~\x7f'
+from slixmpp.stringprep import nodeprep, resourceprep, idna, StringprepError
 
 HAVE_INET_PTON = hasattr(socket, 'inet_pton')
 
@@ -67,50 +59,6 @@ JID_UNESCAPE_TRANSFORMATIONS = {'\\20': ' ',
                                 '\\40': '@',
                                 '\\5c': '\\'}
 
-# pylint: disable=c0103
-#: The nodeprep profile of stringprep used to validate the local,
-#: or username, portion of a JID.
-nodeprep = stringprep_profiles.create(
-    nfkc=True,
-    bidi=True,
-    mappings=[
-        stringprep_profiles.b1_mapping,
-        stringprep.map_table_b2],
-    prohibited=[
-        stringprep.in_table_c11,
-        stringprep.in_table_c12,
-        stringprep.in_table_c21,
-        stringprep.in_table_c22,
-        stringprep.in_table_c3,
-        stringprep.in_table_c4,
-        stringprep.in_table_c5,
-        stringprep.in_table_c6,
-        stringprep.in_table_c7,
-        stringprep.in_table_c8,
-        stringprep.in_table_c9,
-        lambda c: c in ' \'"&/:<>@'],
-    unassigned=[stringprep.in_table_a1])
-
-# pylint: disable=c0103
-#: The resourceprep profile of stringprep, which is used to validate
-#: the resource portion of a JID.
-resourceprep = stringprep_profiles.create(
-    nfkc=True,
-    bidi=True,
-    mappings=[stringprep_profiles.b1_mapping],
-    prohibited=[
-        stringprep.in_table_c12,
-        stringprep.in_table_c21,
-        stringprep.in_table_c22,
-        stringprep.in_table_c3,
-        stringprep.in_table_c4,
-        stringprep.in_table_c5,
-        stringprep.in_table_c6,
-        stringprep.in_table_c7,
-        stringprep.in_table_c8,
-        stringprep.in_table_c9],
-    unassigned=[stringprep.in_table_a1])
-
 
 def _parse_jid(data):
     """
@@ -143,17 +91,17 @@ def _validate_node(node):
 
     :returns: The local portion of a JID, as validated by nodeprep.
     """
-    try:
-        if node is not None:
+    if node is not None:
+        try:
             node = nodeprep(node)
+        except StringprepError:
+            raise InvalidJID('Nodeprep failed')
 
-            if not node:
-                raise InvalidJID('Localpart must not be 0 bytes')
-            if len(node) > 1023:
-                raise InvalidJID('Localpart must be less than 1024 bytes')
-            return node
-    except stringprep_profiles.StringPrepError:
-        raise InvalidJID('Invalid local part')
+        if not node:
+            raise InvalidJID('Localpart must not be 0 bytes')
+        if len(node) > 1023:
+            raise InvalidJID('Localpart must be less than 1024 bytes')
+        return node
 
 
 def _validate_domain(domain):
@@ -194,30 +142,18 @@ def _validate_domain(domain):
         if domain and domain[-1] == '.':
             domain = domain[:-1]
 
-        domain_parts = []
+        try:
+            domain = idna(domain)
+        except StringprepError:
+            raise InvalidJID('idna validation failed')
+
+        if ':' in domain:
+            raise InvalidJID('Domain containing a port')
         for label in domain.split('.'):
-            try:
-                label = encodings.idna.nameprep(label)
-                encodings.idna.ToASCII(label)
-                pass_nameprep = True
-            except UnicodeError:
-                pass_nameprep = False
-
-            if not pass_nameprep:
-                raise InvalidJID('Could not encode domain as ASCII')
-
-            if label.startswith('xn--'):
-                label = encodings.idna.ToUnicode(label)
-
-            for char in label:
-                if char in ILLEGAL_CHARS:
-                    raise InvalidJID('Domain contains illegal characters')
-
+            if not label:
+                raise InvalidJID('Domain containing too many dots')
             if '-' in (label[0], label[-1]):
                 raise InvalidJID('Domain started or ended with -')
-
-            domain_parts.append(label)
-        domain = '.'.join(domain_parts)
 
     if not domain:
         raise InvalidJID('Domain must not be 0 bytes')
@@ -234,17 +170,17 @@ def _validate_resource(resource):
 
     :returns: The local portion of a JID, as validated by resourceprep.
     """
-    try:
-        if resource is not None:
+    if resource is not None:
+        try:
             resource = resourceprep(resource)
+        except StringprepError:
+            raise InvalidJID('Resourceprep failed')
 
-            if not resource:
-                raise InvalidJID('Resource must not be 0 bytes')
-            if len(resource) > 1023:
-                raise InvalidJID('Resource must be less than 1024 bytes')
-            return resource
-    except stringprep_profiles.StringPrepError:
-        raise InvalidJID('Invalid resource')
+        if not resource:
+            raise InvalidJID('Resource must not be 0 bytes')
+        if len(resource) > 1023:
+            raise InvalidJID('Resource must be less than 1024 bytes')
+        return resource
 
 
 def _escape_node(node):
