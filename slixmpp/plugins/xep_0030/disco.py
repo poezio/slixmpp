@@ -368,9 +368,9 @@ class XEP_0030(BasePlugin):
         iq['to'] = jid
         iq['type'] = 'get'
         iq['disco_info']['node'] = node if node else ''
-        iq.send(timeout=kwargs.get('timeout', None),
-                callback=kwargs.get('callback', None),
-                timeout_callback=kwargs.get('timeout_callback', None))
+        return iq.send(timeout=kwargs.get('timeout', None),
+                       callback=kwargs.get('callback', None),
+                       timeout_callback=kwargs.get('timeout_callback', None))
 
     def set_info(self, jid=None, node=None, info=None):
         """
@@ -429,9 +429,9 @@ class XEP_0030(BasePlugin):
             raise NotImplementedError("XEP 0059 has not yet been fixed")
             return self.xmpp['xep_0059'].iterate(iq, 'disco_items')
         else:
-            iq.send(timeout=kwargs.get('timeout', None),
-                    callback=kwargs.get('callback', None),
-                    timeout_callback=kwargs.get('timeout_callback', None))
+            return iq.send(timeout=kwargs.get('timeout', None),
+                           callback=kwargs.get('callback', None),
+                           timeout_callback=kwargs.get('timeout_callback', None))
 
     def set_items(self, jid=None, node=None, **kwargs):
         """
