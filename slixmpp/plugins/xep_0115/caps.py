@@ -280,9 +280,10 @@ class XEP_0115(BasePlugin):
         binary = hash(S.encode('utf8')).digest()
         return base64.b64encode(binary).decode('utf-8')
 
+    @asyncio.coroutine
     def update_caps(self, jid=None, node=None, preserve=False):
         try:
-            info = self.xmpp['xep_0030'].get_info(jid, node, local=True)
+            info = yield from self.xmpp['xep_0030'].get_info(jid, node, local=True)
             if isinstance(info, Iq):
                 info = info['disco_info']
             ver = self.generate_verstring(info, self.hash)

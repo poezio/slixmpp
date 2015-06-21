@@ -8,6 +8,7 @@
 
 import logging
 
+from slixmpp import asyncio
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.base import BasePlugin, register_plugin
 
@@ -61,7 +62,7 @@ class XEP_0163(BasePlugin):
         for ns in namespace:
             self.xmpp['xep_0030'].add_feature('%s+notify' % ns,
                                               jid=jid)
-        self.xmpp['xep_0115'].update_caps(jid)
+        asyncio.async(self.xmpp['xep_0115'].update_caps(jid))
 
     def remove_interest(self, namespace, jid=None):
         """
@@ -80,7 +81,7 @@ class XEP_0163(BasePlugin):
         for ns in namespace:
             self.xmpp['xep_0030'].del_feature(jid=jid,
                                               feature='%s+notify' % namespace)
-        self.xmpp['xep_0115'].update_caps(jid)
+        asyncio.async(self.xmpp['xep_0115'].update_caps(jid))
 
     def publish(self, stanza, node=None, id=None, options=None, ifrom=None,
                 timeout_callback=None, callback=None, timeout=None):

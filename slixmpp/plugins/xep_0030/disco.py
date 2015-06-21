@@ -9,6 +9,7 @@
 import logging
 
 from slixmpp import Iq
+from slixmpp import future_wrapper
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -294,6 +295,7 @@ class XEP_0030(BasePlugin):
                 'cached': cached}
         return self.api['has_identity'](jid, node, ifrom, data)
 
+    @future_wrapper
     def get_info(self, jid=None, node=None, local=None,
                        cached=None, **kwargs):
         """
@@ -381,6 +383,7 @@ class XEP_0030(BasePlugin):
             info = info['disco_info']
         self.api['set_info'](jid, node, None, info)
 
+    @future_wrapper
     def get_items(self, jid=None, node=None, local=False, **kwargs):
         """
         Retrieve the disco#items results from a given JID/node combination.
