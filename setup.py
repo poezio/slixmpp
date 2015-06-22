@@ -13,6 +13,14 @@ try:
 except ImportError:
     from distutils.core import setup
 
+try:
+    from Cython.Build import cythonize
+except ImportError:
+    print('Cython not found, falling back to the slow stringprep module.')
+    ext_modules = None
+else:
+    ext_modules = cythonize('slixmpp/stringprep.pyx')
+
 from run_tests import TestCommand
 from slixmpp.version import __version__
 
@@ -43,6 +51,7 @@ setup(
     license='MIT',
     platforms=['any'],
     packages=packages,
+    ext_modules=ext_modules,
     requires=['aiodns', 'pyasn1', 'pyasn1_modules'],
     classifiers=CLASSIFIERS,
     cmdclass={'test': TestCommand}
