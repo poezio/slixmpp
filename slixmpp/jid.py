@@ -79,7 +79,7 @@ def _validate_node(node):
     :returns: The local portion of a JID, as validated by nodeprep.
     """
     if node is None:
-        return ''
+        return None
 
     try:
         node = nodeprep(node)
@@ -160,7 +160,7 @@ def _validate_resource(resource):
     :returns: The local portion of a JID, as validated by resourceprep.
     """
     if resource is None:
-        return ''
+        return None
 
     try:
         resource = resourceprep(resource)
@@ -209,12 +209,12 @@ def _format_jid(local=None, domain=None, resource=None):
     :return: A full or bare JID string.
     """
     result = []
-    if local:
+    if local is not None:
         result.append(local)
         result.append('@')
-    if domain:
+    if domain is not None:
         result.append(domain)
-    if resource:
+    if resource is not None:
         result.append('/')
         result.append(resource)
     return ''.join(result)
@@ -250,11 +250,11 @@ class UnescapedJID:
                      full, or bare.
         """
         if name == 'resource':
-            return self._resource
+            return self._resource or ''
         if name in ('user', 'username', 'local', 'node'):
-            return self._node
+            return self._node or ''
         if name in ('server', 'domain', 'host'):
-            return self._domain
+            return self._domain or ''
         if name in ('full', 'jid'):
             return _format_jid(self._node, self._domain, self._resource)
         if name == 'bare':
@@ -304,9 +304,9 @@ class JID:
 
     def __init__(self, jid=None):
         if not jid:
-            self._node = ''
-            self._domain = ''
-            self._resource = ''
+            self._node = None
+            self._domain = None
+            self._resource = None
         elif not isinstance(jid, JID):
             self._node, self._domain, self._resource = _parse_jid(jid)
         else:
@@ -331,39 +331,39 @@ class JID:
 
     @property
     def node(self):
-        return self._node
+        return self._node or ''
 
     @property
     def user(self):
-        return self._node
+        return self._node or ''
 
     @property
     def local(self):
-        return self._node
+        return self._node or ''
 
     @property
     def username(self):
-        return self._node
+        return self._node or ''
 
     @property
     def domain(self):
-        return self._domain
+        return self._domain or ''
 
     @property
     def server(self):
-        return self._domain
+        return self._domain or ''
 
     @property
     def host(self):
-        return self._domain
+        return self._domain or ''
+
+    @property
+    def resource(self):
+        return self._resource or ''
 
     @property
     def bare(self):
         return _format_jid(self._node, self._domain)
-
-    @property
-    def resource(self):
-        return self._resource
 
     @property
     def full(self):
