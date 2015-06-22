@@ -1,5 +1,6 @@
 Pre-requisites:
-- Python 3.1 or 2.6
+- Python 3.4
+- Cython 0.22 and libidn, optionally (making JID faster by compiling the stringprep module)
 
 Install:
 > python3 setup.py install
@@ -9,4 +10,4 @@ Root install:
 
 To test:
 > cd examples
-> python echo_client.py -v -j [USER@example.com] -p [PASSWORD]
+> python3 echo_client.py -d -j [USER@example.com] -p [PASSWORD]
