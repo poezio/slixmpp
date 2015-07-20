@@ -77,12 +77,9 @@ class ComponentXMPP(BaseXMPP):
         self.add_event_handler('presence_probe',
                                self._handle_probe)
 
-    def connect(self, host=None, port=None, use_ssl=False,
-                      use_tls=False, reattempt=True):
+    def connect(self, host=None, port=None, use_ssl=False):
         """Connect to the server.
 
-        Setting ``reattempt`` to ``True`` will cause connection attempts to
-        be made every second until a successful connection is established.
 
         :param host: The name of the desired server for the connection.
                      Defaults to :attr:`server_host`.
@@ -90,11 +87,6 @@ class ComponentXMPP(BaseXMPP):
                      Defauts to :attr:`server_port`.
         :param use_ssl: Flag indicating if SSL should be used by connecting
                         directly to a port using SSL.
-        :param use_tls: Flag indicating if TLS should be used, allowing for
-                        connecting to a port without using SSL immediately and
-                        later upgrading the connection.
-        :param reattempt: Flag indicating if the socket should reconnect
-                          after disconnections.
         """
         if host is None:
             host = self.server_host
@@ -103,14 +95,9 @@ class ComponentXMPP(BaseXMPP):
 
         self.server_name = self.boundjid.host
 
-        if use_tls:
-            log.info("XEP-0114 components can not use TLS")
-
         log.debug("Connecting to %s:%s", host, port)
         return XMLStream.connect(self, host=host, port=port,
-                                       use_ssl=use_ssl,
-                                       use_tls=False,
-                                       reattempt=reattempt)
+                                       use_ssl=use_ssl)
 
     def incoming_filter(self, xml):
         """
