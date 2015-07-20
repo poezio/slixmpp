@@ -72,6 +72,8 @@ class XMLStream(asyncio.BaseProtocol):
         # The socket the is used internally by the transport object
         self.socket = None
 
+        self.connect_loop_wait = 0
+
         self.parser = None
         self.xml_depth = 0
         self.xml_root = None
@@ -301,6 +303,7 @@ class XMLStream(asyncio.BaseProtocol):
                 # and try (host, port) as a last resort
                 self.dns_answers = None
 
+        yield from asyncio.sleep(self.connect_loop_wait)
         try:
             yield from self.loop.create_connection(lambda: self,
                                                    self.address[0],
@@ -312,7 +315,10 @@ class XMLStream(asyncio.BaseProtocol):
         except OSError as e:
             log.debug('Connection failed: %s', e)
             self.event("connection_failed", e)
+            self.connect_loop_wait = self.connect_loop_wait * 2 + 1
             asyncio.async(self._connect_routine())
+        else:
+            self.connect_loop_wait = 0
 
     def process(self, *, forever=True, timeout=None):
         """Process all the available XMPP events (receiving or sending data on the
