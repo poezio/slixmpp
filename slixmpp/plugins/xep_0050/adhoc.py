@@ -216,6 +216,7 @@ class XEP_0050(BasePlugin):
         name, handler = self.commands.get(key, ('Not found', None))
         if not handler:
             log.debug('Command not found: %s, %s', key, self.commands)
+            raise XMPPError('item-not-found')
 
         payload = []
         for stanza in iq['command']['substanzas']:
