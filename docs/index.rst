@@ -56,7 +56,6 @@ Here's your first Slixmpp Bot:
     import logging
 
     from slixmpp import ClientXMPP
-    from slixmpp.exceptions import IqError, IqTimeout
 
 
     class EchoBot(ClientXMPP):
