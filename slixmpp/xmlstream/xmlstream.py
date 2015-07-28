@@ -435,9 +435,11 @@ class XMLStream(asyncio.BaseProtocol):
         Forcibly close the connection
         """
         if self.transport:
+            self.transport.close()
             self.transport.abort()
             self.event("killed")
             self.disconnected.set_result(True)
+            self.disconnected = asyncio.Future()
 
     def reconnect(self, wait=2.0):
         """Calls disconnect(), and once we are disconnected (after the timeout, or
