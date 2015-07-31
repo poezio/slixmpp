@@ -1,6 +1,7 @@
 include README.rst
 include LICENSE
-include testall.py
+include run_tests.py
+include slixmpp/stringprep.pyx
 recursive-include docs Makefile *.bat *.py *.rst *.css *.ttf *.png
 recursive-include examples *.py
 recursive-include tests *.py
