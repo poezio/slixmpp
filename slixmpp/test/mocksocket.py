@@ -239,3 +239,7 @@ class TestTransport(object):
 
     def abort(self, *args, **kwargs):
         return
+
+    def close(self, *args, **kwargs):
+        return
+
