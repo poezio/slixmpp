@@ -21,7 +21,7 @@ be in ``docs/_build/html``::
 
 To run the test suite for Slixmpp::
 
-    python testall.py
+    python run_tests.py
 
 
 The Slixmpp Boilerplate
@@ -88,7 +88,7 @@ Slixmpp projects::
 
         xmpp = EchoBot('somejid@example.com', 'use_getpass')
         xmpp.connect()
-        xmpp.process(block=True)
+        xmpp.process(forever=True)
 
 
 Slixmpp Credits
@@ -97,8 +97,8 @@ Slixmpp Credits
 **Maintainer of the slixmpp fork:** Florent Le Coz
     `louiz@louiz.org <xmpp:louiz@louiz.org?message>`_,
 
-Credits
--------
+Credits (SleekXMPP)
+-------------------
 
 **Main Author:** Nathan Fritz
     `fritzy@netflint.net <xmpp:fritzy@netflint.net?message>`_,
