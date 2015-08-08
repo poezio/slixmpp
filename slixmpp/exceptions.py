@@ -56,6 +56,18 @@ class XMPPError(Exception):
         self.extension_ns = extension_ns
         self.extension_args = extension_args
 
+    def format(self):
+        """
+        Format the error in a simple user-readable string.
+        """
+        text = [self.etype, self.condition]
+        if self.text:
+            text.append(self.text)
+        if self.extension:
+            text.append(self.extension)
+        # TODO: handle self.extension_args
+        return ': '.join(text)
+
 
 class IqTimeout(XMPPError):
 
