@@ -260,12 +260,12 @@ class XEP_0060(BasePlugin):
 
         Arguments:
             jid        -- The pubsub service JID.
-            node       -- The node to subscribe to.
+            node       -- The node to unsubscribe from.
             subid      -- The specific subscription, if multiple subscriptions
                           exist for this JID/node combination.
             bare       -- Indicates if the subscribee is a bare or full JID.
                           Defaults to True for a bare JID.
-            subscribee -- The JID that is subscribing to the node.
+            subscribee -- The JID that is unsubscribing from the node.
             ifrom      -- Specify the sender's JID.
             timeout    -- The length of time (in seconds) to wait for a
                           response before exiting the send call if blocking
