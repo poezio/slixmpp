@@ -5,20 +5,16 @@ import logging
 from getpass import getpass
 from argparse import ArgumentParser
 
+import asyncio
 import slixmpp
+from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import ET, tostring
-from slixmpp.xmlstream.asyncio import asyncio
 
-def make_callback():
-    future = asyncio.Future()
-    def callback(result):
-        future.set_result(result)
-    return future, callback
 
 class PubsubClient(slixmpp.ClientXMPP):
 
     def __init__(self, jid, password, server,
-                       node=None, action='list', data=''):
+                       node=None, action='nodes', data=''):
         super(PubsubClient, self).__init__(jid, password)
 
         self.register_plugin('xep_0030')
@@ -36,87 +32,83 @@ class PubsubClient(slixmpp.ClientXMPP):
 
         self.add_event_handler('session_start', self.start)
 
+    @asyncio.coroutine
     def start(self, event):
         self.get_roster()
         self.send_presence()
 
         try:
-            getattr(self, self.action)()
+            yield from getattr(self, self.action)()
         except:
-            logging.error('Could not execute: %s' % self.action)
+            logging.error('Could not execute: %s', self.action)
         self.disconnect()
 
     def nodes(self):
-        future, callback = make_callback()
         try:
-            self['xep_0060'].get_nodes(self.pubsub_server, self.node, callback=callback)
-            result = yield from future
+            result = yield from self['xep_0060'].get_nodes(self.pubsub_server, self.node)
             for item in result['disco_items']['items']:
-                print('  - %s' % str(item))
-        except:
-            logging.error('Could not retrieve node list.')
+                logging.info('  - %s', str(item))
+        except XMPPError as error:
+            logging.error('Could not retrieve node list: %s', error.format())
 
     def create(self):
         try:
-            self['xep_0060'].create_node(self.pubsub_server, self.node)
-        except:
-            logging.error('Could not create node: %s' % self.node)
+            yield from self['xep_0060'].create_node(self.pubsub_server, self.node)
+            logging.info('Created node %s', self.node)
+        except XMPPError as error:
+            logging.error('Could not create node %s: %s', self.node, error.format())
 
     def delete(self):
         try:
-            self['xep_0060'].delete_node(self.pubsub_server, self.node)
-            print('Deleted node: %s' % self.node)
-        except:
-            logging.error('Could not delete node: %s' % self.node)
+            yield from self['xep_0060'].delete_node(self.pubsub_server, self.node)
+            logging.info('Deleted node %s', self.node)
+        except XMPPError as error:
+            logging.error('Could not delete node %s: %s', self.node, error.format())
 
     def publish(self):
         payload = ET.fromstring("<test xmlns='test'>%s</test>" % self.data)
-        future, callback = make_callback()
         try:
-            self['xep_0060'].publish(self.pubsub_server, self.node, payload=payload, callback=callback)
-            result = yield from future
-            id = result['pubsub']['publish']['item']['id']
-            print('Published at item id: %s' % id)
-        except:
-            logging.error('Could not publish to: %s' % self.node)
+            result = yield from self['xep_0060'].publish(self.pubsub_server, self.node, payload=payload)
+            logging.info('Published at item id: %s', result['pubsub']['publish']['item']['id'])
+        except XMPPError as error:
+            logging.error('Could not publish to %s: %s', self.node, error.format())
 
     def get(self):
-        future, callback = make_callback()
         try:
-            self['xep_0060'].get_item(self.pubsub_server, self.node, self.data, callback=callback)
-            result = yield from future
+            result = yield from self['xep_0060'].get_item(self.pubsub_server, self.node, self.data)
             for item in result['pubsub']['items']['substanzas']:
-                print('Retrieved item %s: %s' % (item['id'], tostring(item['payload'])))
-        except:
-            logging.error('Could not retrieve item %s from node %s' % (self.data, self.node))
+                logging.info('Retrieved item %s: %s', item['id'], tostring(item['payload']))
+        except XMPPError as error:
+            logging.error('Could not retrieve item %s from node %s: %s', self.data, self.node, error.format())
 
     def retract(self):
         try:
-            self['xep_0060'].retract(self.pubsub_server, self.node, self.data)
-            print('Retracted item %s from node %s' % (self.data, self.node))
-        except:
-            logging.error('Could not retract item %s from node %s' % (self.data, self.node))
+            yield from self['xep_0060'].retract(self.pubsub_server, self.node, self.data)
+            logging.info('Retracted item %s from node %s', self.data, self.node)
+        except XMPPError as error:
+            logging.error('Could not retract item %s from node %s: %s', self.data, self.node, error.format())
 
     def purge(self):
         try:
-            self['xep_0060'].purge(self.pubsub_server, self.node)
-            print('Purged all items from node %s' % self.node)
-        except:
-            logging.error('Could not purge items from node %s' % self.node)
+            yield from self['xep_0060'].purge(self.pubsub_server, self.node)
+            logging.info('Purged all items from node %s', self.node)
+        except XMPPError as error:
+            logging.error('Could not purge items from node %s: %s', self.node, error.format())
 
     def subscribe(self):
         try:
-            self['xep_0060'].subscribe(self.pubsub_server, self.node)
-            print('Subscribed %s to node %s' % (self.boundjid.bare, self.node))
-        except:
-            logging.error('Could not subscribe %s to node %s' % (self.boundjid.bare, self.node))
+            iq = yield from self['xep_0060'].subscribe(self.pubsub_server, self.node)
+            subscription = iq['pubsub']['subscription']
+            logging.info('Subscribed %s to node %s', subscription['jid'], subscription['node'])
+        except XMPPError as error:
+            logging.error('Could not subscribe %s to node %s: %s', self.boundjid.bare, self.node, error.format())
 
     def unsubscribe(self):
         try:
-            self['xep_0060'].unsubscribe(self.pubsub_server, self.node)
-            print('Unsubscribed %s from node %s' % (self.boundjid.bare, self.node))
-        except:
-            logging.error('Could not unsubscribe %s from node %s' % (self.boundjid.bare, self.node))
+            yield from self['xep_0060'].unsubscribe(self.pubsub_server, self.node)
+            logging.info('Unsubscribed %s from node %s', self.boundjid.bare, self.node)
+        except XMPPError as error:
+            logging.error('Could not unsubscribe %s from node %s: %s', self.boundjid.bare, self.node, error.format())
 
 
 
@@ -133,12 +125,12 @@ if __name__ == '__main__':
                         action="store_const",
                         dest="loglevel",
                         const=logging.ERROR,
-                        default=logging.ERROR)
+                        default=logging.INFO)
     parser.add_argument("-d","--debug", help="set logging to DEBUG",
                         action="store_const",
                         dest="loglevel",
                         const=logging.DEBUG,
-                        default=logging.ERROR)
+                        default=logging.INFO)
 
     # JID and password options.
     parser.add_argument("-j", "--jid", dest="jid",
@@ -147,7 +139,7 @@ if __name__ == '__main__':
                         help="password to use")
 
     parser.add_argument("server")
-    parser.add_argument("action", choice=["nodes", "create", "delete", "purge", "subscribe", "unsubscribe", "publish", "retract", "get"])
+    parser.add_argument("action", choices=["nodes", "create", "delete", "purge", "subscribe", "unsubscribe", "publish", "retract", "get"])
     parser.add_argument("node", nargs='?')
     parser.add_argument("data", nargs='?')
 
