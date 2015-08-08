@@ -174,7 +174,7 @@ def _get_highlight():
             def __init__(self, string):
                 self.string = string
             def __str__(self):
-                return highlight(str(self.string).strip(), LEXER, FORMATTER)
+                return highlight(str(self.string), LEXER, FORMATTER).strip()
 
         return Highlighter
     except ImportError:
