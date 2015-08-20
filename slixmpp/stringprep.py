@@ -101,5 +101,21 @@ def idna(domain):
         domain_parts.append(label)
     return '.'.join(domain_parts)
 
+def punycode(domain):
+    domain_parts = []
+    for label in domain.split('.'):
+        try:
+            label = encodings.idna.nameprep(label)
+            encodings.idna.ToASCII(label)
+        except UnicodeError:
+            raise StringprepError
+
+        for char in label:
+            if char in ILLEGAL_CHARS:
+                raise StringprepError
+
+        domain_parts.append(label)
+    return b'.'.join(domain_parts)
+
 logging.getLogger(__name__).warning('Using slower stringprep, consider '
                                     'compiling the faster cython/libidn one.')
