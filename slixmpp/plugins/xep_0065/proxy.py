@@ -168,7 +168,6 @@ class XEP_0065(BasePlugin):
             raise XMPPError(etype='modify', condition='not-acceptable')
 
         streamhosts = iq['socks']['streamhosts']
-        conn = None
         requester = iq['from']
         target = iq['to']
 
