@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import threading
 import socket
 
 from hashlib import sha1
@@ -33,9 +32,6 @@ class XEP_0065(BasePlugin):
 
         self._proxies = {}
         self._sessions = {}
-        self._sessions_lock = threading.Lock()
-
-        self._preauthed_sids_lock = threading.Lock()
         self._preauthed_sids = {}
 
         self.xmpp.register_handler(
@@ -76,15 +72,14 @@ class XEP_0065(BasePlugin):
             log.warning('Received unknown SOCKS5 proxy: %s', proxy)
             return
 
-        with self._sessions_lock:
-            try:
-                self._sessions[sid] = (yield from self._connect_proxy(
-                        self._get_dest_sha1(sid, self.xmpp.boundjid, to),
-                        self._proxies[proxy][0],
-                        self._proxies[proxy][1]))[1]
-            except socket.error:
-                return None
-            addr, port = yield from self._sessions[sid].connected
+        try:
+            self._sessions[sid] = (yield from self._connect_proxy(
+                    self._get_dest_sha1(sid, self.xmpp.boundjid, to),
+                    self._proxies[proxy][0],
+                    self._proxies[proxy][1]))[1]
+        except socket.error:
+            return None
+        addr, port = yield from self._sessions[sid].connected
 
         # Request that the proxy activate the session with the target.
         yield from self.activate(proxy, sid, to, timeout=timeout)
@@ -212,8 +207,7 @@ class XEP_0065(BasePlugin):
             # TODO: close properly the connection to the other proxies.
 
             iq = iq.reply()
-            with self._sessions_lock:
-                self._sessions[sid] = conn
+            self._sessions[sid] = conn
             iq['socks']['sid'] = sid
             iq['socks']['streamhost_used']['jid'] = used_streamhost
             iq.send()
@@ -239,18 +233,16 @@ class XEP_0065(BasePlugin):
             except socket.error:
                 pass
             # Though this should not be neccessary remove the closed session anyway
-            with self._sessions_lock:
-                if sid in self._sessions:
-                    log.warn(('SOCKS5 session with sid = "%s" was not ' +
-                              'removed from _sessions by sock.close()') % sid)
-                    del self._sessions[sid]
+            if sid in self._sessions:
+                log.warn(('SOCKS5 session with sid = "%s" was not ' +
+                          'removed from _sessions by sock.close()') % sid)
+                del self._sessions[sid]
 
     def close(self):
         """Closes all proxy sockets."""
         for sid, sock in self._sessions.items():
             sock.close()
-        with self._sessions_lock:
-            self._sessions = {}
+        self._sessions = {}
 
     def _connect_proxy(self, dest, proxy, proxy_port):
         """ Returns a future to a connection between the client and the server-side
@@ -277,15 +269,13 @@ class XEP_0065(BasePlugin):
         return self.auto_accept
 
     def _authorized_sid(self, jid, sid, ifrom, iq):
-        with self._preauthed_sids_lock:
-            log.debug('>>> authed sids: %s', self._preauthed_sids)
-            log.debug('>>> lookup: %s %s %s', jid, sid, ifrom)
-            if (jid, sid, ifrom) in self._preauthed_sids:
-                del self._preauthed_sids[(jid, sid, ifrom)]
-                return True
-            return False
+        log.debug('>>> authed sids: %s', self._preauthed_sids)
+        log.debug('>>> lookup: %s %s %s', jid, sid, ifrom)
+        if (jid, sid, ifrom) in self._preauthed_sids:
+            del self._preauthed_sids[(jid, sid, ifrom)]
+            return True
+        return False
 
     def _preauthorize_sid(self, jid, sid, ifrom, data):
         log.debug('>>>> %s %s %s %s', jid, sid, ifrom, data)
-        with self._preauthed_sids_lock:
-            self._preauthed_sids[(jid, sid, ifrom)] = True
+        self._preauthed_sids[(jid, sid, ifrom)] = True
