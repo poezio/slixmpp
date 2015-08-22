@@ -120,7 +120,7 @@ class DiscoInfo(ElementBase):
                 id_xml.attrib['{%s}lang' % self.xml_ns] = lang
             if name:
                 id_xml.attrib['name'] = name
-            self.xml.append(id_xml)
+            self.xml.insert(0, id_xml)
             return True
         return False
 
