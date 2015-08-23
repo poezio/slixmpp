@@ -19,7 +19,8 @@ from libc.stdlib cimport free
 # Those are Cython declarations for the C function we’ll be using.
 
 cdef extern from "stringprep.h" nogil:
-    int stringprep_profile(const char* in_, char** out, const char* profile, int flags)
+    int stringprep_profile(const char* in_, char** out, const char* profile,
+                           int flags)
 
 cdef extern from "idna.h" nogil:
     int idna_to_ascii_8z(const char* in_, char** out, int flags)
@@ -40,15 +41,18 @@ cdef str _stringprep(str in_, const char* profile):
     free(out)
     return unicode_out
 
+
 def nodeprep(str node):
     """The nodeprep profile of stringprep used to validate the local, or
     username, portion of a JID."""
     return _stringprep(node, 'Nodeprep')
 
+
 def resourceprep(str resource):
     """The resourceprep profile of stringprep, which is used to validate the
     resource portion of a JID."""
     return _stringprep(resource, 'Resourceprep')
+
 
 def idna(str domain):
     """The idna conversion functions, which are used to validate the domain
@@ -69,3 +73,17 @@ def idna(str domain):
     unicode_domain = utf8_domain.decode('utf-8')
     free(utf8_domain)
     return unicode_domain
+
+
+def punycode(str domain):
+    """Converts a domain name to its punycode representation."""
+
+    cdef char* ascii_domain
+    cdef bytes bytes_domain
+
+    ret = idna_to_ascii_8z(domain.encode('utf-8'), &ascii_domain, 0)
+    if ret != 0:
+        raise StringprepError(ret)
+    bytes_domain = ascii_domain
+    free(ascii_domain)
+    return bytes_domain

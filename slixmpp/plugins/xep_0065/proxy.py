@@ -1,11 +1,9 @@
+import asyncio
 import logging
-import threading
 import socket
 
 from hashlib import sha1
 from uuid import uuid4
-
-from slixmpp.thirdparty.socks import socksocket, PROXY_TYPE_SOCKS5
 
 from slixmpp.stanza import Iq
 from slixmpp.exceptions import XMPPError
@@ -14,7 +12,7 @@ from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins.base import BasePlugin
 
-from slixmpp.plugins.xep_0065 import stanza, Socks5
+from slixmpp.plugins.xep_0065 import stanza, Socks5, Socks5Protocol
 
 
 log = logging.getLogger(__name__)
@@ -23,7 +21,7 @@ log = logging.getLogger(__name__)
 class XEP_0065(BasePlugin):
 
     name = 'xep_0065'
-    description = "Socks5 Bytestreams"
+    description = "XEP-0065: SOCKS5 Bytestreams"
     dependencies = set(['xep_0030'])
     default_config = {
         'auto_accept': False
@@ -34,9 +32,6 @@ class XEP_0065(BasePlugin):
 
         self._proxies = {}
         self._sessions = {}
-        self._sessions_lock = threading.Lock()
-
-        self._preauthed_sids_lock = threading.Lock()
         self._preauthed_sids = {}
 
         self.xmpp.register_handler(
@@ -65,32 +60,32 @@ class XEP_0065(BasePlugin):
         connection.
         """
         if not self._proxies:
-            self._proxies = self.discover_proxies()
+            self._proxies = yield from self.discover_proxies()
 
         if sid is None:
             sid = uuid4().hex
 
-        used = self.request_stream(to, sid=sid, ifrom=ifrom, timeout=timeout)
+        used = yield from self.request_stream(to, sid=sid, ifrom=ifrom, timeout=timeout)
         proxy = used['socks']['streamhost_used']['jid']
 
         if proxy not in self._proxies:
             log.warning('Received unknown SOCKS5 proxy: %s', proxy)
             return
 
-        with self._sessions_lock:
-            self._sessions[sid] = self._connect_proxy(
-                    sid,
-                    self.xmpp.boundjid,
-                    to,
+        try:
+            self._sessions[sid] = (yield from self._connect_proxy(
+                    self._get_dest_sha1(sid, self.xmpp.boundjid, to),
                     self._proxies[proxy][0],
-                    self._proxies[proxy][1],
-                    peer=to)
+                    self._proxies[proxy][1]))[1]
+        except socket.error:
+            return None
+        addr, port = yield from self._sessions[sid].connected
 
         # Request that the proxy activate the session with the target.
-        self.activate(proxy, sid, to, timeout=timeout)
-        socket = self.get_socket(sid)
-        self.xmpp.event('stream:%s:%s' % (sid, to), socket)
-        return socket
+        yield from self.activate(proxy, sid, to, timeout=timeout)
+        sock = self.get_socket(sid)
+        self.xmpp.event('stream:%s:%s' % (sid, to), sock)
+        return sock
 
     def request_stream(self, to, sid=None, ifrom=None, timeout=None, callback=None):
         if sid is None:
@@ -119,11 +114,16 @@ class XEP_0065(BasePlugin):
 
         discovered = set()
 
-        disco_items = self.xmpp['xep_0030'].get_items(jid, timeout=timeout)
+        disco_items = yield from self.xmpp['xep_0030'].get_items(jid, timeout=timeout)
+        disco_items = {item[0] for item in disco_items['disco_items']['items']}
 
-        for item in disco_items['disco_items']['items']:
+        disco_info_futures = {}
+        for item in disco_items:
+            disco_info_futures[item] = self.xmpp['xep_0030'].get_info(item, timeout=timeout)
+
+        for item in disco_items:
             try:
-                disco_info = self.xmpp['xep_0030'].get_info(item[0], timeout=timeout)
+                disco_info = yield from disco_info_futures[item]
             except XMPPError:
                 continue
             else:
@@ -135,7 +135,7 @@ class XEP_0065(BasePlugin):
 
         for jid in discovered:
             try:
-                addr = self.get_network_address(jid, ifrom=ifrom, timeout=timeout)
+                addr = yield from self.get_network_address(jid, ifrom=ifrom, timeout=timeout)
                 self._proxies[jid] = (addr['socks']['streamhost']['host'],
                                       addr['socks']['streamhost']['port'])
             except XMPPError:
@@ -149,6 +149,15 @@ class XEP_0065(BasePlugin):
         iq.enable('socks')
         return iq.send(timeout=timeout, callback=callback)
 
+    def _get_dest_sha1(self, sid, requester, target):
+        # The hostname MUST be SHA1(SID + Requester JID + Target JID)
+        # where the output is hexadecimal-encoded (not binary).
+        digest = sha1()
+        digest.update(sid.encode('utf8'))
+        digest.update(str(requester).encode('utf8'))
+        digest.update(str(target).encode('utf8'))
+        return digest.hexdigest()
+
     def _handle_streamhost(self, iq):
         """Handle incoming SOCKS5 session request."""
         sid = iq['socks']['sid']
@@ -159,40 +168,59 @@ class XEP_0065(BasePlugin):
             raise XMPPError(etype='modify', condition='not-acceptable')
 
         streamhosts = iq['socks']['streamhosts']
-        conn = None
-        used_streamhost = None
+        requester = iq['from']
+        target = iq['to']
 
-        sender = iq['from']
+        dest = self._get_dest_sha1(sid, requester, target)
+
+        proxy_futures = []
         for streamhost in streamhosts:
-            try:
-                conn = self._connect_proxy(sid,
-                    sender,
-                    self.xmpp.boundjid,
+            proxy_futures.append(self._connect_proxy(
+                    dest,
                     streamhost['host'],
-                    streamhost['port'],
-                    peer=sender)
-                used_streamhost = streamhost['jid']
-                break
-            except socket.error:
-                continue
-        else:
-            raise XMPPError(etype='cancel', condition='item-not-found')
+                    streamhost['port']))
 
-        iq = iq.reply()
-        with self._sessions_lock:
+        @asyncio.coroutine
+        def gather(futures, iq, streamhosts):
+            proxies = yield from asyncio.gather(*futures, return_exceptions=True)
+            for streamhost, proxy in zip(streamhosts, proxies):
+                if isinstance(proxy, ValueError):
+                    continue
+                elif isinstance(proxy, socket.error):
+                    log.error('Socket error while connecting to the proxy.')
+                    continue
+                proxy = proxy[1]
+                # TODO: what if the future never happens?
+                try:
+                    addr, port = yield from proxy.connected
+                except socket.error:
+                    log.exception('Socket error while connecting to the proxy.')
+                    continue
+                # TODO: make a better choice than just the first working one.
+                used_streamhost = streamhost['jid']
+                conn = proxy
+                break
+            else:
+                raise XMPPError(etype='cancel', condition='item-not-found')
+
+            # TODO: close properly the connection to the other proxies.
+
+            iq = iq.reply()
             self._sessions[sid] = conn
-        iq['socks']['sid'] = sid
-        iq['socks']['streamhost_used']['jid'] = used_streamhost
-        iq.send()
-        self.xmpp.event('socks5_stream', conn)
-        self.xmpp.event('stream:%s:%s' % (sid, conn.peer_jid), conn)
+            iq['socks']['sid'] = sid
+            iq['socks']['streamhost_used']['jid'] = used_streamhost
+            iq.send()
+            self.xmpp.event('socks5_stream', conn)
+            self.xmpp.event('stream:%s:%s' % (sid, requester), conn)
+
+        asyncio.async(gather(proxy_futures, iq, streamhosts))
 
     def activate(self, proxy, sid, target, ifrom=None, timeout=None, callback=None):
         """Activate the socks5 session that has been negotiated."""
         iq = self.xmpp.Iq(sto=proxy, stype='set', sfrom=ifrom)
         iq['socks']['sid'] = sid
         iq['socks']['activate'] = target
-        iq.send(timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback)
 
     def deactivate(self, sid):
         """Closes the proxy socket associated with this SID."""
@@ -204,66 +232,28 @@ class XEP_0065(BasePlugin):
             except socket.error:
                 pass
             # Though this should not be neccessary remove the closed session anyway
-            with self._sessions_lock:
-                if sid in self._sessions:
-                    log.warn(('SOCKS5 session with sid = "%s" was not ' +
-                              'removed from _sessions by sock.close()') % sid)
-                    del self._sessions[sid]
+            if sid in self._sessions:
+                log.warn(('SOCKS5 session with sid = "%s" was not ' +
+                          'removed from _sessions by sock.close()') % sid)
+                del self._sessions[sid]
 
     def close(self):
         """Closes all proxy sockets."""
         for sid, sock in self._sessions.items():
             sock.close()
-        with self._sessions_lock:
-            self._sessions = {}
+        self._sessions = {}
 
-    def _connect_proxy(self, sid, requester, target, proxy, proxy_port, peer=None):
-        """ Establishes a connection between the client and the server-side
+    def _connect_proxy(self, dest, proxy, proxy_port):
+        """ Returns a future to a connection between the client and the server-side
         Socks5 proxy.
 
-        sid        : The StreamID. <str>
-        requester  : The JID of the requester. <str>
-        target     : The JID of the target. <str>
-        proxy_host : The hostname or the IP of the proxy. <str>
-        proxy_port : The port of the proxy. <str> or <int>
-        peer       : The JID for the other side of the stream, regardless
-                     of target or requester status.
+        dest : The SHA-1 of (SID + Requester JID + Target JID), in hex. <str>
+        host : The hostname or the IP of the proxy. <str>
+        port : The port of the proxy. <str> or <int>
         """
-        # Because the xep_0065 plugin uses the proxy_port as string,
-        # the Proxy class accepts the proxy_port argument as a string
-        # or an integer. Here, we force to use the port as an integer.
-        proxy_port = int(proxy_port)
 
-        sock = socksocket()
-        sock.setproxy(PROXY_TYPE_SOCKS5, proxy, port=proxy_port)
-
-        # The hostname MUST be SHA1(SID + Requester JID + Target JID)
-        # where the output is hexadecimal-encoded (not binary).
-        digest = sha1()
-        digest.update(sid)
-        digest.update(str(requester))
-        digest.update(str(target))
-
-        dest = digest.hexdigest()
-
-        # The port MUST be 0.
-        sock.connect((dest, 0))
-        log.info('Socket connected.')
-
-        _close = sock.close
-        def close(*args, **kwargs):
-            with self._sessions_lock:
-                if sid in self._sessions:
-                    del self._sessions[sid]
-            _close()
-            log.info('Socket closed.')
-        sock.close = close
-
-        sock.peer_jid = peer
-        sock.self_jid = target if requester == peer else requester
-
-        self.xmpp.event('socks_connected', sid)
-        return sock
+        factory = lambda: Socks5Protocol(dest, 0, self.xmpp.event)
+        return self.xmpp.loop.create_connection(factory, proxy, proxy_port)
 
     def _accept_stream(self, iq):
         receiver = iq['to']
@@ -278,15 +268,13 @@ class XEP_0065(BasePlugin):
         return self.auto_accept
 
     def _authorized_sid(self, jid, sid, ifrom, iq):
-        with self._preauthed_sids_lock:
-            log.debug('>>> authed sids: %s', self._preauthed_sids)
-            log.debug('>>> lookup: %s %s %s', jid, sid, ifrom)
-            if (jid, sid, ifrom) in self._preauthed_sids:
-                del self._preauthed_sids[(jid, sid, ifrom)]
-                return True
-            return False
+        log.debug('>>> authed sids: %s', self._preauthed_sids)
+        log.debug('>>> lookup: %s %s %s', jid, sid, ifrom)
+        if (jid, sid, ifrom) in self._preauthed_sids:
+            del self._preauthed_sids[(jid, sid, ifrom)]
+            return True
+        return False
 
     def _preauthorize_sid(self, jid, sid, ifrom, data):
         log.debug('>>>> %s %s %s %s', jid, sid, ifrom, data)
-        with self._preauthed_sids_lock:
-            self._preauthed_sids[(jid, sid, ifrom)] = True
+        self._preauthed_sids[(jid, sid, ifrom)] = True
