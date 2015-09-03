@@ -86,7 +86,8 @@ class XEP_0080(BasePlugin):
         ifrom = kwargs.get('ifrom', None)
         callback = kwargs.get('callback', None)
         timeout = kwargs.get('timeout', None)
-        for param in ('ifrom', 'block', 'callback', 'timeout', 'options'):
+        timeout_callback = kwargs.get('timeout_callback', None)
+        for param in ('ifrom', 'block', 'callback', 'timeout', 'options', 'timeout_callback'):
             if param in kwargs:
                 del kwargs[param]
 
@@ -97,9 +98,10 @@ class XEP_0080(BasePlugin):
                 options=options,
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None, timeout_callback=None):
         """
         Clear existing user location information to stop notifications.
 
@@ -115,4 +117,5 @@ class XEP_0080(BasePlugin):
         return self.xmpp['xep_0163'].publish(geoloc,
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                timeout_callback=None)

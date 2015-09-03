@@ -45,25 +45,28 @@ class XEP_0084(BasePlugin):
         return hashlib.sha1(data).hexdigest()
 
     def retrieve_avatar(self, jid, id, url=None, ifrom=None,
-                              callback=None, timeout=None):
+                              callback=None, timeout=None, timeout_callback=None):
         return self.xmpp['xep_0060'].get_item(jid, Data.namespace, id,
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                timeout_callback=timeout_callback)
 
     def publish_avatar(self, data, ifrom=None, callback=None,
-                             timeout=None):
+                             timeout=None, timeout_callback=None):
         payload = Data()
         payload['value'] = data
         return self.xmpp['xep_0163'].publish(payload,
                 id=self.generate_id(data),
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                timeout_callback=timeout_callback)
 
     def publish_avatar_metadata(self, items=None, pointers=None,
                                       ifrom=None,
-                                      callback=None, timeout=None):
+                                      callback=None, timeout=None,
+                                      timeout_callback=None):
         metadata = MetaData()
         if items is None:
             items = []
@@ -83,9 +86,10 @@ class XEP_0084(BasePlugin):
                 id=info['id'],
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None, timeout_callback=None):
         """
         Clear existing avatar metadata information to stop notifications.
 
@@ -102,4 +106,5 @@ class XEP_0084(BasePlugin):
                 node=MetaData.namespace,
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                timeout_callback=timeout_callback)

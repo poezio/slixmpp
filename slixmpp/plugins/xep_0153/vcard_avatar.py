@@ -59,7 +59,7 @@ class XEP_0153(BasePlugin):
 
     @future_wrapper
     def set_avatar(self, jid=None, avatar=None, mtype=None, timeout=None,
-                   callback=None):
+                   callback=None, timeout_callback=None):
         if jid is None:
             jid = self.xmpp.boundjid.bare
 
@@ -79,7 +79,8 @@ class XEP_0153(BasePlugin):
             new_future = self.xmpp['xep_0054'].publish_vcard(jid=jid,
                                                              vcard=vcard,
                                                              timeout=timeout,
-                                                             callback=next_callback)
+                                                             callback=next_callback,
+                                                             timeout_callback=timeout_callback)
             new_future.add_done_callback(propagate_timeout_exception)
 
         def next_callback(result):
@@ -92,7 +93,8 @@ class XEP_0153(BasePlugin):
                 future.set_result(result)
 
         first_future = self.xmpp['xep_0054'].get_vcard(jid, cached=False, timeout=timeout,
-                                                       callback=custom_callback)
+                                                       callback=custom_callback,
+                                                       timeout_callback=timeout_callback)
         first_future.add_done_callback(propagate_timeout_exception)
         return future
 

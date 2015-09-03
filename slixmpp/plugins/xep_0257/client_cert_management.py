@@ -31,35 +31,40 @@ class XEP_0257(BasePlugin):
         register_stanza_plugin(Iq, DisableCert)
         register_stanza_plugin(Iq, RevokeCert)
 
-    def get_certs(self, ifrom=None, timeout=None, callback=None):
+    def get_certs(self, ifrom=None, timeout=None, callback=None,
+                        timeout_callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'get'
         iq['from'] = ifrom
         iq.enable('sasl_certs')
-        return iq.send(timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback,
+                       timeout_callback=timeout_callback)
 
     def add_cert(self, name, cert, allow_management=True, ifrom=None,
-                       timeout=None, callback=None):
+                       timeout=None, callback=None, timeout_callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq['sasl_cert_append']['name'] = name
         iq['sasl_cert_append']['x509cert'] = cert
         iq['sasl_cert_append']['cert_management'] = allow_management
-        return iq.send(timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback,
+                       timeout_callback=timeout_callback)
 
-    def disable_cert(self, name, ifrom=None,
-                           timeout=None, callback=None):
+    def disable_cert(self, name, ifrom=None, timeout=None, callback=None,
+                                 timeout_callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq['sasl_cert_disable']['name'] = name
-        return iq.send(timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback,
+                       timeout_callback=timeout_callback)
 
-    def revoke_cert(self, name, ifrom=None,
-                           timeout=None, callback=None):
+    def revoke_cert(self, name, ifrom=None, timeout=None, callback=None,
+                                timeout_callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq['sasl_cert_revoke']['name'] = name
-        return iq.send(timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback,
+                       timeout_callback=timeout_callback)

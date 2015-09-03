@@ -33,8 +33,9 @@ class XEP_0152(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('reachability', Reachability)
 
-    def publish_reachability(self, addresses, options=None,
-                        ifrom=None, callback=None, timeout=None):
+    def publish_reachability(self, addresses, options=None, ifrom=None,
+                             callback=None, timeout=None,
+                             timeout_callback=None):
         """
         Publish alternative addresses where the user can be reached.
 
@@ -65,9 +66,10 @@ class XEP_0152(BasePlugin):
                 options=options,
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, callback=None, timeout=None):
+    def stop(self, ifrom=None, callback=None, timeout=None, timeout_callback=None):
         """
         Clear existing user activity information to stop notifications.
 
@@ -84,4 +86,5 @@ class XEP_0152(BasePlugin):
                 node=Reachability.namespace,
                 ifrom=ifrom,
                 callback=callback,
-                timeout=timeout)
+                timeout=timeout,
+                timeout_callback=timeout_callback)
