@@ -21,10 +21,10 @@ class BitsOfBinary(ElementBase):
     interfaces = set(('cid', 'max_age', 'type', 'data'))
 
     def get_max_age(self):
-        return self._get_attr('max-age')
+        return int(self._get_attr('max-age'))
 
     def set_max_age(self, value):
-        self._set_attr('max-age', value)
+        self._set_attr('max-age', str(value))
 
     def get_data(self):
         return base64.b64decode(bytes(self.xml.text))

@@ -134,8 +134,7 @@ class XEP_0231(BasePlugin):
     def _get_bob(self, jid, node, ifrom, cid):
         if cid in self._cids:
             return self._cids[cid]
-        else:
-            raise XMPPError('item-not-found')
+        raise XMPPError('item-not-found')
 
     def _del_bob(self, jid, node, ifrom, cid):
         if cid in self._cids:
