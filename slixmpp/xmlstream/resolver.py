@@ -193,7 +193,7 @@ def get_A(host, resolver=None, use_aiodns=True, loop=None):
     except Exception as e:
         log.debug('DNS: Exception while querying for %s A records: %s', host, e)
         recs = []
-    return recs
+    return [rec.host for rec in recs]
 
 
 @asyncio.coroutine

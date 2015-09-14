@@ -52,7 +52,7 @@ setup(
     platforms=['any'],
     packages=packages,
     ext_modules=ext_modules,
-    requires=['aiodns', 'pyasn1', 'pyasn1_modules'],
+    install_requires=['aiodns>=1.0', 'pyasn1', 'pyasn1_modules'],
     classifiers=CLASSIFIERS,
     cmdclass={'test': TestCommand}
 )
