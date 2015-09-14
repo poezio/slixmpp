@@ -6,6 +6,8 @@
     See the file LICENSE for copying permission.
 """
 
+import asyncio
+asyncio.sslproto._is_sslproto_available=lambda: False
 import logging
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 

@@ -287,9 +287,8 @@ class XMLStream(asyncio.BaseProtocol):
     def _connect_routine(self):
         self.event_when_connected = "connected"
 
-        try:
-            record = yield from self.pick_dns_answer(self.default_domain)
-        except StopIteration:
+        record = yield from self.pick_dns_answer(self.default_domain)
+        if record is None:
             # No more DNS records to try
             self.dns_answers = None
             return
@@ -497,14 +496,14 @@ class XMLStream(asyncio.BaseProtocol):
 
         ssl_connect_routine = self.loop.create_connection(lambda: self, ssl=self.ssl_context,
                                                           sock=self.socket,
-                                                          server_hostname=self.address[0])
+                                                          server_hostname=self.default_domain)
         @asyncio.coroutine
         def ssl_coro():
             try:
                 transp, prot = yield from ssl_connect_routine
             except ssl.SSLError as e:
-                log.error('CERT: Invalid certificate trust chain.')
                 log.debug('SSL: Unable to connect', exc_info=True)
+                log.error('CERT: Invalid certificate trust chain.')
                 if not self.event_handled('ssl_invalid_chain'):
                     self.disconnect()
                 else:
@@ -513,7 +512,6 @@ class XMLStream(asyncio.BaseProtocol):
                 der_cert = transp.get_extra_info("socket").getpeercert(True)
                 pem_cert = ssl.DER_cert_to_PEM_cert(der_cert)
                 self.event('ssl_cert', pem_cert)
-                self.socket = self.transport.get_extra_info("socket")
 
         asyncio.async(ssl_coro())
 
@@ -663,7 +661,10 @@ class XMLStream(asyncio.BaseProtocol):
             dns_records = yield from self.get_dns_records(domain, port)
             self.dns_answers = iter(dns_records)
 
-        return next(self.dns_answers)
+        try:
+            return next(self.dns_answers)
+        except StopIteration:
+            return
 
     def add_event_handler(self, name, pointer, disposable=False):
         """Add a custom event handler that will be executed whenever
