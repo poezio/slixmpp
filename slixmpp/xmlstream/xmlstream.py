@@ -288,19 +288,14 @@ class XMLStream(asyncio.BaseProtocol):
         self.event_when_connected = "connected"
 
         record = yield from self.pick_dns_answer(self.default_domain)
-        if record is None:
-            # No more DNS records to try
-            self.dns_answers = None
-            return
+        if record is not None:
+            host, address, port = record
+            self.address = (address, port)
+            self._service_name = host
         else:
-            if record:
-                host, address, port = record
-                self.address = (address, port)
-                self._service_name = host
-            else:
-                # No DNS records left, stop iterating
-                # and try (host, port) as a last resort
-                self.dns_answers = None
+            # No DNS records left, stop iterating
+            # and try (host, port) as a last resort
+            self.dns_answers = None
 
         yield from asyncio.sleep(self.connect_loop_wait)
         try:
