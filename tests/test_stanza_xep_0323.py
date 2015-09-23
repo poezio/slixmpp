@@ -7,7 +7,6 @@ namespace='sn'
 
 class TestSensorDataStanzas(SlixTest):
 
-
     def setUp(self):
         pass
         #register_stanza_plugin(Iq, xep_0323.stanza.Request)
@@ -59,8 +58,8 @@ class TestSensorDataStanzas(SlixTest):
         iq['req']['momentary'] = 'true'
 
 
-        iq['req'].add_node("Device02", "Source02", "CacheType");
-        iq['req'].add_node("Device44");
+        iq['req'].add_node("Device02", "Source02", "CacheType")
+        iq['req'].add_node("Device44")
 
         self.check(iq,"""
             <iq type='get'
@@ -75,7 +74,7 @@ class TestSensorDataStanzas(SlixTest):
         """
             )
 
-        iq['req'].del_node("Device02");
+        iq['req'].del_node("Device02")
 
         self.check(iq,"""
             <iq type='get'
@@ -89,7 +88,7 @@ class TestSensorDataStanzas(SlixTest):
         """
             )
 
-        iq['req'].del_nodes();
+        iq['req'].del_nodes()
 
         self.check(iq,"""
             <iq type='get'
@@ -115,8 +114,8 @@ class TestSensorDataStanzas(SlixTest):
         iq['req']['momentary'] = 'true'
 
 
-        iq['req'].add_field("Top temperature");
-        iq['req'].add_field("Bottom temperature");
+        iq['req'].add_field("Top temperature")
+        iq['req'].add_field("Bottom temperature")
 
         self.check(iq,"""
             <iq type='get'
@@ -237,12 +236,12 @@ class TestSensorDataStanzas(SlixTest):
         msg['to'] = 'master@clayster.com/amr'
         msg['fields']['seqnr'] = '1'
 
-        node = msg['fields'].add_node("Device02");
-        ts = node.add_timestamp("2013-03-07T16:24:30");
+        node = msg['fields'].add_node("Device02")
+        ts = node.add_timestamp("2013-03-07T16:24:30")
 
-        data = ts.add_data(typename="numeric", name="Temperature", value="-12.42", unit='K');
-        data['momentary'] = 'true';
-        data['automaticReadout'] = 'true';
+        data = ts.add_data(typename="numeric", name="Temperature", value="-12.42", unit='K')
+        data['momentary'] = 'true'
+        data['automaticReadout'] = 'true'
 
         self.check(msg,"""
             <message from='device@clayster.com'
@@ -258,10 +257,9 @@ class TestSensorDataStanzas(SlixTest):
                        """
             )
 
-        node = msg['fields'].add_node("EmptyDevice");
-        node = msg['fields'].add_node("Device04");
-        ts = node.add_timestamp("EmptyTimestamp");
-
+        node = msg['fields'].add_node("EmptyDevice")
+        node = msg['fields'].add_node("Device04")
+        ts = node.add_timestamp("EmptyTimestamp")
 
         self.check(msg,"""
             <message from='device@clayster.com'
@@ -281,32 +279,32 @@ class TestSensorDataStanzas(SlixTest):
                        """
             )
 
-        node = msg['fields'].add_node("Device77");
-        ts = node.add_timestamp("2013-05-03T12:00:01");
-        data = ts.add_data(typename="numeric", name="Temperature", value="-12.42", unit='K');
-        data['historicalDay'] = 'true';
-        data = ts.add_data(typename="numeric", name="Speed", value="312.42", unit='km/h');
-        data['historicalWeek'] = 'false';
-        data = ts.add_data(typename="string", name="Temperature name", value="Bottom oil");
-        data['historicalMonth'] = 'true';
-        data = ts.add_data(typename="string", name="Speed name", value="Top speed");
-        data['historicalQuarter'] = 'false';
-        data = ts.add_data(typename="dateTime", name="T1", value="1979-01-01T00:00:00");
-        data['historicalYear'] = 'true';
-        data = ts.add_data(typename="dateTime", name="T2", value="2000-01-01T01:02:03");
-        data['historicalOther'] = 'false';
-        data = ts.add_data(typename="timeSpan", name="TS1", value="P5Y");
-        data['missing'] = 'true';
-        data = ts.add_data(typename="timeSpan", name="TS2", value="PT2M1S");
-        data['manualEstimate'] = 'false';
-        data = ts.add_data(typename="enum", name="top color", value="red", dataType="string");
-        data['invoiced'] = 'true';
-        data = ts.add_data(typename="enum", name="bottom color", value="black", dataType="string");
-        data['powerFailure'] = 'false';
-        data = ts.add_data(typename="boolean", name="Temperature real", value="false");
-        data['historicalDay'] = 'true';
-        data = ts.add_data(typename="boolean", name="Speed real", value="true");
-        data['historicalWeek'] = 'false';
+        node = msg['fields'].add_node("Device77")
+        ts = node.add_timestamp("2013-05-03T12:00:01")
+        data = ts.add_data(typename="numeric", name="Temperature", value="-12.42", unit='K')
+        data['historicalDay'] = 'true'
+        data = ts.add_data(typename="numeric", name="Speed", value="312.42", unit='km/h')
+        data['historicalWeek'] = 'false'
+        data = ts.add_data(typename="string", name="Temperature name", value="Bottom oil")
+        data['historicalMonth'] = 'true'
+        data = ts.add_data(typename="string", name="Speed name", value="Top speed")
+        data['historicalQuarter'] = 'false'
+        data = ts.add_data(typename="dateTime", name="T1", value="1979-01-01T00:00:00")
+        data['historicalYear'] = 'true'
+        data = ts.add_data(typename="dateTime", name="T2", value="2000-01-01T01:02:03")
+        data['historicalOther'] = 'false'
+        data = ts.add_data(typename="timeSpan", name="TS1", value="P5Y")
+        data['missing'] = 'true'
+        data = ts.add_data(typename="timeSpan", name="TS2", value="PT2M1S")
+        data['manualEstimate'] = 'false'
+        data = ts.add_data(typename="enum", name="top color", value="red", dataType="string")
+        data['invoiced'] = 'true'
+        data = ts.add_data(typename="enum", name="bottom color", value="black", dataType="string")
+        data['powerFailure'] = 'false'
+        data = ts.add_data(typename="boolean", name="Temperature real", value="false")
+        data['historicalDay'] = 'true'
+        data = ts.add_data(typename="boolean", name="Speed real", value="true")
+        data['historicalWeek'] = 'false'
 
         self.check(msg,"""
             <message from='device@clayster.com'
@@ -344,19 +342,17 @@ class TestSensorDataStanzas(SlixTest):
 
 
     def testTimestamp(self):
-        msg = self.Message();
+        msg = self.Message()
 
         msg['from'] = 'device@clayster.com'
         msg['to'] = 'master@clayster.com/amr'
         msg['fields']['seqnr'] = '1'
 
-        node = msg['fields'].add_node("Device02");
-        node = msg['fields'].add_node("Device03");
+        node = msg['fields'].add_node("Device02")
+        node = msg['fields'].add_node("Device03")
 
-        ts = node.add_timestamp("2013-03-07T16:24:30");
-        ts = node.add_timestamp("2013-03-07T16:24:31");
-
-
+        ts = node.add_timestamp("2013-03-07T16:24:30")
+        ts = node.add_timestamp("2013-03-07T16:24:31")
 
         self.check(msg,"""
             <message from='device@clayster.com'

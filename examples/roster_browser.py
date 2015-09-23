@@ -59,7 +59,7 @@ class RosterBrowser(slixmpp.ClientXMPP):
             self.get_roster(callback=callback)
             yield from future
         except IqError as err:
-            print('Error: %' % err.iq['error']['condition'])
+            print('Error: %s' % err.iq['error']['condition'])
         except IqTimeout:
             print('Error: Request timed out')
         self.send_presence()

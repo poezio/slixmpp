@@ -254,6 +254,9 @@ class RosterNode(object):
             callback     -- Optional reference to a stream handler function.
                             Will be executed when the roster is received.
         """
+        if not groups:
+            groups = []
+
         self[jid]['name'] = name
         self[jid]['groups'] = groups
         self[jid].save()
