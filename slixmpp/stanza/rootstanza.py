@@ -60,7 +60,9 @@ class RootStanza(StanzaBase):
             reply.send()
         elif isinstance(e, XMPPError):
             # We raised this deliberately
+            keep_id = self['id']
             reply = self.reply(clear=e.clear)
+            reply['id'] = keep_id
             reply['error']['condition'] = e.condition
             reply['error']['text'] = e.text
             reply['error']['type'] = e.etype
@@ -72,7 +74,9 @@ class RootStanza(StanzaBase):
             reply.send()
         else:
             # We probably didn't raise this on purpose, so send an error stanza
+            keep_id = self['id']
             reply = self.reply()
+            reply['id'] = keep_id
             reply['error']['condition'] = 'undefined-condition'
             reply['error']['text'] = "Slixmpp got into trouble."
             reply['error']['type'] = 'cancel'

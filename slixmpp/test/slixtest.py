@@ -319,6 +319,9 @@ class SlixTest(unittest.TestCase):
             plugins  -- List of plugins to register. By default, all plugins
                         are loaded.
         """
+        if not plugin_config:
+            plugin_config = {}
+
         if mode == 'client':
             self.xmpp = ClientXMPP(jid, password,
                                    sasl_mech=sasl_mech,
@@ -402,8 +405,7 @@ class SlixTest(unittest.TestCase):
         parts.append('xmlns="%s"' % default_ns)
         return header % ' '.join(parts)
 
-    def recv(self, data, defaults=[], method='exact',
-             use_values=True, timeout=1):
+    def recv(self, data, defaults=None, method='exact', use_values=True, timeout=1):
         """
         Pass data to the dummy XMPP client as if it came from an XMPP server.
 

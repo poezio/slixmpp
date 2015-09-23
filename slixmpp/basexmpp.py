@@ -22,7 +22,6 @@ from slixmpp.exceptions import IqError, IqTimeout
 from slixmpp.stanza import Message, Presence, Iq, StreamError
 from slixmpp.stanza.roster import Roster
 from slixmpp.stanza.nick import Nick
-from slixmpp.stanza.htmlim import HTMLIM
 
 from slixmpp.xmlstream import XMLStream, JID
 from slixmpp.xmlstream import ET, register_stanza_plugin
@@ -46,8 +45,8 @@ class BaseXMPP(XMLStream):
                        is used during initialization.
     """
 
-    def __init__(self, jid='', default_ns='jabber:client'):
-        XMLStream.__init__(self)
+    def __init__(self, jid='', default_ns='jabber:client', **kwargs):
+        XMLStream.__init__(self, **kwargs)
 
         self.default_ns = default_ns
         self.stream_ns = 'http://etherx.jabber.org/streams'
@@ -221,7 +220,7 @@ class BaseXMPP(XMLStream):
                     self.plugin[name].post_init()
                 self.plugin[name].post_inited = True
 
-    def register_plugin(self, plugin, pconfig={}, module=None):
+    def register_plugin(self, plugin, pconfig=None, module=None):
         """Register and configure  a plugin for use in this stream.
 
         :param plugin: The name of the plugin class. Plugin names must
