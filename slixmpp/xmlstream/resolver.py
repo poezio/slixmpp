@@ -240,7 +240,7 @@ def get_AAAA(host, resolver=None, use_aiodns=True, loop=None):
     except Exception as e:
         log.debug('DNS: Exception while querying for %s AAAA records: %s', host, e)
         recs = []
-    return recs
+    return [rec.host for rec in recs]
 
 @asyncio.coroutine
 def get_SRV(host, port, service, proto='tcp', resolver=None, use_aiodns=True):
