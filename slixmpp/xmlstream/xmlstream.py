@@ -348,6 +348,7 @@ class XMLStream(asyncio.BaseProtocol):
         self.socket = self.transport.get_extra_info("socket")
         self.init_parser()
         self.send_raw(self.stream_header)
+        self.dns_answers = None
 
     def data_received(self, data):
         """Called when incoming data is received on the socket.
