@@ -8,6 +8,15 @@ Slixmpp's goals is to only rewrite the core of the library (the low level
 socket handling, the timers, the events dispatching) in order to remove all
 threads.
 
+Building
+--------
+
+Slixmpp can make use of cython to improve performance on critical modules.
+To do that, cython3 is necessary along with libidn headers. Otherwise,
+no compilation is needed. Building is done by running setup.py::
+
+    python3 setup.py build_ext --inplace
+
 Documentation and Testing
 -------------------------
 Documentation can be found both inline in the code, and as a Sphinx project in ``/docs``.
