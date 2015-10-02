@@ -161,8 +161,8 @@ item itself, and the JID and node that will own the item.
     In this case, the owning JID and node are provided with the
     parameters ``ijid`` and ``node``.
 
-Peforming Disco Queries
------------------------
+Performing Disco Queries
+------------------------
 The methods ``get_info()`` and ``get_items()`` are used to query remote JIDs
 and their nodes for disco information. Since these methods are wrappers for
 sending Iq stanzas, they also accept all of the parameters of the ``Iq.send()``
@@ -172,11 +172,10 @@ the `XEP-0059 <http://xmpp.org/extensions/xep-0059.html>`_ plug-in.
 
 .. code-block:: python
 
-    info = self['xep_0030'].get_info(jid='foo@example.com',
-                                     node='bar',
-                                     ifrom='baz@mycomponent.example.com',
-                                     block=True,
-                                     timeout=30)
+    info = yield from self['xep_0030'].get_info(jid='foo@example.com',
+                                                node='bar',
+                                                ifrom='baz@mycomponent.example.com',
+                                                timeout=30)
 
     items = self['xep_0030'].get_info(jid='foo@example.com',
                                       node='bar',

@@ -609,7 +609,7 @@ class XEP_0030(BasePlugin):
         """
         self.api['del_features'](jid, node, None, kwargs)
 
-    def _run_node_handler(self, htype, jid, node=None, ifrom=None, data={}):
+    def _run_node_handler(self, htype, jid, node=None, ifrom=None, data=None):
         """
         Execute the most specific node handler for the given
         JID/node combination.
@@ -620,6 +620,9 @@ class XEP_0030(BasePlugin):
             node  -- The node requested.
             data  -- Optional, custom data to pass to the handler.
         """
+        if not data:
+            data = {}
+
         return self.api[htype](jid, node, ifrom, data)
 
     def _handle_disco_info(self, iq):

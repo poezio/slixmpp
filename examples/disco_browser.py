@@ -76,10 +76,6 @@ class Disco(slixmpp.ClientXMPP):
 
         try:
             if self.get in self.info_types:
-                # By using block=True, the result stanza will be
-                # returned. Execution will block until the reply is
-                # received. Non-blocking options would be to listen
-                # for the disco_info event, or passing a handler
                 # function using the callback parameter.
                 info = yield from self['xep_0030'].get_info(jid=self.target_jid,
                                                             node=self.target_node)

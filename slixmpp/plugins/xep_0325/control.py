@@ -223,7 +223,6 @@ class XEP_0325(BasePlugin):
             error_msg = "Access denied"
 
         # Nodes
-        process_nodes = []
         if len(iq['set']['nodes']) > 0:
             for n in iq['set']['nodes']:
                 if not n['nodeId'] in self.nodes:
@@ -286,7 +285,6 @@ class XEP_0325(BasePlugin):
         req_ok = True
 
         # Nodes
-        process_nodes = []
         if len(msg['set']['nodes']) > 0:
             for n in msg['set']['nodes']:
                 if not n['nodeId'] in self.nodes:
@@ -547,5 +545,4 @@ class XEP_0325(BasePlugin):
 
         callback = self.sessions[seqnr]["callback"]
         callback(from_jid=from_jid, result=result, nodeIds=nodeIds, fields=fields, error_msg=error_msg)
-
 

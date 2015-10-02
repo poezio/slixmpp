@@ -251,7 +251,6 @@ class XEP_0065(BasePlugin):
         host : The hostname or the IP of the proxy. <str>
         port : The port of the proxy. <str> or <int>
         """
-
         factory = lambda: Socks5Protocol(dest, 0, self.xmpp.event)
         return self.xmpp.loop.create_connection(factory, proxy, proxy_port)
 

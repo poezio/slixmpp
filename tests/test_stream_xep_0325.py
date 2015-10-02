@@ -28,7 +28,7 @@ class TestStreamControl(SlixTest):
         pass
 
     def _time_now(self):
-        return datetime.datetime.now().replace(microsecond=0).isoformat();
+        return datetime.datetime.now().replace(microsecond=0).isoformat()
 
     def tearDown(self):
         self.stream_close()
@@ -38,10 +38,10 @@ class TestStreamControl(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        myDevice = Device("Device22");
-        myDevice._add_control_field(name="Temperature", typename="int", value="15");
+        myDevice = Device("Device22")
+        myDevice._add_control_field(name="Temperature", typename="int", value="15")
 
-        self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5);
+        self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5)
 
         self.recv("""
             <iq type='set'
@@ -63,23 +63,23 @@ class TestStreamControl(SlixTest):
             </iq>
             """)
 
-        self.assertEqual(myDevice._get_field_value("Temperature"), "17");
+        self.assertEqual(myDevice._get_field_value("Temperature"), "17")
 
     def testRequestSetMulti(self):
         self.stream_start(mode='component',
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        myDevice = Device("Device22");
-        myDevice._add_control_field(name="Temperature", typename="int", value="15");
-        myDevice._add_control_field(name="Startup", typename="date", value="2013-01-03");
+        myDevice = Device("Device22")
+        myDevice._add_control_field(name="Temperature", typename="int", value="15")
+        myDevice._add_control_field(name="Startup", typename="date", value="2013-01-03")
 
-        myDevice2 = Device("Device23");
-        myDevice2._add_control_field(name="Temperature", typename="int", value="19");
-        myDevice2._add_control_field(name="Startup", typename="date", value="2013-01-09");
+        myDevice2 = Device("Device23")
+        myDevice2._add_control_field(name="Temperature", typename="int", value="19")
+        myDevice2._add_control_field(name="Startup", typename="date", value="2013-01-09")
 
-        self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5);
-        self.xmpp['xep_0325'].register_node(nodeId="Device23", device=myDevice2, commTimeout=0.5);
+        self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5)
+        self.xmpp['xep_0325'].register_node(nodeId="Device23", device=myDevice2, commTimeout=0.5)
 
         self.recv("""
             <iq type='set'
@@ -102,8 +102,8 @@ class TestStreamControl(SlixTest):
             </iq>
             """)
 
-        self.assertEqual(myDevice._get_field_value("Temperature"), "17");
-        self.assertEqual(myDevice2._get_field_value("Temperature"), "19");
+        self.assertEqual(myDevice._get_field_value("Temperature"), "17")
+        self.assertEqual(myDevice2._get_field_value("Temperature"), "19")
 
         self.recv("""
             <iq type='set'
@@ -128,20 +128,20 @@ class TestStreamControl(SlixTest):
             </iq>
             """)
 
-        self.assertEqual(myDevice._get_field_value("Temperature"), "20");
-        self.assertEqual(myDevice2._get_field_value("Temperature"), "20");
-        self.assertEqual(myDevice._get_field_value("Startup"), "2013-02-01");
-        self.assertEqual(myDevice2._get_field_value("Startup"), "2013-02-01");
+        self.assertEqual(myDevice._get_field_value("Temperature"), "20")
+        self.assertEqual(myDevice2._get_field_value("Temperature"), "20")
+        self.assertEqual(myDevice._get_field_value("Startup"), "2013-02-01")
+        self.assertEqual(myDevice2._get_field_value("Startup"), "2013-02-01")
 
     def testRequestSetFail(self):
         self.stream_start(mode='component',
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        myDevice = Device("Device23");
-        myDevice._add_control_field(name="Temperature", typename="int", value="15");
+        myDevice = Device("Device23")
+        myDevice._add_control_field(name="Temperature", typename="int", value="15")
 
-        self.xmpp['xep_0325'].register_node(nodeId="Device23", device=myDevice, commTimeout=0.5);
+        self.xmpp['xep_0325'].register_node(nodeId="Device23", device=myDevice, commTimeout=0.5)
 
         self.recv("""
             <iq type='set'
@@ -166,18 +166,18 @@ class TestStreamControl(SlixTest):
             </iq>
             """)
 
-        self.assertEqual(myDevice._get_field_value("Temperature"), "15");
-        self.assertFalse(myDevice.has_control_field("Voltage", "int"));
+        self.assertEqual(myDevice._get_field_value("Temperature"), "15")
+        self.assertFalse(myDevice.has_control_field("Voltage", "int"))
 
     def testDirectSetOk(self):
         self.stream_start(mode='component',
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        myDevice = Device("Device22");
-        myDevice._add_control_field(name="Temperature", typename="int", value="15");
+        myDevice = Device("Device22")
+        myDevice._add_control_field(name="Temperature", typename="int", value="15")
 
-        self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5);
+        self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5)
 
         self.recv("""
             <message
@@ -191,17 +191,17 @@ class TestStreamControl(SlixTest):
 
         time.sleep(0.5)
 
-        self.assertEqual(myDevice._get_field_value("Temperature"), "17");
+        self.assertEqual(myDevice._get_field_value("Temperature"), "17")
 
     def testDirectSetFail(self):
         self.stream_start(mode='component',
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        myDevice = Device("Device22");
-        myDevice._add_control_field(name="Temperature", typename="int", value="15");
+        myDevice = Device("Device22")
+        myDevice._add_control_field(name="Temperature", typename="int", value="15")
 
-        self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5);
+        self.xmpp['xep_0325'].register_node(nodeId="Device22", device=myDevice, commTimeout=0.5)
 
         self.recv("""
             <message
@@ -223,16 +223,16 @@ class TestStreamControl(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        results = [];
+        results = []
 
         def my_callback(from_jid, result, nodeIds=None, fields=None, error_msg=None):
-            results.append(result);
+            results.append(result)
 
         fields = []
         fields.append(("Temperature", "double", "20.5"))
         fields.append(("TemperatureAlarmSetting", "string", "High"))
 
-        self.xmpp['xep_0325'].set_request(from_jid="tester@localhost", to_jid="you@google.com", fields=fields, nodeIds=['Device33', 'Device22'], callback=my_callback);
+        self.xmpp['xep_0325'].set_request(from_jid="tester@localhost", to_jid="you@google.com", fields=fields, nodeIds=['Device33', 'Device22'], callback=my_callback)
 
         self.send("""
             <iq type='set'
@@ -265,16 +265,16 @@ class TestStreamControl(SlixTest):
                           plugins=['xep_0030',
                                    'xep_0325'])
 
-        results = [];
+        results = []
 
         def my_callback(from_jid, result, nodeIds=None, fields=None, error_msg=None):
-            results.append(result);
+            results.append(result)
 
         fields = []
         fields.append(("Temperature", "double", "20.5"))
         fields.append(("TemperatureAlarmSetting", "string", "High"))
 
-        self.xmpp['xep_0325'].set_request(from_jid="tester@localhost", to_jid="you@google.com", fields=fields, nodeIds=['Device33', 'Device22'], callback=my_callback);
+        self.xmpp['xep_0325'].set_request(from_jid="tester@localhost", to_jid="you@google.com", fields=fields, nodeIds=['Device33', 'Device22'], callback=my_callback)
 
         self.send("""
             <iq type='set'
@@ -301,12 +301,12 @@ class TestStreamControl(SlixTest):
             </iq>
             """)
 
-        self.assertEqual(results, ["OtherError"]);
+        self.assertEqual(results, ["OtherError"])
 
     def testServiceDiscoveryClient(self):
         self.stream_start(mode='client',
                           plugins=['xep_0030',
-                                   'xep_0325']);
+                                   'xep_0325'])
 
         self.recv("""
         <iq type='get'
@@ -331,7 +331,7 @@ class TestStreamControl(SlixTest):
     def testServiceDiscoveryComponent(self):
         self.stream_start(mode='component',
                           plugins=['xep_0030',
-                                   'xep_0325']);
+                                   'xep_0325'])
 
         self.recv("""
         <iq type='get'

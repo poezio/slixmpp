@@ -21,7 +21,10 @@ class Device(object):
           request_fields
     """
 
-    def __init__(self, nodeId, fields={}):
+    def __init__(self, nodeId, fields=None):
+        if not fields:
+            fields = {}
+
         self.nodeId = nodeId
         self.fields = fields # see fields described below
         # {'type':'numeric',
