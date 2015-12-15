@@ -687,7 +687,6 @@ class BaseXMPP(XMLStream):
             self.address = (host, port)
             self.default_domain = host
             self.dns_records = None
-            self.reconnect_delay = None
             self.reconnect()
 
     def _handle_message(self, msg):
