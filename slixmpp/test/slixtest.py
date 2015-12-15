@@ -340,9 +340,6 @@ class SlixTest(unittest.TestCase):
         self.xmpp.default_lang = None
         self.xmpp.peer_default_lang = None
 
-        # Simulate connecting for mock sockets.
-        self.xmpp.auto_reconnect = False
-
         # Must have the stream header ready for xmpp.process() to work.
         if not header:
             header = self.xmpp.stream_header
