@@ -66,7 +66,7 @@ class XEP_0012(BasePlugin):
         self.del_last_activity(jid)
 
     def start_uptime(self, status=None):
-        self.set_last_activity(jid, 0, status)
+        self.set_last_activity(None, 0, status)
 
     def set_last_activity(self, jid=None, seconds=None, status=None):
         self.api['set_last_activity'](jid, args={
