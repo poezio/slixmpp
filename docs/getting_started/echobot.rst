@@ -329,7 +329,7 @@ The Final Product
 -----------------
 
 Here then is what the final result should look like after working through the guide above. The code
-can also be found in the Slixmpp `examples directory <http://github.com/fritzy/Slixmpp/tree/master/examples>`_.
+can also be found in the Slixmpp `examples directory <http://git.poez.io/slixmpp/tree/examples>`_.
 
 .. compound::
 
