@@ -259,8 +259,8 @@ Event Index
 
         Signal that a connection to the XMPP server has been lost and the current
         stream session has ended. Currently equivalent to :term:`disconnected`, but
-        future implementation of `XEP-0198: Stream Management <http://xmpp.org/extensions/xep-0198.html>`_
-        will distinguish the two events.
+        implementations of `XEP-0198: Stream Management <http://xmpp.org/extensions/xep-0198.html>`_
+        distinguish between the two events.
 
         Plugins that maintain session-based state should clear themselves when
         this event is fired.
