@@ -102,8 +102,12 @@ Slixmpp projects::
 Slixmpp Credits
 ---------------
 
-**Maintainer of the slixmpp fork:** Florent Le Coz
-    `louiz@louiz.org <xmpp:louiz@louiz.org?message>`_,
+**Maintainers:**
+    - Florent Le Coz (`louiz@louiz.org <xmpp:louiz@louiz.org?message>`_),
+    - Mathieu Pasquet (`mathieui@mathieui.net <xmpp:mathieui@mathieui.net?message>`_),
+
+**Contributors:**
+    - Emmanuel Gil Peyrot (`Link mauve <xmpp:linkmauve@linkmauve.fr?message>`_)
 
 Credits (SleekXMPP)
 -------------------
