@@ -95,18 +95,20 @@ class XEP_0199(BasePlugin):
             self.timeout = timeout
 
         self.keepalive = True
+        handler = lambda event=None: asyncio.ensure_future(self._keepalive(event))
         self.xmpp.schedule('Ping keepalive',
                            self.interval,
-                           self._keepalive,
+                           handler,
                            repeat=True)
 
     def disable_keepalive(self, event=None):
         self.xmpp.cancel_schedule('Ping keepalive')
 
+    @asyncio.coroutine
     def _keepalive(self, event=None):
         log.debug("Keepalive ping...")
         try:
-            rtt = self.ping(self.xmpp.boundjid.host, timeout=self.timeout)
+            rtt = yield from self.ping(self.xmpp.boundjid.host, timeout=self.timeout)
         except IqTimeout:
             log.debug("Did not recieve ping back in time." + \
                       "Requesting Reconnect.")
@@ -172,8 +174,7 @@ class XEP_0199(BasePlugin):
 
         log.debug('Pinging %s' % jid)
         try:
-            yield from self.send_ping(jid, ifrom=ifrom, timeout=timeout,
-                                      coroutine=True)
+            yield from self.send_ping(jid, ifrom=ifrom, timeout=timeout)
         except IqError as e:
             if own_host:
                 rtt = time.time() - start
