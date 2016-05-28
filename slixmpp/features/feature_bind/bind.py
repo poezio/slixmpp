@@ -6,6 +6,7 @@
     See the file LICENSE for copying permission.
 """
 
+import asyncio
 import logging
 
 from slixmpp.jid import JID
@@ -34,6 +35,7 @@ class FeatureBind(BasePlugin):
         register_stanza_plugin(Iq, stanza.Bind)
         register_stanza_plugin(StreamFeatures, stanza.Bind)
 
+    @asyncio.coroutine
     def _handle_bind_resource(self, features):
         """
         Handle requesting a specific resource.
@@ -49,7 +51,7 @@ class FeatureBind(BasePlugin):
         if self.xmpp.requested_jid.resource:
             iq['bind']['resource'] = self.xmpp.requested_jid.resource
 
-        iq.send(callback=self._on_bind_response)
+        yield from iq.send(callback=self._on_bind_response)
 
     def _on_bind_response(self, response):
         self.xmpp.boundjid = JID(response['bind']['jid'])

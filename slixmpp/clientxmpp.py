@@ -12,6 +12,7 @@
     :license: MIT, see LICENSE for more details
 """
 
+import asyncio
 import logging
 
 from slixmpp.stanza import StreamFeatures
@@ -19,7 +20,7 @@ from slixmpp.basexmpp import BaseXMPP
 from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import XMLStream
 from slixmpp.xmlstream.matcher import StanzaPath, MatchXPath
-from slixmpp.xmlstream.handler import Callback
+from slixmpp.xmlstream.handler import Callback, CoroutineCallback
 
 # Flag indicating if DNS SRV records are available for use.
 try:
@@ -104,9 +105,9 @@ class ClientXMPP(BaseXMPP):
         self.register_stanza(StreamFeatures)
 
         self.register_handler(
-                Callback('Stream Features',
-                         MatchXPath('{%s}features' % self.stream_ns),
-                         self._handle_stream_features))
+                CoroutineCallback('Stream Features',
+                     MatchXPath('{%s}features' % self.stream_ns),
+                     self._handle_stream_features))
         self.register_handler(
                 Callback('Roster Update',
                          StanzaPath('iq@type=set/roster'),
@@ -249,6 +250,7 @@ class ClientXMPP(BaseXMPP):
         self.bindfail = False
         self.features = set()
 
+    @asyncio.coroutine
     def _handle_stream_features(self, features):
         """Process the received stream features.
 
@@ -257,7 +259,11 @@ class ClientXMPP(BaseXMPP):
         for order, name in self._stream_feature_order:
             if name in features['features']:
                 handler, restart = self._stream_feature_handlers[name]
-                if handler(features) and restart:
+                if asyncio.iscoroutinefunction(handler):
+                    result = yield from handler(features)
+                else:
+                    result = handler(features)
+                if result and restart:
                     # Don't continue if the feature requires
                     # restarting the XML stream.
                     return True
