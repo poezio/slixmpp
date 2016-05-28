@@ -10,8 +10,10 @@
 """
 
 import logging
-from queue import Queue, Empty
+import asyncio
+from  asyncio import Queue, wait_for, TimeoutError
 
+import slixmpp
 from slixmpp.xmlstream.handler.base import BaseHandler
 
 
@@ -42,12 +44,13 @@ class Waiter(BaseHandler):
         :param payload: The matched
             :class:`~slixmpp.xmlstream.stanzabase.ElementBase` object.
         """
-        self._payload.put(payload)
+        self._payload.put_nowait(payload)
 
     def run(self, payload):
         """Do not process this handler during the main event loop."""
         pass
 
+    @asyncio.coroutine
     def wait(self, timeout=None):
         """Block an event handler while waiting for a stanza to arrive.
 
@@ -63,18 +66,13 @@ class Waiter(BaseHandler):
             value.
         """
         if timeout is None:
-            timeout = self.stream().response_timeout
+            timeout = slixmpp.xmlstream.RESPONSE_TIMEOUT
 
-        elapsed_time = 0
-        stanza = False
-        while elapsed_time < timeout and not self.stream().stop.is_set():
-            try:
-                stanza = self._payload.get(True, 1)
-                break
-            except Empty:
-                elapsed_time += 1
-                if elapsed_time >= timeout:
-                    log.warning("Timed out waiting for %s", self.name)
+        stanza = None
+        try:
+            stanza = yield from self._payload.get()
+        except TimeoutError:
+            log.warning("Timed out waiting for %s", self.name)
         self.stream().remove_handler(self.name)
         return stanza
 
