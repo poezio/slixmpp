@@ -33,7 +33,7 @@ class XEP_0186(BasePlugin):
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq.enable('invisible')
-        iq.send(callback=callback, timeout=timeout)
+        return iq.send(callback=callback, timeout=timeout)
 
     def set_visible(self, ifrom=None, callback=None,
                           timeout=None):
@@ -41,4 +41,4 @@ class XEP_0186(BasePlugin):
         iq['type'] = 'set'
         iq['from'] = ifrom
         iq.enable('visible')
-        iq.send(callback=callback, timeout=timeout)
+        return iq.send(callback=callback, timeout=timeout)
