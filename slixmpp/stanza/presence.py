@@ -76,12 +76,6 @@ class Presence(RootStanza):
             if self.stream is not None and self.stream.use_presence_ids:
                 self['id'] = self.stream.new_id()
 
-    def exception(self, e):
-        """
-        Override exception passback for presence.
-        """
-        pass
-
     def set_show(self, show):
         """
         Set the value of the <show> element.
