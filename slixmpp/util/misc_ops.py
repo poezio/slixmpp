@@ -1,3 +1,4 @@
+import builtins
 import sys
 import hashlib
 
@@ -22,7 +23,6 @@ def bytes(text):
     if text is None:
         return b''
 
-    import builtins
     if isinstance(text, builtins.bytes):
         # We already have bytes, so do nothing
         return text
@@ -80,10 +80,9 @@ def XOR(x, y):
     :param bytes y: A byte string
     :rtype: bytes
     """
-    result = b''
-    for a, b in zip(x, y):
-        result += bytes([a ^ b])
-    return result
+    # This operation is faster with a list comprehension than with a
+    # generator, as of 2016 on python 3.5.
+    return builtins.bytes([a ^ b for a, b in zip(x, y)])
 
 
 def hash(name):
