@@ -637,7 +637,7 @@ class ElementBase(object):
                         plugin.values = value
         return self
 
-    def __getitem__(self, attrib):
+    def __getitem__(self, full_attrib):
         """Return the value of a stanza interface using dict-like syntax.
 
         Example::
@@ -664,24 +664,16 @@ class ElementBase(object):
             8. The plugin named ``'foo'``
             9. An empty string.
 
-        :param string attrib: The name of the requested stanza interface.
+        :param string full_attrib: The name of the requested stanza interface.
         """
-        full_attrib = attrib
-        attrib_lang = ('%s|' % attrib).split('|')
-        attrib = attrib_lang[0]
-        lang = attrib_lang[1] or None
+        attrib, lang, *_ = ('%s|' % full_attrib).split('|')
 
-        kwargs = {}
-        if lang and attrib in self.lang_interfaces:
-            kwargs['lang'] = lang
-
-        kwargs = OrderedDict(kwargs)
+        kwargs = {'lang': lang} if lang and attrib in self.lang_interfaces else {}
 
         if attrib == 'substanzas':
             return self.iterables
         elif attrib in self.interfaces or attrib == 'lang':
             get_method = "get_%s" % attrib.lower()
-            get_method2 = "get%s" % attrib.title()
 
             if self.plugin_overrides:
                 name = self.plugin_overrides.get(get_method, None)
@@ -694,7 +686,8 @@ class ElementBase(object):
 
             if hasattr(self, get_method):
                 return getattr(self, get_method)(**kwargs)
-            elif hasattr(self, get_method2):
+            get_method2 = "get%s" % attrib.title()
+            if hasattr(self, get_method2):
                 return getattr(self, get_method2)(**kwargs)
             else:
                 if attrib in self.sub_interfaces:
