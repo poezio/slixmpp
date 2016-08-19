@@ -302,7 +302,8 @@ class XMLStream(asyncio.BaseProtocol):
             yield from self.loop.create_connection(lambda: self,
                                                    self.address[0],
                                                    self.address[1],
-                                                   ssl=self.use_ssl)
+                                                   ssl=self.use_ssl,
+                                                   server_hostname=self.default_domain if self.use_ssl else None)
         except Socket.gaierror as e:
             self.event('connection_failed',
                        'No DNS record available for %s' % self.default_domain)
