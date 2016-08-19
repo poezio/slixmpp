@@ -16,7 +16,7 @@ from getpass import getpass
 from argparse import ArgumentParser
 
 import slixmpp
-from slixmpp.exceptions import XMPPError
+from slixmpp.exceptions import XMPPError, IqError
 from slixmpp import asyncio
 
 log = logging.getLogger(__name__)
@@ -37,24 +37,40 @@ class AskConfirm(slixmpp.ClientXMPP):
         self.method = method
 
         # Will be used to set the proper exit code.
-        self.confirmed = None
+        self.confirmed = asyncio.Future()
 
         self.add_event_handler("session_start", self.start)
+        self.add_event_handler("message", self.start)
+        self.add_event_handler("http_confirm_message", self.confirm)
+
+    def confirm(self, message):
+        print(message)
+        if message['confirm']['id'] == self.id:
+            if message['type'] == 'error':
+                self.confirmed.set_result(False)
+            else:
+                self.confirmed.set_result(True)
 
     @asyncio.coroutine
     def start(self, event):
         log.info('Sending confirm request %s to %s who wants to access %s using '
                  'method %s...' % (self.id, self.recipient, self.url, self.method))
-        confirmed = yield from self['xep_0070'].ask_confirm(self.recipient,
-                                                            id=self.id,
-                                                            url=self.url,
-                                                            method=self.method,
-                                                            message='Plz say yes or no for {method} {url} ({id}).')
+        try:
+            confirmed = yield from self['xep_0070'].ask_confirm(self.recipient,
+                                                                id=self.id,
+                                                                url=self.url,
+                                                                method=self.method,
+                                                                message='Plz say yes or no for {method} {url} ({id}).')
+            if isinstance(confirmed, slixmpp.Message):
+                confirmed = yield from self.confirmed
+            else:
+                confirmed = True
+        except IqError:
+            confirmed = False
         if confirmed:
             print('Confirmed')
         else:
             print('Denied')
-        self.confirmed = confirmed
         self.disconnect()
 
 

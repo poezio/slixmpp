@@ -29,18 +29,33 @@ class AnswerConfirm(slixmpp.ClientXMPP):
     def __init__(self, jid, password, trusted):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
-        self.trusted = trusted
-        self.api.register(self.confirm, 'xep_0070', 'get_confirm')
+        self.add_event_handler("http_confirm", self.confirm)
+        self.add_event_handler("session_start", self.start)
 
-    def confirm(self, jid, id, url, method):
-        log.info('Received confirm request %s from %s to access %s using '
-                 'method %s' % (id, jid, url, method))
-        if jid not in self.trusted:
-            log.info('Denied')
-            return False
-        log.info('Confirmed')
-        return True
+    def start(self, *args):
+        self.make_presence().send()
 
+    def prompt(self, stanza):
+        confirm = stanza['confirm']
+        print('Received confirm request %s from %s to access %s using '
+                 'method %s' % (
+                     confirm['id'], stanza['from'], confirm['url'],
+                     confirm['method'])
+                )
+        result = input("Do you accept (y/N)? ")
+        return 'y' == result.lower()
+
+    def confirm(self, stanza):
+        if self.prompt(stanza):
+            reply = stanza.reply()
+        else:
+            reply = stanza.reply()
+            reply.enable('error')
+            reply['error']['type'] = 'auth'
+            reply['error']['code'] = '401'
+            reply['error']['condition'] = 'not-authorized'
+        reply.append(stanza['confirm'])
+        reply.send()
 
 if __name__ == '__main__':
     # Setup the command line arguments.

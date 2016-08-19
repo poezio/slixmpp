@@ -8,10 +8,12 @@
 
 import asyncio
 import logging
+from uuid import uuid4
 
 from slixmpp.plugins import BasePlugin, register_plugin
 from slixmpp import future_wrapper, Iq, Message
 from slixmpp.exceptions import XMPPError, IqError, IqTimeout
+from slixmpp.jid import JID
 from slixmpp.xmlstream import JID, register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -46,10 +48,6 @@ class XEP_0070(BasePlugin):
                  StanzaPath('message/confirm'),
                  self._handle_message_confirm))
 
-        #self.api.register(self._default_get_confirm,
-        #        'get_confirm',
-        #        default=True)
-
     def plugin_end(self):
         self.xmpp.remove_handler('Confirm')
         self.xmpp['xep_0030'].del_feature(feature='http://jabber.org/protocol/http-auth')
@@ -57,51 +55,32 @@ class XEP_0070(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature('http://jabber.org/protocol/http-auth')
 
+    @future_wrapper
     def ask_confirm(self, jid, id, url, method, *, ifrom=None, message=None):
-        if message is None:
+        jid = JID(jid)
+        if jid.resource:
             stanza = self.xmpp.Iq()
             stanza['type'] = 'get'
         else:
             stanza = self.xmpp.Message()
+            stanza['thread'] = uuid4().hex
         stanza['from'] = ifrom
         stanza['to'] = jid
         stanza['confirm']['id'] = id
         stanza['confirm']['url'] = url
         stanza['confirm']['method'] = method
-        if message is not None:
-            stanza['body'] = message.format(id=id, url=url, method=method)
+        if not jid.resource:
+            if message is not None:
+                stanza['body'] = message.format(id=id, url=url, method=method)
             stanza.send()
+            return stanza
         else:
-            try:
-                yield from stanza.send()
-            except IqError:
-                return False
-            except IqTimeout:
-                return False
-            else:
-                return True
+            return stanza.send()
 
     def _handle_iq_confirm(self, iq):
-        emitter = iq['from']
-        id = iq['confirm']['id']
-        url = iq['confirm']['url']
-        method = iq['confirm']['method']
-        accept = self.api['get_confirm'](emitter, id, url, method)
-        if not accept:
-            raise XMPPError(etype='auth', condition='not-authorized')
-
-        iq.reply().send()
+        self.xmpp.event('http_confirm_iq', iq)
+        self.xmpp.event('http_confirm', iq)
 
     def _handle_message_confirm(self, message):
-        emitter = message['from']
-        id = message['confirm']['id']
-        url = message['confirm']['url']
-        method = message['confirm']['method']
-        accept = self.api['get_confirm'](emitter, id, url, method)
-        if not accept:
-            raise XMPPError(etype='auth', condition='not-authorized')
-
-        message.reply().send()
-
-    #def _default_get_confirm(self, jid, id, url, method):
-    #    return False
+        self.xmpp.event('http_confirm_message', message)
+        self.xmpp.event('http_confirm', message)
