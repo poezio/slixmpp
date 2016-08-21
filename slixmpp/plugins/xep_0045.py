@@ -160,6 +160,7 @@ class XEP_0045(BasePlugin):
         got_online = False
         if pr['muc']['room'] not in self.rooms.keys():
             return
+        self.xmpp.roster[pr['from']].ignore_updates = True
         entry = pr['muc'].get_stanza_values()
         entry['show'] = pr['show']
         entry['status'] = pr['status']

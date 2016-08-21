@@ -752,6 +752,9 @@ class BaseXMPP(XMLStream):
 
         Update the roster with presence information.
         """
+        if self.roster[presence['from']].ignore_updates:
+            return
+
         if not self.is_component and not presence['to'].bare:
             presence['to'] = self.boundjid
 
