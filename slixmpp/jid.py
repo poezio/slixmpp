@@ -299,7 +299,7 @@ class JID:
     :raises InvalidJID:
     """
 
-    __slots__ = ('_node', '_domain', '_resource')
+    __slots__ = ('_node', '_domain', '_resource', '_bare', '_full')
 
     def __init__(self, jid=None):
         if not jid:
@@ -312,6 +312,8 @@ class JID:
             self._node = jid._node
             self._domain = jid._domain
             self._resource = jid._resource
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     def unescape(self):
         """Return an unescaped JID object.
@@ -362,43 +364,57 @@ class JID:
 
     @property
     def bare(self):
-        return _format_jid(self._node, self._domain)
+        return self._bare
 
     @property
     def full(self):
-        return _format_jid(self._node, self._domain, self._resource)
+        return self._full
 
     @property
     def jid(self):
-        return _format_jid(self._node, self._domain, self._resource)
+        return self._full
 
     @node.setter
     def node(self, value):
         self._node = _validate_node(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @user.setter
     def user(self, value):
         self._node = _validate_node(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @local.setter
     def local(self, value):
         self._node = _validate_node(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @username.setter
     def username(self, value):
         self._node = _validate_node(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @domain.setter
     def domain(self, value):
         self._domain = _validate_domain(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @server.setter
     def server(self, value):
         self._domain = _validate_domain(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @host.setter
     def host(self, value):
         self._domain = _validate_domain(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @bare.setter
     def bare(self, value):
@@ -406,26 +422,33 @@ class JID:
         assert not resource
         self._node = node
         self._domain = domain
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @resource.setter
     def resource(self, value):
         self._resource = _validate_resource(value)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @full.setter
     def full(self, value):
         self._node, self._domain, self._resource = _parse_jid(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     @jid.setter
     def jid(self, value):
         self._node, self._domain, self._resource = _parse_jid(value)
+        self._bare = _format_jid(self._node, self._domain)
+        self._full = _format_jid(self._node, self._domain, self._resource)
 
     def __str__(self):
         """Use the full JID as the string value."""
-        return _format_jid(self._node, self._domain, self._resource)
+        return self._full
 
     def __repr__(self):
         """Use the full JID as the representation."""
-        return _format_jid(self._node, self._domain, self._resource)
+        return self._full
 
     # pylint: disable=W0212
     def __eq__(self, other):
@@ -445,4 +468,4 @@ class JID:
 
     def __hash__(self):
         """Hash a JID based on the string version of its full JID."""
-        return hash(_format_jid(self._node, self._domain, self._resource))
+        return hash(self._full)
