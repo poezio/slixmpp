@@ -208,16 +208,15 @@ def _format_jid(local=None, domain=None, resource=None):
 
     :return: A full or bare JID string.
     """
-    result = []
+    if domain is None:
+        return ''
     if local is not None:
-        result.append(local)
-        result.append('@')
-    if domain is not None:
-        result.append(domain)
+        result = local + '@' + domain
+    else:
+        result = domain
     if resource is not None:
-        result.append('/')
-        result.append(resource)
-    return ''.join(result)
+        result += '/' + resource
+    return result
 
 
 class InvalidJID(ValueError):
