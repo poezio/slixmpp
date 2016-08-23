@@ -7,7 +7,7 @@ publicly-available git repository (on a fork `on github
 notify the developers with either:
  - a ticket `on the bug tracker <https://dev.poez.io/new>`_
  - a pull request on github
- - a simple message on `the XMPP MUC <xmpp:poezio@muc.poez.io>`_
+ - a simple message on `the XMPP MUC <xmpp:slixmpp@muc.poez.io>`_
 
 Even though Slixmpp’s github repository is just a read-only mirror, we can
 still be notified of the pull requests and fetch your mirror manually to
