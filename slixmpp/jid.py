@@ -303,17 +303,19 @@ class JID:
 
     def __init__(self, jid=None):
         if not jid:
-            self._node = None
-            self._domain = None
-            self._resource = None
+            self._node = ''
+            self._domain = ''
+            self._resource = ''
+            self._bare = ''
+            self._full = ''
+            return
         elif not isinstance(jid, JID):
             self._node, self._domain, self._resource = _parse_jid(jid)
         else:
             self._node = jid._node
             self._domain = jid._domain
             self._resource = jid._resource
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     def unescape(self):
         """Return an unescaped JID object.
@@ -330,37 +332,47 @@ class JID:
                             self._domain,
                             self._resource)
 
+    def _update_bare_full(self):
+        """Format the given JID into a bare and a full JID.
+        """
+        self._bare = (self._node + '@' + self._domain
+                      if self._node
+                      else self._domain)
+        self._full = (self._bare + '/' + self._resource
+                      if self._resource
+                      else self._bare)
+
     @property
     def node(self):
-        return self._node or ''
+        return self._node
 
     @property
     def user(self):
-        return self._node or ''
+        return self._node
 
     @property
     def local(self):
-        return self._node or ''
+        return self._node
 
     @property
     def username(self):
-        return self._node or ''
+        return self._node
 
     @property
     def domain(self):
-        return self._domain or ''
+        return self._domain
 
     @property
     def server(self):
-        return self._domain or ''
+        return self._domain
 
     @property
     def host(self):
-        return self._domain or ''
+        return self._domain
 
     @property
     def resource(self):
-        return self._resource or ''
+        return self._resource
 
     @property
     def bare(self):
@@ -377,44 +389,37 @@ class JID:
     @node.setter
     def node(self, value):
         self._node = _validate_node(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @user.setter
     def user(self, value):
         self._node = _validate_node(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @local.setter
     def local(self, value):
         self._node = _validate_node(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @username.setter
     def username(self, value):
         self._node = _validate_node(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @domain.setter
     def domain(self, value):
         self._domain = _validate_domain(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @server.setter
     def server(self, value):
         self._domain = _validate_domain(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @host.setter
     def host(self, value):
         self._domain = _validate_domain(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @bare.setter
     def bare(self, value):
@@ -422,25 +427,22 @@ class JID:
         assert not resource
         self._node = node
         self._domain = domain
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @resource.setter
     def resource(self, value):
         self._resource = _validate_resource(value)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @full.setter
     def full(self, value):
         self._node, self._domain, self._resource = _parse_jid(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     @jid.setter
     def jid(self, value):
         self._node, self._domain, self._resource = _parse_jid(value)
-        self._bare = _format_jid(self._node, self._domain)
-        self._full = _format_jid(self._node, self._domain, self._resource)
+        self._update_bare_full()
 
     def __str__(self):
         """Use the full JID as the string value."""
