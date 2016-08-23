@@ -12,8 +12,8 @@
     :license: MIT, see LICENSE for more details
 """
 
+import asyncio
 import logging
-import threading
 
 from slixmpp import plugins, roster, stanza
 from slixmpp.api import APIRegistry
@@ -70,7 +70,7 @@ class BaseXMPP(XMLStream):
         #: redirections that will be followed before quitting.
         self.max_redirects = 5
 
-        self.session_bind_event = threading.Event()
+        self.session_bind_event = asyncio.Event()
 
         #: A dictionary mapping plugin names to plugins.
         self.plugin = PluginManager(self)
