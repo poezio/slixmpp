@@ -1280,20 +1280,6 @@ class ElementBase(object):
         if attr in self.xml.attrib:
             del self.xml.attrib[attr]
 
-    @property
-    def attrib(self):
-        """Return the stanza object itself.
-
-        Older implementations of stanza objects used XML objects directly,
-        requiring the use of ``.attrib`` to access attribute values.
-
-        Use of the dictionary syntax with the stanza object itself for
-        accessing stanza interfaces is preferred.
-
-        .. deprecated:: 1.0
-        """
-        return self
-
     def _fix_ns(self, xpath, split=False, propagate_ns=True):
         return fix_ns(xpath, split=split,
                              propagate_ns=propagate_ns,
