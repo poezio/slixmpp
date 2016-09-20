@@ -668,9 +668,6 @@ class ElementBase(object):
 
             if hasattr(self, get_method):
                 return getattr(self, get_method)(**kwargs)
-            get_method2 = "get%s" % attrib.title()
-            if hasattr(self, get_method2):
-                return getattr(self, get_method2)(**kwargs)
             else:
                 if attrib in self.sub_interfaces:
                     return self._get_sub_text(attrib, lang=lang)
@@ -733,7 +730,6 @@ class ElementBase(object):
         if attrib in self.interfaces or attrib == 'lang':
             if value is not None:
                 set_method = "set_%s" % attrib.lower()
-                set_method2 = "set%s" % attrib.title()
 
                 if self.plugin_overrides:
                     name = self.plugin_overrides.get(set_method, None)
@@ -746,8 +742,6 @@ class ElementBase(object):
 
                 if hasattr(self, set_method):
                     getattr(self, set_method)(value, **kwargs)
-                elif hasattr(self, set_method2):
-                    getattr(self, set_method2)(value, **kwargs)
                 else:
                     if attrib in self.sub_interfaces:
                         if lang == '*':
@@ -820,7 +814,6 @@ class ElementBase(object):
 
         if attrib in self.interfaces or attrib == 'lang':
             del_method = "del_%s" % attrib.lower()
-            del_method2 = "del%s" % attrib.title()
 
             if self.plugin_overrides:
                 name = self.plugin_overrides.get(del_method, None)
@@ -833,8 +826,6 @@ class ElementBase(object):
 
             if hasattr(self, del_method):
                 getattr(self, del_method)(**kwargs)
-            elif hasattr(self, del_method2):
-                getattr(self, del_method2)(**kwargs)
             else:
                 if attrib in self.sub_interfaces:
                     return self._del_sub(attrib, lang=lang)
