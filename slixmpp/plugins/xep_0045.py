@@ -222,7 +222,7 @@ class XEP_0045(BasePlugin):
         if ifrom is not None:
             iq['from'] = ifrom
         query = ET.Element('{http://jabber.org/protocol/muc#owner}query')
-        form = form.getXML('submit')
+        form['type'] = 'submit'
         query.append(form)
         iq.append(query)
         # For now, swallow errors to preserve existing API
@@ -373,8 +373,8 @@ class XEP_0045(BasePlugin):
 
     def setRoomConfig(self, room, config, ifrom=''):
         query = ET.Element('{http://jabber.org/protocol/muc#owner}query')
-        x = config.getXML('submit')
-        query.append(x)
+        config['type'] = 'submit'
+        query.append(config)
         iq = self.xmpp.make_iq_set(query)
         iq['to'] = room
         iq['from'] = ifrom

@@ -206,7 +206,7 @@ class Options(ElementBase):
         return form
 
     def set_options(self, value):
-        self.xml.append(value.getXML())
+        self.xml.append(value)
         return self
 
     def del_options(self):
@@ -238,7 +238,7 @@ class PublishOptions(ElementBase):
         if value is None:
             self.del_publish_options()
         else:
-            self.xml.append(value.getXML())
+            self.xml.append(value)
         return self
 
     def del_publish_options(self):
