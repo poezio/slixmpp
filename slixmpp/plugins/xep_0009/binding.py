@@ -25,7 +25,7 @@ def fault2xml(fault):
 
 def xml2fault(params):
     vals = []
-    for value in params.findall('{%s}value' % _namespace):
+    for value in params.xml.findall('{%s}value' % _namespace):
         vals.append(_xml2py(value))
     fault = dict()
     fault['code'] = vals[0]['faultCode']
@@ -92,39 +92,40 @@ def _py2xml(*args):
 def xml2py(params):
     namespace = 'jabber:iq:rpc'
     vals = []
-    for param in params.findall('{%s}param' % namespace):
+    for param in params.xml.findall('{%s}param' % namespace):
         vals.append(_xml2py(param.find('{%s}value' % namespace)))
     return vals
 
 def _xml2py(value):
     namespace = 'jabber:iq:rpc'
-    if value.find('{%s}nil' % namespace) is not None:
+    find_value = value.xml.find
+    if find_value('{%s}nil' % namespace) is not None:
         return None
-    if value.find('{%s}i4' % namespace) is not None:
-        return int(value.find('{%s}i4' % namespace).text)
-    if value.find('{%s}int' % namespace) is not None:
-        return int(value.find('{%s}int' % namespace).text)
-    if value.find('{%s}boolean' % namespace) is not None:
-        return bool(int(value.find('{%s}boolean' % namespace).text))
-    if value.find('{%s}string' % namespace) is not None:
-        return value.find('{%s}string' % namespace).text
-    if value.find('{%s}double' % namespace) is not None:
-        return float(value.find('{%s}double' % namespace).text)
-    if value.find('{%s}base64' % namespace) is not None:
-        return rpcbase64(value.find('{%s}base64' % namespace).text.encode())
-    if value.find('{%s}Base64' % namespace) is not None:
+    if find_value('{%s}i4' % namespace) is not None:
+        return int(find_value('{%s}i4' % namespace).text)
+    if find_value('{%s}int' % namespace) is not None:
+        return int(find_value('{%s}int' % namespace).text)
+    if find_value('{%s}boolean' % namespace) is not None:
+        return bool(int(find_value('{%s}boolean' % namespace).text))
+    if find_value('{%s}string' % namespace) is not None:
+        return find_value('{%s}string' % namespace).text
+    if find_value('{%s}double' % namespace) is not None:
+        return float(find_value('{%s}double' % namespace).text)
+    if find_value('{%s}base64' % namespace) is not None:
+        return rpcbase64(find_value('{%s}base64' % namespace).text.encode())
+    if find_value('{%s}Base64' % namespace) is not None:
         # Older versions of XEP-0009 used Base64
-        return rpcbase64(value.find('{%s}Base64' % namespace).text.encode())
-    if value.find('{%s}dateTime.iso8601' % namespace) is not None:
-        return rpctime(value.find('{%s}dateTime.iso8601' % namespace).text)
-    if value.find('{%s}struct' % namespace) is not None:
+        return rpcbase64(find_value('{%s}Base64' % namespace).text.encode())
+    if find_value('{%s}dateTime.iso8601' % namespace) is not None:
+        return rpctime(find_value('{%s}dateTime.iso8601' % namespace).text)
+    if find_value('{%s}struct' % namespace) is not None:
         struct = {}
-        for member in value.find('{%s}struct' % namespace).findall('{%s}member' % namespace):
+        for member in find_value('{%s}struct' % namespace).findall('{%s}member' % namespace):
             struct[member.find('{%s}name' % namespace).text] = _xml2py(member.find('{%s}value' % namespace))
         return struct
-    if value.find('{%s}array' % namespace) is not None:
+    if find_value('{%s}array' % namespace) is not None:
         array = []
-        for val in value.find('{%s}array' % namespace).find('{%s}data' % namespace).findall('{%s}value' % namespace):
+        for val in find_value('{%s}array' % namespace).find('{%s}data' % namespace).findall('{%s}value' % namespace):
             array.append(_xml2py(val))
         return array
     raise ValueError()

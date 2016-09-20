@@ -540,7 +540,7 @@ class XEP_0325(BasePlugin):
         fields = [f['name'] for f in iq['setResponse']['datas']]
         error_msg = None
 
-        if not iq['setResponse'].find('error') is None and not iq['setResponse']['error']['text'] == "":
+        if not iq['setResponse'].xml.find('error') is None and not iq['setResponse']['error']['text'] == "":
             error_msg = iq['setResponse']['error']['text']
 
         callback = self.sessions[seqnr]["callback"]

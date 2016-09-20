@@ -163,7 +163,7 @@ class ACL:
 
     @classmethod
     def _next_token(cls, expression, index):
-        new_index = expression.find('*', index)
+        new_index = expression.xml.find('*', index)
         if new_index == 0:
             return ''
         else:
@@ -182,7 +182,7 @@ class ACL:
             #! print "[TOKEN] '%s'" % token
             size = len(token)
             if size > 0:
-                token_index = value.find(token, position)
+                token_index = value.xml.find(token, position)
                 if token_index == -1:
                     return False
                 else:

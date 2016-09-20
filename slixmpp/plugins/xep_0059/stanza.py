@@ -70,7 +70,7 @@ class Set(ElementBase):
                       'count', 'index', 'last', 'max'))
 
     def set_first_index(self, val):
-        fi = self.find("{%s}first" % (self.namespace))
+        fi = self.xml.find("{%s}first" % (self.namespace))
         if fi is not None:
             if val:
                 fi.attrib['index'] = val
@@ -82,7 +82,7 @@ class Set(ElementBase):
             self.xml.append(fi)
 
     def get_first_index(self):
-        fi = self.find("{%s}first" % (self.namespace))
+        fi = self.xml.find("{%s}first" % (self.namespace))
         if fi is not None:
             return fi.attrib.get('index', '')
 

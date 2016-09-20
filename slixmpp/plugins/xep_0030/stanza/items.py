@@ -95,7 +95,7 @@ class DiscoItems(ElementBase):
             node -- Optional extra identifying information.
         """
         if (jid, node) in self._items:
-            for item_xml in self.findall('{%s}item' % self.namespace):
+            for item_xml in self.xml.findall('{%s}item' % self.namespace):
                 item = (item_xml.attrib['jid'],
                         item_xml.attrib.get('node', None))
                 if item == (jid, node):

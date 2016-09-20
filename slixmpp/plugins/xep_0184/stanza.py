@@ -32,7 +32,7 @@ class Request(ElementBase):
 
     def get_request_receipt(self):
         parent = self.parent()
-        if parent.find("{%s}request" % self.namespace) is not None:
+        if parent.xml.find("{%s}request" % self.namespace) is not None:
             return True
         else:
             return False
@@ -63,7 +63,7 @@ class Received(ElementBase):
 
     def get_receipt(self):
         parent = self.parent()
-        xml = parent.find("{%s}received" % self.namespace)
+        xml = parent.xml.find("{%s}received" % self.namespace)
         if xml is not None:
             return xml.attrib.get('id', '')
         return ''

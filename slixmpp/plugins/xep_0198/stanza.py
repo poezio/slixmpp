@@ -99,7 +99,7 @@ class StreamManagement(ElementBase):
     interfaces = set(['required', 'optional'])
 
     def get_required(self):
-        return self.find('{%s}required' % self.namespace) is not None
+        return self.xml.find('{%s}required' % self.namespace) is not None
 
     def set_required(self, val):
         self.del_required()
@@ -110,7 +110,7 @@ class StreamManagement(ElementBase):
         self._del_sub('required')
 
     def get_optional(self):
-        return self.find('{%s}optional' % self.namespace) is not None
+        return self.xml.find('{%s}optional' % self.namespace) is not None
 
     def set_optional(self, val):
         self.del_optional()

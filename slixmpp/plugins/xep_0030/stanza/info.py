@@ -137,7 +137,7 @@ class DiscoInfo(ElementBase):
         identity = (category, itype, lang)
         if identity in self._identities:
             self._identities.remove(identity)
-            for id_xml in self.findall('{%s}identity' % self.namespace):
+            for id_xml in self.xml.findall('{%s}identity' % self.namespace):
                 id = (id_xml.attrib['category'],
                       id_xml.attrib['type'],
                       id_xml.attrib.get('{%s}lang' % self.xml_ns, None))
@@ -163,7 +163,7 @@ class DiscoInfo(ElementBase):
             identities = set()
         else:
             identities = []
-        for id_xml in self.findall('{%s}identity' % self.namespace):
+        for id_xml in self.xml.findall('{%s}identity' % self.namespace):
             xml_lang = id_xml.attrib.get('{%s}lang' % self.xml_ns, None)
             if lang is None or xml_lang == lang:
                 id = (id_xml.attrib['category'],
@@ -205,7 +205,7 @@ class DiscoInfo(ElementBase):
         Arguments:
             lang -- Optional, standard xml:lang value.
         """
-        for id_xml in self.findall('{%s}identity' % self.namespace):
+        for id_xml in self.xml.findall('{%s}identity' % self.namespace):
             if lang is None:
                 self.xml.remove(id_xml)
             elif id_xml.attrib.get('{%s}lang' % self.xml_ns, None) == lang:
@@ -239,7 +239,7 @@ class DiscoInfo(ElementBase):
         """
         if feature in self._features:
             self._features.remove(feature)
-            for feature_xml in self.findall('{%s}feature' % self.namespace):
+            for feature_xml in self.xml.findall('{%s}feature' % self.namespace):
                 if feature_xml.attrib['var'] == feature:
                     self.xml.remove(feature_xml)
                     return True
@@ -251,7 +251,7 @@ class DiscoInfo(ElementBase):
             features = set()
         else:
             features = []
-        for feature_xml in self.findall('{%s}feature' % self.namespace):
+        for feature_xml in self.xml.findall('{%s}feature' % self.namespace):
             if dedupe:
                 features.add(feature_xml.attrib['var'])
             else:
@@ -272,5 +272,5 @@ class DiscoInfo(ElementBase):
     def del_features(self):
         """Remove all features."""
         self._features = set()
-        for feature_xml in self.findall('{%s}feature' % self.namespace):
+        for feature_xml in self.xml.findall('{%s}feature' % self.namespace):
             self.xml.remove(feature_xml)

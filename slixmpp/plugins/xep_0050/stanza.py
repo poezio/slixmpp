@@ -100,7 +100,7 @@ class Command(ElementBase):
         self.del_actions()
         if values:
             self._set_sub_text('{%s}actions' % self.namespace, '', True)
-            actions = self.find('{%s}actions' % self.namespace)
+            actions = self.xml.find('{%s}actions' % self.namespace)
             for val in values:
                 if val in self.next_actions:
                     action = ET.Element('{%s}%s' % (self.namespace, val))
@@ -111,7 +111,7 @@ class Command(ElementBase):
         Return the set of allowable next actions.
         """
         actions = set()
-        actions_xml = self.find('{%s}actions' % self.namespace)
+        actions_xml = self.xml.find('{%s}actions' % self.namespace)
         if actions_xml is not None:
             for action in self.next_actions:
                 action_xml = actions_xml.find('{%s}%s' % (self.namespace,

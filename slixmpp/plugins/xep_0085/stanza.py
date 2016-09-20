@@ -50,7 +50,7 @@ class ChatState(ElementBase):
     def get_chat_state(self):
         parent = self.parent()
         for state in self.states:
-            state_xml = parent.find('{%s}%s' % (self.namespace, state))
+            state_xml = parent.xml.find('{%s}%s' % (self.namespace, state))
             if state_xml is not None:
                 self.xml = state_xml
                 return state
@@ -68,7 +68,7 @@ class ChatState(ElementBase):
     def del_chat_state(self):
         parent = self.parent()
         for state in self.states:
-            state_xml = parent.find('{%s}%s' % (self.namespace, state))
+            state_xml = parent.xml.find('{%s}%s' % (self.namespace, state))
             if state_xml is not None:
                 self.xml = ET.Element('')
                 parent.xml.remove(state_xml)

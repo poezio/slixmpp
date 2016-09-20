@@ -1123,36 +1123,6 @@ class ElementBase(object):
         # Everything matched.
         return True
 
-    def find(self, xpath):
-        """Find an XML object in this stanza given an XPath expression.
-
-        Exposes ElementTree interface for backwards compatibility.
-
-        .. note::
-
-            Matching on attribute values is not supported in Python 2.6
-            or Python 3.1
-
-        :param string xpath: An XPath expression matching a single
-                             desired element.
-        """
-        return self.xml.find(xpath)
-
-    def findall(self, xpath):
-        """Find multiple XML objects in this stanza given an XPath expression.
-
-        Exposes ElementTree interface for backwards compatibility.
-
-        .. note::
-
-            Matching on attribute values is not supported in Python 2.6
-            or Python 3.1.
-
-        :param string xpath: An XPath expression matching multiple
-                             desired elements.
-        """
-        return self.xml.findall(xpath)
-
     def get(self, key, default=None):
         """Return the value of a stanza interface.
 
