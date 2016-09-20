@@ -124,23 +124,19 @@ class StaticCaps(object):
             return None
 
     def cache_caps(self, jid, node, ifrom, data):
-        with self.static.lock:
-            verstring = data.get('verstring', None)
-            info = data.get('info', None)
-            if not verstring or not info:
-                return
-            self.ver_cache[verstring] = info
+        verstring = data.get('verstring', None)
+        info = data.get('info', None)
+        if not verstring or not info:
+            return
+        self.ver_cache[verstring] = info
 
     def assign_verstring(self, jid, node, ifrom, data):
-        with self.static.lock:
-            if isinstance(jid, JID):
-                jid = jid.full
-            self.jid_vers[jid] = data.get('verstring', None)
+        if isinstance(jid, JID):
+            jid = jid.full
+        self.jid_vers[jid] = data.get('verstring', None)
 
     def get_verstring(self, jid, node, ifrom, data):
-        with self.static.lock:
-            return self.jid_vers.get(jid, None)
+        return self.jid_vers.get(jid, None)
 
     def get_caps(self, jid, node, ifrom, data):
-        with self.static.lock:
-            return self.ver_cache.get(data.get('verstring', None), None)
+        return self.ver_cache.get(data.get('verstring', None), None)

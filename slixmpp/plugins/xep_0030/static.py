@@ -7,7 +7,6 @@
 """
 
 import logging
-import threading
 
 from slixmpp import Iq
 from slixmpp.exceptions import XMPPError, IqError, IqTimeout
@@ -48,7 +47,6 @@ class StaticDisco(object):
         self.nodes = {}
         self.xmpp = xmpp
         self.disco = disco
-        self.lock = threading.RLock()
 
     def add_node(self, jid=None, node=None, ifrom=None):
         """
@@ -59,48 +57,45 @@ class StaticDisco(object):
             jid  -- The JID that will own the new stanzas.
             node -- The node that will own the new stanzas.
         """
-        with self.lock:
-            if jid is None:
-                jid = self.xmpp.boundjid.full
-            if node is None:
-                node = ''
-            if ifrom is None:
-                ifrom = ''
-            if isinstance(ifrom, JID):
-                ifrom = ifrom.full
-            if (jid, node, ifrom) not in self.nodes:
-                self.nodes[(jid, node, ifrom)] = {'info': DiscoInfo(),
-                                           'items': DiscoItems()}
-                self.nodes[(jid, node, ifrom)]['info']['node'] = node
-                self.nodes[(jid, node, ifrom)]['items']['node'] = node
+        if jid is None:
+            jid = self.xmpp.boundjid.full
+        if node is None:
+            node = ''
+        if ifrom is None:
+            ifrom = ''
+        if isinstance(ifrom, JID):
+            ifrom = ifrom.full
+        if (jid, node, ifrom) not in self.nodes:
+            self.nodes[(jid, node, ifrom)] = {'info': DiscoInfo(),
+                                       'items': DiscoItems()}
+            self.nodes[(jid, node, ifrom)]['info']['node'] = node
+            self.nodes[(jid, node, ifrom)]['items']['node'] = node
 
     def get_node(self, jid=None, node=None, ifrom=None):
-        with self.lock:
-            if jid is None:
-                jid = self.xmpp.boundjid.full
-            if node is None:
-                node = ''
-            if ifrom is None:
-                ifrom = ''
-            if isinstance(ifrom, JID):
-                ifrom = ifrom.full
-            if (jid, node, ifrom) not in self.nodes:
-                self.add_node(jid, node, ifrom)
-            return self.nodes[(jid, node, ifrom)]
+        if jid is None:
+            jid = self.xmpp.boundjid.full
+        if node is None:
+            node = ''
+        if ifrom is None:
+            ifrom = ''
+        if isinstance(ifrom, JID):
+            ifrom = ifrom.full
+        if (jid, node, ifrom) not in self.nodes:
+            self.add_node(jid, node, ifrom)
+        return self.nodes[(jid, node, ifrom)]
 
     def node_exists(self, jid=None, node=None, ifrom=None):
-        with self.lock:
-            if jid is None:
-                jid = self.xmpp.boundjid.full
-            if node is None:
-                node = ''
-            if ifrom is None:
-                ifrom = ''
-            if isinstance(ifrom, JID):
-                ifrom = ifrom.full
-            if (jid, node, ifrom) not in self.nodes:
-                return False
-            return True
+        if jid is None:
+            jid = self.xmpp.boundjid.full
+        if node is None:
+            node = ''
+        if ifrom is None:
+            ifrom = ''
+        if isinstance(ifrom, JID):
+            ifrom = ifrom.full
+        if (jid, node, ifrom) not in self.nodes:
+            return False
+        return True
 
     # =================================================================
     # Node Handlers
@@ -199,14 +194,13 @@ class StaticDisco(object):
 
         The data parameter is not used.
         """
-        with self.lock:
-            if not self.node_exists(jid, node):
-                if not node:
-                    return DiscoInfo()
-                else:
-                    raise XMPPError(condition='item-not-found')
+        if not self.node_exists(jid, node):
+            if not node:
+                return DiscoInfo()
             else:
-                return self.get_node(jid, node)['info']
+                raise XMPPError(condition='item-not-found')
+        else:
+            return self.get_node(jid, node)['info']
 
     def set_info(self, jid, node, ifrom, data):
         """
@@ -214,9 +208,8 @@ class StaticDisco(object):
 
         The data parameter is a disco#info substanza.
         """
-        with self.lock:
-            self.add_node(jid, node)
-            self.get_node(jid, node)['info'] = data
+        self.add_node(jid, node)
+        self.get_node(jid, node)['info'] = data
 
     def del_info(self, jid, node, ifrom, data):
         """
@@ -224,9 +217,8 @@ class StaticDisco(object):
 
         The data parameter is not used.
         """
-        with self.lock:
-            if self.node_exists(jid, node):
-                self.get_node(jid, node)['info'] = DiscoInfo()
+        if self.node_exists(jid, node):
+            self.get_node(jid, node)['info'] = DiscoInfo()
 
     def get_items(self, jid, node, ifrom, data):
         """
@@ -234,14 +226,13 @@ class StaticDisco(object):
 
         The data parameter is not used.
         """
-        with self.lock:
-            if not self.node_exists(jid, node):
-                if not node:
-                    return DiscoItems()
-                else:
-                    raise XMPPError(condition='item-not-found')
+        if not self.node_exists(jid, node):
+            if not node:
+                return DiscoItems()
             else:
-                return self.get_node(jid, node)['items']
+                raise XMPPError(condition='item-not-found')
+        else:
+            return self.get_node(jid, node)['items']
 
     def set_items(self, jid, node, ifrom, data):
         """
@@ -250,10 +241,9 @@ class StaticDisco(object):
         The data parameter may provide:
             items -- A set of items in tuple format.
         """
-        with self.lock:
-            items = data.get('items', set())
-            self.add_node(jid, node)
-            self.get_node(jid, node)['items']['items'] = items
+        items = data.get('items', set())
+        self.add_node(jid, node)
+        self.get_node(jid, node)['items']['items'] = items
 
     def del_items(self, jid, node, ifrom, data):
         """
@@ -261,9 +251,8 @@ class StaticDisco(object):
 
         The data parameter is not used.
         """
-        with self.lock:
-            if self.node_exists(jid, node):
-                self.get_node(jid, node)['items'] = DiscoItems()
+        if self.node_exists(jid, node):
+            self.get_node(jid, node)['items'] = DiscoItems()
 
     def add_identity(self, jid, node, ifrom, data):
         """
@@ -275,13 +264,12 @@ class StaticDisco(object):
             name     -- Optional human readable name for this identity.
             lang     -- Optional standard xml:lang value.
         """
-        with self.lock:
-            self.add_node(jid, node)
-            self.get_node(jid, node)['info'].add_identity(
-                    data.get('category', ''),
-                    data.get('itype', ''),
-                    data.get('name', None),
-                    data.get('lang', None))
+        self.add_node(jid, node)
+        self.get_node(jid, node)['info'].add_identity(
+                data.get('category', ''),
+                data.get('itype', ''),
+                data.get('name', None),
+                data.get('lang', None))
 
     def set_identities(self, jid, node, ifrom, data):
         """
@@ -291,10 +279,9 @@ class StaticDisco(object):
             identities -- A list of identities in tuple form:
                             (category, type, name, lang)
         """
-        with self.lock:
-            identities = data.get('identities', set())
-            self.add_node(jid, node)
-            self.get_node(jid, node)['info']['identities'] = identities
+        identities = data.get('identities', set())
+        self.add_node(jid, node)
+        self.get_node(jid, node)['info']['identities'] = identities
 
     def del_identity(self, jid, node, ifrom, data):
         """
@@ -306,13 +293,12 @@ class StaticDisco(object):
             name     -- Optional human readable name for this identity.
             lang     -- Optional, standard xml:lang value.
         """
-        with self.lock:
-            if self.node_exists(jid, node):
-                self.get_node(jid, node)['info'].del_identity(
-                        data.get('category', ''),
-                        data.get('itype', ''),
-                        data.get('name', None),
-                        data.get('lang', None))
+        if self.node_exists(jid, node):
+            self.get_node(jid, node)['info'].del_identity(
+                    data.get('category', ''),
+                    data.get('itype', ''),
+                    data.get('name', None),
+                    data.get('lang', None))
 
     def del_identities(self, jid, node, ifrom, data):
         """
@@ -320,9 +306,8 @@ class StaticDisco(object):
 
         The data parameter is not used.
         """
-        with self.lock:
-            if self.node_exists(jid, node):
-                del self.get_node(jid, node)['info']['identities']
+        if self.node_exists(jid, node):
+            del self.get_node(jid, node)['info']['identities']
 
     def add_feature(self, jid, node, ifrom, data):
         """
@@ -331,10 +316,9 @@ class StaticDisco(object):
         The data parameter should include:
             feature -- The namespace of the supported feature.
         """
-        with self.lock:
-            self.add_node(jid, node)
-            self.get_node(jid, node)['info'].add_feature(
-                    data.get('feature', ''))
+        self.add_node(jid, node)
+        self.get_node(jid, node)['info'].add_feature(
+                data.get('feature', ''))
 
     def set_features(self, jid, node, ifrom, data):
         """
@@ -343,10 +327,9 @@ class StaticDisco(object):
         The data parameter should include:
             features -- The new set of supported features.
         """
-        with self.lock:
-            features = data.get('features', set())
-            self.add_node(jid, node)
-            self.get_node(jid, node)['info']['features'] = features
+        features = data.get('features', set())
+        self.add_node(jid, node)
+        self.get_node(jid, node)['info']['features'] = features
 
     def del_feature(self, jid, node, ifrom, data):
         """
@@ -355,10 +338,9 @@ class StaticDisco(object):
         The data parameter should include:
             feature -- The namespace of the removed feature.
         """
-        with self.lock:
-            if self.node_exists(jid, node):
-                self.get_node(jid, node)['info'].del_feature(
-                        data.get('feature', ''))
+        if self.node_exists(jid, node):
+            self.get_node(jid, node)['info'].del_feature(
+                    data.get('feature', ''))
 
     def del_features(self, jid, node, ifrom, data):
         """
@@ -366,10 +348,9 @@ class StaticDisco(object):
 
         The data parameter is not used.
         """
-        with self.lock:
-            if not self.node_exists(jid, node):
-                return
-            del self.get_node(jid, node)['info']['features']
+        if not self.node_exists(jid, node):
+            return
+        del self.get_node(jid, node)['info']['features']
 
     def add_item(self, jid, node, ifrom, data):
         """
@@ -381,12 +362,11 @@ class StaticDisco(object):
                      non-addressable items.
             name  -- Optional human readable name for the item.
         """
-        with self.lock:
-            self.add_node(jid, node)
-            self.get_node(jid, node)['items'].add_item(
-                    data.get('ijid', ''),
-                    node=data.get('inode', ''),
-                    name=data.get('name', ''))
+        self.add_node(jid, node)
+        self.get_node(jid, node)['items'].add_item(
+                data.get('ijid', ''),
+                node=data.get('inode', ''),
+                name=data.get('name', ''))
 
     def del_item(self, jid, node, ifrom, data):
         """
@@ -396,11 +376,10 @@ class StaticDisco(object):
             ijid  -- JID of the item to remove.
             inode -- Optional extra identifying information.
         """
-        with self.lock:
-            if self.node_exists(jid, node):
-                self.get_node(jid, node)['items'].del_item(
-                        data.get('ijid', ''),
-                        node=data.get('inode', None))
+        if self.node_exists(jid, node):
+            self.get_node(jid, node)['items'].del_item(
+                    data.get('ijid', ''),
+                    node=data.get('inode', None))
 
     def cache_info(self, jid, node, ifrom, data):
         """
@@ -410,12 +389,11 @@ class StaticDisco(object):
         containing the disco info to cache, or
         the disco#info substanza itself.
         """
-        with self.lock:
-            if isinstance(data, Iq):
-                data = data['disco_info']
+        if isinstance(data, Iq):
+            data = data['disco_info']
 
-            self.add_node(jid, node, ifrom)
-            self.get_node(jid, node, ifrom)['info'] = data
+        self.add_node(jid, node, ifrom)
+        self.get_node(jid, node, ifrom)['info'] = data
 
     def get_cached_info(self, jid, node, ifrom, data):
         """
@@ -423,8 +401,7 @@ class StaticDisco(object):
 
         The data parameter is not used.
         """
-        with self.lock:
-            if not self.node_exists(jid, node, ifrom):
-                return None
-            else:
-                return self.get_node(jid, node, ifrom)['info']
+        if not self.node_exists(jid, node, ifrom):
+            return None
+        else:
+            return self.get_node(jid, node, ifrom)['info']
