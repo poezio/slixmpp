@@ -94,7 +94,7 @@ class CommandUserBot(slixmpp.ClientXMPP):
         #          label="Your greeting" />
         # </x>
 
-        form = self['xep_0004'].makeForm(ftype='submit')
+        form = self['xep_0004'].make_form(ftype='submit')
         form.addField(var='greeting',
                       value=session['greeting'])
 

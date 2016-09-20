@@ -205,8 +205,8 @@ class TestStreamDisco(SlixTest):
                                                handler=dynamic_jid)
 
 
-        self.xmpp['xep_0030'].make_static(jid='tester@localhost',
-                                          node='testing')
+        self.xmpp['xep_0030'].restore_defaults(jid='tester@localhost',
+                                               node='testing')
 
         self.xmpp['xep_0030'].add_identity(jid='tester@localhost',
                                            node='testing',
@@ -245,8 +245,8 @@ class TestStreamDisco(SlixTest):
         self.xmpp['xep_0030'].set_node_handler('get_info',
                                                handler=dynamic_global)
 
-        self.xmpp['xep_0030'].make_static(jid='user@tester.localhost',
-                                          node='testing')
+        self.xmpp['xep_0030'].restore_defaults(jid='user@tester.localhost',
+                                               node='testing')
 
         self.xmpp['xep_0030'].add_feature(jid='user@tester.localhost',
                                           node='testing',
@@ -396,8 +396,8 @@ class TestStreamDisco(SlixTest):
                                                handler=dynamic_jid)
 
 
-        self.xmpp['xep_0030'].make_static(jid='tester@localhost',
-                                          node='testing')
+        self.xmpp['xep_0030'].restore_defaults(jid='tester@localhost',
+                                               node='testing')
 
         self.xmpp['xep_0030'].add_item(ijid='tester@localhost',
                                        node='testing',
@@ -436,8 +436,8 @@ class TestStreamDisco(SlixTest):
         self.xmpp['xep_0030'].set_node_handler('get_items',
                                                handler=dynamic_global)
 
-        self.xmpp['xep_0030'].make_static(jid='user@tester.localhost',
-                                          node='testing')
+        self.xmpp['xep_0030'].restore_defaults(jid='user@tester.localhost',
+                                               node='testing')
 
         self.xmpp['xep_0030'].add_item(ijid='user@tester.localhost',
                                        node='testing',

@@ -76,7 +76,7 @@ class TestAdHocCommands(SlixTest):
         """Test running a command with no steps."""
 
         def handle_command(iq, session):
-            form = self.xmpp['xep_0004'].makeForm(ftype='result')
+            form = self.xmpp['xep_0004'].make_form(ftype='result')
             form.addField(var='foo', ftype='text-single',
                           label='Foo', value='bar')
 
@@ -122,7 +122,7 @@ class TestAdHocCommands(SlixTest):
                 results.append(form.get_values()['foo'])
                 session['payload'] = None
 
-            form = self.xmpp['xep_0004'].makeForm('form')
+            form = self.xmpp['xep_0004'].make_form('form')
             form.addField(var='foo', ftype='text-single', label='Foo')
 
             session['payload'] = form
@@ -198,7 +198,7 @@ class TestAdHocCommands(SlixTest):
             def handle_step1(form, session):
                 results.append(form.get_values()['foo'])
 
-                form = self.xmpp['xep_0004'].makeForm('form')
+                form = self.xmpp['xep_0004'].make_form('form')
                 form.addField(var='bar', ftype='text-single', label='Bar')
 
                 session['payload'] = form
@@ -207,7 +207,7 @@ class TestAdHocCommands(SlixTest):
 
                 return session
 
-            form = self.xmpp['xep_0004'].makeForm('form')
+            form = self.xmpp['xep_0004'].make_form('form')
             form.addField(var='foo', ftype='text-single', label='Foo')
 
             session['payload'] = form
@@ -312,7 +312,7 @@ class TestAdHocCommands(SlixTest):
             def handle_cancel(iq, session):
                 results.append('canceled')
 
-            form = self.xmpp['xep_0004'].makeForm('form')
+            form = self.xmpp['xep_0004'].make_form('form')
             form.addField(var='foo', ftype='text-single', label='Foo')
 
             session['payload'] = form
@@ -380,7 +380,7 @@ class TestAdHocCommands(SlixTest):
         """Test adding notes to commands."""
 
         def handle_command(iq, session):
-            form = self.xmpp['xep_0004'].makeForm(ftype='result')
+            form = self.xmpp['xep_0004'].make_form(ftype='result')
             form.addField(var='foo', ftype='text-single',
                           label='Foo', value='bar')
 
@@ -431,11 +431,11 @@ class TestAdHocCommands(SlixTest):
                     results.append(form.get_values()['FORM_TYPE'])
                 session['payload'] = None
 
-            form1 = self.xmpp['xep_0004'].makeForm('form')
+            form1 = self.xmpp['xep_0004'].make_form('form')
             form1.addField(var='FORM_TYPE', ftype='hidden', value='form_1')
             form1.addField(var='foo', ftype='text-single', label='Foo')
 
-            form2 = self.xmpp['xep_0004'].makeForm('form')
+            form2 = self.xmpp['xep_0004'].make_form('form')
             form2.addField(var='FORM_TYPE', ftype='hidden', value='form_2')
             form2.addField(var='foo', ftype='text-single', label='Foo')
 
@@ -528,7 +528,7 @@ class TestAdHocCommands(SlixTest):
                 results.append(item)
 
         def handle_step2(iq, session):
-            form = self.xmpp['xep_0004'].makeForm(ftype='submit')
+            form = self.xmpp['xep_0004'].make_form(ftype='submit')
             form.addField(var='bar', value='123')
 
             session['custom_data'].append('baz')
@@ -537,7 +537,7 @@ class TestAdHocCommands(SlixTest):
             self.xmpp['xep_0050'].complete_command(session)
 
         def handle_step1(iq, session):
-            form = self.xmpp['xep_0004'].makeForm(ftype='submit')
+            form = self.xmpp['xep_0004'].make_form(ftype='submit')
             form.addField(var='foo', value='42')
 
             session['custom_data'].append('bar')

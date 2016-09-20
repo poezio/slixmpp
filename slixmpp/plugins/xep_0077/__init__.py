@@ -13,7 +13,3 @@ from slixmpp.plugins.xep_0077.register import XEP_0077
 
 
 register_plugin(XEP_0077)
-
-
-# Retain some backwards compatibility
-xep_0077 = XEP_0077

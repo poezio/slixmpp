@@ -13,7 +13,3 @@ from slixmpp.features.feature_session.stanza import Session
 
 
 register_plugin(FeatureSession)
-
-
-# Retain some backwards compatibility
-feature_session = FeatureSession

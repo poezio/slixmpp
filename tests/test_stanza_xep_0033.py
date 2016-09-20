@@ -13,7 +13,7 @@ class TestAddresses(SlixTest):
     def testAddAddress(self):
         """Testing adding extended stanza address."""
         msg = self.Message()
-        msg['addresses'].addAddress(atype='to', jid='to@header1.org')
+        msg['addresses'].add_address(atype='to', jid='to@header1.org')
         self.check(msg, """
         <message>
           <addresses xmlns="http://jabber.org/protocol/address">
@@ -23,9 +23,9 @@ class TestAddresses(SlixTest):
         """)
 
         msg = self.Message()
-        msg['addresses'].addAddress(atype='replyto',
-                                    jid='replyto@header1.org',
-                                    desc='Reply address')
+        msg['addresses'].add_address(atype='replyto',
+                                     jid='replyto@header1.org',
+                                     desc='Reply address')
         self.check(msg, """
           <message>
             <addresses xmlns="http://jabber.org/protocol/address">
@@ -48,7 +48,7 @@ class TestAddresses(SlixTest):
         """
 
         msg = self.Message()
-        msg['addresses'].setAddresses([
+        msg['addresses'].set_addresses([
             {'type':'replyto',
              'jid':'replyto@header1.org',
              'desc':'Reply address'},
@@ -69,9 +69,9 @@ class TestAddresses(SlixTest):
         """Testing adding URI attribute to extended stanza address."""
 
         msg = self.Message()
-        addr = msg['addresses'].addAddress(atype='to',
-                                           jid='to@header1.org',
-                                           node='foo')
+        addr = msg['addresses'].add_address(atype='to',
+                                            jid='to@header1.org',
+                                            node='foo')
         self.check(msg, """
           <message>
             <addresses xmlns="http://jabber.org/protocol/address">
@@ -101,7 +101,7 @@ class TestAddresses(SlixTest):
         """
 
         msg = self.Message()
-        addr = msg['addresses'].addAddress(jid='to@header1.org', atype='to')
+        addr = msg['addresses'].add_address(jid='to@header1.org', atype='to')
         self.check(msg, xmlstring % '')
 
         addr['delivered'] = True

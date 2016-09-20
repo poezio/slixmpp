@@ -68,7 +68,7 @@ class CommandBot(slixmpp.ClientXMPP):
                        session. Additional, custom data may be saved
                        here to persist across handler callbacks.
         """
-        form = self['xep_0004'].makeForm('form', 'Greeting')
+        form = self['xep_0004'].make_form('form', 'Greeting')
         form['instructions'] = 'Send a custom greeting to a JID'
         form.addField(var='greeting',
                       ftype='text-single',

@@ -360,7 +360,7 @@ class XEP_0045(BasePlugin):
         form = result.xml.find('{http://jabber.org/protocol/muc#owner}query/{jabber:x:data}x')
         if form is None:
             raise ValueError
-        return self.xmpp.plugin['xep_0004'].buildForm(form)
+        return self.xmpp.plugin['xep_0004'].build_form(form)
 
     def cancelConfig(self, room, ifrom=None):
         query = ET.Element('{http://jabber.org/protocol/muc#owner}query')

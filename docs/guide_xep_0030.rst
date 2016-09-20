@@ -61,7 +61,7 @@ operation using these stanzas without doing any complex operations such as
 checking an ACL, etc.
 
 You may find it necessary at some point to revert a particular node or JID to
-using the default, static handlers. To do so, use the method ``make_static()``.
+using the default, static handlers. To do so, use the method ``restore_defaults()``.
 You may also elect to only convert a given set of actions instead.
 
 Creating a Node Handler
