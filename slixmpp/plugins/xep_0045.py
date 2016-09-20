@@ -29,82 +29,82 @@ class MUCPresence(ElementBase):
     affiliations = set(('', ))
     roles = set(('', ))
 
-    def getXMLItem(self):
+    def get_xml_item(self):
         item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
         if item is None:
             item = ET.Element('{http://jabber.org/protocol/muc#user}item')
             self.xml.append(item)
         return item
 
-    def getAffiliation(self):
+    def get_affiliation(self):
         #TODO if no affilation, set it to the default and return default
-        item = self.getXMLItem()
+        item = self.get_xml_item()
         return item.get('affiliation', '')
 
-    def setAffiliation(self, value):
-        item = self.getXMLItem()
+    def set_affiliation(self, value):
+        item = self.get_xml_item()
         #TODO check for valid affiliation
         item.attrib['affiliation'] = value
         return self
 
-    def delAffiliation(self):
-        item = self.getXMLItem()
+    def del_affiliation(self):
+        item = self.get_xml_item()
         #TODO set default affiliation
         if 'affiliation' in item.attrib: del item.attrib['affiliation']
         return self
 
-    def getJid(self):
-        item = self.getXMLItem()
+    def get_jid(self):
+        item = self.get_xml_item()
         return JID(item.get('jid', ''))
 
-    def setJid(self, value):
-        item = self.getXMLItem()
+    def set_jid(self, value):
+        item = self.get_xml_item()
         if not isinstance(value, str):
             value = str(value)
         item.attrib['jid'] = value
         return self
 
-    def delJid(self):
-        item = self.getXMLItem()
+    def del_jid(self):
+        item = self.get_xml_item()
         if 'jid' in item.attrib: del item.attrib['jid']
         return self
 
-    def getRole(self):
-        item = self.getXMLItem()
+    def get_role(self):
+        item = self.get_xml_item()
         #TODO get default role, set default role if none
         return item.get('role', '')
 
-    def setRole(self, value):
-        item = self.getXMLItem()
+    def set_role(self, value):
+        item = self.get_xml_item()
         #TODO check for valid role
         item.attrib['role'] = value
         return self
 
-    def delRole(self):
-        item = self.getXMLItem()
+    def del_role(self):
+        item = self.get_xml_item()
         #TODO set default role
         if 'role' in item.attrib: del item.attrib['role']
         return self
 
-    def getNick(self):
+    def get_nick(self):
         return self.parent()['from'].resource
 
-    def getRoom(self):
+    def get_room(self):
         return self.parent()['from'].bare
 
-    def setNick(self, value):
+    def set_nick(self, value):
         log.warning("Cannot set nick through mucpresence plugin.")
         return self
 
-    def setRoom(self, value):
+    def set_room(self, value):
         log.warning("Cannot set room through mucpresence plugin.")
         return self
 
-    def delNick(self):
+    def del_nick(self):
         log.warning("Cannot delete nick through mucpresence plugin.")
         return self
 
-    def delRoom(self):
+    def del_room(self):
         log.warning("Cannot delete room through mucpresence plugin.")
         return self
 
@@ -121,7 +121,7 @@ class XEP_0045(BasePlugin):
 
     def plugin_init(self):
         self.rooms = {}
-        self.ourNicks = {}
+        self.our_nicks = {}
         self.xep = '0045'
         # load MUC support in presence stanzas
         register_stanza_plugin(Presence, MUCPresence)
@@ -201,22 +201,22 @@ class XEP_0045(BasePlugin):
         """
         self.xmpp.event('groupchat_subject', msg)
 
-    def jidInRoom(self, room, jid):
+    def jid_in_room(self, room, jid):
         for nick in self.rooms[room]:
             entry = self.rooms[room][nick]
             if entry is not None and entry['jid'].full == jid:
                 return True
         return False
 
-    def getNick(self, room, jid):
+    def get_nick(self, room, jid):
         for nick in self.rooms[room]:
             entry = self.rooms[room][nick]
             if entry is not None and entry['jid'].full == jid:
                 return nick
 
-    def configureRoom(self, room, form=None, ifrom=None):
+    def configure_room(self, room, form=None, ifrom=None):
         if form is None:
-            form = self.getRoomConfig(room, ifrom=ifrom)
+            form = self.get_room_config(room, ifrom=ifrom)
         iq = self.xmpp.make_iq_set()
         iq['to'] = room
         if ifrom is not None:
@@ -234,7 +234,7 @@ class XEP_0045(BasePlugin):
             return False
         return True
 
-    def joinMUC(self, room, nick, maxhistory="0", password='', wait=False, pstatus=None, pshow=None, pfrom=None):
+    def join_muc(self, room, nick, maxhistory="0", password='', wait=False, pstatus=None, pshow=None, pfrom=None):
         """ Join the specified room, requesting 'maxhistory' lines of history.
         """
         stanza = self.xmpp.make_presence(pto="%s/%s" % (room, nick), pstatus=pstatus, pshow=pshow, pfrom=pfrom)
@@ -258,7 +258,7 @@ class XEP_0045(BasePlugin):
             expect = ET.Element("{%s}presence" % self.xmpp.default_ns, {'from':"%s/%s" % (room, nick)})
             self.xmpp.send(stanza, expect)
         self.rooms[room] = {}
-        self.ourNicks[room] = nick
+        self.our_nicks[room] = nick
 
     def destroy(self, room, reason='', altroom = '', ifrom=None):
         iq = self.xmpp.make_iq_set()
@@ -283,7 +283,7 @@ class XEP_0045(BasePlugin):
             return False
         return True
 
-    def setAffiliation(self, room, jid=None, nick=None, affiliation='member', ifrom=None):
+    def set_affiliation(self, room, jid=None, nick=None, affiliation='member', ifrom=None):
         """ Change room affiliation."""
         if affiliation not in ('outcast', 'member', 'admin', 'owner', 'none'):
             raise TypeError
@@ -305,7 +305,7 @@ class XEP_0045(BasePlugin):
             return False
         return True
 
-    def setRole(self, room, nick, role):
+    def set_role(self, room, nick, role):
         """ Change role property of a nick in a room.
             Typically, roles are temporary (they last only as long as you are in the
             room), whereas affiliations are permanent (they last across groupchat
@@ -337,7 +337,7 @@ class XEP_0045(BasePlugin):
         msg.append(x)
         self.xmpp.send(msg)
 
-    def leaveMUC(self, room, nick, msg='', pfrom=None):
+    def leave_muc(self, room, nick, msg='', pfrom=None):
         """ Leave the specified room.
         """
         if msg:
@@ -346,7 +346,7 @@ class XEP_0045(BasePlugin):
             self.xmpp.send_presence(pshow='unavailable', pto="%s/%s" % (room, nick), pfrom=pfrom)
         del self.rooms[room]
 
-    def getRoomConfig(self, room, ifrom=''):
+    def get_room_config(self, room, ifrom=''):
         iq = self.xmpp.make_iq_get('http://jabber.org/protocol/muc#owner')
         iq['to'] = room
         iq['from'] = ifrom
@@ -362,7 +362,7 @@ class XEP_0045(BasePlugin):
             raise ValueError
         return self.xmpp.plugin['xep_0004'].build_form(form)
 
-    def cancelConfig(self, room, ifrom=None):
+    def cancel_config(self, room, ifrom=None):
         query = ET.Element('{http://jabber.org/protocol/muc#owner}query')
         x = ET.Element('{jabber:x:data}x', type='cancel')
         query.append(x)
@@ -371,7 +371,7 @@ class XEP_0045(BasePlugin):
         iq['from'] = ifrom
         iq.send()
 
-    def setRoomConfig(self, room, config, ifrom=''):
+    def set_room_config(self, room, config, ifrom=''):
         query = ET.Element('{http://jabber.org/protocol/muc#owner}query')
         config['type'] = 'submit'
         query.append(config)
@@ -380,31 +380,31 @@ class XEP_0045(BasePlugin):
         iq['from'] = ifrom
         iq.send()
 
-    def getJoinedRooms(self):
+    def get_joined_rooms(self):
         return self.rooms.keys()
 
-    def getOurJidInRoom(self, roomJid):
+    def get_our_jid_in_room(self, room_jid):
         """ Return the jid we're using in a room.
         """
-        return "%s/%s" % (roomJid, self.ourNicks[roomJid])
+        return "%s/%s" % (room_jid, self.our_nicks[room_jid])
 
-    def getJidProperty(self, room, nick, jidProperty):
+    def get_jid_property(self, room, nick, jid_property):
         """ Get the property of a nick in a room, such as its 'jid' or 'affiliation'
             If not found, return None.
         """
-        if room in self.rooms and nick in self.rooms[room] and jidProperty in self.rooms[room][nick]:
-            return self.rooms[room][nick][jidProperty]
+        if room in self.rooms and nick in self.rooms[room] and jid_property in self.rooms[room][nick]:
+            return self.rooms[room][nick][jid_property]
         else:
             return None
 
-    def getRoster(self, room):
+    def get_roster(self, room):
         """ Get the list of nicks in a room.
         """
         if room not in self.rooms.keys():
             return None
         return self.rooms[room].keys()
 
-    def getUsersByAffiliation(cls, room, affiliation='member', ifrom=None):
+    def get_users_by_affiliation(cls, room, affiliation='member', ifrom=None):
         if affiliation not in ('outcast', 'member', 'admin', 'owner', 'none'):
             raise TypeError
         query = ET.Element('{http://jabber.org/protocol/muc#admin}query')
@@ -415,5 +415,4 @@ class XEP_0045(BasePlugin):
         return iq.send()
 
 
-xep_0045 = XEP_0045
 register_plugin(XEP_0045)

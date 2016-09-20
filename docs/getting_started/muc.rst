@@ -63,13 +63,13 @@ has been established:
     def start(self, event):
         self.get_roster()
         self.send_presence()
-        self.plugin['xep_0045'].joinMUC(self.room,
-                                        self.nick,
-                                        wait=True)
+        self.plugin['xep_0045'].join_muc(self.room,
+                                         self.nick,
+                                         wait=True)
 
 Note that as in :ref:`echobot`, we need to include send an initial presence and request
 the roster. Next, we want to join the group chat, so we call the
-``joinMUC`` method of the MUC plugin.
+``join_muc`` method of the MUC plugin.
 
 .. note::
 

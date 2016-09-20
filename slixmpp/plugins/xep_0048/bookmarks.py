@@ -59,7 +59,7 @@ class XEP_0048(BasePlugin):
         for conf in bookmarks['conferences']:
             if conf['autojoin']:
                 log.debug('Auto joining %s as %s', conf['jid'], conf['nick'])
-                self.xmpp['xep_0045'].joinMUC(conf['jid'], conf['nick'],
+                self.xmpp['xep_0045'].join_muc(conf['jid'], conf['nick'],
                         password=conf['password'])
 
     def set_bookmarks(self, bookmarks, method=None, **iqargs):
