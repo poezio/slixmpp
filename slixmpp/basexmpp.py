@@ -21,7 +21,6 @@ from slixmpp.exceptions import IqError, IqTimeout
 
 from slixmpp.stanza import Message, Presence, Iq, StreamError
 from slixmpp.stanza.roster import Roster
-from slixmpp.stanza.nick import Nick
 
 from slixmpp.xmlstream import XMLStream, JID
 from slixmpp.xmlstream import ET, register_stanza_plugin
@@ -194,7 +193,6 @@ class BaseXMPP(XMLStream):
 
         # Initialize a few default stanza plugins.
         register_stanza_plugin(Iq, Roster)
-        register_stanza_plugin(Message, Nick)
 
     def start_stream_handler(self, xml):
         """Save the stream ID once the streams have been established.
