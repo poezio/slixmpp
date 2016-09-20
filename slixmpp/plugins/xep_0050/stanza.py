@@ -136,7 +136,7 @@ class Command(ElementBase):
              ('error', 'The command ran, but had errors')]
         """
         notes = []
-        notes_xml = self.findall('{%s}note' % self.namespace)
+        notes_xml = self.xml.findall('{%s}note' % self.namespace)
         for note in notes_xml:
             notes.append((note.attrib.get('type', 'info'),
                           note.text))
@@ -167,7 +167,7 @@ class Command(ElementBase):
         """
         Remove all notes associated with the command result.
         """
-        notes_xml = self.findall('{%s}note' % self.namespace)
+        notes_xml = self.xml.findall('{%s}note' % self.namespace)
         for note in notes_xml:
             self.xml.remove(note)
 
