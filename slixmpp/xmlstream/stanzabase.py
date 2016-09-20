@@ -379,20 +379,6 @@ class ElementBase(object):
     #: .. versionadded:: 1.0-Beta5
     plugin_iterables = set()
 
-    #: A deprecated version of :attr:`plugin_iterables` that remains
-    #: for backward compatibility. It required a parent stanza to
-    #: know beforehand what stanza classes would be iterable::
-    #:
-    #:     class DiscoItem(ElementBase):
-    #:         ...
-    #:
-    #:     class DiscoInfo(ElementBase):
-    #:         subitem = (DiscoItem, )
-    #:         ...
-    #:
-    #: .. deprecated:: 1.0-Beta5
-    subitem = set()
-
     #: The default XML namespace: ``http://www.w3.org/XML/1998/namespace``.
     xml_ns = XML_NS
 
@@ -425,10 +411,6 @@ class ElementBase(object):
                 self.parent = weakref.ref(parent)
             else:
                 self.parent = parent
-
-        if self.subitem is not None:
-            for sub in self.subitem:
-                self.plugin_iterables.add(sub)
 
         if self.setup(xml):
             # If we generated our own XML, then everything is ready.
