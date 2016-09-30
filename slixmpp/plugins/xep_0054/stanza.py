@@ -127,7 +127,7 @@ class Telephone(ElementBase):
                            'ISDN', 'PCS', 'PREF'])
 
     def setup(self, xml=None):
-        super(Telephone, self).setup(xml=xml)
+        super().setup(xml=xml)
         ## this blanks out numbers received from server
         ##self._set_sub_text('NUMBER', '', keep=True)
 

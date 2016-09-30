@@ -22,7 +22,7 @@ from slixmpp import ClientXMPP
 class LocationBot(ClientXMPP):
 
     def __init__(self, jid, password):
-        super(LocationBot, self).__init__(jid, password)
+        super().__init__(jid, password)
 
         self.add_event_handler('session_start', self.start)
         self.add_event_handler('user_location_publish',

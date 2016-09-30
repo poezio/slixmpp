@@ -70,7 +70,7 @@ as well.
     class EchoBot(slixmpp.ClientXMPP):
 
         def __init__(self, jid, password):
-            super(EchoBot, self).__init__(jid, password)
+            super().__init__(jid, password)
 
 Handling Session Start
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -83,7 +83,7 @@ started. To do that, we will register an event handler for the :term:`session_st
 .. code-block:: python
 
      def __init__(self, jid, password):
-        super(EchoBot, self).__init__(jid, password)
+        super().__init__(jid, password)
 
         self.add_event_handler('session_start', self.start)
 
@@ -153,7 +153,7 @@ whenever a messsage is received.
 .. code-block:: python
 
      def __init__(self, jid, password):
-        super(EchoBot, self).__init__(jid, password)
+        super().__init__(jid, password)
 
         self.add_event_handler('session_start', self.start)
         self.add_event_handler('message', self.message)

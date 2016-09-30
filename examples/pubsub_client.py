@@ -15,7 +15,7 @@ class PubsubClient(slixmpp.ClientXMPP):
 
     def __init__(self, jid, password, server,
                        node=None, action='nodes', data=''):
-        super(PubsubClient, self).__init__(jid, password)
+        super().__init__(jid, password)
 
         self.register_plugin('xep_0030')
         self.register_plugin('xep_0059')

@@ -308,7 +308,7 @@ class BasePlugin(object):
         if key in self.default_config:
             self.config[key] = value
         else:
-            super(BasePlugin, self).__setattr__(key, value)
+            super().__setattr__(key, value)
 
     def _init(self):
         """Initialize plugin state, such as registering event handlers.

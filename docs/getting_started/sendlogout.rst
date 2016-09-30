@@ -24,7 +24,7 @@ for the JID that will receive our message, and the string content of the message
     class SendMsgBot(slixmpp.ClientXMPP):
 
         def __init__(self, jid, password, recipient, msg):
-            super(SendMsgBot, self).__init__(jid, password)
+            super().__init__(jid, password)
 
             self.recipient = recipient
             self.msg = msg

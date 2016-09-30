@@ -14,7 +14,7 @@ from slixmpp.xmlstream.handler import Callback
 class PubsubEvents(slixmpp.ClientXMPP):
 
     def __init__(self, jid, password):
-        super(PubsubEvents, self).__init__(jid, password)
+        super().__init__(jid, password)
 
         self.register_plugin('xep_0030')
         self.register_plugin('xep_0059')

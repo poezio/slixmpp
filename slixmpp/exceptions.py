@@ -77,7 +77,7 @@ class IqTimeout(XMPPError):
     """
 
     def __init__(self, iq):
-        super(IqTimeout, self).__init__(
+        super().__init__(
                 condition='remote-server-timeout',
                 etype='cancel')
 
@@ -94,7 +94,7 @@ class IqError(XMPPError):
     """
 
     def __init__(self, iq):
-        super(IqError, self).__init__(
+        super().__init__(
                 condition=iq['error']['condition'],
                 text=iq['error']['text'],
                 etype=iq['error']['type'])

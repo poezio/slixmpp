@@ -17,7 +17,7 @@ from slixmpp import ClientXMPP
 class TuneBot(ClientXMPP):
 
     def __init__(self, jid, password):
-        super(TuneBot, self).__init__(jid, password)
+        super().__init__(jid, password)
 
         # Check for the current song every 5 seconds.
         self.schedule('Check Current Tune', 5, self._update_tune, repeat=True)
