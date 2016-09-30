@@ -256,9 +256,9 @@ class XMLStream(asyncio.BaseProtocol):
         TODO fix the comment
         :param force_starttls: If True, the connection will be aborted if
                                the server does not initiate a STARTTLS
-                               negociation.  If None, the connection will be
+                               negotiation.  If None, the connection will be
                                upgraded to TLS only if the server initiate
-                               the STARTTLS negociation, otherwise it will
+                               the STARTTLS negotiation, otherwise it will
                                connect in clear.  If False it will never
                                upgrade to TLS, even if the server provides
                                it.  Use this for example if you’re on
