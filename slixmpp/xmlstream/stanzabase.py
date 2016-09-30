@@ -907,11 +907,17 @@ class ElementBase(object):
         stanzas = self.xml.findall(name)
         if not stanzas:
             return default
+        result = None
         for stanza in stanzas:
             if stanza.attrib.get('{%s}lang' % XML_NS, default_lang) == lang:
                 if stanza.text is None:
                     return default
-                return stanza.text
+                result = stanza.text
+                break
+            if stanza.text:
+                result = stanza.text
+        if result is not None:
+            return result
         return default
 
     def _get_all_sub_text(self, name, default='', lang=None):
