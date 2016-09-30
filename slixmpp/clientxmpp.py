@@ -141,8 +141,11 @@ class ClientXMPP(BaseXMPP):
         will be used.
 
         :param address: A tuple containing the server's host and port.
-        :param use_tls: Indicates if TLS should be used for the
-                        connection. Defaults to ``True``.
+        :param force_starttls: Indicates that negotiation should be aborted
+                               if the server does not advertise support for
+                               STARTTLS. Defaults to ``True``.
+        :param disable_starttls: Disables TLS for the connection.
+                                 Defaults to ``False``.
         :param use_ssl: Indicates if the older SSL connection method
                         should be used. Defaults to ``False``.
         """
