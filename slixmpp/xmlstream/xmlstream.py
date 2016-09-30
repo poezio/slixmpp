@@ -760,6 +760,9 @@ class XMLStream(asyncio.BaseProtocol):
         :param repeat: Flag indicating if the scheduled event should
                        be reset and repeat after executing.
         """
+        if name in self.scheduled_events:
+            raise ValueError(
+                "There is already a scheduled event of name: %s" % name)
         if seconds is None:
             seconds = RESPONSE_TIMEOUT
         cb = functools.partial(callback, *args, **kwargs)
@@ -769,7 +772,6 @@ class XMLStream(asyncio.BaseProtocol):
         else:
             handle = self.loop.call_later(seconds, self._execute_and_unschedule,
                                           name, cb)
-
         # Save that handle, so we can just cancel this scheduled event by
         # canceling scheduled_events[name]
         self.scheduled_events[name] = handle
