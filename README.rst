@@ -12,8 +12,8 @@ Building
 --------
 
 Slixmpp can make use of cython to improve performance on critical modules.
-To do that, cython3 is necessary along with libidn headers. Otherwise,
-no compilation is needed. Building is done by running setup.py::
+To do that, **cython3** is necessary along with **libidn** headers.
+Otherwise, no compilation is needed. Building is done by running setup.py::
 
     python3 setup.py build_ext --inplace
 
@@ -108,6 +108,11 @@ Slixmpp Credits
 
 **Contributors:**
     - Emmanuel Gil Peyrot (`Link mauve <xmpp:linkmauve@linkmauve.fr?message>`_)
+    - Sam Whited (`Sam Whited <mailto:sam@samwhited.com>`_)
+    - Dan Sully (`Dan Sully <mailto:daniel@electricalrain.com>`_)
+    - Gasper Zejn (`Gasper Zejn <mailto:zejn@kiberpipa.org>`_)
+    - Krzysztof Kotlenga (`Krzysztof Kotlenga <mailto:pocek@users.sf.net>`_)
+    - Tsukasa Hiiragi (`Tsukasa Hiiragi <mailto:bakalolka@gmail.com>`_)
 
 Credits (SleekXMPP)
 -------------------
