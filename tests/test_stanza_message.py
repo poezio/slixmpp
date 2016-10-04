@@ -20,12 +20,6 @@ class TestMessageStanzas(SlixTest):
         msg = msg.reply()
         self.failUnless(str(msg['to']) == 'room@someservice.someserver.tld')
 
-    def testAttribProperty(self):
-        "Test attrib property returning self"
-        msg = self.Message()
-        msg.attrib.attrib.attrib['to'] = 'usr@server.tld'
-        self.failUnless(str(msg['to']) == 'usr@server.tld')
-
     def testHTMLPlugin(self):
         "Test message/html/body stanza"
         msg = self.Message()
