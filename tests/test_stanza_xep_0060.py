@@ -161,6 +161,7 @@ class TestPubsubStanzas(SlixTest):
         iq['pubsub']['subscribe']['options']['node'] = 'cheese'
         iq['pubsub']['subscribe']['options']['jid'] = 'fritzy@netflint.net/slixmpp'
         form = xep_0004.Form()
+        form['type'] = 'submit'
         form.add_field('pubsub#title', ftype='text-single', value='this thing is awesome')
         iq['pubsub']['subscribe']['options']['options'] = form
         self.check(iq, """
@@ -201,6 +202,7 @@ class TestPubsubStanzas(SlixTest):
         iq['pubsub']['publish'].append(item)
         iq['pubsub']['publish'].append(item2)
         form = xep_0004.Form()
+        form['type'] = 'submit'
         form.addField('pubsub#description', ftype='text-single', value='this thing is awesome')
         iq['pubsub']['publish_options'] = form
 
