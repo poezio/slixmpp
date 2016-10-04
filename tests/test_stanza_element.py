@@ -142,7 +142,7 @@ class TestElementBase(SlixTest):
             interfaces = set(('bar', 'baz', 'qux'))
             sub_interfaces = set(('baz',))
 
-            def getQux(self):
+            def get_qux(self):
               return 'qux'
 
         class TestStanzaPlugin(ElementBase):
@@ -188,7 +188,7 @@ class TestElementBase(SlixTest):
             interfaces = set(('bar', 'baz', 'qux'))
             sub_interfaces = set(('baz',))
 
-            def setQux(self, value):
+            def set_qux(self, value):
                 pass
 
         class TestStanzaPlugin(ElementBase):
@@ -222,7 +222,7 @@ class TestElementBase(SlixTest):
             interfaces = set(('bar', 'baz', 'qux'))
             sub_interfaces = set(('bar',))
 
-            def delQux(self):
+            def del_qux(self):
                 pass
 
         class TestStanzaPlugin(ElementBase):
@@ -300,14 +300,14 @@ class TestElementBase(SlixTest):
             namespace = "foo"
             interfaces = set(('bar',))
 
-            def setBar(self, value):
+            def set_bar(self, value):
                 wrapper = ET.Element("{foo}wrapper")
                 bar = ET.Element("{foo}bar")
                 bar.text = value
                 wrapper.append(bar)
                 self.xml.append(wrapper)
 
-            def getBar(self):
+            def get_bar(self):
                 return self._get_sub_text("wrapper/bar", default="not found")
 
         stanza = TestStanza()
@@ -333,16 +333,16 @@ class TestElementBase(SlixTest):
             namespace = "foo"
             interfaces = set(('bar', 'baz'))
 
-            def setBaz(self, value):
+            def set_baz(self, value):
                 self._set_sub_text("wrapper/baz", text=value)
 
-            def getBaz(self):
+            def get_baz(self):
                 return self._get_sub_text("wrapper/baz")
 
-            def setBar(self, value):
+            def set_bar(self, value):
                 self._set_sub_text("wrapper/bar", text=value)
 
-            def getBar(self):
+            def get_bar(self):
                 return self._get_sub_text("wrapper/bar")
 
         stanza = TestStanza()
@@ -384,22 +384,22 @@ class TestElementBase(SlixTest):
             namespace = "foo"
             interfaces = set(('bar', 'baz'))
 
-            def setBar(self, value):
+            def set_bar(self, value):
                 self._set_sub_text("path/to/only/bar", value)
 
-            def getBar(self):
+            def get_bar(self):
                 return self._get_sub_text("path/to/only/bar")
 
-            def delBar(self):
+            def del_bar(self):
                 self._del_sub("path/to/only/bar")
 
-            def setBaz(self, value):
+            def set_baz(self, value):
                 self._set_sub_text("path/to/just/baz", value)
 
-            def getBaz(self):
+            def get_baz(self):
                 return self._get_sub_text("path/to/just/baz")
 
-            def delBaz(self):
+            def del_baz(self):
                 self._del_sub("path/to/just/baz")
 
         stanza = TestStanza()
@@ -466,10 +466,10 @@ class TestElementBase(SlixTest):
             interfaces = set(('bar','baz', 'qux'))
             sub_interfaces = set(('qux',))
 
-            def setQux(self, value):
+            def set_qux(self, value):
                 self._set_sub_text('qux', text=value)
 
-            def getQux(self):
+            def get_qux(self):
                 return self._get_sub_text('qux')
 
         class TestStanzaPlugin(ElementBase):

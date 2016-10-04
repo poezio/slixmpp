@@ -136,11 +136,11 @@ class TestPubsubStanzas(SlixTest):
         iq = self.Iq()
         iq['pubsub_owner']['default']
         iq['pubsub_owner']['default']['node'] = 'mynode'
-        iq['pubsub_owner']['default']['form'].addField('pubsub#title',
+        iq['pubsub_owner']['default']['form'].add_field('pubsub#title',
                                                        ftype='text-single',
                                                        value='This thing is awesome')
         self.check(iq, """
-	      <iq id="0">
+          <iq id="0">
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
               <default node="mynode">
                 <x xmlns="jabber:x:data" type="form">
@@ -161,7 +161,7 @@ class TestPubsubStanzas(SlixTest):
         iq['pubsub']['subscribe']['options']['node'] = 'cheese'
         iq['pubsub']['subscribe']['options']['jid'] = 'fritzy@netflint.net/slixmpp'
         form = xep_0004.Form()
-        form.addField('pubsub#title', ftype='text-single', value='this thing is awesome')
+        form.add_field('pubsub#title', ftype='text-single', value='this thing is awesome')
         iq['pubsub']['subscribe']['options']['options'] = form
         self.check(iq, """
         <iq id="0">
@@ -253,7 +253,7 @@ class TestPubsubStanzas(SlixTest):
         pub = iq['pubsub']
         pub['create']['node'] = 'testnode2'
         pub['configure']['form']['type'] = 'submit'
-        pub['configure']['form'].setFields([
+        pub['configure']['form'].set_fields([
                 ('FORM_TYPE', {'type': 'hidden',
                                'value': 'http://jabber.org/protocol/pubsub#node_config'}),
                 ('pubsub#node_type', {'type': 'list-single',
