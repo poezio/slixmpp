@@ -38,9 +38,8 @@ class StaticExtendedDisco(object):
         The data parameter may provide:
             data -- Either a single data form, or a list of data forms.
         """
-        with self.static.lock:
-            self.del_extended_info(jid, node, ifrom, data)
-            self.add_extended_info(jid, node, ifrom, data)
+        self.del_extended_info(jid, node, ifrom, data)
+        self.add_extended_info(jid, node, ifrom, data)
 
     def add_extended_info(self, jid, node, ifrom, data):
         """
@@ -49,16 +48,15 @@ class StaticExtendedDisco(object):
         The data parameter may provide:
             data -- Either a single data form, or a list of data forms.
         """
-        with self.static.lock:
-            self.static.add_node(jid, node)
+        self.static.add_node(jid, node)
 
-            forms = data.get('data', [])
-            if not isinstance(forms, list):
-                forms = [forms]
+        forms = data.get('data', [])
+        if not isinstance(forms, list):
+            forms = [forms]
 
-            info = self.static.get_node(jid, node)['info']
-            for form in forms:
-                info.append(form)
+        info = self.static.get_node(jid, node)['info']
+        for form in forms:
+            info.append(form)
 
     def del_extended_info(self, jid, node, ifrom, data):
         """
@@ -66,8 +64,7 @@ class StaticExtendedDisco(object):
 
         The data parameter is not used.
         """
-        with self.static.lock:
-            if self.static.node_exists(jid, node):
-                info = self.static.get_node(jid, node)['info']
-                for form in info['substanza']:
-                    info.xml.remove(form.xml)
+        if self.static.node_exists(jid, node):
+            info = self.static.get_node(jid, node)['info']
+            for form in info['substanza']:
+                info.xml.remove(form.xml)
