@@ -23,13 +23,13 @@ class GmailQuery(ElementBase):
     plugin_attrib = 'gmail'
     interfaces = set(('newer-than-time', 'newer-than-tid', 'q', 'search'))
 
-    def getSearch(self):
+    def get_search(self):
         return self['q']
 
-    def setSearch(self, search):
+    def set_search(self, search):
         self['q'] = search
 
-    def delSearch(self):
+    def del_search(self):
         del self['q']
 
 
@@ -40,17 +40,17 @@ class MailBox(ElementBase):
     interfaces = set(('result-time', 'total-matched', 'total-estimate',
                       'url', 'threads', 'matched', 'estimate'))
 
-    def getThreads(self):
+    def get_threads(self):
         threads = []
         for threadXML in self.xml.findall('{%s}%s' % (MailThread.namespace,
                                                       MailThread.name)):
             threads.append(MailThread(xml=threadXML, parent=None))
         return threads
 
-    def getMatched(self):
+    def get_matched(self):
         return self['total-matched']
 
-    def getEstimate(self):
+    def get_estimate(self):
         return self['total-estimate'] == '1'
 
 
@@ -62,7 +62,7 @@ class MailThread(ElementBase):
                       'senders', 'url', 'labels', 'subject', 'snippet'))
     sub_interfaces = set(('labels', 'subject', 'snippet'))
 
-    def getSenders(self):
+    def get_senders(self):
         senders = []
         sendersXML = self.xml.find('{%s}senders' % self.namespace)
         if sendersXML is not None:
@@ -77,10 +77,10 @@ class MailSender(ElementBase):
     plugin_attrib = 'sender'
     interfaces = set(('address', 'name', 'originator', 'unread'))
 
-    def getOriginator(self):
+    def get_originator(self):
         return self.xml.attrib.get('originator', '0') == '1'
 
-    def getUnread(self):
+    def get_unread(self):
         return self.xml.attrib.get('unread', '0') == '1'
 
 
