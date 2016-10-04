@@ -92,13 +92,13 @@ def _py2xml(*args):
 def xml2py(params):
     namespace = 'jabber:iq:rpc'
     vals = []
-    for param in params.xml.findall('{%s}param' % namespace):
+    for param in params.findall('{%s}param' % namespace):
         vals.append(_xml2py(param.find('{%s}value' % namespace)))
     return vals
 
 def _xml2py(value):
     namespace = 'jabber:iq:rpc'
-    find_value = value.xml.find
+    find_value = value.find
     if find_value('{%s}nil' % namespace) is not None:
         return None
     if find_value('{%s}i4' % namespace) is not None:
