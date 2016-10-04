@@ -79,7 +79,7 @@ def _validate_node(node):
     :returns: The local portion of a JID, as validated by nodeprep.
     """
     if node is None:
-        return None
+        return ''
 
     try:
         node = nodeprep(node)
@@ -160,7 +160,7 @@ def _validate_resource(resource):
     :returns: The local portion of a JID, as validated by resourceprep.
     """
     if resource is None:
-        return None
+        return ''
 
     try:
         resource = resourceprep(resource)
