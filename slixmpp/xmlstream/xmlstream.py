@@ -380,7 +380,7 @@ class XMLStream(asyncio.BaseProtocol):
                 elif self.xml_depth == 1:
                     # A stanza is an XML element that is a direct child of
                     # the root element, hence the check of depth == 1
-                    self.loop.idle_call(functools.partial(self.__spawn_event, xml))
+                    self._spawn_event(xml)
                     if self.xml_root is not None:
                         # Keep the root element empty of children to
                         # save on memory use.
@@ -893,7 +893,7 @@ class XMLStream(asyncio.BaseProtocol):
             stanza['lang'] = self.peer_default_lang
         return stanza
 
-    def __spawn_event(self, xml):
+    def _spawn_event(self, xml):
         """
         Analyze incoming XML stanzas and convert them into stanza
         objects if applicable and queue stream events to be processed
