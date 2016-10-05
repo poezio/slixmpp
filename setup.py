@@ -7,19 +7,14 @@
 # This software is licensed as described in the README.rst and LICENSE
 # file, which you should have received as part of this distribution.
 
+import os
 from pathlib import Path
+from subprocess import call, DEVNULL
+from tempfile import TemporaryFile
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-
-try:
-    from Cython.Build import cythonize
-except ImportError:
-    print('Cython not found, falling back to the slow stringprep module.')
-    ext_modules = None
-else:
-    ext_modules = cythonize('slixmpp/stringprep.pyx')
 
 from run_tests import TestCommand
 from slixmpp.version import __version__
@@ -39,6 +34,27 @@ CLASSIFIERS = [
 ]
 
 packages = [str(mod.parent) for mod in Path('slixmpp').rglob('__init__.py')]
+
+def check_include(header):
+    command = [os.environ.get('CC', 'cc'), '-E', '-']
+    with TemporaryFile('w+') as c_file:
+        c_file.write('#include <%s>' % header)
+        c_file.seek(0)
+        try:
+            return call(command, stdin=c_file, stdout=DEVNULL, stderr=DEVNULL) == 0
+        except FileNotFoundError:
+            return False
+
+ext_modules = None
+if check_include('stringprep.h'):
+    try:
+        from Cython.Build import cythonize
+    except ImportError:
+        print('Cython not found, falling back to the slow stringprep module.')
+    else:
+        ext_modules = cythonize('slixmpp/stringprep.pyx')
+else:
+    print('libidn-dev not found, falling back to the slow stringprep module.')
 
 setup(
     name="slixmpp",
