@@ -33,7 +33,7 @@ class DisplayMarking(ElementBase):
     name = 'displaymarking'
     namespace = 'urn:xmpp:sec-label:0'
     plugin_attrib = 'display_marking'
-    interfaces = set(['fgcolor', 'bgcolor', 'value'])
+    interfaces = {'fgcolor', 'bgcolor', 'value'}
 
     def get_fgcolor(self):
         return self._get_attr('fgcolor', 'black')
@@ -62,7 +62,7 @@ class Catalog(ElementBase):
     name = 'catalog'
     namespace = 'urn:xmpp:sec-label:catalog:2'
     plugin_attrib = 'security_label_catalog'
-    interfaces = set(['to', 'from', 'name', 'desc', 'id', 'size', 'restrict'])
+    interfaces = {'to', 'from', 'name', 'desc', 'id', 'size', 'restrict'}
 
     def get_to(self):
         return JID(self._get_attr('to'))
@@ -96,7 +96,7 @@ class CatalogItem(ElementBase):
     namespace = 'urn:xmpp:sec-label:catalog:2'
     plugin_attrib = 'item'
     plugin_multi_attrib = 'items'
-    interfaces = set(['selector', 'default'])
+    interfaces = {'selector', 'default'}
 
     def get_default(self):
         value = self._get_attr('default', '')
@@ -116,7 +116,7 @@ class ESSLabel(ElementBase):
     name = 'esssecuritylabel'
     namespace = 'urn:xmpp:sec-label:ess:0'
     plugin_attrib = 'ess'
-    interfaces = set(['value'])
+    interfaces = {'value'}
 
     def get_value(self):
         if self.xml.text:

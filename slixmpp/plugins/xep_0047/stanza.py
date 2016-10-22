@@ -38,7 +38,7 @@ class Data(ElementBase):
     namespace = 'http://jabber.org/protocol/ibb'
     plugin_attrib = 'ibb_data'
     interfaces = {'seq', 'sid', 'data'}
-    sub_interfaces = set(['data'])
+    sub_interfaces = {'data'}
 
     def get_seq(self):
         return int(self._get_attr('seq', '0'))
@@ -67,4 +67,4 @@ class Close(ElementBase):
     name = 'close'
     namespace = 'http://jabber.org/protocol/ibb'
     plugin_attrib = 'ibb_close'
-    interfaces = set(['sid'])
+    interfaces = {'sid'}

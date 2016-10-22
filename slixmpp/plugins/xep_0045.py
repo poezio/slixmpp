@@ -117,7 +117,7 @@ class XEP_0045(BasePlugin):
 
     name = 'xep_0045'
     description = 'XEP-0045: Multi-User Chat'
-    dependencies = set(['xep_0030', 'xep_0004'])
+    dependencies = {'xep_0030', 'xep_0004'}
 
     def plugin_init(self):
         self.rooms = {}

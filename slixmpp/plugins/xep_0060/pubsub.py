@@ -26,7 +26,7 @@ class XEP_0060(BasePlugin):
 
     name = 'xep_0060'
     description = 'XEP-0060: Publish-Subscribe'
-    dependencies = set(['xep_0030', 'xep_0004', 'xep_0082', 'xep_0131'])
+    dependencies = {'xep_0030', 'xep_0004', 'xep_0082', 'xep_0131'}
     stanza = stanza
 
     def plugin_init(self):

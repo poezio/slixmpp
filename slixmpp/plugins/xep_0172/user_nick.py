@@ -28,7 +28,7 @@ class XEP_0172(BasePlugin):
 
     name = 'xep_0172'
     description = 'XEP-0172: User Nickname'
-    dependencies = set(['xep_0163'])
+    dependencies = {'xep_0163'}
     stanza = stanza
 
     def plugin_init(self):

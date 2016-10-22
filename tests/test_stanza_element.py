@@ -754,7 +754,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(['bar'])
+            interfaces = {'bar'}
             bool_interfaces = interfaces
 
         stanza = TestStanza()
@@ -946,7 +946,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['test'])
+            interfaces = {'test'}
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 
@@ -972,7 +972,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['test'])
+            interfaces = {'test'}
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 
@@ -1008,7 +1008,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['test'])
+            interfaces = {'test'}
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 
@@ -1040,7 +1040,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['test'])
+            interfaces = {'test'}
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 
@@ -1096,7 +1096,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['test'])
+            interfaces = {'test'}
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 
@@ -1136,7 +1136,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['test'])
+            interfaces = {'test'}
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 
@@ -1177,7 +1177,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['test'])
+            interfaces = {'test'}
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 
@@ -1217,7 +1217,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['test'])
+            interfaces = {'test'}
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 

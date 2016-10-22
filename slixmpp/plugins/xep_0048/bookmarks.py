@@ -24,7 +24,7 @@ class XEP_0048(BasePlugin):
 
     name = 'xep_0048'
     description = 'XEP-0048: Bookmarks'
-    dependencies = set(['xep_0045', 'xep_0049', 'xep_0060', 'xep_0163', 'xep_0223'])
+    dependencies = {'xep_0045', 'xep_0049', 'xep_0060', 'xep_0163', 'xep_0223'}
     stanza = stanza
     default_config = {
         'auto_join': False,

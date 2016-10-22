@@ -23,7 +23,7 @@ class XEP_0004(BasePlugin):
 
     name = 'xep_0004'
     description = 'XEP-0004: Data Forms'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

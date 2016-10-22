@@ -37,7 +37,7 @@ class Address(ElementBase):
     name = 'address'
     namespace = 'http://jabber.org/protocol/address'
     plugin_attrib = 'address'
-    interfaces = set(['type', 'jid', 'node', 'uri', 'desc', 'delivered'])
+    interfaces = {'type', 'jid', 'node', 'uri', 'desc', 'delivered'}
 
     address_types = {'bcc', 'cc', 'noreply', 'replyroom', 'replyto', 'to'}
 

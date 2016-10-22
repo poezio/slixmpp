@@ -27,7 +27,7 @@ class XEP_0107(BasePlugin):
 
     name = 'xep_0107'
     description = 'XEP-0107: User Mood'
-    dependencies = set(['xep_0163'])
+    dependencies = {'xep_0163'}
     stanza = stanza
 
     def plugin_init(self):

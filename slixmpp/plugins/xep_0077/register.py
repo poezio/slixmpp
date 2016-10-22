@@ -26,7 +26,7 @@ class XEP_0077(BasePlugin):
 
     name = 'xep_0077'
     description = 'XEP-0077: In-Band Registration'
-    dependencies = set(['xep_0004', 'xep_0066'])
+    dependencies = {'xep_0004', 'xep_0066'}
     stanza = stanza
     default_config = {
         'create_account': True,

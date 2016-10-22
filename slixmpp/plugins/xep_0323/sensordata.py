@@ -101,7 +101,7 @@ class XEP_0323(BasePlugin):
 
     name = 'xep_0323'
     description = 'XEP-0323 Internet of Things - Sensor Data'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
 

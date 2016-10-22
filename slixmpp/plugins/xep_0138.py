@@ -95,7 +95,7 @@ class XEP_0138(BasePlugin):
     """
     name = "xep_0138"
     description = "XEP-0138: Compression"
-    dependencies = set(["xep_0030"])
+    dependencies = {"xep_0030"}
 
     def plugin_init(self):
         self.xep = '0138'

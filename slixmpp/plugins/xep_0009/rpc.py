@@ -24,7 +24,7 @@ class XEP_0009(BasePlugin):
 
     name = 'xep_0009'
     description = 'XEP-0009: Jabber-RPC'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

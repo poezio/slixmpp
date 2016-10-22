@@ -28,7 +28,7 @@ class XEP_0249(BasePlugin):
 
     name = 'xep_0249'
     description = 'XEP-0249: Direct MUC Invitations'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

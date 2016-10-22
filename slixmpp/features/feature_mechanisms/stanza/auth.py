@@ -24,7 +24,7 @@ class Auth(StanzaBase):
 
     #: Some SASL mechs require sending values as is,
     #: without converting base64.
-    plain_mechs = set(['X-MESSENGER-OAUTH2'])
+    plain_mechs = {'X-MESSENGER-OAUTH2'}
 
     def setup(self, xml):
         StanzaBase.setup(self, xml)

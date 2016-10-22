@@ -45,7 +45,7 @@ class Received(ElementBase):
     namespace = 'urn:xmpp:receipts'
     name = 'received'
     plugin_attrib = 'receipt'
-    interfaces = set(['receipt'])
+    interfaces = {'receipt'}
     sub_interfaces = interfaces
     is_extension = True
 

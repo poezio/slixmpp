@@ -23,7 +23,7 @@ class XEP_0223(BasePlugin):
 
     name = 'xep_0223'
     description = 'XEP-0223: Persistent Storage of Private Data via PubSub'
-    dependencies = set(['xep_0163', 'xep_0060', 'xep_0004'])
+    dependencies = {'xep_0163', 'xep_0060', 'xep_0004'}
 
     profile = {'pubsub#persist_items': True,
                'pubsub#send_last_published_item': 'never'}

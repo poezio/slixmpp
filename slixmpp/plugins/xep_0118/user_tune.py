@@ -23,7 +23,7 @@ class XEP_0118(BasePlugin):
 
     name = 'xep_0118'
     description = 'XEP-0118: User Tune'
-    dependencies = set(['xep_0163'])
+    dependencies = {'xep_0163'}
     stanza = stanza
 
     def plugin_end(self):

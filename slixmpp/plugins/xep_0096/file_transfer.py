@@ -23,7 +23,7 @@ class XEP_0096(BasePlugin):
 
     name = 'xep_0096'
     description = 'XEP-0096: SI File Transfer'
-    dependencies = set(['xep_0095'])
+    dependencies = {'xep_0095'}
     stanza = stanza
 
     def plugin_init(self):

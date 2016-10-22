@@ -19,7 +19,7 @@ from slixmpp.plugins.xep_0319 import stanza
 class XEP_0319(BasePlugin):
     name = 'xep_0319'
     description = 'XEP-0319: Last User Interaction in Presence'
-    dependencies = set(['xep_0012'])
+    dependencies = {'xep_0012'}
     stanza = stanza
 
     def plugin_init(self):

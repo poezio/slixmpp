@@ -16,7 +16,7 @@ class Data(ElementBase):
     name = 'data'
     namespace = 'urn:xmpp:avatar:data'
     plugin_attrib = 'avatar_data'
-    interfaces = set(['value'])
+    interfaces = {'value'}
 
     def get_value(self):
         if self.xml.text:
@@ -63,7 +63,7 @@ class Info(ElementBase):
     namespace = 'urn:xmpp:avatar:metadata'
     plugin_attrib = 'info'
     plugin_multi_attrib = 'items'
-    interfaces = set(['bytes', 'height', 'id', 'type', 'url', 'width'])
+    interfaces = {'bytes', 'height', 'id', 'type', 'url', 'width'}
 
 
 class Pointer(ElementBase):

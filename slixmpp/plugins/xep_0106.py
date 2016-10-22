@@ -14,7 +14,7 @@ class XEP_0106(BasePlugin):
 
     name = 'xep_0106'
     description = 'XEP-0106: JID Escaping'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
 
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature(feature='jid\\20escaping')

@@ -21,13 +21,13 @@ class CertItem(ElementBase):
     namespace = 'urn:xmpp:saslcert:1'
     plugin_attrib = 'item'
     plugin_multi_attrib = 'items'
-    interfaces = set(['name', 'x509cert', 'users'])
-    sub_interfaces = set(['name', 'x509cert'])
+    interfaces = {'name', 'x509cert', 'users'}
+    sub_interfaces = {'name', 'x509cert'}
 
     def get_users(self):
         resources = self.xml.findall('{%s}users/{%s}resource' % (
             self.namespace, self.namespace))
-        return set([res.text for res in resources])
+        return {res.text for res in resources}
 
     def set_users(self, values):
         users = self.xml.find('{%s}users' % self.namespace)
@@ -49,8 +49,8 @@ class AppendCert(ElementBase):
     name = 'append'
     namespace = 'urn:xmpp:saslcert:1'
     plugin_attrib = 'sasl_cert_append'
-    interfaces = set(['name', 'x509cert', 'cert_management'])
-    sub_interfaces = set(['name', 'x509cert'])
+    interfaces = {'name', 'x509cert', 'cert_management'}
+    sub_interfaces = {'name', 'x509cert'}
 
     def get_cert_management(self):
         manage = self.xml.find('{%s}no-cert-management' % self.namespace)
@@ -72,7 +72,7 @@ class DisableCert(ElementBase):
     name = 'disable'
     namespace = 'urn:xmpp:saslcert:1'
     plugin_attrib = 'sasl_cert_disable'
-    interfaces = set(['name'])
+    interfaces = {'name'}
     sub_interfaces = interfaces
 
 
@@ -80,7 +80,7 @@ class RevokeCert(ElementBase):
     name = 'revoke'
     namespace = 'urn:xmpp:saslcert:1'
     plugin_attrib = 'sasl_cert_revoke'
-    interfaces = set(['name'])
+    interfaces = {'name'}
     sub_interfaces = interfaces
 
 

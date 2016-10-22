@@ -13,7 +13,7 @@ class ReceivedCarbon(ElementBase):
     name = 'received'
     namespace = 'urn:xmpp:carbons:2'
     plugin_attrib = 'carbon_received'
-    interfaces = set(['carbon_received'])
+    interfaces = {'carbon_received'}
     is_extension = True
 
     def get_carbon_received(self):
@@ -30,7 +30,7 @@ class SentCarbon(ElementBase):
     name = 'sent'
     namespace = 'urn:xmpp:carbons:2'
     plugin_attrib = 'carbon_sent'
-    interfaces = set(['carbon_sent'])
+    interfaces = {'carbon_sent'}
     is_extension = True
 
     def get_carbon_sent(self):

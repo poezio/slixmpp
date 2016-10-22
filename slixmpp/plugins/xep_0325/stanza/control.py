@@ -23,7 +23,7 @@ class ControlSet(ElementBase):
     namespace = 'urn:xmpp:iot:control'
     name = 'set'
     plugin_attrib = name
-    interfaces = set(['nodes','datas'])
+    interfaces = {'nodes','datas'}
 
     def __init__(self, xml=None, parent=None):
         ElementBase.__init__(self, xml, parent)
@@ -42,8 +42,8 @@ class ControlSet(ElementBase):
             xml -- Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
-        self._nodes = set([node['nodeId'] for node in self['nodes']])
-        self._datas = set([data['name'] for data in self['datas']])
+        self._nodes = {node['nodeId'] for node in self['nodes']}
+        self._datas = {data['name'] for data in self['datas']}
 
     def add_node(self, nodeId, sourceId=None, cacheType=None):
         """
@@ -207,14 +207,14 @@ class RequestNode(ElementBase):
     namespace = 'urn:xmpp:iot:control'
     name = 'node'
     plugin_attrib = name
-    interfaces = set(['nodeId','sourceId','cacheType'])
+    interfaces = {'nodeId','sourceId','cacheType'}
 
 
 class ControlSetResponse(ElementBase):
     namespace = 'urn:xmpp:iot:control'
     name = 'setResponse'
     plugin_attrib = name
-    interfaces = set(['responseCode'])
+    interfaces = {'responseCode'}
 
     def __init__(self, xml=None, parent=None):
         ElementBase.__init__(self, xml, parent)
@@ -233,8 +233,8 @@ class ControlSetResponse(ElementBase):
             xml -- Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
-        self._nodes = set([node['nodeId'] for node in self['nodes']])
-        self._datas = set([data['name'] for data in self['datas']])
+        self._nodes = {node['nodeId'] for node in self['nodes']}
+        self._datas = {data['name'] for data in self['datas']}
 
     def add_node(self, nodeId, sourceId=None, cacheType=None):
         """
@@ -370,7 +370,7 @@ class Error(ElementBase):
     namespace = 'urn:xmpp:iot:control'
     name = 'error'
     plugin_attrib = name
-    interfaces = set(['var','text'])
+    interfaces = {'var','text'}
 
     def get_text(self):
         """Return then contents inside the XML tag."""
@@ -398,7 +398,7 @@ class ResponseParameter(ElementBase):
     namespace = 'urn:xmpp:iot:control'
     name = 'parameter'
     plugin_attrib = name
-    interfaces = set(['name'])
+    interfaces = {'name'}
 
 
 class BaseParameter(ElementBase):
@@ -419,7 +419,7 @@ class BaseParameter(ElementBase):
     namespace = 'urn:xmpp:iot:control'
     name = 'baseParameter'
     plugin_attrib = name
-    interfaces = set(['name','value'])
+    interfaces = {'name','value'}
 
     def _get_typename(self):
         return self.name

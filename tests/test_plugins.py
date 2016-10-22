@@ -14,21 +14,21 @@ class B(BasePlugin):
 
 class C(BasePlugin):
     name = 'c'
-    dependencies = set(['b', 'd'])
+    dependencies = {'b', 'd'}
 
 
 class D(BasePlugin):
     name = 'd'
-    dependencies = set(['c'])
+    dependencies = {'c'}
 
 
 class E(BasePlugin):
     name = 'e'
-    dependencies = set(['a', 'd'])
+    dependencies = {'a', 'd'}
 
 class F(BasePlugin):
     name = 'f'
-    dependencies = set(['a', 'b'])
+    dependencies = {'a', 'b'}
 
 
 register_plugin(A)

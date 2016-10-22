@@ -21,7 +21,7 @@ class XEP_0297(BasePlugin):
 
     name = 'xep_0297'
     description = 'XEP-0297: Stanza Forwarding'
-    dependencies = set(['xep_0030', 'xep_0203'])
+    dependencies = {'xep_0030', 'xep_0203'}
     stanza = stanza
 
     def plugin_init(self):

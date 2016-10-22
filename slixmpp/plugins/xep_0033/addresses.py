@@ -22,7 +22,7 @@ class XEP_0033(BasePlugin):
 
     name = 'xep_0033'
     description = 'XEP-0033: Extended Stanza Addressing'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

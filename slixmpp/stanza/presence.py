@@ -58,12 +58,12 @@ class Presence(RootStanza):
     plugin_attrib = name
     interfaces = set(['type', 'to', 'from', 'id', 'show',
                       'status', 'priority'])
-    sub_interfaces = set(['show', 'status', 'priority'])
-    lang_interfaces = set(['status'])
+    sub_interfaces = {'show', 'status', 'priority'}
+    lang_interfaces = {'status'}
 
     types = set(['available', 'unavailable', 'error', 'probe', 'subscribe',
                  'subscribed', 'unsubscribe', 'unsubscribed'])
-    showtypes = set(['dnd', 'chat', 'xa', 'away'])
+    showtypes = {'dnd', 'chat', 'xa', 'away'}
 
     def __init__(self, *args, **kwargs):
         """

@@ -21,9 +21,9 @@ class Address(ElementBase):
     namespace = 'urn:xmpp:reach:0'
     plugin_attrib = 'address'
     plugin_multi_attrib = 'addresses'
-    interfaces = set(['uri', 'desc'])
-    lang_interfaces = set(['desc'])
-    sub_interfaces = set(['desc'])
+    interfaces = {'uri', 'desc'}
+    lang_interfaces = {'desc'}
+    sub_interfaces = {'desc'}
 
 
 register_stanza_plugin(Reachability, Address, iterable=True)

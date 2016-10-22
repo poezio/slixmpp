@@ -31,7 +31,7 @@ class XEP_0095(BasePlugin):
 
     name = 'xep_0095'
     description = 'XEP-0095: Stream Initiation'
-    dependencies = set(['xep_0020', 'xep_0030', 'xep_0047', 'xep_0065'])
+    dependencies = {'xep_0020', 'xep_0030', 'xep_0047', 'xep_0065'}
     stanza = stanza
 
     def plugin_init(self):

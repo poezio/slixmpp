@@ -74,7 +74,7 @@ class XEP_0050(BasePlugin):
 
     name = 'xep_0050'
     description = 'XEP-0050: Ad-Hoc Commands'
-    dependencies = set(['xep_0030', 'xep_0004'])
+    dependencies = {'xep_0030', 'xep_0004'}
     stanza = stanza
     default_config = {
         'session_db': None
@@ -225,8 +225,8 @@ class XEP_0050(BasePlugin):
         if len(payload) == 1:
             payload = payload[0]
 
-        interfaces = set([item.plugin_attrib for item in payload])
-        payload_classes = set([item.__class__ for item in payload])
+        interfaces = {item.plugin_attrib for item in payload}
+        payload_classes = {item.__class__ for item in payload}
 
         initial_session = {'id': sessionid,
                            'from': iq['from'],

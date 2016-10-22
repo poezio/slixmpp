@@ -23,7 +23,7 @@ class XEP_0256(BasePlugin):
 
     name = 'xep_0256'
     description = 'XEP-0256: Last Activity in Presence'
-    dependencies = set(['xep_0012'])
+    dependencies = {'xep_0012'}
     stanza = stanza
     default_config = {
         'auto_last_activity': False

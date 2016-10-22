@@ -37,9 +37,9 @@ class Request(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'req'
     plugin_attrib = name
-    interfaces = set(['seqnr','nodes','fields','serviceToken','deviceToken','userToken','from','to','when','historical','all'])
+    interfaces = {'seqnr','nodes','fields','serviceToken','deviceToken','userToken','from','to','when','historical','all'}
     interfaces.update(FieldTypes.field_types)
-    _flags = set(['serviceToken','deviceToken','userToken','from','to','when','historical','all'])
+    _flags = {'serviceToken','deviceToken','userToken','from','to','when','historical','all'}
     _flags.update(FieldTypes.field_types)
 
     def __init__(self, xml=None, parent=None):
@@ -59,8 +59,8 @@ class Request(ElementBase):
             xml -- Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
-        self._nodes = set([node['nodeId'] for node in self['nodes']])
-        self._fields = set([field['name'] for field in self['fields']])
+        self._nodes = {node['nodeId'] for node in self['nodes']}
+        self._fields = {field['name'] for field in self['fields']}
 
     def _get_flags(self):
         """
@@ -225,39 +225,39 @@ class RequestNode(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'node'
     plugin_attrib = name
-    interfaces = set(['nodeId','sourceId','cacheType'])
+    interfaces = {'nodeId','sourceId','cacheType'}
 
 class RequestField(ElementBase):
     """ Field element in a request """
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'field'
     plugin_attrib = name
-    interfaces = set(['name'])
+    interfaces = {'name'}
 
 class Accepted(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'accepted'
     plugin_attrib = name
-    interfaces = set(['seqnr','queued'])
+    interfaces = {'seqnr','queued'}
 
 class Started(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'started'
     plugin_attrib = name
-    interfaces = set(['seqnr'])
+    interfaces = {'seqnr'}
 
 class Failure(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'failure'
     plugin_attrib = name
-    interfaces = set(['seqnr','done'])
+    interfaces = {'seqnr','done'}
 
 class Error(ElementBase):
     """ Error element in a request failure """
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'error'
     plugin_attrib = name
-    interfaces = set(['nodeId','timestamp','sourceId','cacheType','text'])
+    interfaces = {'nodeId','timestamp','sourceId','cacheType','text'}
 
     def get_text(self):
         """Return then contents inside the XML tag."""
@@ -281,15 +281,15 @@ class Rejected(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'rejected'
     plugin_attrib = name
-    interfaces = set(['seqnr','error'])
-    sub_interfaces = set(['error'])
+    interfaces = {'seqnr','error'}
+    sub_interfaces = {'error'}
 
 class Fields(ElementBase):
     """ Fields element, top level in a response message with data """
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'fields'
     plugin_attrib = name
-    interfaces = set(['seqnr','done','nodes'])
+    interfaces = {'seqnr','done','nodes'}
 
     def __init__(self, xml=None, parent=None):
         ElementBase.__init__(self, xml, parent)
@@ -307,7 +307,7 @@ class Fields(ElementBase):
             xml -- Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
-        self._nodes = set([node['nodeId'] for node in self['nodes']])
+        self._nodes = {node['nodeId'] for node in self['nodes']}
 
 
     def add_node(self, nodeId, sourceId=None, cacheType=None, substanzas=None):
@@ -389,7 +389,7 @@ class FieldsNode(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'node'
     plugin_attrib = name
-    interfaces = set(['nodeId','sourceId','cacheType','timestamps'])
+    interfaces = {'nodeId','sourceId','cacheType','timestamps'}
 
     def __init__(self, xml=None, parent=None):
         ElementBase.__init__(self, xml, parent)
@@ -407,7 +407,7 @@ class FieldsNode(ElementBase):
             xml -- Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
-        self._timestamps = set([ts['value'] for ts in self['timestamps']])
+        self._timestamps = {ts['value'] for ts in self['timestamps']}
 
     def add_timestamp(self, timestamp, substanzas=None):
         """
@@ -498,7 +498,7 @@ class Field(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'field'
     plugin_attrib = name
-    interfaces = set(['name','module','stringIds'])
+    interfaces = {'name','module','stringIds'}
     interfaces.update(FieldTypes.field_types)
     interfaces.update(FieldStatus.field_status)
 
@@ -554,7 +554,7 @@ class Timestamp(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'timestamp'
     plugin_attrib = name
-    interfaces = set(['value','datas'])
+    interfaces = {'value','datas'}
 
     def __init__(self, xml=None, parent=None):
         ElementBase.__init__(self, xml, parent)
@@ -572,7 +572,7 @@ class Timestamp(ElementBase):
             xml -- Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
-        self._datas = set([data['name'] for data in self['datas']])
+        self._datas = {data['name'] for data in self['datas']}
 
     def add_data(self, typename, name, value, module=None, stringIds=None, unit=None, dataType=None, flags=None):
         """
@@ -668,7 +668,7 @@ class DataNumeric(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'numeric'
     plugin_attrib = name
-    interfaces = set(['value', 'unit'])
+    interfaces = {'value', 'unit'}
     interfaces.update(Field.interfaces)
 
     def _get_typename(self):
@@ -681,7 +681,7 @@ class DataString(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'string'
     plugin_attrib = name
-    interfaces = set(['value'])
+    interfaces = {'value'}
     interfaces.update(Field.interfaces)
 
     def _get_typename(self):
@@ -695,7 +695,7 @@ class DataBoolean(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'boolean'
     plugin_attrib = name
-    interfaces = set(['value'])
+    interfaces = {'value'}
     interfaces.update(Field.interfaces)
 
     def _get_typename(self):
@@ -709,7 +709,7 @@ class DataDateTime(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'dateTime'
     plugin_attrib = name
-    interfaces = set(['value'])
+    interfaces = {'value'}
     interfaces.update(Field.interfaces)
 
     def _get_typename(self):
@@ -723,7 +723,7 @@ class DataTimeSpan(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'timeSpan'
     plugin_attrib = name
-    interfaces = set(['value'])
+    interfaces = {'value'}
     interfaces.update(Field.interfaces)
 
     def _get_typename(self):
@@ -737,7 +737,7 @@ class DataEnum(Field):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'enum'
     plugin_attrib = name
-    interfaces = set(['value', 'dataType'])
+    interfaces = {'value', 'dataType'}
     interfaces.update(Field.interfaces)
 
     def _get_typename(self):
@@ -748,21 +748,21 @@ class Done(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'done'
     plugin_attrib = name
-    interfaces = set(['seqnr'])
+    interfaces = {'seqnr'}
 
 class Cancel(ElementBase):
     """ Cancel element used to signal that a request shall be cancelled """
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'cancel'
     plugin_attrib = name
-    interfaces = set(['seqnr'])
+    interfaces = {'seqnr'}
 
 class Cancelled(ElementBase):
     """ Cancelled element used to signal that cancellation is confirmed """
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'cancelled'
     plugin_attrib = name
-    interfaces = set(['seqnr'])
+    interfaces = {'seqnr'}
 
 
 register_stanza_plugin(Iq, Request)

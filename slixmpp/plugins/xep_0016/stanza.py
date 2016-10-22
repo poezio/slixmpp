@@ -18,14 +18,14 @@ class Active(ElementBase):
     name = 'active'
     namespace = 'jabber:iq:privacy'
     plugin_attrib = name
-    interfaces = set(['name'])
+    interfaces = {'name'}
 
 
 class Default(ElementBase):
     name = 'default'
     namespace = 'jabber:iq:privacy'
     plugin_attrib = name
-    interfaces = set(['name'])
+    interfaces = {'name'}
 
 
 class List(ElementBase):
@@ -33,7 +33,7 @@ class List(ElementBase):
     namespace = 'jabber:iq:privacy'
     plugin_attrib = name
     plugin_multi_attrib = 'lists'
-    interfaces = set(['name'])
+    interfaces = {'name'}
 
     def add_item(self, value, action, order, itype=None, iq=False,
                  message=False, presence_in=False, presence_out=False):
@@ -57,7 +57,7 @@ class Item(ElementBase):
     plugin_multi_attrib = 'items'
     interfaces = set(['type', 'value', 'action', 'order', 'iq',
                       'message', 'presence_in', 'presence_out'])
-    bool_interfaces = set(['message', 'iq', 'presence_in', 'presence_out'])
+    bool_interfaces = {'message', 'iq', 'presence_in', 'presence_out'}
 
     type_values = ('', 'jid', 'group', 'subscription')
     action_values = ('allow', 'deny')

@@ -111,7 +111,7 @@ class XEP_0059(BasePlugin):
 
     name = 'xep_0059'
     description = 'XEP-0059: Result Set Management'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

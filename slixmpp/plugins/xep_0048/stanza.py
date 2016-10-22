@@ -40,8 +40,8 @@ class Conference(ElementBase):
     namespace = 'storage:bookmarks'
     plugin_attrib = 'conference'
     plugin_multi_attrib = 'conferences'
-    interfaces = set(['nick', 'password', 'autojoin', 'jid', 'name'])
-    sub_interfaces = set(['nick', 'password'])
+    interfaces = {'nick', 'password', 'autojoin', 'jid', 'name'}
+    sub_interfaces = {'nick', 'password'}
 
     def get_autojoin(self):
         value = self._get_attr('autojoin')
@@ -58,7 +58,7 @@ class URL(ElementBase):
     namespace = 'storage:bookmarks'
     plugin_attrib = 'url'
     plugin_multi_attrib = 'urls'
-    interfaces = set(['url', 'name'])
+    interfaces = {'url', 'name'}
 
 
 register_stanza_plugin(Bookmarks, Conference, iterable=True)

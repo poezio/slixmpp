@@ -14,7 +14,7 @@ class Headers(ElementBase):
     name = 'headers'
     namespace = 'http://jabber.org/protocol/shim'
     plugin_attrib = 'headers'
-    interfaces = set(['headers'])
+    interfaces = {'headers'}
     is_extension = True
 
     def get_headers(self):

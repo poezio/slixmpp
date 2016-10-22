@@ -13,7 +13,7 @@ class BlockList(ElementBase):
     name = 'blocklist'
     namespace = 'urn:xmpp:blocking'
     plugin_attrib = 'blocklist'
-    interfaces = set(['items'])
+    interfaces = {'items'}
 
     def get_items(self):
         result = set()

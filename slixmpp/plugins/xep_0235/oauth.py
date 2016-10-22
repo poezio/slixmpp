@@ -19,7 +19,7 @@ class XEP_0235(BasePlugin):
 
     name = 'xep_0235'
     description = 'XEP-0235: OAuth Over XMPP'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

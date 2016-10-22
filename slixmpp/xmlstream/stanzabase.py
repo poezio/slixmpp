@@ -147,8 +147,8 @@ def multifactory(stanza, plugin_attrib):
     Multi.is_extension = True
     Multi.plugin_attrib = plugin_attrib
     Multi._multistanza = stanza
-    Multi.interfaces = set([plugin_attrib])
-    Multi.lang_interfaces = set([plugin_attrib])
+    Multi.interfaces = {plugin_attrib}
+    Multi.lang_interfaces = {plugin_attrib}
     setattr(Multi, "get_%s" % plugin_attrib, get_multi)
     setattr(Multi, "set_%s" % plugin_attrib, set_multi)
     setattr(Multi, "del_%s" % plugin_attrib, del_multi)

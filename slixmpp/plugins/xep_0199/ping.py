@@ -50,7 +50,7 @@ class XEP_0199(BasePlugin):
 
     name = 'xep_0199'
     description = 'XEP-0199: XMPP Ping'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
     default_config = {
         'keepalive': False,

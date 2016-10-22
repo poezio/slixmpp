@@ -23,7 +23,7 @@ class XEP_0152(BasePlugin):
 
     name = 'xep_0152'
     description = 'XEP-0152: Reachability Addresses'
-    dependencies = set(['xep_0163'])
+    dependencies = {'xep_0163'}
     stanza = stanza
 
     def plugin_end(self):

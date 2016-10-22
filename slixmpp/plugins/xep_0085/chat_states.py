@@ -28,7 +28,7 @@ class XEP_0085(BasePlugin):
 
     name = 'xep_0085'
     description = 'XEP-0085: Chat State Notifications'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

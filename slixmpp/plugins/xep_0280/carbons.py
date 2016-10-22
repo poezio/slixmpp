@@ -28,7 +28,7 @@ class XEP_0280(BasePlugin):
 
     name = 'xep_0280'
     description = 'XEP-0280: Message Carbons'
-    dependencies = set(['xep_0030', 'xep_0297'])
+    dependencies = {'xep_0030', 'xep_0297'}
     stanza = stanza
 
     def plugin_init(self):

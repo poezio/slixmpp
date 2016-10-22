@@ -13,7 +13,7 @@ class Signed(ElementBase):
     name = 'x'
     namespace = 'jabber:x:signed'
     plugin_attrib = 'signed'
-    interfaces = set(['signed'])
+    interfaces = {'signed'}
     is_extension = True
 
     def set_signed(self, value):
@@ -33,7 +33,7 @@ class Encrypted(ElementBase):
     name = 'x'
     namespace = 'jabber:x:encrypted'
     plugin_attrib = 'encrypted'
-    interfaces = set(['encrypted'])
+    interfaces = {'encrypted'}
     is_extension = True
 
     def set_encrypted(self, value):

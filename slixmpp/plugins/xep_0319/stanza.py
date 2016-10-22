@@ -16,7 +16,7 @@ class Idle(ElementBase):
     name = 'idle'
     namespace = 'urn:xmpp:idle:1'
     plugin_attrib = 'idle'
-    interfaces = set(['since'])
+    interfaces = {'since'}
 
     def get_since(self):
         timestamp = self._get_attr('since')

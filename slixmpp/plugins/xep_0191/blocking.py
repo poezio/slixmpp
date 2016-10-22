@@ -23,7 +23,7 @@ class XEP_0191(BasePlugin):
 
     name = 'xep_0191'
     description = 'XEP-0191: Blocking Command'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

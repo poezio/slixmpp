@@ -17,7 +17,7 @@ class XEP_0131(BasePlugin):
 
     name = 'xep_0131'
     description = 'XEP-0131: Stanza Headers and Internet Metadata'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
     default_config = {
         'supported_headers': set()

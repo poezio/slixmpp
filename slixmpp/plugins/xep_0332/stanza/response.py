@@ -46,7 +46,7 @@ class HTTPResponse(ElementBase):
 
     name = 'response'
     namespace = 'urn:xmpp:http'
-    interfaces = set(['code', 'message', 'version'])
+    interfaces = {'code', 'message', 'version'}
     plugin_attrib = 'http-resp'
 
     def get_code(self):

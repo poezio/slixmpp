@@ -29,7 +29,7 @@ class XEP_0054(BasePlugin):
 
     name = 'xep_0054'
     description = 'XEP-0054: vcard-temp'
-    dependencies = set(['xep_0030', 'xep_0082'])
+    dependencies = {'xep_0030', 'xep_0082'}
     stanza = stanza
 
     def plugin_init(self):

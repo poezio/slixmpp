@@ -22,7 +22,7 @@ class XEP_0065(BasePlugin):
 
     name = 'xep_0065'
     description = "XEP-0065: SOCKS5 Bytestreams"
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     default_config = {
         'auto_accept': False
     }

@@ -31,7 +31,7 @@ class XEP_0231(BasePlugin):
 
     name = 'xep_0231'
     description = 'XEP-0231: Bits of Binary'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
 
     def plugin_init(self):
         self._cids = {}

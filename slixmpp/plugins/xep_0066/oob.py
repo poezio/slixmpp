@@ -44,7 +44,7 @@ class XEP_0066(BasePlugin):
 
     name = 'xep_0066'
     description = 'XEP-0066: Out of Band Data'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

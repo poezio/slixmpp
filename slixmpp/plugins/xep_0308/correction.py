@@ -28,7 +28,7 @@ class XEP_0308(BasePlugin):
 
     name = 'xep_0308'
     description = 'XEP-0308: Last Message Correction'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

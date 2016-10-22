@@ -25,7 +25,7 @@ class XEP_0080(BasePlugin):
 
     name = 'xep_0080'
     description = 'XEP-0080: User Location'
-    dependencies = set(['xep_0163'])
+    dependencies = {'xep_0163'}
     stanza = stanza
 
     def plugin_end(self):

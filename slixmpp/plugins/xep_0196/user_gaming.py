@@ -23,7 +23,7 @@ class XEP_0196(BasePlugin):
 
     name = 'xep_0196'
     description = 'XEP-0196: User Gaming'
-    dependencies = set(['xep_0163'])
+    dependencies = {'xep_0163'}
     stanza = stanza
 
     def plugin_end(self):

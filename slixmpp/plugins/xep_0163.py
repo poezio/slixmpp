@@ -24,7 +24,7 @@ class XEP_0163(BasePlugin):
 
     name = 'xep_0163'
     description = 'XEP-0163: Personal Eventing Protocol (PEP)'
-    dependencies = set(['xep_0030', 'xep_0060', 'xep_0115'])
+    dependencies = {'xep_0030', 'xep_0060', 'xep_0115'}
 
     def register_pep(self, name, stanza):
         """

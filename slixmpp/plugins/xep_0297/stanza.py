@@ -14,7 +14,7 @@ class Forwarded(ElementBase):
     name = 'forwarded'
     namespace = 'urn:xmpp:forward:0'
     plugin_attrib = 'forwarded'
-    interfaces = set(['stanza'])
+    interfaces = {'stanza'}
 
     def get_stanza(self):
         for stanza in self:

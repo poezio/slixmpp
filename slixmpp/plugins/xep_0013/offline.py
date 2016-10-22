@@ -29,7 +29,7 @@ class XEP_0013(BasePlugin):
 
     name = 'xep_0013'
     description = 'XEP-0013: Flexible Offline Message Retrieval'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

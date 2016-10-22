@@ -17,7 +17,7 @@ class XEP_0071(BasePlugin):
 
     name = 'xep_0071'
     description = 'XEP-0071: XHTML-IM'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

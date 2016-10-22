@@ -25,7 +25,7 @@ class TestAdHocCommands(SlixTest):
         class TestPayload(ElementBase):
             name = 'foo'
             namespace = 'test'
-            interfaces = set(['bar'])
+            interfaces = {'bar'}
             plugin_attrib = name
 
         Command = self.xmpp['xep_0050'].stanza.Command

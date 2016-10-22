@@ -41,7 +41,7 @@ class XEP_0128(BasePlugin):
 
     name = 'xep_0128'
     description = 'XEP-0128: Service Discovery Extensions'
-    dependencies = set(['xep_0030', 'xep_0004'])
+    dependencies = {'xep_0030', 'xep_0004'}
 
     def plugin_init(self):
         """Start the XEP-0128 plugin."""

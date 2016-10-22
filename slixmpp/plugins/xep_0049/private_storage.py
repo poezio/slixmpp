@@ -23,7 +23,7 @@ class XEP_0049(BasePlugin):
 
     name = 'xep_0049'
     description = 'XEP-0049: Private XML Storage'
-    dependencies = set([])
+    dependencies = {}
     stanza = stanza
 
     def plugin_init(self):

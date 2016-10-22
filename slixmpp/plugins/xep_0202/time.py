@@ -28,7 +28,7 @@ class XEP_0202(BasePlugin):
 
     name = 'xep_0202'
     description = 'XEP-0202: Entity Time'
-    dependencies = set(['xep_0030', 'xep_0082'])
+    dependencies = {'xep_0030', 'xep_0082'}
     stanza = stanza
     default_config = {
         #: As a default, respond to time requests with the

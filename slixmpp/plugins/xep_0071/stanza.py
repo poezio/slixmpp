@@ -19,8 +19,8 @@ class XHTML_IM(ElementBase):
 
     namespace = 'http://jabber.org/protocol/xhtml-im'
     name = 'html'
-    interfaces = set(['body'])
-    lang_interfaces = set(['body'])
+    interfaces = {'body'}
+    lang_interfaces = {'body'}
     plugin_attrib = name
 
     def set_body(self, content, lang=None):

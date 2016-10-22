@@ -49,7 +49,7 @@ class HTTPRequest(ElementBase):
 
     name = 'request'
     namespace = 'urn:xmpp:http'
-    interfaces = set(['method', 'resource', 'version'])
+    interfaces = {'method', 'resource', 'version'}
     plugin_attrib = 'http-req'
 
     def get_method(self):

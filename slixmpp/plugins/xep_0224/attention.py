@@ -27,7 +27,7 @@ class XEP_0224(BasePlugin):
 
     name = 'xep_0224'
     description = 'XEP-0224: Attention'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

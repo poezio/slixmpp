@@ -14,7 +14,7 @@ class IPCheck(ElementBase):
     name = 'ip'
     namespace = 'urn:xmpp:sic:0'
     plugin_attrib = 'ip_check'
-    interfaces = set(['ip_check'])
+    interfaces = {'ip_check'}
     is_extension = True
 
     def get_ip_check(self):

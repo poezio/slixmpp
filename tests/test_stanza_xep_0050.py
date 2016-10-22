@@ -51,7 +51,7 @@ class TestAdHocCommandStanzas(SlixTest):
         iq['command']['actions'] = ['prev', 'next']
 
         results = iq['command']['actions']
-        expected = set(['prev', 'next'])
+        expected = {'prev', 'next'}
         self.assertEqual(results, expected,
                          "Incorrect next actions: %s" % results)
 

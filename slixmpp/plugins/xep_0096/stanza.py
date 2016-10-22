@@ -16,8 +16,8 @@ class File(ElementBase):
     name = 'file'
     namespace = 'http://jabber.org/protocol/si/profile/file-transfer'
     plugin_attrib = 'file'
-    interfaces = set(['name', 'size', 'date', 'hash', 'desc'])
-    sub_interfaces = set(['desc'])
+    interfaces = {'name', 'size', 'date', 'hash', 'desc'}
+    sub_interfaces = {'desc'}
 
     def set_size(self, value):
         self._set_attr('size', str(value))
@@ -36,7 +36,7 @@ class Range(ElementBase):
     name = 'range'
     namespace = 'http://jabber.org/protocol/si/profile/file-transfer'
     plugin_attrib = 'range'
-    interfaces = set(['length', 'offset'])
+    interfaces = {'length', 'offset'}
 
     def set_length(self, value):
         self._set_attr('length', str(value))

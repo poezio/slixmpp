@@ -91,7 +91,7 @@ class DiscoInfo(ElementBase):
         """
         ElementBase.setup(self, xml)
 
-        self._identities = set([id[0:3] for id in self['identities']])
+        self._identities = {id[0:3] for id in self['identities']}
         self._features = self['features']
 
     def add_identity(self, category, itype, name=None, lang=None):

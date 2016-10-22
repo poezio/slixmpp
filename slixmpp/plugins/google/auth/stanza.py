@@ -13,7 +13,7 @@ class GoogleAuth(ElementBase):
     name = 'auth'
     namespace = 'http://www.google.com/talk/protocol/auth'
     plugin_attrib = 'google'
-    interfaces = set(['client_uses_full_bind_result', 'service'])
+    interfaces = {'client_uses_full_bind_result', 'service'}
 
     discovery_attr= '{%s}client-uses-full-bind-result' % namespace
     service_attr= '{%s}service' % namespace

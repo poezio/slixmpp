@@ -14,7 +14,7 @@ class NoSave(ElementBase):
     name = 'x'
     namespace = 'google:nosave'
     plugin_attrib = 'google_nosave'
-    interfaces = set(['value'])
+    interfaces = {'value'}
 
     def get_value(self):
         return self._get_attr('value', '') == 'enabled'
@@ -35,7 +35,7 @@ class Item(ElementBase):
     namespace = 'google:nosave'
     plugin_attrib = 'item'
     plugin_multi_attrib = 'items'
-    interfaces = set(['jid', 'source', 'value'])
+    interfaces = {'jid', 'source', 'value'}
 
     def get_value(self):
         return self._get_attr('value', '') == 'enabled'

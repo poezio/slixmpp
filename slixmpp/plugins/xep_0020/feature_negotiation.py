@@ -24,7 +24,7 @@ class XEP_0020(BasePlugin):
 
     name = 'xep_0020'
     description = 'XEP-0020: Feature Negotiation'
-    dependencies = set(['xep_0004', 'xep_0030'])
+    dependencies = {'xep_0004', 'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

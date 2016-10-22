@@ -21,7 +21,7 @@ class XEP_0186(BasePlugin):
 
     name = 'xep_0186'
     description = 'XEP-0186: Invisible Command'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
 
     def plugin_init(self):
         register_stanza_plugin(Iq, Visible)

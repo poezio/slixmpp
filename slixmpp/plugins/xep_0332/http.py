@@ -36,7 +36,7 @@ class XEP_0332(BasePlugin):
 
     #: xep_0047 not included.
     #: xep_0001, 0137 and 0166 are missing
-    dependencies = set(['xep_0030', 'xep_0131'])
+    dependencies = {'xep_0030', 'xep_0131'}
 
     #: TODO: Do we really need to mention the supported_headers?!
     default_config = {

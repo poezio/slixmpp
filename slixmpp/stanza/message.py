@@ -49,9 +49,9 @@ class Message(RootStanza):
     plugin_attrib = name
     interfaces = set(['type', 'to', 'from', 'id', 'body', 'subject',
                       'thread', 'parent_thread', 'mucroom', 'mucnick'])
-    sub_interfaces = set(['body', 'subject', 'thread'])
+    sub_interfaces = {'body', 'subject', 'thread'}
     lang_interfaces = sub_interfaces
-    types = set(['normal', 'chat', 'headline', 'error', 'groupchat'])
+    types = {'normal', 'chat', 'headline', 'error', 'groupchat'}
 
     def __init__(self, *args, **kwargs):
         """

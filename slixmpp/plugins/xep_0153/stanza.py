@@ -13,7 +13,7 @@ class VCardTempUpdate(ElementBase):
     name = 'x'
     namespace = 'vcard-temp:x:update'
     plugin_attrib = 'vcard_temp_update'
-    interfaces = set(['photo'])
+    interfaces = {'photo'}
     sub_interfaces = interfaces
 
     def set_photo(self, value):

@@ -13,4 +13,4 @@ class Replace(ElementBase):
     name = 'replace'
     namespace = 'urn:xmpp:message-correct:0'
     plugin_attrib = 'replace'
-    interfaces = set(['id'])
+    interfaces = {'id'}

@@ -62,7 +62,7 @@ class DiscoItems(ElementBase):
             xml -- Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
-        self._items = set([item[0:2] for item in self['items']])
+        self._items = {item[0:2] for item in self['items']}
 
     def add_item(self, jid, node=None, name=None):
         """

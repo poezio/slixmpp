@@ -21,7 +21,7 @@ class XEP_0258(BasePlugin):
 
     name = 'xep_0258'
     description = 'XEP-0258: Security Labels in XMPP'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

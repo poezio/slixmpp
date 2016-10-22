@@ -22,7 +22,7 @@ class XEP_0257(BasePlugin):
 
     name = 'xep_0257'
     description = 'XEP-0257: Client Certificate Management for SASL EXTERNAL'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

@@ -14,7 +14,7 @@ class XEP_0133(BasePlugin):
 
     name = 'xep_0133'
     description = 'XEP-0133: Service Administration'
-    dependencies = set(['xep_0030', 'xep_0004', 'xep_0050'])
+    dependencies = {'xep_0030', 'xep_0004', 'xep_0050'}
     commands = set(['add-user', 'delete-user', 'disable-user',
                     'reenable-user', 'end-user-session', 'get-user-password',
                     'change-user-password', 'get-user-roster',

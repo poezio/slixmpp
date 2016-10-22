@@ -27,7 +27,7 @@ class XEP_0079(BasePlugin):
 
     name = 'xep_0079'
     description = 'XEP-0079: Advanced Message Processing'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

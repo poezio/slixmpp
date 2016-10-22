@@ -24,7 +24,7 @@ class XEP_0153(BasePlugin):
 
     name = 'xep_0153'
     description = 'XEP-0153: vCard-Based Avatars'
-    dependencies = set(['xep_0054'])
+    dependencies = {'xep_0054'}
     stanza = stanza
 
     def plugin_init(self):

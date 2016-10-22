@@ -39,7 +39,7 @@ class ANONYMOUS(Mech):
 class LOGIN(Mech):
 
     name = 'LOGIN'
-    required_credentials = set(['username', 'password'])
+    required_credentials = {'username', 'password'}
 
     def setup(self, name):
         self.step = 0
@@ -59,9 +59,9 @@ class LOGIN(Mech):
 class PLAIN(Mech):
 
     name = 'PLAIN'
-    required_credentials = set(['username', 'password'])
-    optional_credentials = set(['authzid'])
-    security = set(['encrypted', 'encrypted_plain', 'unencrypted_plain'])
+    required_credentials = {'username', 'password'}
+    optional_credentials = {'authzid'}
+    security = {'encrypted', 'encrypted_plain', 'unencrypted_plain'}
 
     def setup(self, name):
         if not self.security_settings['encrypted']:
@@ -82,7 +82,7 @@ class PLAIN(Mech):
 class EXTERNAL(Mech):
 
     name = 'EXTERNAL'
-    optional_credentials = set(['authzid'])
+    optional_credentials = {'authzid'}
 
     def process(self, challenge=b''):
         return self.credentials['authzid']
@@ -92,7 +92,7 @@ class EXTERNAL(Mech):
 class X_FACEBOOK_PLATFORM(Mech):
 
     name = 'X-FACEBOOK-PLATFORM'
-    required_credentials = set(['api_key', 'access_token'])
+    required_credentials = {'api_key', 'access_token'}
 
     def process(self, challenge=b''):
         if challenge:
@@ -119,7 +119,7 @@ class X_FACEBOOK_PLATFORM(Mech):
 class X_MESSENGER_OAUTH2(Mech):
 
     name = 'X-MESSENGER-OAUTH2'
-    required_credentials = set(['access_token'])
+    required_credentials = {'access_token'}
 
     def process(self, challenge=b''):
         return self.credentials['access_token']
@@ -129,7 +129,7 @@ class X_MESSENGER_OAUTH2(Mech):
 class X_OAUTH2(Mech):
 
     name = 'X-OAUTH2'
-    required_credentials = set(['username', 'access_token'])
+    required_credentials = {'username', 'access_token'}
 
     def process(self, challenge=b''):
         return b'\x00' + self.credentials['username'] + \
@@ -140,7 +140,7 @@ class X_OAUTH2(Mech):
 class X_GOOGLE_TOKEN(Mech):
 
     name = 'X-GOOGLE-TOKEN'
-    required_credentials = set(['email', 'access_token'])
+    required_credentials = {'email', 'access_token'}
 
     def process(self, challenge=b''):
         email = self.credentials['email']
@@ -153,8 +153,8 @@ class CRAM(Mech):
 
     name = 'CRAM'
     use_hashes = True
-    required_credentials = set(['username', 'password'])
-    security = set(['encrypted', 'unencrypted_cram'])
+    required_credentials = {'username', 'password'}
+    security = {'encrypted', 'unencrypted_cram'}
 
     def setup(self, name):
         self.hash_name = name[5:]
@@ -184,9 +184,9 @@ class SCRAM(Mech):
     name = 'SCRAM'
     use_hashes = True
     channel_binding = True
-    required_credentials = set(['username', 'password'])
-    optional_credentials = set(['authzid', 'channel_binding'])
-    security = set(['encrypted', 'unencrypted_scram'])
+    required_credentials = {'username', 'password'}
+    optional_credentials = {'authzid', 'channel_binding'}
+    security = {'encrypted', 'unencrypted_scram'}
 
     def setup(self, name):
         self.use_channel_binding = False
@@ -334,9 +334,9 @@ class DIGEST(Mech):
 
     name = 'DIGEST'
     use_hashes = True
-    required_credentials = set(['username', 'password', 'realm', 'service', 'host'])
-    optional_credentials = set(['authzid', 'service-name'])
-    security = set(['encrypted', 'unencrypted_digest'])
+    required_credentials = {'username', 'password', 'realm', 'service', 'host'}
+    optional_credentials = {'authzid', 'service-name'}
+    security = {'encrypted', 'unencrypted_digest'}
 
     def setup(self, name):
         self.hash_name = name[7:]
@@ -511,8 +511,8 @@ else:
     class GSSAPI(Mech):
 
         name = 'GSSAPI'
-        required_credentials = set(['username', 'service-name'])
-        optional_credentials = set(['authzid'])
+        required_credentials = {'username', 'service-name'}
+        optional_credentials = {'authzid'}
 
         def setup(self, name):
             authzid = self.credentials['authzid']

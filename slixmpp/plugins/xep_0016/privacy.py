@@ -17,7 +17,7 @@ class XEP_0016(BasePlugin):
 
     name = 'xep_0016'
     description = 'XEP-0016: Privacy Lists'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

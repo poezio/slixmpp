@@ -14,7 +14,7 @@ class Offline(ElementBase):
     name = 'offline'
     namespace = 'http://jabber.org/protocol/offline'
     plugin_attrib = 'offline'
-    interfaces = set(['fetch', 'purge', 'results'])
+    interfaces = {'fetch', 'purge', 'results'}
     bool_interfaces = interfaces
 
     def setup(self, xml=None):
@@ -39,9 +39,9 @@ class Item(ElementBase):
     name = 'item'
     namespace = 'http://jabber.org/protocol/offline'
     plugin_attrib = 'item'
-    interfaces = set(['action', 'node', 'jid'])
+    interfaces = {'action', 'node', 'jid'}
 
-    actions = set(['view', 'remove'])
+    actions = {'view', 'remove'}
 
     def get_jid(self):
         return JID(self._get_attr('jid'))

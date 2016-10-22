@@ -29,7 +29,7 @@ class XEP_0313(BasePlugin):
 
     name = 'xep_0313'
     description = 'XEP-0313: Message Archive Management'
-    dependencies = set(['xep_0030', 'xep_0050', 'xep_0059', 'xep_0297'])
+    dependencies = {'xep_0030', 'xep_0050', 'xep_0059', 'xep_0297'}
     stanza = stanza
 
     def plugin_init(self):

@@ -13,7 +13,7 @@ class SI(ElementBase):
     name = 'si'
     namespace = 'http://jabber.org/protocol/si'
     plugin_attrib = 'si'
-    interfaces = set(['id', 'mime_type', 'profile'])
+    interfaces = {'id', 'mime_type', 'profile'}
 
     def get_mime_type(self):
         return self._get_attr('mime-type', 'application/octet-stream')

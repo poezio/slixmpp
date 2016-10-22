@@ -12,7 +12,7 @@ class XEP_0122(BasePlugin):
 
     name = 'xep_0122'
     description = 'XEP-0122: Data Forms Validation'
-    dependencies = set(['xep_0004'])
+    dependencies = {'xep_0004'}
     stanza = stanza
 
     def plugin_init(self):

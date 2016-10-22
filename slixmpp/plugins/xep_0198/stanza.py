@@ -13,7 +13,7 @@ from slixmpp.xmlstream import ElementBase, StanzaBase
 class Enable(StanzaBase):
     name = 'enable'
     namespace = 'urn:xmpp:sm:3'
-    interfaces = set(['max', 'resume'])
+    interfaces = {'max', 'resume'}
 
     def setup(self, xml):
         StanzaBase.setup(self, xml)
@@ -30,7 +30,7 @@ class Enable(StanzaBase):
 class Enabled(StanzaBase):
     name = 'enabled'
     namespace = 'urn:xmpp:sm:3'
-    interfaces = set(['id', 'location', 'max', 'resume'])
+    interfaces = {'id', 'location', 'max', 'resume'}
 
     def setup(self, xml):
         StanzaBase.setup(self, xml)
@@ -47,7 +47,7 @@ class Enabled(StanzaBase):
 class Resume(StanzaBase):
     name = 'resume'
     namespace = 'urn:xmpp:sm:3'
-    interfaces = set(['h', 'previd'])
+    interfaces = {'h', 'previd'}
 
     def setup(self, xml):
         StanzaBase.setup(self, xml)
@@ -66,7 +66,7 @@ class Resume(StanzaBase):
 class Resumed(StanzaBase):
     name = 'resumed'
     namespace = 'urn:xmpp:sm:3'
-    interfaces = set(['h', 'previd'])
+    interfaces = {'h', 'previd'}
 
     def setup(self, xml):
         StanzaBase.setup(self, xml)
@@ -96,7 +96,7 @@ class StreamManagement(ElementBase):
     name = 'sm'
     namespace = 'urn:xmpp:sm:3'
     plugin_attrib = name
-    interfaces = set(['required', 'optional'])
+    interfaces = {'required', 'optional'}
 
     def get_required(self):
         return self.xml.find('{%s}required' % self.namespace) is not None
@@ -134,7 +134,7 @@ class RequestAck(StanzaBase):
 class Ack(StanzaBase):
     name = 'a'
     namespace = 'urn:xmpp:sm:3'
-    interfaces = set(['h'])
+    interfaces = {'h'}
 
     def setup(self, xml):
         StanzaBase.setup(self, xml)

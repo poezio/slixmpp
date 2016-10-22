@@ -28,7 +28,7 @@ class XEP_0092(BasePlugin):
 
     name = 'xep_0092'
     description = 'XEP-0092: Software Version'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
     default_config = {
         'software_name': 'Slixmpp',

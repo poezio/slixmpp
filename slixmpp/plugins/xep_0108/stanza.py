@@ -14,8 +14,8 @@ class UserActivity(ElementBase):
     name = 'activity'
     namespace = 'http://jabber.org/protocol/activity'
     plugin_attrib = 'activity'
-    interfaces = set(['value', 'text'])
-    sub_interfaces = set(['text'])
+    interfaces = {'value', 'text'}
+    sub_interfaces = {'text'}
     general = set(['doing_chores', 'drinking', 'eating', 'exercising',
                    'grooming', 'having_appointment', 'inactive', 'relaxing',
                    'talking', 'traveling', 'undefined', 'working'])

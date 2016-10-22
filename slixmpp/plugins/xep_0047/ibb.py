@@ -18,7 +18,7 @@ class XEP_0047(BasePlugin):
 
     name = 'xep_0047'
     description = 'XEP-0047: In-band Bytestreams'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
     default_config = {
         'block_size': 4096,

@@ -29,7 +29,7 @@ class XEP_0012(BasePlugin):
 
     name = 'xep_0012'
     description = 'XEP-0012: Last Activity'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

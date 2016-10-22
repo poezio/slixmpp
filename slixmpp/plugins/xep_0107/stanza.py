@@ -14,8 +14,8 @@ class UserMood(ElementBase):
     name = 'mood'
     namespace = 'http://jabber.org/protocol/mood'
     plugin_attrib = 'mood'
-    interfaces = set(['value', 'text'])
-    sub_interfaces = set(['text'])
+    interfaces = {'value', 'text'}
+    sub_interfaces = {'text'}
     moods = set(['afraid', 'amazed', 'amorous', 'angry', 'annoyed', 'anxious',
                  'aroused', 'ashamed', 'bored', 'brave', 'calm', 'cautious',
                  'cold', 'confident', 'confused', 'contemplative', 'contented',

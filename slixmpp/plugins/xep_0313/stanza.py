@@ -17,8 +17,8 @@ class MAM(ElementBase):
     name = 'query'
     namespace = 'urn:xmpp:mam:tmp'
     plugin_attrib = 'mam'
-    interfaces = set(['queryid', 'start', 'end', 'with', 'results'])
-    sub_interfaces = set(['start', 'end', 'with'])
+    interfaces = {'queryid', 'start', 'end', 'with', 'results'}
+    sub_interfaces = {'start', 'end', 'with'}
 
     def setup(self, xml=None):
         ElementBase.setup(self, xml)
@@ -66,8 +66,8 @@ class Preferences(ElementBase):
     name = 'prefs'
     namespace = 'urn:xmpp:mam:tmp'
     plugin_attrib = 'mam_prefs'
-    interfaces = set(['default', 'always', 'never'])
-    sub_interfaces = set(['always', 'never'])
+    interfaces = {'default', 'always', 'never'}
+    sub_interfaces = {'always', 'never'}
 
     def get_always(self):
         results = set()
@@ -122,7 +122,7 @@ class Result(ElementBase):
     name = 'result'
     namespace = 'urn:xmpp:mam:tmp'
     plugin_attrib = 'mam_result'
-    interfaces = set(['queryid', 'id'])
+    interfaces = {'queryid', 'id'}
 
 
 class Archived(ElementBase):
@@ -130,7 +130,7 @@ class Archived(ElementBase):
     namespace = 'urn:xmpp:mam:tmp'
     plugin_attrib = 'mam_archived'
     plugin_multi_attrib = 'mam_archives'
-    interfaces = set(['by', 'id'])
+    interfaces = {'by', 'id'}
 
     def get_by(self):
         return JID(self._get_attr('by'))

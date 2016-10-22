@@ -17,7 +17,7 @@ class HTTPData(ElementBase):
     """
     name = 'data'
     namespace = 'urn:xmpp:http'
-    interfaces = set(['data'])
+    interfaces = {'data'}
     plugin_attrib = 'data'
     is_extension = True
 

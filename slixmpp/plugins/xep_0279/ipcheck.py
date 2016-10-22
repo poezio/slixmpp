@@ -19,7 +19,7 @@ class XEP_0279(BasePlugin):
 
     name = 'xep_0279'
     description = 'XEP-0279: Server IP Check'
-    dependencies = set(['xep_0030'])
+    dependencies = {'xep_0030'}
     stanza = stanza
 
     def plugin_init(self):

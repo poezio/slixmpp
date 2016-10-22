@@ -15,7 +15,7 @@ class AMP(ElementBase):
     namespace = 'http://jabber.org/protocol/amp'
     name = 'amp'
     plugin_attrib = 'amp'
-    interfaces = set(['from', 'to', 'status', 'per_hop'])
+    interfaces = {'from', 'to', 'status', 'per_hop'}
 
     def get_from(self):
         return JID(self._get_attr('from'))
@@ -53,7 +53,7 @@ class Rule(ElementBase):
     name = 'rule'
     plugin_attrib = name
     plugin_multi_attrib = 'rules'
-    interfaces = set(['action', 'condition', 'value'])
+    interfaces = {'action', 'condition', 'value'}
 
 
 class InvalidRules(ElementBase):

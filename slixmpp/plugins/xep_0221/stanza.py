@@ -13,7 +13,7 @@ class Media(ElementBase):
     name = 'media'
     namespace = 'urn:xmpp:media-element'
     plugin_attrib = 'media'
-    interfaces = set(['height', 'width', 'alt'])
+    interfaces = {'height', 'width', 'alt'}
 
     def add_uri(self, value, itype):
         uri = URI()
@@ -27,7 +27,7 @@ class URI(ElementBase):
     namespace = 'urn:xmpp:media-element'
     plugin_attrib = 'uri'
     plugin_multi_attrib = 'uris'
-    interfaces = set(['type', 'value'])
+    interfaces = {'type', 'value'}
 
     def get_value(self):
         return self.xml.text
