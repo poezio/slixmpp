@@ -38,7 +38,7 @@ class TestStreamPresence(SlixTest):
                     to="tester@localhost"/>
         """)
 
-        self.assertEqual(events, set(('unavailable',)),
+        self.assertEqual(events, {'unavailable'},
                 "Got offline incorrectly triggered: %s." % events)
 
     def testGotOffline(self):

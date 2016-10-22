@@ -19,10 +19,11 @@ class Failure(StanzaBase):
     interfaces = {'condition', 'text'}
     plugin_attrib = name
     sub_interfaces = {'text'}
-    conditions = set(('aborted', 'account-disabled', 'credentials-expired',
-        'encryption-required', 'incorrect-encoding', 'invalid-authzid',
-        'invalid-mechanism', 'malformed-request', 'mechansism-too-weak',
-        'not-authorized', 'temporary-auth-failure'))
+    conditions = {'aborted', 'account-disabled', 'credentials-expired',
+                  'encryption-required', 'incorrect-encoding',
+                  'invalid-authzid', 'invalid-mechanism', 'malformed-request',
+                  'mechansism-too-weak', 'not-authorized',
+                  'temporary-auth-failure'}
 
     def setup(self, xml=None):
         """

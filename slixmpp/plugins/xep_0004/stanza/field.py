@@ -14,21 +14,21 @@ class FormField(ElementBase):
     name = 'field'
     plugin_attrib = 'field'
     plugin_multi_attrib = 'fields'
-    interfaces = set(('answer', 'desc', 'required', 'value',
-                      'label', 'type', 'var'))
+    interfaces = {'answer', 'desc', 'required', 'value',
+                  'label', 'type', 'var'}
     sub_interfaces = {'desc'}
     plugin_tag_map = {}
     plugin_attrib_map = {}
 
-    field_types = set(('boolean', 'fixed', 'hidden', 'jid-multi',
-                       'jid-single', 'list-multi', 'list-single',
-                       'text-multi', 'text-private', 'text-single'))
+    field_types = {'boolean', 'fixed', 'hidden', 'jid-multi',
+                   'jid-single', 'list-multi', 'list-single',
+                   'text-multi', 'text-private', 'text-single'}
 
     true_values = {True, '1', 'true'}
     option_types = {'list-multi', 'list-single'}
     multi_line_types = {'hidden', 'text-multi'}
-    multi_value_types = set(('hidden', 'jid-multi',
-                             'list-multi', 'text-multi'))
+    multi_value_types = {'hidden', 'jid-multi',
+                         'list-multi', 'text-multi'}
 
     def setup(self, xml=None):
         if ElementBase.setup(self, xml):

@@ -16,14 +16,14 @@ class Register(ElementBase):
     namespace = 'jabber:iq:register'
     name = 'query'
     plugin_attrib = 'register'
-    interfaces = set(('username', 'password', 'email', 'nick', 'name',
-                      'first', 'last', 'address', 'city', 'state', 'zip',
-                      'phone', 'url', 'date', 'misc', 'text', 'key',
-                      'registered', 'remove', 'instructions', 'fields'))
+    interfaces = {'username', 'password', 'email', 'nick', 'name',
+                  'first', 'last', 'address', 'city', 'state', 'zip',
+                  'phone', 'url', 'date', 'misc', 'text', 'key',
+                  'registered', 'remove', 'instructions', 'fields'}
     sub_interfaces = interfaces
-    form_fields = set(('username', 'password', 'email', 'nick', 'name',
-                       'first', 'last', 'address', 'city', 'state', 'zip',
-                       'phone', 'url', 'date', 'misc', 'text', 'key'))
+    form_fields = {'username', 'password', 'email', 'nick', 'name',
+                   'first', 'last', 'address', 'city', 'state', 'zip',
+                   'phone', 'url', 'date', 'misc', 'text', 'key'}
 
     def get_registered(self):
         present = self.xml.find('{%s}registered' % self.namespace)

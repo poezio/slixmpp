@@ -15,18 +15,18 @@ class XEP_0133(BasePlugin):
     name = 'xep_0133'
     description = 'XEP-0133: Service Administration'
     dependencies = {'xep_0030', 'xep_0004', 'xep_0050'}
-    commands = set(['add-user', 'delete-user', 'disable-user',
-                    'reenable-user', 'end-user-session', 'get-user-password',
-                    'change-user-password', 'get-user-roster',
-                    'get-user-lastlogin', 'user-stats', 'edit-blacklist',
-                    'edit-whitelist', 'get-registered-users-num',
-                    'get-disabled-users-num', 'get-online-users-num',
-                    'get-active-users-num', 'get-idle-users-num',
-                    'get-registered-users-list', 'get-disabled-users-list',
-                    'get-online-users-list', 'get-online-users',
-                    'get-active-users', 'get-idle-userslist', 'announce',
-                    'set-motd', 'edit-motd', 'delete-motd', 'set-welcome',
-                    'delete-welcome', 'edit-admin', 'restart', 'shutdown'])
+    commands = {'add-user', 'delete-user', 'disable-user',
+                'reenable-user', 'end-user-session', 'get-user-password',
+                'change-user-password', 'get-user-roster',
+                'get-user-lastlogin', 'user-stats', 'edit-blacklist',
+                'edit-whitelist', 'get-registered-users-num',
+                'get-disabled-users-num', 'get-online-users-num',
+                'get-active-users-num', 'get-idle-users-num',
+                'get-registered-users-list', 'get-disabled-users-list',
+                'get-online-users-list', 'get-online-users',
+                'get-active-users', 'get-idle-userslist', 'announce',
+                'set-motd', 'edit-motd', 'delete-motd', 'set-welcome',
+                'delete-welcome', 'edit-admin', 'restart', 'shutdown'}
 
     def get_commands(self, jid=None, **kwargs):
         if jid is None:

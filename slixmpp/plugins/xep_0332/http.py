@@ -40,7 +40,7 @@ class XEP_0332(BasePlugin):
 
     #: TODO: Do we really need to mention the supported_headers?!
     default_config = {
-        'supported_headers': set([
+        'supported_headers': {
             'Content-Length', 'Transfer-Encoding', 'DateTime',
             'Accept-Charset', 'Location', 'Content-ID', 'Description',
             'Content-Language', 'Content-Transfer-Encoding', 'Timestamp',
@@ -48,7 +48,7 @@ class XEP_0332(BasePlugin):
             'WWW-Authenticate', 'Accept-Encoding', 'Server', 'Error-Info',
             'Identifier', 'Content-Location', 'Content-Encoding', 'Distribute',
             'Accept', 'Proxy-Authenticate', 'ETag', 'Expect', 'Content-Type'
-        ])
+        }
     }
 
     def plugin_init(self):

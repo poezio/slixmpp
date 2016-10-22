@@ -163,7 +163,7 @@ behaviour:
         namespace = 'jabber:iq:register'
         name = 'query'
         plugin_attrib = 'register'
-        interfaces = set(('username', 'password', 'registered', 'remove'))
+        interfaces = {'username', 'password', 'registered', 'remove'}
         sub_interfaces = interfaces
 
         def getRegistered(self):
@@ -535,10 +535,10 @@ with some additional registration fields implemented.
         namespace = 'jabber:iq:register'
         name = 'query'
         plugin_attrib = 'register'
-        interfaces = set(('username', 'password', 'email', 'nick', 'name',
-                          'first', 'last', 'address', 'city', 'state', 'zip',
-                          'phone', 'url', 'date', 'misc', 'text', 'key',
-                          'registered', 'remove', 'instructions'))
+        interfaces = {'username', 'password', 'email', 'nick', 'name',
+                      'first', 'last', 'address', 'city', 'state', 'zip',
+                      'phone', 'url', 'date', 'misc', 'text', 'key',
+                      'registered', 'remove', 'instructions'}
         sub_interfaces = interfaces
 
         def getRegistered(self):

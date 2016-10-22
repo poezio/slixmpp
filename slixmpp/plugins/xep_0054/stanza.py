@@ -105,11 +105,11 @@ class Address(ElementBase):
     namespace = 'vcard-temp'
     plugin_attrib = name
     plugin_multi_attrib = 'addresses'
-    interfaces = set(['HOME', 'WORK', 'POSTAL', 'PARCEL', 'DOM', 'INTL',
-                      'PREF', 'POBOX', 'EXTADD', 'STREET', 'LOCALITY',
-                      'REGION', 'PCODE', 'CTRY'])
-    sub_interfaces = set(['POBOX', 'EXTADD', 'STREET', 'LOCALITY',
-                          'REGION', 'PCODE', 'CTRY'])
+    interfaces = {'HOME', 'WORK', 'POSTAL', 'PARCEL', 'DOM', 'INTL',
+                  'PREF', 'POBOX', 'EXTADD', 'STREET', 'LOCALITY',
+                  'REGION', 'PCODE', 'CTRY'}
+    sub_interfaces = {'POBOX', 'EXTADD', 'STREET', 'LOCALITY',
+                      'REGION', 'PCODE', 'CTRY'}
     bool_interfaces = {'HOME', 'WORK', 'DOM', 'INTL', 'PREF'}
 
 
@@ -118,13 +118,13 @@ class Telephone(ElementBase):
     namespace = 'vcard-temp'
     plugin_attrib = name
     plugin_multi_attrib = 'telephone_numbers'
-    interfaces = set(['HOME', 'WORK', 'VOICE', 'FAX', 'PAGER', 'MSG',
-                      'CELL', 'VIDEO', 'BBS', 'MODEM', 'ISDN', 'PCS',
-                      'PREF', 'NUMBER'])
+    interfaces = {'HOME', 'WORK', 'VOICE', 'FAX', 'PAGER', 'MSG',
+                  'CELL', 'VIDEO', 'BBS', 'MODEM', 'ISDN', 'PCS',
+                  'PREF', 'NUMBER'}
     sub_interfaces = {'NUMBER'}
-    bool_interfaces = set(['HOME', 'WORK', 'VOICE', 'FAX', 'PAGER',
-                           'MSG', 'CELL', 'VIDEO', 'BBS', 'MODEM',
-                           'ISDN', 'PCS', 'PREF'])
+    bool_interfaces = {'HOME', 'WORK', 'VOICE', 'FAX', 'PAGER',
+                       'MSG', 'CELL', 'VIDEO', 'BBS', 'MODEM',
+                       'ISDN', 'PCS', 'PREF'}
 
     def setup(self, xml=None):
         super().setup(xml=xml)
@@ -143,10 +143,10 @@ class Label(ElementBase):
     namespace = 'vcard-temp'
     plugin_attrib = name
     plugin_multi_attrib = 'labels'
-    interfaces = set(['HOME', 'WORK', 'POSTAL', 'PARCEL', 'DOM', 'INT',
-                      'PREF', 'lines'])
-    bool_interfaces = set(['HOME', 'WORK', 'POSTAL', 'PARCEL', 'DOM',
-                           'INT', 'PREF'])
+    interfaces = {'HOME', 'WORK', 'POSTAL', 'PARCEL', 'DOM', 'INT',
+                  'PREF', 'lines'}
+    bool_interfaces = {'HOME', 'WORK', 'POSTAL', 'PARCEL', 'DOM',
+                       'INT', 'PREF'}
 
     def add_line(self, value):
         line = ET.Element('{%s}LINE' % self.namespace)

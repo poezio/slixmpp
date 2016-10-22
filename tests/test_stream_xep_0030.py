@@ -307,7 +307,7 @@ class TestStreamDisco(SlixTest):
           </iq>
         """)
 
-        self.assertEqual(events, set(('disco_info',)),
+        self.assertEqual(events, {'disco_info'},
                 "Disco info event was not triggered: %s" % events)
 
     def testDynamicItemsJID(self):
@@ -502,9 +502,9 @@ class TestStreamDisco(SlixTest):
           </iq>
         """)
 
-        items = set([('user@localhost', 'bar', 'Test'),
-                     ('user@localhost', 'baz', 'Test 2')])
-        self.assertEqual(events, set(('disco_items',)),
+        items = {('user@localhost', 'bar', 'Test'),
+                 ('user@localhost', 'baz', 'Test 2')}
+        self.assertEqual(events, {'disco_items'},
                 "Disco items event was not triggered: %s" % events)
         self.assertEqual(results, items,
                 "Unexpected items: %s" % results)

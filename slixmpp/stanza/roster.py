@@ -118,8 +118,7 @@ class RosterItem(ElementBase):
     namespace = 'jabber:iq:roster'
     name = 'item'
     plugin_attrib = 'item'
-    interfaces = set(('jid', 'name', 'subscription', 'ask',
-                      'approved', 'groups'))
+    interfaces = {'jid', 'name', 'subscription', 'ask', 'approved', 'groups'}
 
     def get_jid(self):
         return JID(self._get_attr('jid', ''))

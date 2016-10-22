@@ -55,8 +55,8 @@ class Item(ElementBase):
     namespace = 'jabber:iq:privacy'
     plugin_attrib = name
     plugin_multi_attrib = 'items'
-    interfaces = set(['type', 'value', 'action', 'order', 'iq',
-                      'message', 'presence_in', 'presence_out'])
+    interfaces = {'type', 'value', 'action', 'order', 'iq',
+                  'message', 'presence_in', 'presence_out'}
     bool_interfaces = {'message', 'iq', 'presence_in', 'presence_out'}
 
     type_values = ('', 'jid', 'group', 'subscription')

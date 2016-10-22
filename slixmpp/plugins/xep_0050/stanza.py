@@ -72,8 +72,8 @@ class Command(ElementBase):
     name = 'command'
     namespace = 'http://jabber.org/protocol/commands'
     plugin_attrib = 'command'
-    interfaces = set(('action', 'sessionid', 'node',
-                      'status', 'actions', 'notes'))
+    interfaces = {'action', 'sessionid', 'node',
+                  'status', 'actions', 'notes'}
     actions = {'cancel', 'complete', 'execute', 'next', 'prev'}
     statuses = {'canceled', 'completed', 'executing'}
     next_actions = {'prev', 'next', 'complete'}

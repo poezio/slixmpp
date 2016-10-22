@@ -47,8 +47,8 @@ class Message(RootStanza):
     name = 'message'
     namespace = 'jabber:client'
     plugin_attrib = name
-    interfaces = set(['type', 'to', 'from', 'id', 'body', 'subject',
-                      'thread', 'parent_thread', 'mucroom', 'mucnick'])
+    interfaces = {'type', 'to', 'from', 'id', 'body', 'subject', 'thread',
+                  'parent_thread', 'mucroom', 'mucnick'}
     sub_interfaces = {'body', 'subject', 'thread'}
     lang_interfaces = sub_interfaces
     types = {'normal', 'chat', 'headline', 'error', 'groupchat'}
