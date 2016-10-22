@@ -64,10 +64,10 @@ class Set(ElementBase):
     namespace = 'http://jabber.org/protocol/rsm'
     name = 'set'
     plugin_attrib = 'rsm'
-    sub_interfaces = set(('first', 'after', 'before', 'count',
-                          'index', 'last', 'max'))
-    interfaces = set(('first_index', 'first', 'after', 'before',
-                      'count', 'index', 'last', 'max'))
+    sub_interfaces = {'first', 'after', 'before', 'count',
+                      'index', 'last', 'max'}
+    interfaces = {'first_index', 'first', 'after', 'before',
+                  'count', 'index', 'last', 'max'}
 
     def set_first_index(self, val):
         fi = self.xml.find("{%s}first" % (self.namespace))

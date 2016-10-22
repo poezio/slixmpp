@@ -51,20 +51,20 @@ class Error(ElementBase):
     namespace = 'jabber:client'
     name = 'error'
     plugin_attrib = 'error'
-    interfaces = set(('code', 'condition', 'text', 'type',
-                      'gone', 'redirect', 'by'))
+    interfaces = {'code', 'condition', 'text', 'type',
+                      'gone', 'redirect', 'by'}
     sub_interfaces = {'text'}
     plugin_attrib_map = {}
     plugin_tag_map = {}
-    conditions = set(('bad-request', 'conflict', 'feature-not-implemented',
-                      'forbidden', 'gone', 'internal-server-error',
-                      'item-not-found', 'jid-malformed', 'not-acceptable',
-                      'not-allowed', 'not-authorized', 'payment-required',
-                      'recipient-unavailable', 'redirect',
-                      'registration-required', 'remote-server-not-found',
-                      'remote-server-timeout', 'resource-constraint',
-                      'service-unavailable', 'subscription-required',
-                      'undefined-condition', 'unexpected-request'))
+    conditions = {'bad-request', 'conflict', 'feature-not-implemented',
+                  'forbidden', 'gone', 'internal-server-error',
+                  'item-not-found', 'jid-malformed', 'not-acceptable',
+                  'not-allowed', 'not-authorized', 'payment-required',
+                  'recipient-unavailable', 'redirect',
+                  'registration-required', 'remote-server-not-found',
+                  'remote-server-timeout', 'resource-constraint',
+                  'service-unavailable', 'subscription-required',
+                  'undefined-condition', 'unexpected-request'}
     condition_ns = 'urn:ietf:params:xml:ns:xmpp-stanzas'
     types = {'cancel', 'continue', 'modify', 'auth', 'wait'}
 

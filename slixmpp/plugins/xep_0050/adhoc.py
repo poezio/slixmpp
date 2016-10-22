@@ -322,8 +322,8 @@ class XEP_0050(BasePlugin):
         interfaces = session.get('interfaces', set())
         payload_classes = session.get('payload_classes', set())
 
-        interfaces.update(set([item.plugin_attrib for item in payload]))
-        payload_classes.update(set([item.__class__ for item in payload]))
+        interfaces.update({item.plugin_attrib for item in payload})
+        payload_classes.update({item.__class__ for item in payload})
 
         session['interfaces'] = interfaces
         session['payload_classes'] = payload_classes

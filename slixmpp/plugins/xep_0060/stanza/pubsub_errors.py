@@ -16,15 +16,15 @@ class PubsubErrorCondition(ElementBase):
     interfaces = {'condition', 'unsupported'}
     plugin_attrib_map = {}
     plugin_tag_map = {}
-    conditions = set(('closed-node', 'configuration-required', 'invalid-jid',
-                      'invalid-options', 'invalid-payload', 'invalid-subid',
-                      'item-forbidden', 'item-required', 'jid-required',
-                      'max-items-exceeded', 'max-nodes-exceeded',
-                      'nodeid-required', 'not-in-roster-group',
-                      'not-subscribed', 'payload-too-big',
-                      'payload-required', 'pending-subscription',
-                      'presence-subscription-required', 'subid-required',
-                      'too-many-subscriptions', 'unsupported'))
+    conditions = {'closed-node', 'configuration-required', 'invalid-jid',
+                  'invalid-options', 'invalid-payload', 'invalid-subid',
+                  'item-forbidden', 'item-required', 'jid-required',
+                  'max-items-exceeded', 'max-nodes-exceeded',
+                  'nodeid-required', 'not-in-roster-group',
+                  'not-subscribed', 'payload-too-big',
+                  'payload-required', 'pending-subscription',
+                  'presence-subscription-required', 'subid-required',
+                  'too-many-subscriptions', 'unsupported'}
     condition_ns = 'http://jabber.org/protocol/pubsub#errors'
 
     def setup(self, xml):

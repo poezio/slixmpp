@@ -17,21 +17,25 @@ class Sensordata(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'
     name = 'sensordata'
     plugin_attrib = name
-    interfaces = set(tuple())
+    interfaces = set()
 
 class FieldTypes():
     """
     All field types are optional booleans that default to False
     """
-    field_types = set([ 'momentary','peak','status','computed','identity','historicalSecond','historicalMinute','historicalHour', \
-                        'historicalDay','historicalWeek','historicalMonth','historicalQuarter','historicalYear','historicalOther'])
+    field_types = {'momentary', 'peak', 'status', 'computed', 'identity',
+                   'historicalSecond', 'historicalMinute', 'historicalHour',
+                   'historicalDay', 'historicalWeek', 'historicalMonth',
+                   'historicalQuarter', 'historicalYear', 'historicalOther'}
 
 class FieldStatus():
     """
     All field statuses are optional booleans that default to False
     """
-    field_status = set([ 'missing','automaticEstimate','manualEstimate','manualReadout','automaticReadout','timeOffset','warning','error', \
-                         'signed','invoiced','endOfSeries','powerFailure','invoiceConfirmed'])
+    field_status = {'missing', 'automaticEstimate', 'manualEstimate',
+                    'manualReadout', 'automaticReadout', 'timeOffset',
+                    'warning', 'error', 'signed', 'invoiced', 'endOfSeries',
+                    'powerFailure', 'invoiceConfirmed'}
 
 class Request(ElementBase):
     namespace = 'urn:xmpp:iot:sensordata'

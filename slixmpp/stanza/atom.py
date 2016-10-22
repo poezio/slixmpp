@@ -22,8 +22,7 @@ class AtomEntry(ElementBase):
     name = 'entry'
     plugin_attrib = 'entry'
     interfaces = {'title', 'summary', 'id', 'published', 'updated'}
-    sub_interfaces = set(('title', 'summary', 'id', 'published',
-                          'updated'))
+    sub_interfaces = {'title', 'summary', 'id', 'published', 'updated'}
 
 class AtomAuthor(ElementBase):
 

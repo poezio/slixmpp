@@ -77,7 +77,7 @@ class TestInBandByteStreams(SlixTest):
               from="tester@localhost/receiver" />
         """)
 
-        self.assertEqual(events, set(['ibb_stream_start', 'callback']))
+        self.assertEqual(events, {'ibb_stream_start', 'callback'})
 
     @asyncio.coroutine
     def testSendData(self):

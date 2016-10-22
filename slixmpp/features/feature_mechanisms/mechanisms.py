@@ -49,7 +49,7 @@ class FeatureMechanisms(BasePlugin):
         if self.security_callback is None:
             self.security_callback = self._default_security
 
-        creds = self.sasl_callback(set(['username']), set())
+        creds = self.sasl_callback({'username'}, set())
         if not self.use_mech and not creds['username']:
             self.use_mech = 'ANONYMOUS'
 

@@ -16,23 +16,23 @@ class UserMood(ElementBase):
     plugin_attrib = 'mood'
     interfaces = {'value', 'text'}
     sub_interfaces = {'text'}
-    moods = set(['afraid', 'amazed', 'amorous', 'angry', 'annoyed', 'anxious',
-                 'aroused', 'ashamed', 'bored', 'brave', 'calm', 'cautious',
-                 'cold', 'confident', 'confused', 'contemplative', 'contented',
-                 'cranky', 'crazy', 'creative', 'curious', 'dejected',
-                 'depressed', 'disappointed', 'disgusted', 'dismayed',
-                 'distracted', 'embarrassed', 'envious', 'excited',
-                 'flirtatious', 'frustrated', 'grateful', 'grieving', 'grumpy',
-                 'guilty', 'happy', 'hopeful', 'hot', 'humbled', 'humiliated',
-                 'hungry', 'hurt', 'impressed', 'in_awe', 'in_love',
-                 'indignant', 'interested', 'intoxicated', 'invincible',
-                 'jealous', 'lonely', 'lost', 'lucky', 'mean', 'moody',
-                 'nervous', 'neutral', 'offended', 'outraged', 'playful',
-                 'proud', 'relaxed', 'relieved', 'remorseful', 'restless',
-                 'sad', 'sarcastic', 'satisfied', 'serious', 'shocked',
-                 'shy', 'sick', 'sleepy', 'spontaneous', 'stressed', 'strong',
-                 'surprised', 'thankful', 'thirsty', 'tired', 'undefined',
-                 'weak', 'worried'])
+    moods = {'afraid', 'amazed', 'amorous', 'angry', 'annoyed', 'anxious',
+             'aroused', 'ashamed', 'bored', 'brave', 'calm', 'cautious',
+             'cold', 'confident', 'confused', 'contemplative', 'contented',
+             'cranky', 'crazy', 'creative', 'curious', 'dejected',
+             'depressed', 'disappointed', 'disgusted', 'dismayed',
+             'distracted', 'embarrassed', 'envious', 'excited',
+             'flirtatious', 'frustrated', 'grateful', 'grieving', 'grumpy',
+             'guilty', 'happy', 'hopeful', 'hot', 'humbled', 'humiliated',
+             'hungry', 'hurt', 'impressed', 'in_awe', 'in_love',
+             'indignant', 'interested', 'intoxicated', 'invincible',
+             'jealous', 'lonely', 'lost', 'lucky', 'mean', 'moody',
+             'nervous', 'neutral', 'offended', 'outraged', 'playful',
+             'proud', 'relaxed', 'relieved', 'remorseful', 'restless',
+             'sad', 'sarcastic', 'satisfied', 'serious', 'shocked',
+             'shy', 'sick', 'sleepy', 'spontaneous', 'stressed', 'strong',
+             'surprised', 'thankful', 'thirsty', 'tired', 'undefined',
+             'weak', 'worried'}
 
     def set_value(self, value):
         self.del_value()

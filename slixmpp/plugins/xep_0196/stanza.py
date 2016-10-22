@@ -14,7 +14,7 @@ class UserGaming(ElementBase):
     name = 'gaming'
     namespace = 'urn:xmpp:gaming:0'
     plugin_attrib = 'gaming'
-    interfaces = set(['character_name', 'character_profile', 'name',
-                        'level', 'server_address', 'server_name', 'uri'])
+    interfaces = {'character_name', 'character_profile', 'name',
+                  'level', 'server_address', 'server_name', 'uri'}
     sub_interfaces = interfaces
 

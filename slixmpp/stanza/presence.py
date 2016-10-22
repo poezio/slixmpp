@@ -56,13 +56,12 @@ class Presence(RootStanza):
     name = 'presence'
     namespace = 'jabber:client'
     plugin_attrib = name
-    interfaces = set(['type', 'to', 'from', 'id', 'show',
-                      'status', 'priority'])
+    interfaces = {'type', 'to', 'from', 'id', 'show', 'status', 'priority'}
     sub_interfaces = {'show', 'status', 'priority'}
     lang_interfaces = {'status'}
 
-    types = set(['available', 'unavailable', 'error', 'probe', 'subscribe',
-                 'subscribed', 'unsubscribe', 'unsubscribed'])
+    types = {'available', 'unavailable', 'error', 'probe', 'subscribe',
+             'subscribed', 'unsubscribe', 'unsubscribed'}
     showtypes = {'dnd', 'chat', 'xa', 'away'}
 
     def __init__(self, *args, **kwargs):

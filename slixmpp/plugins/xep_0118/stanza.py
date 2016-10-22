@@ -14,8 +14,8 @@ class UserTune(ElementBase):
     name = 'tune'
     namespace = 'http://jabber.org/protocol/tune'
     plugin_attrib = 'tune'
-    interfaces = set(['artist', 'length', 'rating', 'source',
-                      'title', 'track', 'uri'])
+    interfaces = {'artist', 'length', 'rating', 'source',
+                  'title', 'track', 'uri'}
     sub_interfaces = interfaces
 
     def set_length(self, value):

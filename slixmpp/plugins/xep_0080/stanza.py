@@ -65,11 +65,11 @@ class Geoloc(ElementBase):
 
     namespace = 'http://jabber.org/protocol/geoloc'
     name = 'geoloc'
-    interfaces = set(('accuracy', 'alt', 'area', 'bearing', 'building',
-                      'country', 'countrycode', 'datum', 'dscription',
-                      'error', 'floor', 'lat', 'locality', 'lon',
-                      'postalcode', 'region', 'room', 'speed', 'street',
-                      'text', 'timestamp', 'uri'))
+    interfaces = {'accuracy', 'alt', 'area', 'bearing', 'building',
+                  'country', 'countrycode', 'datum', 'dscription',
+                  'error', 'floor', 'lat', 'locality', 'lon',
+                  'postalcode', 'region', 'room', 'speed', 'street',
+                  'text', 'timestamp', 'uri'}
     sub_interfaces = interfaces
     plugin_attrib = name
 

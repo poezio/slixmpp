@@ -254,10 +254,10 @@ class TestDisco(SlixTest):
         iq['disco_info'].add_identity('client', 'pc', lang='en')
         iq['disco_info'].add_identity('client', 'pc', lang='fr')
 
-        expected = set([('client', 'pc', None, None),
-                        ('client', 'pc', 'no', None),
-                        ('client', 'pc', 'en', None),
-                        ('client', 'pc', 'fr', None)])
+        expected = {('client', 'pc', None, None),
+                    ('client', 'pc', 'no', None),
+                    ('client', 'pc', 'en', None),
+                    ('client', 'pc', 'fr', None)}
         self.failUnless(iq['disco_info']['identities'] == expected,
                 "Identities do not match:\n%s\n%s" % (
                     expected,
@@ -472,9 +472,9 @@ class TestDisco(SlixTest):
                                    node='bar',
                                    name='Tester')
 
-        expected = set([('user@localhost', None, None),
-                        ('user@localhost', 'foo', None),
-                        ('test@localhost', 'bar', 'Tester')])
+        expected = {('user@localhost', None, None),
+                    ('user@localhost', 'foo', None),
+                    ('test@localhost', 'bar', 'Tester')}
         self.failUnless(iq['disco_items']['items'] == expected,
                 "Items do not match:\n%s\n%s" % (
                     expected,

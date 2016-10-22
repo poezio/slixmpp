@@ -561,12 +561,12 @@ class TestElementBase(SlixTest):
 
         stanza = TestStanza()
 
-        self.failUnless(set(stanza.keys()) == set(('lang', 'bar', 'baz')),
+        self.failUnless(set(stanza.keys()) == {'lang', 'bar', 'baz'},
             "Returned set of interface keys does not match expected.")
 
         stanza.enable('qux')
 
-        self.failUnless(set(stanza.keys()) == set(('lang', 'bar', 'baz', 'qux')),
+        self.failUnless(set(stanza.keys()) == {'lang', 'bar', 'baz', 'qux'},
             "Incorrect set of interface and plugin keys.")
 
     def testGet(self):

@@ -37,8 +37,8 @@ class MailBox(ElementBase):
     namespace = 'google:mail:notify'
     name = 'mailbox'
     plugin_attrib = 'mailbox'
-    interfaces = set(('result-time', 'total-matched', 'total-estimate',
-                      'url', 'threads', 'matched', 'estimate'))
+    interfaces = {'result-time', 'total-matched', 'total-estimate',
+                  'url', 'threads', 'matched', 'estimate'}
 
     def get_threads(self):
         threads = []
@@ -58,8 +58,8 @@ class MailThread(ElementBase):
     namespace = 'google:mail:notify'
     name = 'mail-thread-info'
     plugin_attrib = 'thread'
-    interfaces = set(('tid', 'participation', 'messages', 'date',
-                      'senders', 'url', 'labels', 'subject', 'snippet'))
+    interfaces = {'tid', 'participation', 'messages', 'date',
+                  'senders', 'url', 'labels', 'subject', 'snippet'}
     sub_interfaces = {'labels', 'subject', 'snippet'}
 
     def get_senders(self):

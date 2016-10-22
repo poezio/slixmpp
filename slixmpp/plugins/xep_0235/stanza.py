@@ -19,9 +19,9 @@ class OAuth(ElementBase):
     name = 'oauth'
     namespace = 'urn:xmpp:oauth:0'
     plugin_attrib = 'oauth'
-    interfaces = set(['oauth_consumer_key', 'oauth_nonce', 'oauth_signature',
-                      'oauth_signature_method', 'oauth_timestamp',
-                      'oauth_token', 'oauth_version'])
+    interfaces = {'oauth_consumer_key', 'oauth_nonce', 'oauth_signature',
+                  'oauth_signature_method', 'oauth_timestamp', 'oauth_token',
+                  'oauth_version'}
     sub_interfaces = interfaces
 
     def generate_signature(self, stanza, sfrom, sto, consumer_secret,
