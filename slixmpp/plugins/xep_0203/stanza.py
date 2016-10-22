@@ -18,7 +18,7 @@ class Delay(ElementBase):
     name = 'delay'
     namespace = 'urn:xmpp:delay'
     plugin_attrib = 'delay'
-    interfaces = set(('from', 'stamp', 'text'))
+    interfaces = {'from', 'stamp', 'text'}
 
     def get_from(self):
         from_ = self._get_attr('from')

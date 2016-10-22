@@ -41,7 +41,7 @@ class Action(ElementBase):
     #:     del action['status']
     #:
     #: to set, get, or remove its values.
-    interfaces = set(('method', 'param', 'status'))
+    interfaces = {'method', 'param', 'status'}
 
     #: By default, values in the `interfaces` set are mapped to
     #: attribute values. This can be changed such that an interface

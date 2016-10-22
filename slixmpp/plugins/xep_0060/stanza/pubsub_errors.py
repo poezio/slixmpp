@@ -13,7 +13,7 @@ from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin
 class PubsubErrorCondition(ElementBase):
 
     plugin_attrib = 'pubsub'
-    interfaces = set(('condition', 'unsupported'))
+    interfaces = {'condition', 'unsupported'}
     plugin_attrib_map = {}
     plugin_tag_map = {}
     conditions = set(('closed-node', 'configuration-required', 'invalid-jid',

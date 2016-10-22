@@ -16,6 +16,6 @@ class Bind(ElementBase):
 
     name = 'bind'
     namespace = 'urn:ietf:params:xml:ns:xmpp-bind'
-    interfaces = set(('resource', 'jid'))
+    interfaces = {'resource', 'jid'}
     sub_interfaces = interfaces
     plugin_attrib = 'bind'

@@ -54,7 +54,7 @@ class StreamError(Error, StanzaBase):
     """
 
     namespace = 'http://etherx.jabber.org/streams'
-    interfaces = set(('condition', 'text', 'see_other_host'))
+    interfaces = {'condition', 'text', 'see_other_host'}
     conditions = set((
         'bad-format', 'bad-namespace-prefix', 'conflict',
         'connection-timeout', 'host-gone', 'host-unknown',

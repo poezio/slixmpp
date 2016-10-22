@@ -30,7 +30,7 @@ class Affiliation(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'affiliation'
     plugin_attrib = name
-    interfaces = set(('node', 'affiliation', 'jid'))
+    interfaces = {'node', 'affiliation', 'jid'}
 
     def set_jid(self, value):
         self._set_attr('jid', str(value))
@@ -43,7 +43,7 @@ class Subscription(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'subscription'
     plugin_attrib = name
-    interfaces = set(('jid', 'node', 'subscription', 'subid'))
+    interfaces = {'jid', 'node', 'subscription', 'subid'}
 
     def set_jid(self, value):
         self._set_attr('jid', str(value))
@@ -70,7 +70,7 @@ class Item(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'item'
     plugin_attrib = name
-    interfaces = set(('id', 'payload'))
+    interfaces = {'id', 'payload'}
 
     def set_payload(self, value):
         del self['payload']
@@ -95,7 +95,7 @@ class Items(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'items'
     plugin_attrib = name
-    interfaces = set(('node', 'max_items'))
+    interfaces = {'node', 'max_items'}
 
     def set_max_items(self, value):
         self._set_attr('max_items', str(value))
@@ -112,7 +112,7 @@ class Default(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'default'
     plugin_attrib = name
-    interfaces = set(('node', 'type'))
+    interfaces = {'node', 'type'}
 
     def get_type(self):
         t = self._get_attr('type')
@@ -132,7 +132,7 @@ class Retract(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'retract'
     plugin_attrib = name
-    interfaces = set(('node', 'notify'))
+    interfaces = {'node', 'notify'}
 
     def get_notify(self):
         notify = self._get_attr('notify')
@@ -156,7 +156,7 @@ class Unsubscribe(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'unsubscribe'
     plugin_attrib = name
-    interfaces = set(('node', 'jid', 'subid'))
+    interfaces = {'node', 'jid', 'subid'}
 
     def set_jid(self, value):
         self._set_attr('jid', str(value))
@@ -169,7 +169,7 @@ class Subscribe(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'subscribe'
     plugin_attrib = name
-    interfaces = set(('node', 'jid'))
+    interfaces = {'node', 'jid'}
 
     def set_jid(self, value):
         self._set_attr('jid', str(value))
@@ -182,7 +182,7 @@ class Configure(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'configure'
     plugin_attrib = name
-    interfaces = set(('node', 'type'))
+    interfaces = {'node', 'type'}
 
     def getType(self):
         t = self._get_attr('type')
@@ -195,7 +195,7 @@ class Options(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'options'
     plugin_attrib = name
-    interfaces = set(('jid', 'node', 'options'))
+    interfaces = {'jid', 'node', 'options'}
 
     def __init__(self, *args, **kwargs):
         ElementBase.__init__(self, *args, **kwargs)

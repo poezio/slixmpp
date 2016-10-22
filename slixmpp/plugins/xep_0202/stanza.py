@@ -48,7 +48,7 @@ class EntityTime(ElementBase):
     name = 'time'
     namespace = 'urn:xmpp:time'
     plugin_attrib = 'entity_time'
-    interfaces = set(('tzo', 'utc', 'time'))
+    interfaces = {'tzo', 'utc', 'time'}
     sub_interfaces = interfaces
 
     def set_time(self, value):

@@ -21,7 +21,7 @@ class GmailQuery(ElementBase):
     namespace = 'google:mail:notify'
     name = 'query'
     plugin_attrib = 'gmail'
-    interfaces = set(('newer-than-time', 'newer-than-tid', 'q', 'search'))
+    interfaces = {'newer-than-time', 'newer-than-tid', 'q', 'search'}
 
     def get_search(self):
         return self['q']
@@ -60,7 +60,7 @@ class MailThread(ElementBase):
     plugin_attrib = 'thread'
     interfaces = set(('tid', 'participation', 'messages', 'date',
                       'senders', 'url', 'labels', 'subject', 'snippet'))
-    sub_interfaces = set(('labels', 'subject', 'snippet'))
+    sub_interfaces = {'labels', 'subject', 'snippet'}
 
     def get_senders(self):
         senders = []
@@ -75,7 +75,7 @@ class MailSender(ElementBase):
     namespace = 'google:mail:notify'
     name = 'sender'
     plugin_attrib = 'sender'
-    interfaces = set(('address', 'name', 'originator', 'unread'))
+    interfaces = {'address', 'name', 'originator', 'unread'}
 
     def get_originator(self):
         return self.xml.attrib.get('originator', '0') == '1'

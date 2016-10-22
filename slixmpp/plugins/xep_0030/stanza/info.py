@@ -71,7 +71,7 @@ class DiscoInfo(ElementBase):
     name = 'query'
     namespace = 'http://jabber.org/protocol/disco#info'
     plugin_attrib = 'disco_info'
-    interfaces = set(('node', 'features', 'identities'))
+    interfaces = {'node', 'features', 'identities'}
     lang_interfaces = {'identities'}
 
     # Cache identities and features

@@ -18,7 +18,7 @@ class LegacyDelay(ElementBase):
     name = 'x'
     namespace = 'jabber:x:delay'
     plugin_attrib = 'legacy_delay'
-    interfaces = set(('from', 'stamp', 'text'))
+    interfaces = {'from', 'stamp', 'text'}
 
     def get_from(self):
         from_ = self._get_attr('from')

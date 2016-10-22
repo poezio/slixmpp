@@ -66,7 +66,7 @@ class Error(ElementBase):
                       'service-unavailable', 'subscription-required',
                       'undefined-condition', 'unexpected-request'))
     condition_ns = 'urn:ietf:params:xml:ns:xmpp-stanzas'
-    types = set(('cancel', 'continue', 'modify', 'auth', 'wait'))
+    types = {'cancel', 'continue', 'modify', 'auth', 'wait'}
 
     def setup(self, xml=None):
         """

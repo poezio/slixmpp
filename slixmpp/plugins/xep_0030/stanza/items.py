@@ -45,7 +45,7 @@ class DiscoItems(ElementBase):
     name = 'query'
     namespace = 'http://jabber.org/protocol/disco#items'
     plugin_attrib = 'disco_items'
-    interfaces = set(('node', 'items'))
+    interfaces = {'node', 'items'}
 
     # Cache items
     _items = set()
@@ -138,7 +138,7 @@ class DiscoItem(ElementBase):
     name = 'item'
     namespace = 'http://jabber.org/protocol/disco#items'
     plugin_attrib = name
-    interfaces = set(('jid', 'node', 'name'))
+    interfaces = {'jid', 'node', 'name'}
 
     def get_node(self):
         """Return the item's node name or ``None``."""

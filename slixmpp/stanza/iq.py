@@ -57,8 +57,8 @@ class Iq(RootStanza):
 
     namespace = 'jabber:client'
     name = 'iq'
-    interfaces = set(('type', 'to', 'from', 'id', 'query'))
-    types = set(('get', 'result', 'set', 'error'))
+    interfaces = {'type', 'to', 'from', 'id', 'query'}
+    types = {'get', 'result', 'set', 'error'}
     plugin_attrib = name
 
     def __init__(self, *args, **kwargs):

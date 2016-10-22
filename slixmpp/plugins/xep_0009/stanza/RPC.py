@@ -14,8 +14,8 @@ class RPCQuery(ElementBase):
     name = 'query'
     namespace = 'jabber:iq:rpc'
     plugin_attrib = 'rpc_query'
-    interfaces = set(())
-    subinterfaces = set(())
+    interfaces = {}
+    subinterfaces = {}
     plugin_attrib_map = {}
     plugin_tag_map = {}
 
@@ -24,8 +24,8 @@ class MethodCall(ElementBase):
     name = 'methodCall'
     namespace = 'jabber:iq:rpc'
     plugin_attrib = 'method_call'
-    interfaces = set(('method_name', 'params'))
-    subinterfaces = set(())
+    interfaces = {'method_name', 'params'}
+    subinterfaces = {}
     plugin_attrib_map = {}
     plugin_tag_map = {}
 
@@ -46,8 +46,8 @@ class MethodResponse(ElementBase):
     name = 'methodResponse'
     namespace = 'jabber:iq:rpc'
     plugin_attrib = 'method_response'
-    interfaces = set(('params', 'fault'))
-    subinterfaces = set(())
+    interfaces = {'params', 'fault'}
+    subinterfaces = {}
     plugin_attrib_map = {}
     plugin_tag_map = {}
 

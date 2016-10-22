@@ -25,7 +25,7 @@ class Form(ElementBase):
     plugin_attrib = 'form'
     interfaces = OrderedSet(('instructions', 'reported', 'title', 'type', 'items', ))
     sub_interfaces = {'title'}
-    form_types = set(('cancel', 'form', 'result', 'submit'))
+    form_types = {'cancel', 'form', 'result', 'submit'}
 
     def __init__(self, *args, **kwargs):
         title = None

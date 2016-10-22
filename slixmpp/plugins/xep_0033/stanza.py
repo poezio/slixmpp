@@ -39,7 +39,7 @@ class Address(ElementBase):
     plugin_attrib = 'address'
     interfaces = set(['type', 'jid', 'node', 'uri', 'desc', 'delivered'])
 
-    address_types = set(('bcc', 'cc', 'noreply', 'replyroom', 'replyto', 'to'))
+    address_types = {'bcc', 'cc', 'noreply', 'replyroom', 'replyto', 'to'}
 
     def get_jid(self):
         return JID(self._get_attr('jid'))

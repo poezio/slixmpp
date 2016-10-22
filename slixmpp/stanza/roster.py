@@ -36,7 +36,7 @@ class Roster(ElementBase):
     namespace = 'jabber:iq:roster'
     name = 'query'
     plugin_attrib = 'roster'
-    interfaces = set(('items', 'ver'))
+    interfaces = {'items', 'ver'}
 
     def get_ver(self):
         """

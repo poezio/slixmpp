@@ -38,5 +38,5 @@ class Version(ElementBase):
     name = 'query'
     namespace = 'jabber:iq:version'
     plugin_attrib = 'software_version'
-    interfaces = set(('name', 'version', 'os'))
+    interfaces = {'name', 'version', 'os'}
     sub_interfaces = interfaces

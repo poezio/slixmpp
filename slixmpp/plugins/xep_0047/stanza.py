@@ -21,7 +21,7 @@ class Open(ElementBase):
     name = 'open'
     namespace = 'http://jabber.org/protocol/ibb'
     plugin_attrib = 'ibb_open'
-    interfaces = set(('block_size', 'sid', 'stanza'))
+    interfaces = {'block_size', 'sid', 'stanza'}
 
     def get_block_size(self):
         return int(self._get_attr('block-size', '0'))
@@ -37,7 +37,7 @@ class Data(ElementBase):
     name = 'data'
     namespace = 'http://jabber.org/protocol/ibb'
     plugin_attrib = 'ibb_data'
-    interfaces = set(('seq', 'sid', 'data'))
+    interfaces = {'seq', 'sid', 'data'}
     sub_interfaces = set(['data'])
 
     def get_seq(self):

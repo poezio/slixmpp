@@ -14,7 +14,7 @@ class LastActivity(ElementBase):
     name = 'query'
     namespace = 'jabber:iq:last'
     plugin_attrib = 'last_activity'
-    interfaces = set(('seconds', 'status'))
+    interfaces = {'seconds', 'status'}
 
     def get_seconds(self):
         return int(self._get_attr('seconds'))

@@ -16,4 +16,4 @@ class Capabilities(ElementBase):
     namespace = 'http://jabber.org/protocol/caps'
     name = 'c'
     plugin_attrib = 'caps'
-    interfaces = set(('hash', 'node', 'ver', 'ext'))
+    interfaces = {'hash', 'node', 'ver', 'ext'}

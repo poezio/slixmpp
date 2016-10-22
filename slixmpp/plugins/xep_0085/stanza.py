@@ -41,7 +41,7 @@ class ChatState(ElementBase):
     sub_interfaces = interfaces
     is_extension = True
 
-    states = set(('active', 'composing', 'gone', 'inactive', 'paused'))
+    states = {'active', 'composing', 'gone', 'inactive', 'paused'}
 
     def setup(self, xml=None):
         self.xml = ET.Element('')

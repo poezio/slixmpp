@@ -102,7 +102,7 @@ class TestStreamPresence(SlixTest):
                     to="tester@localhost" />
         """)
 
-        expected = set(('presence_available', 'got_online'))
+        expected = {'presence_available', 'got_online'}
         self.assertEqual(events, expected,
                 "Incorrect events triggered: %s" % events)
 
@@ -151,7 +151,7 @@ class TestStreamPresence(SlixTest):
                     type="subscribe" />
         """)
 
-        expected = set(('presence_subscribe', 'changed_subscription'))
+        expected = {'presence_subscribe', 'changed_subscription'}
         self.assertEqual(events, expected,
                 "Incorrect events triggered: %s" % events)
 
@@ -185,7 +185,7 @@ class TestStreamPresence(SlixTest):
                     type="unsubscribed" />
         """)
 
-        expected = set(('presence_subscribe', 'changed_subscription'))
+        expected = {'presence_subscribe', 'changed_subscription'}
         self.assertEqual(events, expected,
                 "Incorrect events triggered: %s" % events)
 

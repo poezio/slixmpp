@@ -25,9 +25,9 @@ class MUCPresence(ElementBase):
     name = 'x'
     namespace = 'http://jabber.org/protocol/muc#user'
     plugin_attrib = 'muc'
-    interfaces = set(('affiliation', 'role', 'jid', 'nick', 'room'))
-    affiliations = set(('', ))
-    roles = set(('', ))
+    interfaces = {'affiliation', 'role', 'jid', 'nick', 'room'}
+    affiliations = {'', }
+    roles = {'', }
 
     def get_xml_item(self):
         item = self.xml.find('{http://jabber.org/protocol/muc#user}item')

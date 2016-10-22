@@ -21,7 +21,7 @@ class AtomEntry(ElementBase):
     namespace = 'http://www.w3.org/2005/Atom'
     name = 'entry'
     plugin_attrib = 'entry'
-    interfaces = set(('title', 'summary', 'id', 'published', 'updated'))
+    interfaces = {'title', 'summary', 'id', 'published', 'updated'}
     sub_interfaces = set(('title', 'summary', 'id', 'published',
                           'updated'))
 
@@ -37,7 +37,7 @@ class AtomAuthor(ElementBase):
 
     name = 'author'
     plugin_attrib = 'author'
-    interfaces = set(('name', 'uri'))
-    sub_interfaces = set(('name', 'uri'))
+    interfaces = {'name', 'uri'}
+    sub_interfaces = {'name', 'uri'}
 
 register_stanza_plugin(AtomEntry, AtomAuthor)

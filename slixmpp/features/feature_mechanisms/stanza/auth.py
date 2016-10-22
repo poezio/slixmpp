@@ -19,7 +19,7 @@ class Auth(StanzaBase):
 
     name = 'auth'
     namespace = 'urn:ietf:params:xml:ns:xmpp-sasl'
-    interfaces = set(('mechanism', 'value'))
+    interfaces = {'mechanism', 'value'}
     plugin_attrib = name
 
     #: Some SASL mechs require sending values as is,

@@ -212,7 +212,7 @@ class ElementBase(object):
         >>> class Message(ElementBase):
         ...     name = "message"
         ...     namespace = "jabber:client"
-        ...     interfaces = set(('to', 'from', 'type', 'body'))
+        ...     interfaces = {'to', 'from', 'type', 'body'}
         ...     sub_interfaces = {'body'}
 
     The resulting Message stanza's contents may be accessed as so::
@@ -239,7 +239,7 @@ class ElementBase(object):
         >>> class MessagePlugin(ElementBase):
         ...     name = "custom_plugin"
         ...     namespace = "custom"
-        ...     interfaces = set(('useful_thing', 'custom'))
+        ...     interfaces = {'useful_thing', 'custom'}
         ...     plugin_attrib = "custom"
 
     The plugin stanza class must be associated with its intended
@@ -311,7 +311,7 @@ class ElementBase(object):
     #: manipulating the underlying XML object. This set may be augmented
     #: with the :attr:`plugin_attrib` value of any registered
     #: stanza plugins.
-    interfaces = set(('type', 'to', 'from', 'id', 'payload'))
+    interfaces = {'type', 'to', 'from', 'id', 'payload'}
 
     #: A subset of :attr:`interfaces` which maps interfaces to direct
     #: subelements of the underlying XML object. Using this set, the text
@@ -1385,10 +1385,10 @@ class StanzaBase(ElementBase):
     #: There is a small set of attributes which apply to all XMPP stanzas:
     #: the stanza type, the to and from JIDs, the stanza ID, and, especially
     #: in the case of an Iq stanza, a payload.
-    interfaces = set(('type', 'to', 'from', 'id', 'payload'))
+    interfaces = {'type', 'to', 'from', 'id', 'payload'}
 
     #: A basic set of allowed values for the ``'type'`` interface.
-    types = set(('get', 'set', 'error', None, 'unavailable', 'normal', 'chat'))
+    types = {'get', 'set', 'error', None, 'unavailable', 'normal', 'chat'}
 
     def __init__(self, stream=None, xml=None, stype=None,
                  sto=None, sfrom=None, sid=None, parent=None):

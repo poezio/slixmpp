@@ -18,7 +18,7 @@ class BitsOfBinary(ElementBase):
     name = 'data'
     namespace = 'urn:xmpp:bob'
     plugin_attrib = 'bob'
-    interfaces = set(('cid', 'max_age', 'type', 'data'))
+    interfaces = {'cid', 'max_age', 'type', 'data'}
 
     def get_max_age(self):
         return int(self._get_attr('max-age'))

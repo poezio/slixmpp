@@ -74,9 +74,9 @@ class Command(ElementBase):
     plugin_attrib = 'command'
     interfaces = set(('action', 'sessionid', 'node',
                       'status', 'actions', 'notes'))
-    actions = set(('cancel', 'complete', 'execute', 'next', 'prev'))
-    statuses = set(('canceled', 'completed', 'executing'))
-    next_actions = set(('prev', 'next', 'complete'))
+    actions = {'cancel', 'complete', 'execute', 'next', 'prev'}
+    statuses = {'canceled', 'completed', 'executing'}
+    next_actions = {'prev', 'next', 'complete'}
 
     def get_action(self):
         """

@@ -43,18 +43,18 @@ class TestElementBase(SlixTest):
         class TestStanzaPlugin(ElementBase):
             name = "foo2"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
             plugin_attrib = "foo2"
 
         class TestSubStanza(ElementBase):
             name = "subfoo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         register_stanza_plugin(TestStanza, TestStanzaPlugin, iterable=True)
 
@@ -90,24 +90,24 @@ class TestElementBase(SlixTest):
         class TestStanzaPlugin(ElementBase):
             name = "pluginfoo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
             plugin_attrib = "plugin_foo"
 
         class TestStanzaPlugin2(ElementBase):
             name = "pluginfoo2"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
             plugin_attrib = "plugin_foo2"
 
         class TestSubStanza(ElementBase):
             name = "subfoo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         register_stanza_plugin(TestStanza, TestSubStanza, iterable=True)
         register_stanza_plugin(TestStanza, TestStanzaPlugin)
@@ -139,7 +139,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz', 'qux'))
+            interfaces = {'bar', 'baz', 'qux'}
             sub_interfaces = {'baz'}
 
             def get_qux(self):
@@ -185,7 +185,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz', 'qux'))
+            interfaces = {'bar', 'baz', 'qux'}
             sub_interfaces = {'baz'}
 
             def set_qux(self, value):
@@ -219,7 +219,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz', 'qux'))
+            interfaces = {'bar', 'baz', 'qux'}
             sub_interfaces = {'bar'}
 
             def del_qux(self):
@@ -261,7 +261,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         stanza = TestStanza()
 
@@ -331,7 +331,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
             def set_baz(self, value):
                 self._set_sub_text("wrapper/baz", text=value)
@@ -382,7 +382,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
             def set_bar(self, value):
                 self._set_sub_text("path/to/only/bar", value)
@@ -463,7 +463,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar','baz', 'qux'))
+            interfaces = {'bar','baz', 'qux'}
             sub_interfaces = {'qux'}
 
             def set_qux(self, value):
@@ -528,7 +528,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         stanza1 = TestStanza()
         stanza1['bar'] = 'a'
@@ -554,7 +554,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
             plugin_attrib = 'qux'
 
         register_stanza_plugin(TestStanza, TestStanza)
@@ -575,7 +575,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         stanza = TestStanza()
         stanza['bar'] = 'a'
@@ -597,7 +597,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         register_stanza_plugin(TestStanza, TestSubStanza, iterable=True)
 
@@ -652,7 +652,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         stanza1 = TestStanza()
         stanza1['bar'] = 'a'
@@ -672,7 +672,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         class TestExtension(ElementBase):
             name = 'extended'
@@ -715,7 +715,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar', 'baz'))
+            interfaces = {'bar', 'baz'}
 
         class TestOverride(ElementBase):
             name = 'overrider'

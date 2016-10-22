@@ -16,7 +16,7 @@ class Mechanisms(ElementBase):
 
     name = 'mechanisms'
     namespace = 'urn:ietf:params:xml:ns:xmpp-sasl'
-    interfaces = set(('mechanisms', 'required'))
+    interfaces = {'mechanisms', 'required'}
     plugin_attrib = name
     is_extension = True
 

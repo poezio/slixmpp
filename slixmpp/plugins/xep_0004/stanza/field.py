@@ -24,9 +24,9 @@ class FormField(ElementBase):
                        'jid-single', 'list-multi', 'list-single',
                        'text-multi', 'text-private', 'text-single'))
 
-    true_values = set((True, '1', 'true'))
-    option_types = set(('list-multi', 'list-single'))
-    multi_line_types = set(('hidden', 'text-multi'))
+    true_values = {True, '1', 'true'}
+    option_types = {'list-multi', 'list-single'}
+    multi_line_types = {'hidden', 'text-multi'}
     multi_value_types = set(('hidden', 'jid-multi',
                              'list-multi', 'text-multi'))
 
@@ -164,7 +164,7 @@ class FieldOption(ElementBase):
     namespace = 'jabber:x:data'
     name = 'option'
     plugin_attrib = 'option'
-    interfaces = set(('label', 'value'))
+    interfaces = {'label', 'value'}
     sub_interfaces = {'value'}
     plugin_multi_attrib = 'options'
 

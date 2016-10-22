@@ -25,7 +25,7 @@ class EventItem(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'item'
     plugin_attrib = name
-    interfaces = set(('id', 'payload', 'node', 'publisher'))
+    interfaces = {'id', 'payload', 'node', 'publisher'}
 
     def set_payload(self, value):
         self.xml.append(value)
@@ -93,7 +93,7 @@ class EventDelete(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'delete'
     plugin_attrib = name
-    interfaces = set(('node', 'redirect'))
+    interfaces = {'node', 'redirect'}
 
     def set_redirect(self, uri):
         del self['redirect']
@@ -117,7 +117,7 @@ class EventSubscription(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'subscription'
     plugin_attrib = name
-    interfaces = set(('node', 'expiry', 'jid', 'subid', 'subscription'))
+    interfaces = {'node', 'expiry', 'jid', 'subid', 'subscription'}
 
     def get_expiry(self):
         expiry = self._get_attr('expiry')

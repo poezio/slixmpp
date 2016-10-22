@@ -25,7 +25,7 @@ class DefaultConfig(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
     name = 'default'
     plugin_attrib = name
-    interfaces = set(('node', 'config'))
+    interfaces = {'node', 'config'}
 
     def __init__(self, *args, **kwargs):
         ElementBase.__init__(self, *args, **kwargs)
@@ -51,7 +51,7 @@ class OwnerAffiliations(Affiliations):
 
 class OwnerAffiliation(Affiliation):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
-    interfaces = set(('affiliation', 'jid'))
+    interfaces = {'affiliation', 'jid'}
 
 
 class OwnerConfigure(Configure):
@@ -84,7 +84,7 @@ class OwnerRedirect(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
     name = 'redirect'
     plugin_attrib = name
-    interfaces = set(('node', 'jid'))
+    interfaces = {'node', 'jid'}
 
     def set_jid(self, value):
         self._set_attr('jid', str(value))
@@ -109,7 +109,7 @@ class OwnerSubscription(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
     name = 'subscription'
     plugin_attrib = name
-    interfaces = set(('jid', 'subscription'))
+    interfaces = {'jid', 'subscription'}
 
     def set_jid(self, value):
         self._set_attr('jid', str(value))

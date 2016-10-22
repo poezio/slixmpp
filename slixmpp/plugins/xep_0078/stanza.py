@@ -13,8 +13,8 @@ class IqAuth(ElementBase):
     namespace = 'jabber:iq:auth'
     name = 'query'
     plugin_attrib = 'auth'
-    interfaces = set(('fields', 'username', 'password', 'resource', 'digest'))
-    sub_interfaces = set(('username', 'password', 'resource', 'digest'))
+    interfaces = {'fields', 'username', 'password', 'resource', 'digest'}
+    sub_interfaces = {'username', 'password', 'resource', 'digest'}
     plugin_tag_map = {}
     plugin_attrib_map = {}
 
