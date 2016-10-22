@@ -16,7 +16,7 @@ class FormField(ElementBase):
     plugin_multi_attrib = 'fields'
     interfaces = set(('answer', 'desc', 'required', 'value',
                       'label', 'type', 'var'))
-    sub_interfaces = set(('desc',))
+    sub_interfaces = {'desc'}
     plugin_tag_map = {}
     plugin_attrib_map = {}
 
@@ -165,7 +165,7 @@ class FieldOption(ElementBase):
     name = 'option'
     plugin_attrib = 'option'
     interfaces = set(('label', 'value'))
-    sub_interfaces = set(('value',))
+    sub_interfaces = {'value'}
     plugin_multi_attrib = 'options'
 
 

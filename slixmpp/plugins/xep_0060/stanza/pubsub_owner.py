@@ -41,7 +41,7 @@ class DefaultConfig(ElementBase):
 
 class OwnerAffiliations(Affiliations):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
     def append(self, affiliation):
         if not isinstance(affiliation, OwnerAffiliation):
@@ -58,26 +58,26 @@ class OwnerConfigure(Configure):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
     name = 'configure'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class OwnerDefault(OwnerConfigure):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class OwnerDelete(ElementBase, OptionalSetting):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
     name = 'delete'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class OwnerPurge(ElementBase, OptionalSetting):
     namespace = 'http://jabber.org/protocol/pubsub#owner'
     name = 'purge'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class OwnerRedirect(ElementBase):
@@ -97,7 +97,7 @@ class OwnerSubscriptions(Subscriptions):
     name = 'subscriptions'
     namespace = 'http://jabber.org/protocol/pubsub#owner'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
     def append(self, subscription):
         if not isinstance(subscription, OwnerSubscription):

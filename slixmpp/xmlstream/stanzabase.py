@@ -213,7 +213,7 @@ class ElementBase(object):
         ...     name = "message"
         ...     namespace = "jabber:client"
         ...     interfaces = set(('to', 'from', 'type', 'body'))
-        ...     sub_interfaces = set(('body',))
+        ...     sub_interfaces = {'body'}
 
     The resulting Message stanza's contents may be accessed as so::
 

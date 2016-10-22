@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 class Compression(ElementBase):
     name = 'compression'
     namespace = 'http://jabber.org/features/compress'
-    interfaces = set(('methods',))
+    interfaces = {'methods'}
     plugin_attrib = 'compression'
     plugin_tag_map = {}
     plugin_attrib_map = {}
@@ -37,7 +37,7 @@ class Compression(ElementBase):
 class Compress(StanzaBase):
     name = 'compress'
     namespace = 'http://jabber.org/protocol/compress'
-    interfaces = set(('method',))
+    interfaces = {'method'}
     sub_interfaces = interfaces
     plugin_attrib = 'compress'
     plugin_tag_map = {}

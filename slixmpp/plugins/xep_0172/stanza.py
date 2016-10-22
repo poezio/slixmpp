@@ -46,7 +46,7 @@ class UserNick(ElementBase):
     namespace = 'http://jabber.org/protocol/nick'
     name = 'nick'
     plugin_attrib = name
-    interfaces = set(('nick',))
+    interfaces = {'nick'}
 
     def set_nick(self, nick):
         """

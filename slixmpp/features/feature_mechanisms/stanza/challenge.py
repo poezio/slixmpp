@@ -19,7 +19,7 @@ class Challenge(StanzaBase):
 
     name = 'challenge'
     namespace = 'urn:ietf:params:xml:ns:xmpp-sasl'
-    interfaces = set(('value',))
+    interfaces = {'value'}
     plugin_attrib = name
 
     def setup(self, xml):

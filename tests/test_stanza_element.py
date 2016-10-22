@@ -140,7 +140,7 @@ class TestElementBase(SlixTest):
             name = "foo"
             namespace = "foo"
             interfaces = set(('bar', 'baz', 'qux'))
-            sub_interfaces = set(('baz',))
+            sub_interfaces = {'baz'}
 
             def get_qux(self):
               return 'qux'
@@ -149,7 +149,7 @@ class TestElementBase(SlixTest):
             name = "foobar"
             namespace = "foo"
             plugin_attrib = "foobar"
-            interfaces = set(('fizz',))
+            interfaces = {'fizz'}
 
         register_stanza_plugin(TestStanza, TestStanza, iterable=True)
         register_stanza_plugin(TestStanza, TestStanzaPlugin)
@@ -186,7 +186,7 @@ class TestElementBase(SlixTest):
             name = "foo"
             namespace = "foo"
             interfaces = set(('bar', 'baz', 'qux'))
-            sub_interfaces = set(('baz',))
+            sub_interfaces = {'baz'}
 
             def set_qux(self, value):
                 pass
@@ -195,7 +195,7 @@ class TestElementBase(SlixTest):
             name = "foobar"
             namespace = "foo"
             plugin_attrib = "foobar"
-            interfaces = set(('foobar',))
+            interfaces = {'foobar'}
 
         register_stanza_plugin(TestStanza, TestStanzaPlugin)
 
@@ -220,7 +220,7 @@ class TestElementBase(SlixTest):
             name = "foo"
             namespace = "foo"
             interfaces = set(('bar', 'baz', 'qux'))
-            sub_interfaces = set(('bar',))
+            sub_interfaces = {'bar'}
 
             def del_qux(self):
                 pass
@@ -229,7 +229,7 @@ class TestElementBase(SlixTest):
             name = "foobar"
             namespace = "foo"
             plugin_attrib = "foobar"
-            interfaces = set(('foobar',))
+            interfaces = {'foobar'}
 
         register_stanza_plugin(TestStanza, TestStanzaPlugin)
 
@@ -298,7 +298,7 @@ class TestElementBase(SlixTest):
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
-            interfaces = set(('bar',))
+            interfaces = {'bar'}
 
             def set_bar(self, value):
                 wrapper = ET.Element("{foo}wrapper")
@@ -458,13 +458,13 @@ class TestElementBase(SlixTest):
         class TestSubStanza(ElementBase):
             name = "sub"
             namespace = "baz"
-            interfaces = set(('attrib',))
+            interfaces = {'attrib'}
 
         class TestStanza(ElementBase):
             name = "foo"
             namespace = "foo"
             interfaces = set(('bar','baz', 'qux'))
-            sub_interfaces = set(('qux',))
+            sub_interfaces = {'qux'}
 
             def set_qux(self, value):
                 self._set_sub_text('qux', text=value)
@@ -475,7 +475,7 @@ class TestElementBase(SlixTest):
         class TestStanzaPlugin(ElementBase):
             name = "plugin"
             namespace = "http://test/slash/bar"
-            interfaces = set(('attrib',))
+            interfaces = {'attrib'}
 
         register_stanza_plugin(TestStanza, TestSubStanza, iterable=True)
         register_stanza_plugin(TestStanza, TestStanzaPlugin)
@@ -592,7 +592,7 @@ class TestElementBase(SlixTest):
         class TestSubStanza(ElementBase):
             name = "foobar"
             namespace = "foo"
-            interfaces = set(('qux',))
+            interfaces = {'qux'}
 
         class TestStanza(ElementBase):
             name = "foo"
@@ -678,7 +678,7 @@ class TestElementBase(SlixTest):
             name = 'extended'
             namespace = 'foo'
             plugin_attrib = name
-            interfaces = set((name,))
+            interfaces = {name}
             is_extension = True
 
             def set_extended(self, value):
@@ -721,7 +721,7 @@ class TestElementBase(SlixTest):
             name = 'overrider'
             namespace = 'foo'
             plugin_attrib = name
-            interfaces = set(('bar',))
+            interfaces = {'bar'}
             overrides = ['set_bar']
 
             def setup(self, xml):

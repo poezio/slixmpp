@@ -11,7 +11,7 @@ from slixmpp.xmlstream import ET
 
 class OptionalSetting(object):
 
-    interfaces = set(('required',))
+    interfaces = {'required'}
 
     def set_required(self, value):
         if value in (True, 'true', 'True', '1'):

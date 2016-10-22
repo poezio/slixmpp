@@ -44,7 +44,7 @@ class LegacyError(ElementBase):
     name = 'legacy'
     namespace = Error.namespace
     plugin_attrib = name
-    interfaces = set(('condition',))
+    interfaces = {'condition'}
     overrides = ['set_condition']
 
     error_map = {'bad-request': ('modify', '400'),

@@ -23,7 +23,7 @@ class Affiliations(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'affiliations'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class Affiliation(ElementBase):
@@ -56,14 +56,14 @@ class Subscriptions(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'subscriptions'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class SubscribeOptions(ElementBase, OptionalSetting):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'subscribe-options'
     plugin_attrib = 'suboptions'
-    interfaces = set(('required',))
+    interfaces = {'required'}
 
 
 class Item(ElementBase):
@@ -105,7 +105,7 @@ class Create(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'create'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class Default(ElementBase):
@@ -125,7 +125,7 @@ class Publish(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'publish'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class Retract(ElementBase):
@@ -227,7 +227,7 @@ class PublishOptions(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub'
     name = 'publish-options'
     plugin_attrib = 'publish_options'
-    interfaces = set(('publish_options',))
+    interfaces = {'publish_options'}
     is_extension = True
 
     def get_publish_options(self):

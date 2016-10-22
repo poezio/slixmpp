@@ -44,49 +44,49 @@ class EventRetract(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'retract'
     plugin_attrib = name
-    interfaces = set(('id',))
+    interfaces = {'id'}
 
 
 class EventItems(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'items'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class EventCollection(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'collection'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class EventAssociate(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'associate'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class EventDisassociate(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'disassociate'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class EventConfiguration(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'configuration'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class EventPurge(ElementBase):
     namespace = 'http://jabber.org/protocol/pubsub#event'
     name = 'purge'
     plugin_attrib = name
-    interfaces = set(('node',))
+    interfaces = {'node'}
 
 
 class EventDelete(ElementBase):

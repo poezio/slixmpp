@@ -13,7 +13,7 @@ class Request(ElementBase):
     namespace = 'urn:xmpp:receipts'
     name = 'request'
     plugin_attrib = 'request_receipt'
-    interfaces = set(('request_receipt',))
+    interfaces = {'request_receipt'}
     sub_interfaces = interfaces
     is_extension = True
 

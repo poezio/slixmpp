@@ -37,7 +37,7 @@ class ChatState(ElementBase):
     name = ''
     namespace = 'http://jabber.org/protocol/chatstates'
     plugin_attrib = 'chat_state'
-    interfaces = set(('chat_state',))
+    interfaces = {'chat_state'}
     sub_interfaces = interfaces
     is_extension = True
 

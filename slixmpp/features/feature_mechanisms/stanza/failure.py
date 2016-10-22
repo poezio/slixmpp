@@ -18,7 +18,7 @@ class Failure(StanzaBase):
     namespace = 'urn:ietf:params:xml:ns:xmpp-sasl'
     interfaces = set(('condition', 'text'))
     plugin_attrib = name
-    sub_interfaces = set(('text',))
+    sub_interfaces = {'text'}
     conditions = set(('aborted', 'account-disabled', 'credentials-expired',
         'encryption-required', 'incorrect-encoding', 'invalid-authzid',
         'invalid-mechanism', 'malformed-request', 'mechansism-too-weak',

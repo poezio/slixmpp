@@ -17,7 +17,7 @@ class Attention(ElementBase):
     name = 'attention'
     namespace = 'urn:xmpp:attention:0'
     plugin_attrib = 'attention'
-    interfaces = set(('attention',))
+    interfaces = {'attention'}
     is_extension = True
 
     def setup(self, xml):

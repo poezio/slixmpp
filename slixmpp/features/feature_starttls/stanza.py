@@ -16,7 +16,7 @@ class STARTTLS(ElementBase):
 
     name = 'starttls'
     namespace = 'urn:ietf:params:xml:ns:xmpp-tls'
-    interfaces = set(('required',))
+    interfaces = {'required'}
     plugin_attrib = name
 
     def get_required(self):
