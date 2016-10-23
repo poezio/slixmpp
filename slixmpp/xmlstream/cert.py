@@ -76,7 +76,7 @@ def extract_names(raw_cert):
             name_type = name.getName()
             if name_type == 'dNSName':
                 results['DNS'].add(decode_str(name.getComponent()))
-            if name_type == 'uniformResourceIdentifier':
+            elif name_type == 'uniformResourceIdentifier':
                 value = decode_str(name.getComponent())
                 if value.startswith('xmpp:'):
                     results['URI'].add(value[5:])
