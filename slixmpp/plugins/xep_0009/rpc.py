@@ -121,7 +121,7 @@ class XEP_0009(BasePlugin):
     def _recipient_unvailable(self, iq):
         payload = iq.get_payload()
         iq = iq.reply()
-        error().set_payload(payload)
+        iq.error().set_payload(payload)
         iq['error']['code'] = '404'
         iq['error']['type'] = 'wait'
         iq['error']['condition'] = 'recipient-unavailable'
