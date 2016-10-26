@@ -8,6 +8,7 @@
 
 from base64 import b64encode, b64decode
 
+from slixmpp import JID
 from slixmpp.util import bytes
 from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin
 

@@ -8,6 +8,7 @@
 
 from __future__ import unicode_literals
 
+from slixmpp import JID
 from slixmpp.xmlstream import ElementBase, register_stanza_plugin
 
 
