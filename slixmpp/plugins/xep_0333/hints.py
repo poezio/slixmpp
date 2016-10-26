@@ -11,6 +11,8 @@ import logging
 from slixmpp import Message
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin
+from slixmpp.xmlstream.handler import Callback
+from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins.xep_0333 import stanza, Markable, Received, Displayed, Acknowledged
 
 log = logging.getLogger(__name__)
