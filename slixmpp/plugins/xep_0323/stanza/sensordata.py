@@ -10,7 +10,7 @@
 
 from slixmpp import Iq, Message
 from slixmpp.xmlstream import register_stanza_plugin, ElementBase, ET, JID
-from re import match
+import re
 
 class Sensordata(ElementBase):
     """ Placeholder for the namespace, not used as a stanza """
