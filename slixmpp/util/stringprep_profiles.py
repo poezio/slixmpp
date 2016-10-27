@@ -146,6 +146,7 @@ def create(nfkc=True, bidi=True, mappings=None,
         if bidi:
             check_bidi(data)
         if query and unassigned:
-            check_unassigned(data, unassigned)
+            #check_unassigned(data, unassigned)
+            raise StringPrepError('Query profile with unassigned data is unimplemented.')
         return data
     return profile
