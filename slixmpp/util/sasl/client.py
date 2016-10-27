@@ -75,7 +75,7 @@ def sasl_mech(score):
             MECH_SEC_SCORES[mech.name] = mech.score
             if mech.channel_binding:
                 MECHANISMS[mech.name + '-PLUS'] = mech
-                MECH_SEC_SCORES[name] = mech.score + 10
+                MECH_SEC_SCORES[mech.name] = mech.score + 10
         return mech
     return register
 
