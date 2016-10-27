@@ -135,5 +135,5 @@ class Archived(ElementBase):
     def get_by(self):
         return JID(self._get_attr('by'))
 
-    def set_by(self):
+    def set_by(self, value):
         return self._set_attr('by', str(value))
