@@ -108,10 +108,15 @@ class ClientXMPP(BaseXMPP):
                 CoroutineCallback('Stream Features',
                      MatchXPath('{%s}features' % self.stream_ns),
                      self._handle_stream_features))
+        def roster_push_filter(iq):
+            from_ = iq['from']
+            if from_ and from_ != self.boundjid.bare:
+                return
+            self.event('roster_update', iq)
         self.register_handler(
                 Callback('Roster Update',
                          StanzaPath('iq@type=set/roster'),
-                         lambda iq: self.event('roster_update', iq)))
+                         roster_push_filter))
 
         # Setup default stream features
         self.register_plugin('feature_starttls')
