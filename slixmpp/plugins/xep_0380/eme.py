@@ -55,6 +55,9 @@ class XEP_0380(BasePlugin):
     def session_bind(self, jid):
         self.xmpp.plugin['xep_0030'].add_feature(Encryption.namespace)
 
+    def has_eme(self, msg):
+        return msg.xml.find('{%s}encryption' % Encryption.namespace) is not None
+
     def replace_body_with_eme(self, msg):
         eme = msg['eme']
         namespace = eme['namespace']
