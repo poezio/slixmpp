@@ -1,0 +1,8 @@
+test:
+  tags:
+    - docker
+  image: ubuntu:latest
+  script:
+    - apt update
+    - apt install -y python3 cython3
+    - ./run_tests.py
