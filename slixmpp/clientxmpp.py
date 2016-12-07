@@ -15,6 +15,7 @@
 import asyncio
 import logging
 
+from slixmpp.jid import JID
 from slixmpp.stanza import StreamFeatures
 from slixmpp.basexmpp import BaseXMPP
 from slixmpp.exceptions import XMPPError
@@ -110,7 +111,13 @@ class ClientXMPP(BaseXMPP):
                      self._handle_stream_features))
         def roster_push_filter(iq):
             from_ = iq['from']
-            if from_ and from_ != self.boundjid.bare:
+            if from_ and from_ != JID('') and from_ != self.boundjid.bare:
+                reply = iq.reply()
+                reply['type'] = 'error'
+                reply['error']['type'] = 'cancel'
+                reply['error']['code'] = 503
+                reply['error']['condition'] = 'service-unavailable'
+                reply.send()
                 return
             self.event('roster_update', iq)
         self.register_handler(
