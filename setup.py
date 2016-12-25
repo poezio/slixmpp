@@ -9,7 +9,7 @@
 
 import os
 from pathlib import Path
-from subprocess import call, DEVNULL
+from subprocess import call, DEVNULL, check_output, CalledProcessError
 from tempfile import TemporaryFile
 try:
     from setuptools import setup
@@ -35,18 +35,31 @@ CLASSIFIERS = [
 
 packages = [str(mod.parent) for mod in Path('slixmpp').rglob('__init__.py')]
 
-def check_include(header):
-    command = [os.environ.get('CC', 'cc'), '-E', '-']
+def check_include(library_name, header):
+    command = [os.environ.get('PKG_CONFIG', 'pkg-config'), '--cflags', library_name]
+    try:
+        cflags = check_output(command).decode('utf-8').split()
+    except FileNotFoundError:
+        print('pkg-config not found.')
+        return False
+    except CalledProcessError:
+        # pkg-config already prints the missing libraries on stderr.
+        return False
+    command = [os.environ.get('CC', 'cc')] + cflags + ['-E', '-']
     with TemporaryFile('w+') as c_file:
         c_file.write('#include <%s>' % header)
         c_file.seek(0)
         try:
             return call(command, stdin=c_file, stdout=DEVNULL, stderr=DEVNULL) == 0
         except FileNotFoundError:
+            print('%s headers not found.' % library_name)
             return False
 
+HAS_PYTHON_HEADERS = check_include('python3', 'Python.h')
+HAS_STRINGPREP_HEADERS = check_include('libidn', 'stringprep.h')
+
 ext_modules = None
-if check_include('stringprep.h'):
+if HAS_PYTHON_HEADERS and HAS_STRINGPREP_HEADERS:
     try:
         from Cython.Build import cythonize
     except ImportError:
@@ -54,7 +67,7 @@ if check_include('stringprep.h'):
     else:
         ext_modules = cythonize('slixmpp/stringprep.pyx')
 else:
-    print('libidn-dev not found, falling back to the slow stringprep module.')
+    print('Falling back to the slow stringprep module.')
 
 setup(
     name="slixmpp",
