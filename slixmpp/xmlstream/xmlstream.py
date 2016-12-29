@@ -19,7 +19,7 @@ import ssl
 import weakref
 import uuid
 
-import xml.etree.ElementTree
+import xml.etree.ElementTree as ET
 
 from slixmpp.xmlstream.asyncio import asyncio
 from slixmpp.xmlstream import tostring, highlight
@@ -339,7 +339,7 @@ class XMLStream(asyncio.BaseProtocol):
         """
         self.xml_depth = 0
         self.xml_root = None
-        self.parser = xml.etree.ElementTree.XMLPullParser(("start", "end"))
+        self.parser = ET.XMLPullParser(("start", "end"))
 
     def connection_made(self, transport):
         """Called when the TCP connection has been established with the server
@@ -359,34 +359,46 @@ class XMLStream(asyncio.BaseProtocol):
         the stream is opened, etc).
         """
         self.parser.feed(data)
-        for event, xml in self.parser.read_events():
-            if event == 'start':
-                if self.xml_depth == 0:
-                    # We have received the start of the root element.
-                    self.xml_root = xml
-                    log.debug('[33;1mRECV[0m: %s',
-                              highlight(tostring(self.xml_root,
-                                                 xmlns=self.default_ns,
-                                                 stream=self,
-                                                 top_level=True,
-                                                 open_only=True)))
-                    self.start_stream_handler(self.xml_root)
-                self.xml_depth += 1
-            if event == 'end':
-                self.xml_depth -= 1
-                if self.xml_depth == 0:
-                    # The stream's root element has closed,
-                    # terminating the stream.
-                    log.debug("End of stream received")
-                    self.abort()
-                elif self.xml_depth == 1:
-                    # A stanza is an XML element that is a direct child of
-                    # the root element, hence the check of depth == 1
-                    self._spawn_event(xml)
-                    if self.xml_root is not None:
-                        # Keep the root element empty of children to
-                        # save on memory use.
-                        self.xml_root.clear()
+        try:
+            for event, xml in self.parser.read_events():
+                if event == 'start':
+                    if self.xml_depth == 0:
+                        # We have received the start of the root element.
+                        self.xml_root = xml
+                        log.debug('[33;1mRECV[0m: %s',
+                                  highlight(tostring(self.xml_root,
+                                                     xmlns=self.default_ns,
+                                                     stream=self,
+                                                     top_level=True,
+                                                     open_only=True)))
+                        self.start_stream_handler(self.xml_root)
+                    self.xml_depth += 1
+                if event == 'end':
+                    self.xml_depth -= 1
+                    if self.xml_depth == 0:
+                        # The stream's root element has closed,
+                        # terminating the stream.
+                        log.debug("End of stream received")
+                        self.abort()
+                    elif self.xml_depth == 1:
+                        # A stanza is an XML element that is a direct child of
+                        # the root element, hence the check of depth == 1
+                        self._spawn_event(xml)
+                        if self.xml_root is not None:
+                            # Keep the root element empty of children to
+                            # save on memory use.
+                            self.xml_root.clear()
+        except ET.ParseError:
+            log.error('Parse error: %r', data)
+
+            # Due to cyclic dependencies, this can’t be imported at the module
+            # level.
+            from slixmpp.stanza.stream_error import StreamError
+            error = StreamError()
+            error['condition'] = 'not-well-formed'
+            error['text'] = 'Server sent: %r' % data
+            self.send(error)
+            self.disconnect()
 
     def is_connected(self):
         return self.transport is not None
