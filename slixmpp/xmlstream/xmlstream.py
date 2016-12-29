@@ -364,10 +364,12 @@ class XMLStream(asyncio.BaseProtocol):
                 if self.xml_depth == 0:
                     # We have received the start of the root element.
                     self.xml_root = xml
-                    log.debug('[33;1mRECV[0m: %s', highlight(tostring(self.xml_root, xmlns=self.default_ns,
-                                                         stream=self,
-                                                         top_level=True,
-                                                         open_only=True)))
+                    log.debug('[33;1mRECV[0m: %s',
+                              highlight(tostring(self.xml_root,
+                                                 xmlns=self.default_ns,
+                                                 stream=self,
+                                                 top_level=True,
+                                                 open_only=True)))
                     self.start_stream_handler(self.xml_root)
                 self.xml_depth += 1
             if event == 'end':
