@@ -13,7 +13,7 @@
 
 from slixmpp import ClientXMPP
 
-from optparse import OptionParser
+from argparse import ArgumentParser
 import logging
 import getpass
 
@@ -58,40 +58,40 @@ if __name__ == '__main__':
     # ./http_over_xmpp.py -J <jid> -P <pwd> -i <ip> -p <port> [-v]
     #
 
-    parser = OptionParser()
+    parser = ArgumentParser()
 
     # Output verbosity options.
-    parser.add_option(
+    parser.add_argument(
         '-v', '--verbose', help='set logging to DEBUG', action='store_const',
         dest='loglevel', const=logging.DEBUG, default=logging.ERROR
     )
 
     # JID and password options.
-    parser.add_option('-J', '--jid', dest='jid', help='JID')
-    parser.add_option('-P', '--password', dest='password', help='Password')
+    parser.add_argument('-J', '--jid', dest='jid', help='JID')
+    parser.add_argument('-P', '--password', dest='password', help='Password')
 
     # XMPP server ip and port options.
-    parser.add_option(
+    parser.add_argument(
         '-i', '--ipaddr', dest='ipaddr',
         help='IP Address of the XMPP server', default=None
     )
-    parser.add_option(
+    parser.add_argument(
         '-p', '--port', dest='port',
         help='Port of the XMPP server', default=None
     )
 
-    opts, args = parser.parse_args()
+    args = parser.parse_args()
 
     # Setup logging.
-    logging.basicConfig(level=opts.loglevel,
+    logging.basicConfig(level=args.loglevel,
                         format='%(levelname)-8s %(message)s')
 
-    if opts.jid is None:
-        opts.jid = input('Username: ')
-    if opts.password is None:
-        opts.password = getpass.getpass('Password: ')
+    if args.jid is None:
+        args.jid = input('Username: ')
+    if args.password is None:
+        args.password = getpass.getpass('Password: ')
 
-    xmpp = HTTPOverXMPPClient(opts.jid, opts.password)
+    xmpp = HTTPOverXMPPClient(args.jid, args.password)
     xmpp.connect()
     xmpp.process()
 
