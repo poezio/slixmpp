@@ -55,6 +55,7 @@ class XEP_0065(BasePlugin):
         """Returns the socket associated to the SID."""
         return self._sessions.get(sid, None)
 
+    @asyncio.coroutine
     def handshake(self, to, ifrom=None, sid=None, timeout=None):
         """ Starts the handshake to establish the socks5 bytestreams
         connection.
@@ -104,6 +105,7 @@ class XEP_0065(BasePlugin):
             iq['socks'].add_streamhost(proxy, host, port)
         return iq.send(timeout=timeout, callback=callback)
 
+    @asyncio.coroutine
     def discover_proxies(self, jid=None, ifrom=None, timeout=None):
         """Auto-discover the JIDs of SOCKS5 proxies on an XMPP server."""
         if jid is None:
