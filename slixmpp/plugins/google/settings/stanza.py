@@ -6,7 +6,7 @@
     See the file LICENSE for copying permission.
 """
 
-from slixmpp.xmlstream import ET, ElementBase, register_stanza_plugin
+from slixmpp.xmlstream import ET, ElementBase
 
 
 class UserSettings(ElementBase):
