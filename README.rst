@@ -36,7 +36,7 @@ The Slixmpp Boilerplate
 -------------------------
 Projects using Slixmpp tend to follow a basic pattern for setting up client/component
 connections and configuration. Here is the gist of the boilerplate needed for a Slixmpp
-based project. See the documetation or examples directory for more detailed archetypes for
+based project. See the documentation or examples directory for more detailed archetypes for
 Slixmpp projects::
 
     import logging
