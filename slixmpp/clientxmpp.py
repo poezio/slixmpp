@@ -255,7 +255,7 @@ class ClientXMPP(BaseXMPP):
                 orig_cb(resp)
             callback = wrapped
 
-        iq.send(callback, timeout, timeout_callback)
+        return iq.send(callback, timeout, timeout_callback)
 
     def _reset_connection_state(self, event=None):
         #TODO: Use stream state here
