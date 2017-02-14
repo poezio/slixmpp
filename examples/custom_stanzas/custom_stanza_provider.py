@@ -50,7 +50,7 @@ class ActionBot(slixmpp.ClientXMPP):
 
         register_stanza_plugin(Iq, Action)
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -73,7 +73,7 @@ class ActionBot(slixmpp.ClientXMPP):
         """
         self.event('custom_action', iq)
 
-    def _handle_action_event(self, iq):
+    async def _handle_action_event(self, iq):
         """
         Respond to the custom action event.
         """
@@ -82,17 +82,20 @@ class ActionBot(slixmpp.ClientXMPP):
 
         if method == 'is_prime' and param == '2':
             print("got message: %s" % iq)
-            iq.reply()
-            iq['action']['status'] = 'done'
-            iq.send()
+            rep = iq.reply()
+            rep['action']['status'] = 'done'
+            await rep.send()
         elif method == 'bye':
             print("got message: %s" % iq)
+            rep = iq.reply()
+            rep['action']['status'] = 'done'
+            await rep.send()
             self.disconnect()
         else:
             print("got message: %s" % iq)
-            iq.reply()
-            iq['action']['status'] = 'error'
-            iq.send()
+            rep = iq.reply()
+            rep['action']['status'] = 'error'
+            await rep.send()
 
 if __name__ == '__main__':
     # Setup the command line arguments.

@@ -43,7 +43,7 @@ class ActionUserBot(slixmpp.ClientXMPP):
 
         register_stanza_plugin(Iq, Action)
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -57,11 +57,11 @@ class ActionUserBot(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
-        self.send_custom_iq()
+        await self.send_custom_iq()
 
-    def send_custom_iq(self):
+    async def send_custom_iq(self):
         """Create and send two custom actions.
 
         If the first action was successful, then send
@@ -74,14 +74,14 @@ class ActionUserBot(slixmpp.ClientXMPP):
         iq['action']['param'] = '2'
 
         try:
-            resp = iq.send()
+            resp = await iq.send()
             if resp['action']['status'] == 'done':
                 #sending bye
                 iq2 = self.Iq()
                 iq2['to'] = self.action_provider
                 iq2['type'] = 'set'
                 iq2['action']['method'] = 'bye'
-                iq2.send(block=False)
+                await iq2.send()
 
                 self.disconnect()
         except XMPPError:
