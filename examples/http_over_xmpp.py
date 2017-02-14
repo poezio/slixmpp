@@ -23,7 +23,7 @@ class HTTPOverXMPPClient(ClientXMPP):
         ClientXMPP.__init__(self, jid, password)
         self.register_plugin('xep_0332')    # HTTP over XMPP Transport
         self.add_event_handler(
-            'session_start', self.session_start, threaded=True
+            'session_start', self.session_start
         )
         self.add_event_handler('http_request', self.http_request_received)
         self.add_event_handler('http_response', self.http_response_received)
