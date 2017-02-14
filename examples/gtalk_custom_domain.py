@@ -55,8 +55,8 @@ class GTalkBot(slixmpp.ClientXMPP):
             cert.verify('talk.google.com', der_cert)
             logging.debug("CERT: Found GTalk certificate")
         except cert.CertificateError as err:
-            log.error(err.message)
-            self.disconnect(send_close=False)
+            logging.error(err.message)
+            self.disconnect()
 
     def start(self, event):
         """
