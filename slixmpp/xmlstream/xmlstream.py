@@ -358,6 +358,10 @@ class XMLStream(asyncio.BaseProtocol):
         event.  This could trigger one or more event (a stanza is received,
         the stream is opened, etc).
         """
+        if self.parser is None:
+            log.warning('Received data before the connection is established: %r',
+                        data)
+            return
         self.parser.feed(data)
         try:
             for event, xml in self.parser.read_events():
