@@ -291,8 +291,7 @@ class SCRAM(Mech):
         cbind_input = self.gs2_header + cbind_data
         channel_binding = b'c=' + b64encode(cbind_input).replace(b'\n', b'')
 
-        client_final_message_without_proof = channel_binding + b',' + \
-                                             b'r=' + nonce
+        client_final_message_without_proof = channel_binding + b',r=' + nonce
 
         salted_password = self.Hi(self.credentials['password'],
                                        salt,
