@@ -299,6 +299,8 @@ class XMLStream(asyncio.BaseProtocol):
 
         if self.use_ssl:
             ssl_context = self.get_ssl_context()
+        else:
+            ssl_context = False
 
         yield from asyncio.sleep(self.connect_loop_wait)
         try:
