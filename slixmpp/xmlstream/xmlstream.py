@@ -298,12 +298,15 @@ class XMLStream(asyncio.BaseProtocol):
             # and try (host, port) as a last resort
             self.dns_answers = None
 
+        if self.use_ssl:
+            ssl_context = self.get_ssl_context()
+
         yield from asyncio.sleep(self.connect_loop_wait)
         try:
             yield from self.loop.create_connection(lambda: self,
                                                    self.address[0],
                                                    self.address[1],
-                                                   ssl=self.use_ssl,
+                                                   ssl=ssl_context,
                                                    server_hostname=self.default_domain if self.use_ssl else None)
         except Socket.gaierror as e:
             self.event('connection_failed',
