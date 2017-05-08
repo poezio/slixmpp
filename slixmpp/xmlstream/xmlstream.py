@@ -289,7 +289,8 @@ class XMLStream(asyncio.BaseProtocol):
 
         record = yield from self.pick_dns_answer(self.default_domain)
         if record is not None:
-            host, address, port = record
+            host, address, dns_port = record
+            port = dns_port if dns_port else self.address[1]
             self.address = (address, port)
             self._service_name = host
         else:
