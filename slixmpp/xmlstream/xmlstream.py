@@ -525,7 +525,9 @@ class XMLStream(asyncio.BaseProtocol):
                 else:
                     self.event('ssl_invalid_chain', e)
             else:
-                der_cert = transp.get_extra_info("socket").getpeercert(True)
+                # Workaround for a regression in 3.4 where ssl_object was not set.
+                der_cert = transp.get_extra_info("ssl_object",
+                                                 default=transp.get_extra_info("socket")).getpeercert(True)
                 pem_cert = ssl.DER_cert_to_PEM_cert(der_cert)
                 self.event('ssl_cert', pem_cert)
 
