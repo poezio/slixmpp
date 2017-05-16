@@ -298,12 +298,17 @@ class XMLStream(asyncio.BaseProtocol):
             # and try (host, port) as a last resort
             self.dns_answers = None
 
+        if self.use_ssl:
+            ssl_context = self.get_ssl_context()
+        else:
+            ssl_context = False
+
         yield from asyncio.sleep(self.connect_loop_wait)
         try:
             yield from self.loop.create_connection(lambda: self,
                                                    self.address[0],
                                                    self.address[1],
-                                                   ssl=self.use_ssl,
+                                                   ssl=ssl_context,
                                                    server_hostname=self.default_domain if self.use_ssl else None)
         except Socket.gaierror as e:
             self.event('connection_failed',
@@ -488,14 +493,10 @@ class XMLStream(asyncio.BaseProtocol):
         """
         pass
 
-    def start_tls(self):
-        """Perform handshakes for TLS.
-
-        If the handshake is successful, the XML stream will need
-        to be restarted.
+    def get_ssl_context(self):
         """
-        self.event_when_connected = "tls_success"
-
+        Get SSL context.
+        """
         if self.ciphers is not None:
             self.ssl_context.set_ciphers(self.ciphers)
         if self.keyfile and self.certfile:
@@ -510,7 +511,18 @@ class XMLStream(asyncio.BaseProtocol):
             self.ssl_context.verify_mode = ssl.CERT_REQUIRED
             self.ssl_context.load_verify_locations(cafile=self.ca_certs)
 
-        ssl_connect_routine = self.loop.create_connection(lambda: self, ssl=self.ssl_context,
+        return self.ssl_context
+
+    def start_tls(self):
+        """Perform handshakes for TLS.
+
+        If the handshake is successful, the XML stream will need
+        to be restarted.
+        """
+        self.event_when_connected = "tls_success"
+
+        ssl_context = self.get_ssl_context()
+        ssl_connect_routine = self.loop.create_connection(lambda: self, ssl=ssl_context,
                                                           sock=self.socket,
                                                           server_hostname=self.default_domain)
         @asyncio.coroutine
