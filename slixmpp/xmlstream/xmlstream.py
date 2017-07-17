@@ -22,7 +22,7 @@ import uuid
 import xml.etree.ElementTree as ET
 
 from slixmpp.xmlstream.asyncio import asyncio
-from slixmpp.xmlstream import tostring, highlight
+from slixmpp.xmlstream import tostring
 from slixmpp.xmlstream.stanzabase import StanzaBase, ElementBase
 from slixmpp.xmlstream.resolver import resolve, default_resolver
 
@@ -375,12 +375,11 @@ class XMLStream(asyncio.BaseProtocol):
                     if self.xml_depth == 0:
                         # We have received the start of the root element.
                         self.xml_root = xml
-                        log.debug('[33;1mRECV[0m: %s',
-                                  highlight(tostring(self.xml_root,
-                                                     xmlns=self.default_ns,
-                                                     stream=self,
-                                                     top_level=True,
-                                                     open_only=True)))
+                        log.debug('RECV: %s', tostring(self.xml_root,
+                                                       xmlns=self.default_ns,
+                                                       stream=self,
+                                                       top_level=True,
+                                                       open_only=True))
                         self.start_stream_handler(self.xml_root)
                     self.xml_depth += 1
                 if event == 'end':
@@ -875,8 +874,7 @@ class XMLStream(asyncio.BaseProtocol):
                     if data is None:
                         return
             str_data = tostring(data.xml, xmlns=self.default_ns,
-                                          stream=self,
-                                          top_level=True)
+                                stream=self, top_level=True)
             self.send_raw(str_data)
         else:
             self.send_raw(data)
@@ -894,7 +892,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         :param string data: Any bytes or utf-8 string value.
         """
-        log.debug("[36;1mSEND[0m: %s", highlight(data))
+        log.debug("SEND: %s", data)
         if not self.transport:
             raise NotConnectedError()
         if isinstance(data, str):
@@ -947,7 +945,7 @@ class XMLStream(asyncio.BaseProtocol):
         if stanza is None:
             return
 
-        log.debug("[33;1mRECV[0m: %s", highlight(stanza))
+        log.debug("RECV: %s", stanza)
 
         # Match the stanza against registered handlers. Handlers marked
         # to run "in stream" will be executed immediately; the rest will
