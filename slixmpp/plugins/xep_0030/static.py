@@ -66,10 +66,11 @@ class StaticDisco(object):
         if isinstance(ifrom, JID):
             ifrom = ifrom.full
         if (jid, node, ifrom) not in self.nodes:
-            self.nodes[(jid, node, ifrom)] = {'info': DiscoInfo(),
-                                       'items': DiscoItems()}
-            self.nodes[(jid, node, ifrom)]['info']['node'] = node
-            self.nodes[(jid, node, ifrom)]['items']['node'] = node
+            new_node = {'info': DiscoInfo(), 'items': DiscoItems()}
+            new_node['info']['node'] = node
+            new_node['items']['node'] = node
+            self.nodes[(jid, node, ifrom)] = new_node
+        return self.nodes[(jid, node, ifrom)]
 
     def get_node(self, jid=None, node=None, ifrom=None):
         if jid is None:
@@ -208,8 +209,8 @@ class StaticDisco(object):
 
         The data parameter is a disco#info substanza.
         """
-        self.add_node(jid, node)
-        self.get_node(jid, node)['info'] = data
+        new_node = self.add_node(jid, node)
+        new_node['info'] = data
 
     def del_info(self, jid, node, ifrom, data):
         """
@@ -242,8 +243,8 @@ class StaticDisco(object):
             items -- A set of items in tuple format.
         """
         items = data.get('items', set())
-        self.add_node(jid, node)
-        self.get_node(jid, node)['items']['items'] = items
+        new_node = self.add_node(jid, node)
+        new_node['items']['items'] = items
 
     def del_items(self, jid, node, ifrom, data):
         """
@@ -264,8 +265,8 @@ class StaticDisco(object):
             name     -- Optional human readable name for this identity.
             lang     -- Optional standard xml:lang value.
         """
-        self.add_node(jid, node)
-        self.get_node(jid, node)['info'].add_identity(
+        new_node = self.add_node(jid, node)
+        new_node['info'].add_identity(
                 data.get('category', ''),
                 data.get('itype', ''),
                 data.get('name', None),
@@ -280,8 +281,8 @@ class StaticDisco(object):
                             (category, type, name, lang)
         """
         identities = data.get('identities', set())
-        self.add_node(jid, node)
-        self.get_node(jid, node)['info']['identities'] = identities
+        new_node = self.add_node(jid, node)
+        new_node['info']['identities'] = identities
 
     def del_identity(self, jid, node, ifrom, data):
         """
@@ -316,8 +317,8 @@ class StaticDisco(object):
         The data parameter should include:
             feature -- The namespace of the supported feature.
         """
-        self.add_node(jid, node)
-        self.get_node(jid, node)['info'].add_feature(
+        new_node = self.add_node(jid, node)
+        new_node['info'].add_feature(
                 data.get('feature', ''))
 
     def set_features(self, jid, node, ifrom, data):
@@ -328,8 +329,8 @@ class StaticDisco(object):
             features -- The new set of supported features.
         """
         features = data.get('features', set())
-        self.add_node(jid, node)
-        self.get_node(jid, node)['info']['features'] = features
+        new_node = self.add_node(jid, node)
+        new_node['info']['features'] = features
 
     def del_feature(self, jid, node, ifrom, data):
         """
@@ -362,8 +363,8 @@ class StaticDisco(object):
                      non-addressable items.
             name  -- Optional human readable name for the item.
         """
-        self.add_node(jid, node)
-        self.get_node(jid, node)['items'].add_item(
+        new_node = self.add_node(jid, node)
+        new_node['items'].add_item(
                 data.get('ijid', ''),
                 node=data.get('inode', ''),
                 name=data.get('name', ''))
@@ -392,8 +393,8 @@ class StaticDisco(object):
         if isinstance(data, Iq):
             data = data['disco_info']
 
-        self.add_node(jid, node, ifrom)
-        self.get_node(jid, node, ifrom)['info'] = data
+        new_node = self.add_node(jid, node, ifrom)
+        new_node['info'] = data
 
     def get_cached_info(self, jid, node, ifrom, data):
         """
