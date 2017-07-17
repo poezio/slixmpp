@@ -6,7 +6,7 @@
     See the file LICENSE for copying permission.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from slixmpp.stanza import Presence
 from slixmpp.plugins import BasePlugin
@@ -14,6 +14,10 @@ from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins.xep_0319 import stanza
+
+
+def get_local_timezone():
+    return datetime.now(timezone.utc).astimezone().tzinfo
 
 
 class XEP_0319(BasePlugin):
@@ -47,10 +51,11 @@ class XEP_0319(BasePlugin):
 
     def idle(self, jid=None, since=None):
         seconds = None
+        timezone = get_local_timezone()
         if since is None:
-            since = datetime.now()
+            since = datetime.now(timezone)
         else:
-            seconds = datetime.now() - since
+            seconds = datetime.now(timezone) - since
         self.api['set_idle'](jid, None, None, since)
         self.xmpp['xep_0012'].set_last_activity(jid=jid, seconds=seconds)
 
