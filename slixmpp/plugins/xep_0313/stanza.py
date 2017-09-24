@@ -10,44 +10,76 @@ import datetime as dt
 
 from slixmpp.jid import JID
 from slixmpp.xmlstream import ElementBase, ET
-from slixmpp.plugins import xep_0082
+from slixmpp.plugins import xep_0082, xep_0004
 
 
 class MAM(ElementBase):
     name = 'query'
-    namespace = 'urn:xmpp:mam:tmp'
+    namespace = 'urn:xmpp:mam:2'
     plugin_attrib = 'mam'
     interfaces = {'queryid', 'start', 'end', 'with', 'results'}
     sub_interfaces = {'start', 'end', 'with'}
 
     def setup(self, xml=None):
         ElementBase.setup(self, xml)
+        self._form = xep_0004.stanza.Form()
+        self._form['type'] = 'submit'
+        field = self._form.add_field(var='FORM_TYPE', ftype='hidden',
+                             value='urn:xmpp:mam:2')
+        self.append(self._form)
         self._results = []
 
+    def __get_fields(self):
+        return self._form.get_fields()
+
     def get_start(self):
-        timestamp = self._get_sub_text('start')
-        return xep_0082.parse(timestamp)
+        fields = self.__get_fields()
+        field = fields.get('start')
+        if field:
+            return xep_0082.parse(field['value'])
 
     def set_start(self, value):
         if isinstance(value, dt.datetime):
             value = xep_0082.format_datetime(value)
-        self._set_sub_text('start', value)
+        fields = self.__get_fields()
+        field = fields.get('start')
+        if field:
+            field['value'] = value
+        else:
+            field = self._form.add_field(var='start')
+            field['value'] = value
 
     def get_end(self):
-        timestamp = self._get_sub_text('end')
-        return xep_0082.parse(timestamp)
+        fields = self.__get_fields()
+        field = fields.get('end')
+        if field:
+            return xep_0082.parse(field['value'])
 
     def set_end(self, value):
         if isinstance(value, dt.datetime):
             value = xep_0082.format_datetime(value)
-        self._set_sub_text('end', value)
+        fields = self.__get_fields()
+        field = fields.get('end')
+        if field:
+            field['value'] = value
+        else:
+            field = self._form.add_field(var='end')
+            field['value'] = value
 
     def get_with(self):
-        return JID(self._get_sub_text('with'))
+        fields = self.__get_fields()
+        field = fields.get('with')
+        if field:
+            return JID(field['value'])
 
     def set_with(self, value):
-        self._set_sub_text('with', str(value))
-
+        fields = self.__get_fields()
+        field = fields.get('with')
+        if field:
+            field['with'] = str(value)
+        else:
+            field = self._form.add_field(var='with')
+            field['value'] = str(value)
     # The results interface is meant only as an easy
     # way to access the set of collected message responses
     # from the query.
@@ -64,7 +96,7 @@ class MAM(ElementBase):
 
 class Preferences(ElementBase):
     name = 'prefs'
-    namespace = 'urn:xmpp:mam:tmp'
+    namespace = 'urn:xmpp:mam:2'
     plugin_attrib = 'mam_prefs'
     interfaces = {'default', 'always', 'never'}
     sub_interfaces = {'always', 'never'}
@@ -118,22 +150,13 @@ class Preferences(ElementBase):
             never.append(jid_xml)
 
 
+class Fin(ElementBase):
+    name = 'fin'
+    namespace = 'urn:xmpp:mam:2'
+    plugin_attrib = 'mam_fin'
+
 class Result(ElementBase):
     name = 'result'
-    namespace = 'urn:xmpp:mam:tmp'
+    namespace = 'urn:xmpp:mam:2'
     plugin_attrib = 'mam_result'
     interfaces = {'queryid', 'id'}
-
-
-class Archived(ElementBase):
-    name = 'archived'
-    namespace = 'urn:xmpp:mam:tmp'
-    plugin_attrib = 'mam_archived'
-    plugin_multi_attrib = 'mam_archives'
-    interfaces = {'by', 'id'}
-
-    def get_by(self):
-        return JID(self._get_attr('by'))
-
-    def set_by(self, value):
-        return self._set_attr('by', str(value))

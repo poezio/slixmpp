@@ -36,35 +36,58 @@ class XEP_0313(BasePlugin):
         register_stanza_plugin(Iq, stanza.MAM)
         register_stanza_plugin(Iq, stanza.Preferences)
         register_stanza_plugin(Message, stanza.Result)
-        register_stanza_plugin(Message, stanza.Archived, iterable=True)
+        register_stanza_plugin(Iq, stanza.Fin)
         register_stanza_plugin(stanza.Result, self.xmpp['xep_0297'].stanza.Forwarded)
         register_stanza_plugin(stanza.MAM, self.xmpp['xep_0059'].stanza.Set)
+        register_stanza_plugin(stanza.Fin, self.xmpp['xep_0059'].stanza.Set)
 
     def retrieve(self, jid=None, start=None, end=None, with_jid=None, ifrom=None,
-                 timeout=None, callback=None, iterator=False):
+                 timeout=None, callback=None, iterator=False, rsm=None):
         iq = self.xmpp.Iq()
         query_id = iq['id']
 
         iq['to'] = jid
         iq['from'] = ifrom
-        iq['type'] = 'get'
+        iq['type'] = 'set'
         iq['mam']['queryid'] = query_id
         iq['mam']['start'] = start
         iq['mam']['end'] = end
         iq['mam']['with'] = with_jid
+        if rsm:
+            for key, value in rsm.items():
+                iq['mam']['rsm'][key] = str(value)
+
+        cb_data = {}
+        def pre_cb(query):
+            query['mam']['queryid'] = query['id']
+            collector = Collector(
+                'MAM_Results_%s' % query_id,
+                StanzaPath('message/mam_result@queryid=%s' % query['id']))
+            self.xmpp.register_handler(collector)
+            cb_data['collector'] = collector
+
+        def post_cb(result):
+            results = cb_data['collector'].stop()
+            if result['type'] == 'result':
+                result['mam']['results'] = results
+
+        if iterator:
+            return self.xmpp['xep_0059'].iterate(iq, 'mam', 'results',
+                                                 recv_interface='mam_fin',
+                                                 pre_cb=pre_cb, post_cb=post_cb)
 
         collector = Collector(
             'MAM_Results_%s' % query_id,
             StanzaPath('message/mam_result@queryid=%s' % query_id))
         self.xmpp.register_handler(collector)
 
-        if iterator:
-            return self.xmpp['xep_0059'].iterate(iq, 'mam', 'results')
         def wrapped_cb(iq):
             results = collector.stop()
             if iq['type'] == 'result':
                 iq['mam']['results'] = results
-            callback(iq)
+            if callback:
+                callback(iq)
+
         return iq.send(timeout=timeout, callback=wrapped_cb)
 
     def set_preferences(self, jid=None, default=None, always=None, never=None,
