@@ -261,7 +261,7 @@ class BinVal(ElementBase):
 
     def get_binval(self):
         parent = self.parent()
-        xml = parent.find('{%s}BINVAL' % self.namespace)
+        xml = parent.xml.find('{%s}BINVAL' % self.namespace)
         if xml is not None:
             return base64.b64decode(bytes(xml.text))
         return b''
