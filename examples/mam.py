@@ -43,8 +43,10 @@ class MAM(slixmpp.ClientXMPP):
         async for rsm in results:
             print('Page %d' % page)
             for msg in rsm['mam']['results']:
-                forwarded_stanza = msg['mam_result']['forwarded']['stanza']
-                print('%s: %s' % (forwarded_stanza['from'], forwarded_stanza['body']))
+                forwarded = msg['mam_result']['forwarded']
+                timestamp = forwarded['delay']['stamp']
+                message = forwarded['stanza']
+                print('[%s] %s: %s' % (timestamp, message['from'], message['body']))
             page += 1
         self.disconnect()
 
