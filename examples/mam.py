@@ -38,13 +38,13 @@ class MAM(slixmpp.ClientXMPP):
         Fetch mam results for the specified JID.
         Use RSM to paginate the results.
         """
-        iq = self.make_iq_get()
         results = self.plugin['xep_0313'].retrieve(jid=self.remote_jid, iterator=True, rsm={'max': 10}, start=self.start_date)
         page = 1
         async for rsm in results:
-            print('Page %s' % page)
+            print('Page %d' % page)
             for msg in rsm['mam']['results']:
-                print('%s: %s' % (msg['mam_result']['forwarded']['stanza']['from'], msg['mam_result']['forwarded']['stanza']['body']))
+                forwarded_stanza = msg['mam_result']['forwarded']['stanza']
+                print('%s: %s' % (forwarded_stanza['from'], forwarded_stanza['body']))
             page += 1
         self.disconnect()
 
