@@ -114,7 +114,7 @@ def punycode(domain):
             if char in ILLEGAL_CHARS:
                 raise StringprepError
 
-        domain_parts.append(label)
+        domain_parts.append(label.encode('ascii'))
     return b'.'.join(domain_parts)
 
 logging.getLogger(__name__).warning('Using slower stringprep, consider '
