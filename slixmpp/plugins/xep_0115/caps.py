@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 class XEP_0115(BasePlugin):
 
     """
-    XEP-0115: Entity Capabalities
+    XEP-0115: Entity Capabilities
     """
 
     name = 'xep_0115'
