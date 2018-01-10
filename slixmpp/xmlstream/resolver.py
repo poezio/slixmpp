@@ -229,7 +229,7 @@ def get_AAAA(host, resolver=None, use_aiodns=True, loop=None):
                                                type=socket.SOCK_STREAM)
             return [rec[4][0] for rec in recs]
         except (OSError, socket.gaierror):
-            log.debug("DNS: Error retreiving AAAA address " + \
+            log.debug("DNS: Error retrieving AAAA address " + \
                       "info for %s." % host)
             return []
 

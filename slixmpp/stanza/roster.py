@@ -40,7 +40,7 @@ class Roster(ElementBase):
 
     def get_ver(self):
         """
-        Ensure handling an empty ver attribute propery.
+        Ensure handling an empty ver attribute property.
 
         The ver attribute is special in that the presence of the
         attribute with an empty value is important for boostrapping
@@ -50,7 +50,7 @@ class Roster(ElementBase):
 
     def set_ver(self, ver):
         """
-        Ensure handling an empty ver attribute propery.
+        Ensure handling an empty ver attribute property.
 
         The ver attribute is special in that the presence of the
         attribute with an empty value is important for boostrapping

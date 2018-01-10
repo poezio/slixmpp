@@ -13,7 +13,7 @@ from slixmpp.plugins.xep_0030.stanza.items import DiscoItems
 class Set(ElementBase):
 
     """
-    XEP-0059 (Result Set Managment) can be used to manage the
+    XEP-0059 (Result Set Management) can be used to manage the
     results of queries. For example, limiting the number of items
     per response or starting at certain positions.
 

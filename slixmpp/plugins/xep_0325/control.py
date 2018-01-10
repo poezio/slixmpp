@@ -399,7 +399,7 @@ class XEP_0325(BasePlugin):
         """
 
         if not session in self.sessions:
-            # This can happend if a session was deleted, like in a timeout. Just drop the data.
+            # This can happen if a session was deleted, like in a timeout. Just drop the data.
             return
 
         if result == "error":
@@ -457,7 +457,7 @@ class XEP_0325(BasePlugin):
         Arguments:
             from_jid        -- The jid of the requester
             to_jid          -- The jid of the device(s)
-            callback        -- The callback function to call when data is availble.
+            callback        -- The callback function to call when data is available.
 
                             The callback function must support the following arguments:
 

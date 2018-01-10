@@ -233,7 +233,7 @@ class XEP_0065(BasePlugin):
                 sock.close()
             except socket.error:
                 pass
-            # Though this should not be neccessary remove the closed session anyway
+            # Though this should not be necessary remove the closed session anyway
             if sid in self._sessions:
                 log.warn(('SOCKS5 session with sid = "%s" was not ' +
                           'removed from _sessions by sock.close()') % sid)

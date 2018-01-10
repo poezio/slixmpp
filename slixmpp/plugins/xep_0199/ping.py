@@ -110,7 +110,7 @@ class XEP_0199(BasePlugin):
         try:
             rtt = yield from self.ping(self.xmpp.boundjid.host, timeout=self.timeout)
         except IqTimeout:
-            log.debug("Did not recieve ping back in time." + \
+            log.debug("Did not receive ping back in time." + \
                       "Requesting Reconnect.")
             self.xmpp.reconnect()
         else:

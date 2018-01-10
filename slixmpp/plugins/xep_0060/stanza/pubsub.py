@@ -82,9 +82,9 @@ class Item(ElementBase):
             self.xml.append(value)
 
     def get_payload(self):
-        childs = list(self.xml)
-        if len(childs) > 0:
-            return childs[0]
+        children = list(self.xml)
+        if len(children) > 0:
+            return children[0]
 
     def del_payload(self):
         for child in self.xml:

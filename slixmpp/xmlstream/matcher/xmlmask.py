@@ -75,7 +75,7 @@ class MatchXMLMask(MatcherBase):
                      Defaults to ``"__no_ns__"``.
         """
         if source is None:
-            # If the element was not found. May happend during recursive calls.
+            # If the element was not found. May happen during recursive calls.
             return False
 
         # Convert the mask to an XML object if it is a string.

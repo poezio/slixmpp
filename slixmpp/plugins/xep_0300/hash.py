@@ -25,7 +25,7 @@ class XEP_0300(BasePlugin):
     stanza = stanza
     default_config = {
         'block_size': 1024 * 1024,  # One MiB
-        'prefered': 'sha-256',
+        'preferded': 'sha-256',
         'enable_sha-1': False,
         'enable_sha-256': True,
         'enable_sha-512': True,
@@ -73,7 +73,7 @@ class XEP_0300(BasePlugin):
 
     def compute_hash(self, filename, function=None):
         if function is None:
-            function = self.prefered
+            function = self.preferred
         h = self._hashlib_function[function]()
         with open(filename, 'rb') as f:
             while True:

@@ -436,7 +436,7 @@ class XMLStream(asyncio.BaseProtocol):
 
     def cancel_connection_attempt(self):
         """
-        Immediatly cancel the current create_connection() Future.
+        Immediately cancel the current create_connection() Future.
         This is useful when a client using slixmpp tries to connect
         on flaky networks, where sometimes a connection just gets lost
         and it needs to reconnect while the attempt is still ongoing.
@@ -449,7 +449,7 @@ class XMLStream(asyncio.BaseProtocol):
         """Close the XML stream and wait for an acknowldgement from the server for
         at most `wait` seconds.  After the given number of seconds has
         passed without a response from the serveur, or when the server
-        successfuly responds with a closure of its own stream, abort() is
+        successfully responds with a closure of its own stream, abort() is
         called. If wait is 0.0, this is almost equivalent to calling abort()
         directly.
 

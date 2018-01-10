@@ -61,7 +61,7 @@ def _intercept(method, name, public):
         except InvocationException:
             raise
         except Exception as e:
-            raise InvocationException("A problem occured calling %s.%s!" % (instance.FQN(), method.__name__), e)
+            raise InvocationException("A problem occurred calling %s.%s!" % (instance.FQN(), method.__name__), e)
     _resolver._rpc = public
     _resolver._rpc_name = method.__name__ if name is None else name
     return _resolver
@@ -696,7 +696,7 @@ class RemoteSession(object):
         e = {
             'item-not-found': RemoteException("No remote handler available for %s at %s!" % (pmethod, iq['from'])),
             'forbidden': AuthorizationException("Forbidden to invoke remote handler for %s at %s!" % (pmethod, iq['from'])),
-            'undefined-condition': RemoteException("An unexpected problem occured trying to invoke %s at %s!" % (pmethod, iq['from'])),
+            'undefined-condition': RemoteException("An unexpected problem occurred trying to invoke %s at %s!" % (pmethod, iq['from'])),
         }[condition]
         if e is None:
             RemoteException("An unexpected exception occurred at %s!" % iq['from'])

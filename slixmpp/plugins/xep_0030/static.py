@@ -257,7 +257,7 @@ class StaticDisco(object):
 
     def add_identity(self, jid, node, ifrom, data):
         """
-        Add a new identity to te JID/node combination.
+        Add a new identity to the JID/node combination.
 
         The data parameter may provide:
             category -- The general category to which the agent belongs.

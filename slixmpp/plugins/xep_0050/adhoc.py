@@ -611,7 +611,7 @@ class XEP_0050(BasePlugin):
     def terminate_command(self, session):
         """
         Delete a command's session after a command has completed
-        or an error has occured.
+        or an error has occurred.
 
         Arguments:
             session -- All stored data relevant to the current

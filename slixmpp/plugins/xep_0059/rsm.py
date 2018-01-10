@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 class ResultIterator:
 
     """
-    An iterator for Result Set Managment
+    An iterator for Result Set Management
     """
 
     def __init__(self, query, interface, results='substanzas', amount=10,
