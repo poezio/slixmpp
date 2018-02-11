@@ -78,7 +78,7 @@ class CoroutineCallback(BaseHandler):
                               :meth:`prerun()`. Defaults to ``False``.
         """
         if not self._instream or instream:
-            asyncio.async(self._pointer(payload))
+            asyncio.ensure_future(self._pointer(payload))
             if self._once:
                 self._destroy = True
                 del self._pointer

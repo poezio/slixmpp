@@ -215,7 +215,7 @@ class XEP_0065(BasePlugin):
             self.xmpp.event('socks5_stream', conn)
             self.xmpp.event('stream:%s:%s' % (sid, requester), conn)
 
-        asyncio.async(gather(proxy_futures, iq, streamhosts))
+        asyncio.ensure_future(gather(proxy_futures, iq, streamhosts))
 
     def activate(self, proxy, sid, target, ifrom=None, timeout=None, callback=None):
         """Activate the socks5 session that has been negotiated."""

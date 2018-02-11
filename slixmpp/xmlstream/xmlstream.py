@@ -285,7 +285,7 @@ class XMLStream(asyncio.BaseProtocol):
             self.disable_starttls = disable_starttls
 
         self.event("connecting")
-        self._current_connection_attempt = asyncio.async(self._connect_routine())
+        self._current_connection_attempt = asyncio.ensure_future(self._connect_routine())
 
     @asyncio.coroutine
     def _connect_routine(self):
@@ -322,7 +322,7 @@ class XMLStream(asyncio.BaseProtocol):
             log.debug('Connection failed: %s', e)
             self.event("connection_failed", e)
             self.connect_loop_wait = self.connect_loop_wait * 2 + 1
-            self._current_connection_attempt = asyncio.async(self._connect_routine())
+            self._current_connection_attempt = asyncio.ensure_future(self._connect_routine())
 
     def process(self, *, forever=True, timeout=None):
         """Process all the available XMPP events (receiving or sending data on the
@@ -558,7 +558,7 @@ class XMLStream(asyncio.BaseProtocol):
                 pem_cert = ssl.DER_cert_to_PEM_cert(der_cert)
                 self.event('ssl_cert', pem_cert)
 
-        asyncio.async(ssl_coro())
+        asyncio.ensure_future(ssl_coro())
 
     def _start_keepalive(self, event):
         """Begin sending whitespace periodically to keep the connection alive.
@@ -777,7 +777,7 @@ class XMLStream(asyncio.BaseProtocol):
                             old_exception(e)
                         else:
                             self.exception(e)
-                asyncio.async(handler_callback_routine(handler_callback))
+                asyncio.ensure_future(handler_callback_routine(handler_callback))
             else:
                 try:
                     handler_callback(data)
