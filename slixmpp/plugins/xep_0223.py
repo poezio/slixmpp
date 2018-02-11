@@ -78,7 +78,7 @@ class XEP_0223(BasePlugin):
         for field, value in self.profile.items():
             if field not in fields:
                 options.add_field(var=field)
-            options['fields'][field]['value'] = value
+            options.get_fields()[field]['value'] = value
 
         return self.xmpp['xep_0163'].publish(stanza, node, options=options,
                                              ifrom=ifrom, callback=callback,

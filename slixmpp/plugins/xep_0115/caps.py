@@ -199,8 +199,8 @@ class XEP_0115(BasePlugin):
                 log.debug("Non form extension found, ignoring for caps")
                 caps.xml.remove(stanza.xml)
                 continue
-            if 'FORM_TYPE' in stanza['fields']:
-                f_type = tuple(stanza['fields']['FORM_TYPE']['value'])
+            if 'FORM_TYPE' in stanza.get_fields():
+                f_type = tuple(stanza.get_fields()['FORM_TYPE']['value'])
                 form_types.append(f_type)
                 deduped_form_types.add(f_type)
                 if len(form_types) != len(deduped_form_types):
@@ -214,7 +214,7 @@ class XEP_0115(BasePlugin):
                         log.debug("Extra FORM_TYPE data, invalid for caps")
                         return False
 
-                if stanza['fields']['FORM_TYPE']['type'] != 'hidden':
+                if stanza.get_fields()['FORM_TYPE']['type'] != 'hidden':
                     log.debug("Field FORM_TYPE type not 'hidden', " + \
                               "ignoring form for caps")
                     caps.xml.remove(stanza.xml)
@@ -253,7 +253,7 @@ class XEP_0115(BasePlugin):
 
         for stanza in info['substanzas']:
             if isinstance(stanza, self.xmpp['xep_0004'].stanza.Form):
-                if 'FORM_TYPE' in stanza['fields']:
+                if 'FORM_TYPE' in stanza.get_fields():
                     f_type = stanza['values']['FORM_TYPE']
                     if len(f_type):
                         f_type = f_type[0]
@@ -265,11 +265,11 @@ class XEP_0115(BasePlugin):
         for f_type in sorted_forms:
             for form in form_types[f_type]:
                 S += '%s<' % f_type
-                fields = sorted(form['fields'].keys())
+                fields = sorted(form.get_fields().keys())
                 fields.remove('FORM_TYPE')
                 for field in fields:
                     S += '%s<' % field
-                    vals = form['fields'][field].get_value(convert=False)
+                    vals = form.get_fields()[field].get_value(convert=False)
                     if vals is None:
                         S += '<'
                     else:

@@ -97,7 +97,7 @@ class XEP_0095(BasePlugin):
                 extension='bad-profile',
                 extension_ns=SI.namespace)
 
-        neg = iq['si']['feature_neg']['form']['fields']
+        neg = iq['si']['feature_neg']['form'].get_fields()
         options = neg['stream-method']['options'] or []
         methods = []
         for opt in options:

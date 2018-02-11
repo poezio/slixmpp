@@ -185,14 +185,14 @@ class XEP_0060(BasePlugin):
 
         if config is not None:
             form_type = 'http://jabber.org/protocol/pubsub#node_config'
-            if 'FORM_TYPE' in config['fields']:
+            if 'FORM_TYPE' in config.get_fields():
                 config.field['FORM_TYPE']['value'] = form_type
             else:
                 config.add_field(var='FORM_TYPE',
                                  ftype='hidden',
                                  value=form_type)
             if ntype:
-                if 'pubsub#node_type' in config['fields']:
+                if 'pubsub#node_type' in config.get_fields():
                     config.field['pubsub#node_type']['value'] = ntype
                 else:
                     config.add_field(var='pubsub#node_type', value=ntype)

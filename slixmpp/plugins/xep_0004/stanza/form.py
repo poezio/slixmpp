@@ -23,7 +23,7 @@ class Form(ElementBase):
     namespace = 'jabber:x:data'
     name = 'x'
     plugin_attrib = 'form'
-    interfaces = OrderedSet(('instructions', 'reported', 'title', 'type', 'items', ))
+    interfaces = OrderedSet(('instructions', 'reported', 'title', 'type', 'items', 'values'))
     sub_interfaces = {'title'}
     form_types = {'cancel', 'form', 'result', 'submit'}
 
