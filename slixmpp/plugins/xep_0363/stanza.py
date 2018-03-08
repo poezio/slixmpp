@@ -35,4 +35,14 @@ class Header(ElementBase):
     plugin_attrib = 'header'
     name = 'header'
     namespace = 'urn:xmpp:http:upload:0'
+    plugin_multi_attrib = 'headers'
     interfaces = {'name', 'value'}
+
+    def get_value(self):
+        return self.xml.text
+
+    def set_value(self, value):
+        self.xml.text = value
+
+    def del_value(self):
+        self.xml.text = ''

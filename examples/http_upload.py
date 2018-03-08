@@ -9,19 +9,12 @@
     See the file LICENSE for copying permission.
 """
 
-import sys
-
 import logging
 from getpass import getpass
 from argparse import ArgumentParser
 
 import slixmpp
-from slixmpp.exceptions import XMPPError, IqError
 from slixmpp import asyncio
-
-from urllib.parse import urlparse
-from http.client import HTTPConnection, HTTPSConnection
-from mimetypes import MimeTypes
 
 log = logging.getLogger(__name__)
 
@@ -36,65 +29,19 @@ class HttpUpload(slixmpp.ClientXMPP):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
         self.recipient = recipient
-        self.file = open(filename, 'rb')
-        self.size = self.file.seek(0, 2)
-        self.file.seek(0)
-        self.content_type = MimeTypes().guess_type(filename)[0] or 'application/octet-stream'
+        self.filename = filename
 
         self.add_event_handler("session_start", self.start)
 
     @asyncio.coroutine
     def start(self, event):
-        log.info('Uploading file %s...', self.file.name)
-
-        info_iq = yield from self['xep_0363'].find_upload_service()
-        if info_iq is None:
-            log.error('No upload service found on this server')
-            self.disconnect()
-            return
-
-        for form in info_iq['disco_info'].iterables:
-            values = form['values']
-            if values['FORM_TYPE'] == ['urn:xmpp:http:upload:0']:
-                max_file_size = int(values['max-file-size'])
-                if self.size > max_file_size:
-                    log.error('File size bigger than max allowed')
-                    self.disconnect()
-                    return
-                break
-        else:
-            log.warn('Impossible to find max-file-size, assuming infinite storage space')
-
-        log.info('Using service %s', info_iq['from'])
-        slot_iq = yield from self['xep_0363'].request_slot(
-                info_iq['from'], self.file.name, self.size, self.content_type)
-        put = slot_iq['http_upload_slot']['put']['url']
-        get = slot_iq['http_upload_slot']['get']['url']
-
-        # Now we got the two URLs, we can start uploading the HTTP file.
-        put_scheme, put_host, put_path, _, _, _ = urlparse(put)
-        Connection = {'http': HTTPConnection, 'https': HTTPSConnection}[put_scheme]
-        conn = Connection(put_host)
-        conn.putrequest('PUT', put_path)
-        for header, value in slot_iq['http_upload_slot']['put']['headers']:
-            conn.putheader(header, value)
-        conn.putheader('Content-Length', self.size)
-        conn.putheader('Content-Type', self.content_type)
-        conn.endheaders(self.file.read())
-        response = conn.getresponse()
-        if response.status >= 400:
-            log.error('Failed to upload file: %d %s', response.status, response.reason)
-            self.disconnect()
-            return
-
-        log.info('Upload success! %d %s', response.status, response.reason)
-        if self.content_type.startswith('image/'):
-            html = '<body xmlns="http://www.w3.org/1999/xhtml"><img src="%s" alt="Uploaded Image"/></body>' % get
-        else:
-            html = '<body xmlns="http://www.w3.org/1999/xhtml"><a href="%s">%s</a></body>' % (get, get)
+        log.info('Uploading file %s...', self.filename)
+        url = yield from self['xep_0363'].upload_file(self.filename)
+        log.info('Upload success!')
 
         log.info('Sending file to %s', self.recipient)
-        self.send_message(self.recipient, get, mhtml=html)
+        html = '<body xmlns="http://www.w3.org/1999/xhtml"><a href="%s">%s</a></body>' % (url, url)
+        self.send_message(self.recipient, url, mhtml=html)
         self.disconnect()
 
 
