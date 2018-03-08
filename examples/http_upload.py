@@ -53,7 +53,17 @@ class HttpUpload(slixmpp.ClientXMPP):
             self.disconnect()
             return
 
-        # TODO: check the maximum size from info_iq here.
+        for form in info_iq['disco_info'].iterables:
+            values = form['values']
+            if values['FORM_TYPE'] == ['urn:xmpp:http:upload:0']:
+                max_file_size = int(values['max-file-size'])
+                if self.size > max_file_size:
+                    log.error('File size bigger than max allowed')
+                    self.disconnect()
+                    return
+                break
+        else:
+            log.warn('Impossible to find max-file-size, assuming infinite storage space')
 
         log.info('Using service %s', info_iq['from'])
         slot_iq = yield from self['xep_0363'].request_slot(
@@ -127,6 +137,7 @@ if __name__ == '__main__':
 
     xmpp = HttpUpload(args.jid, args.password, args.recipient, args.file)
     xmpp.register_plugin('xep_0071')
+    xmpp.register_plugin('xep_0128')
     xmpp.register_plugin('xep_0363')
 
     # Connect to the XMPP server and start processing XMPP stanzas.
