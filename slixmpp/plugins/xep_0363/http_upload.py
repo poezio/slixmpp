@@ -39,7 +39,7 @@ class XEP_0363(BasePlugin):
     stanza = stanza
     default_config = {
         'upload_service': None,
-        'maximum_size': float('+inf'),
+        'max_file_size': float('+inf'),
         'default_content_type': 'application/octet-stream',
     }
 
