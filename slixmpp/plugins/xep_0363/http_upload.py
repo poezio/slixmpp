@@ -8,6 +8,7 @@
 
 import asyncio
 import logging
+import os.path
 
 from aiohttp import ClientSession
 from mimetypes import guess_type
@@ -128,7 +129,8 @@ class XEP_0363(BasePlugin):
             if content_type is None:
                 content_type = self.default_content_type
 
-        slot_iq = await self.request_slot(self.upload_service, filename, size,
+        basename = os.path.basename(filename)
+        slot_iq = await self.request_slot(self.upload_service, basename, size,
                                                content_type, ifrom, timeout)
         slot = slot_iq['http_upload_slot']
 
