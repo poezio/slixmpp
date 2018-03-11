@@ -10,7 +10,7 @@ import asyncio
 import logging
 
 from aiohttp import ClientSession
-from mimetypes import MimeTypes
+from mimetypes import guess_type
 
 from slixmpp import Iq, __version__
 from slixmpp.plugins import BasePlugin
@@ -124,7 +124,7 @@ class XEP_0363(BasePlugin):
             raise FileTooBig()
 
         if content_type is None:
-            content_type = MimeTypes().guess_type(filename)[0]
+            content_type = guess_type(filename)[0]
             if content_type is None:
                 content_type = self.default_content_type
 
