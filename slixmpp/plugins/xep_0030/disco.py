@@ -646,9 +646,11 @@ class XEP_0030(BasePlugin):
                 info['id'] = iq['id']
                 info.send()
             else:
+                node = iq['disco_info']['node']
                 iq = iq.reply()
                 if info:
                     info = self._fix_default_info(info)
+                    info['node'] = node
                     iq.set_payload(info.xml)
                 iq.send()
         elif iq['type'] == 'result':
