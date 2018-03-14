@@ -188,10 +188,19 @@ class Iq(RootStanza):
         future = asyncio.Future()
 
         def callback_success(result):
-            if result['type'] == 'error':
+            type_ = result['type']
+            if type_ == 'result':
+                future.set_result(result)
+            elif type_ == 'error':
                 future.set_exception(IqError(result))
             else:
-                future.set_result(result)
+                # Most likely an iq addressed to ourself, rearm the callback.
+                handler = constr(handler_name,
+                                 matcher,
+                                 callback_success,
+                                 once=True)
+                self.stream.register_handler(handler)
+                return
 
             if timeout is not None:
                 self.stream.cancel_schedule('IqTimeout_%s' % self['id'])
