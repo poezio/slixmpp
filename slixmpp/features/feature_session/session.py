@@ -43,11 +43,15 @@ class FeatureSession(BasePlugin):
         Arguments:
             feature -- The stream features element.
         """
-        if not features['session']['optional']:
-            iq = self.xmpp.Iq()
-            iq['type'] = 'set'
-            iq.enable('session')
-            yield from iq.send(callback=self._on_start_session_response)
+        if features['session']['optional']:
+            self.xmpp.sessionstarted = True
+            self.xmpp.event('session_start')
+            return
+
+        iq = self.xmpp.Iq()
+        iq['type'] = 'set'
+        iq.enable('session')
+        yield from iq.send(callback=self._on_start_session_response)
 
     def _on_start_session_response(self, response):
         self.xmpp.features.add('session')
