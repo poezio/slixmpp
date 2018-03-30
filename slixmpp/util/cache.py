@@ -41,13 +41,13 @@ class MemoryPerJidCache(PerJidCache):
         self.cache = {}
 
     def retrieve_by_jid(self, jid, key):
-        cache = self.cache.get(jid.bare, None)
+        cache = self.cache.get(jid, None)
         if cache is None:
             return None
         return cache.get(key, None)
 
     def store_by_jid(self, jid, key, value):
-        cache = self.cache.setdefault(jid.bare, {})
+        cache = self.cache.setdefault(jid, {})
         cache[key] = value
         return True
 
@@ -97,9 +97,9 @@ class FileSystemPerJidCache(PerJidCache, FileSystemStorage):
         self.base_dir = os.path.join(directory, cache_type)
 
     def retrieve_by_jid(self, jid, key):
-        directory = os.path.join(self.base_dir, jid.bare)
+        directory = os.path.join(self.base_dir, jid)
         return self._retrieve(directory, key)
 
     def store_by_jid(self, jid, key, value):
-        directory = os.path.join(self.base_dir, jid.bare)
+        directory = os.path.join(self.base_dir, jid)
         return self._store(directory, key, value)
