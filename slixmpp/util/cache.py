@@ -53,8 +53,8 @@ class MemoryPerJidCache(PerJidCache):
 
 class FileSystemStorage:
     def __init__(self, encode, decode, binary):
-        self.encode = encode
-        self.decode = decode
+        self.encode = encode if encode is not None else lambda x: x
+        self.decode = decode if decode is not None else lambda x: x
         self.read = 'rb' if binary else 'r'
         self.write = 'wb' if binary else 'w'
 
@@ -81,7 +81,7 @@ class FileSystemStorage:
             return False
 
 class FileSystemCache(Cache, FileSystemStorage):
-    def __init__(self, directory, cache_type, *, encode, decode, binary=False):
+    def __init__(self, directory, cache_type, *, encode=None, decode=None, binary=False):
         FileSystemStorage.__init__(self, encode, decode, binary)
         self.base_dir = os.path.join(directory, cache_type)
 
@@ -92,7 +92,7 @@ class FileSystemCache(Cache, FileSystemStorage):
         return self._store(self.base_dir, key, value)
 
 class FileSystemPerJidCache(PerJidCache, FileSystemStorage):
-    def __init__(self, directory, cache_type, *, encode, decode, binary=False):
+    def __init__(self, directory, cache_type, *, encode=None, decode=None, binary=False):
         FileSystemStorage.__init__(self, encode, decode, binary)
         self.base_dir = os.path.join(directory, cache_type)
 
