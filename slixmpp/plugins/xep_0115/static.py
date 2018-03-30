@@ -33,7 +33,6 @@ class StaticCaps(object):
         self.disco = self.xmpp['xep_0030']
         self.caps = self.xmpp['xep_0115']
         self.static = static
-        self.ver_cache = {}
         self.jid_vers = {}
 
     def supports(self, jid, node, ifrom, data):
@@ -128,7 +127,7 @@ class StaticCaps(object):
         info = data.get('info', None)
         if not verstring or not info:
             return
-        self.ver_cache[verstring] = info
+        self.caps.cache.store(verstring, info)
 
     def assign_verstring(self, jid, node, ifrom, data):
         if isinstance(jid, JID):
@@ -139,4 +138,7 @@ class StaticCaps(object):
         return self.jid_vers.get(jid, None)
 
     def get_caps(self, jid, node, ifrom, data):
-        return self.ver_cache.get(data.get('verstring', None), None)
+        verstring = data.get('verstring', None)
+        if verstring is None:
+            return None
+        return self.caps.cache.retrieve(verstring)

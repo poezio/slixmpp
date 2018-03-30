@@ -15,6 +15,7 @@ from slixmpp.stanza import StreamFeatures, Presence, Iq
 from slixmpp.xmlstream import register_stanza_plugin, JID
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
+from slixmpp.util import MemoryCache
 from slixmpp import asyncio
 from slixmpp.exceptions import XMPPError, IqError, IqTimeout
 from slixmpp.plugins import BasePlugin
@@ -37,7 +38,8 @@ class XEP_0115(BasePlugin):
     default_config = {
         'hash': 'sha-1',
         'caps_node': None,
-        'broadcast': True
+        'broadcast': True,
+        'cache': None,
     }
 
     def plugin_init(self):
@@ -47,6 +49,9 @@ class XEP_0115(BasePlugin):
 
         if self.caps_node is None:
             self.caps_node = 'http://slixmpp.com/ver/%s' % __version__
+
+        if self.cache is None:
+            self.cache = MemoryCache()
 
         register_stanza_plugin(Presence, stanza.Capabilities)
         register_stanza_plugin(StreamFeatures, stanza.Capabilities)
