@@ -13,3 +13,5 @@
 from slixmpp.util.misc_ops import bytes, unicode, hashes, hash, \
                                     num_to_bytes, bytes_to_num, quote, \
                                     XOR
+from slixmpp.util.cache import MemoryCache, MemoryPerJidCache, \
+                               FileSystemCache, FileSystemPerJidCache
