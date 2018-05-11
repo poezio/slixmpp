@@ -34,5 +34,46 @@ class Device(ElementBase):
             return children[0]
 
 
+class Encrypted(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'encrypted'
+    plugin_attrib = 'omemo_encrypted'
+    interfaces = set()
+
+
+class Header(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'header'
+    plugin_attrib = name
+    interfaces = {'sid'}
+
+
+class Key(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'key'
+    plugin_attrib = name
+    interfaces = {'rid', 'prekey'}
+
+
+class IV(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'iv'
+    plugin_attrib = name
+    interfaces = set()
+
+
+class Payload(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'payload'
+    plugin_attrib = name
+    interfaces = set()
+
+
+register_stanza_plugin(Message, Encrypted)
+register_stanza_plugin(Encrypted, Header)
+register_stanza_plugin(Header, Key)
+register_stanza_plugin(Header, IV)
+register_stanza_plugin(Encrypted, Payload)
+
 register_stanza_plugin(EventItem, Devices)
 register_stanza_plugin(Devices, Device, iterable=True)
