@@ -69,6 +69,49 @@ class Payload(ElementBase):
     interfaces = set()
 
 
+class Bundle(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'bundle'
+    plugin_attrib = name
+    interfaces = set()
+
+
+class SignedPreKeyPublic(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'signedPreKeyPublic'
+    plugin_attrib = name
+    interfaces = {'id'}
+
+
+class SignedPreKeySignature(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'signedPreKeySignature'
+    plugin_attrib = name
+    interfaces = set()
+
+
+class IdentityKey(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'identityKey'
+    plugin_attrib = name
+    interfaces = set()
+
+
+class PreKeys(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'prekeys'
+    plugin_attrib = name
+    interfaces = set()
+
+
+class PreKeyPublic(ElementBase):
+    namespace = OMEMO_BASE_NS
+    name = 'preKeyPublic'
+    plugin_attrib = name
+    # TODO: XEP has mentions of "preKeyId" and "id"
+    interfaces = {'id'}
+
+
 register_stanza_plugin(Message, Encrypted)
 register_stanza_plugin(Encrypted, Header)
 register_stanza_plugin(Header, Key)
@@ -77,3 +120,10 @@ register_stanza_plugin(Encrypted, Payload)
 
 register_stanza_plugin(EventItem, Devices)
 register_stanza_plugin(Devices, Device, iterable=True)
+
+register_stanza_plugin(EventItem, Bundle)
+register_stanza_plugin(Bundle, SignedPreKeyPublic)
+register_stanza_plugin(Bundle, SignedPreKeySignature)
+register_stanza_plugin(Bundle, IdentityKey)
+register_stanza_plugin(Bundle, PreKeys)
+register_stanza_plugin(PreKeys, PreKeyPublic, iterable=True)
