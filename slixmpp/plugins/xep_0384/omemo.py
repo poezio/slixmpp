@@ -1,47 +1,21 @@
-#! /usr/bin/env python3
-# -*- coding: utf-8 -*-
-# vim:fenc=utf-8
-#
-# Copyright © 2018 Maxime “pep” Buquet <pep@bouah.net>
-#
-# Distributed under terms of the MIT license.
-
 """
-    OMEMO Plugin
+    Slixmpp: The Slick XMPP Library
+    Copyright (C) 2018 Maxime “pep” Buquet <pep@bouah.net>
+    This file is part of Slixmpp.
+
+    See the file LICENSE for copying permission.
 """
 
 import logging
 
 from slixmpp.jid import JID
-from slixmpp.plugins.xep_0060.stanza.pubsub_event import EventItem
+from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
+from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLE_NS
 from slixmpp.plugins.base import BasePlugin, register_plugin
-from slixmpp.xmlstream import register_stanza_plugin, ElementBase
-
 
 log = logging.getLogger(__name__)
 
-OMEMO_BASE_NS = 'eu.siacs.conversations.axolotl'
-OMEMO_DEVICES_NS = OMEMO_BASE_NS + '.devicelist'
-OMEMO_BUNDLE_NS = OMEMO_BASE_NS + '.bundle'
 
-
-class ItemList(ElementBase):
-    namespace = OMEMO_BASE_NS
-    name = 'list'
-    plugin_attrib = name
-    interfaces = set()
-
-
-class Device(ElementBase):
-    namespace = OMEMO_BASE_NS
-    name = 'device'
-    plugin_attrib = name
-    interfaces = {'id'}
-
-    def get_payload(self):
-        children = list(self.xml)
-        if len(children) > 0:
-            return children[0]
 
 
 class XEP_0384(BasePlugin):
@@ -83,6 +57,4 @@ class XEP_0384(BasePlugin):
             return
 
 
-register_stanza_plugin(EventItem, ItemList)
-register_stanza_plugin(ItemList, Device, iterable=True)
 register_plugin(XEP_0384)
