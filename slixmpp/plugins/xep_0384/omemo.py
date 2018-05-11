@@ -47,7 +47,7 @@ class XEP_0384(BasePlugin):
         jid = JID(msg['from']).bare
         items = msg['pubsub_event']['items']
         for item in items:
-            device_ids = [d['id'] for d in item['list']]
+            device_ids = [d['id'] for d in item['devices']]
             if jid not in self.device_ids:
                 self.device_ids[jid] = device_ids
             self.xmpp.event('omemo_device_ids', (jid, device_ids))

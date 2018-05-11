@@ -15,10 +15,10 @@ OMEMO_DEVICES_NS = OMEMO_BASE_NS + '.devicelist'
 OMEMO_BUNDLE_NS = OMEMO_BASE_NS + '.bundle'
 
 
-class ItemList(ElementBase):
+class Devices(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'list'
-    plugin_attrib = 'list'
+    plugin_attrib = 'devices'
     interfaces = set()
 
 
@@ -34,5 +34,5 @@ class Device(ElementBase):
             return children[0]
 
 
-register_stanza_plugin(EventItem, ItemList)
-register_stanza_plugin(ItemList, Device, iterable=True)
+register_stanza_plugin(EventItem, Devices)
+register_stanza_plugin(Devices, Device, iterable=True)
