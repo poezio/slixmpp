@@ -81,21 +81,48 @@ class SignedPreKeyPublic(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'signedPreKeyPublic'
     plugin_attrib = name
-    interfaces = {'signedPreKeyId'}
+    interfaces = {'signedPreKeyId', 'value'}
+
+    def get_value(self):
+        return self.xml.text
+
+    def set_value(self, value):
+        self.xml.text = value
+
+    def del_value(self):
+        self.xml.text = ''
 
 
 class SignedPreKeySignature(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'signedPreKeySignature'
     plugin_attrib = name
-    interfaces = set()
+    interfaces = {'value'}
+
+    def get_value(self):
+        return self.xml.text
+
+    def set_value(self, value):
+        self.xml.text = value
+
+    def del_value(self):
+        self.xml.text = ''
 
 
 class IdentityKey(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'identityKey'
     plugin_attrib = name
-    interfaces = set()
+    interfaces = {'value'}
+
+    def get_value(self):
+        return self.xml.text
+
+    def set_value(self, value):
+        self.xml.text = value
+
+    def del_value(self):
+        self.xml.text = ''
 
 
 class PreKeys(ElementBase):
