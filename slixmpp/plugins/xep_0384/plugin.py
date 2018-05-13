@@ -15,7 +15,11 @@ from slixmpp.plugins.base import BasePlugin, register_plugin
 
 log = logging.getLogger(__name__)
 
-
+HAS_OMEMO = True
+try:
+    import omemo
+except ImportError as e:
+    HAS_OMEMO = False
 
 
 class XEP_0384(BasePlugin):
@@ -27,13 +31,22 @@ class XEP_0384(BasePlugin):
     name = 'xep_0384'
     description = 'XEP-0384 OMEMO'
     dependencies = {'xep_0163'}
+    backend_loaded = HAS_OMEMO
 
     device_ids = {}
 
     def plugin_init(self):
+        if not self.backend_loaded:
+            log.debug("xep_0384 cannot be loaded as the backend omemo library "
+                      "is not available")
+            return
+
         self.xmpp.add_event_handler('pubsub_publish', self.device_list)
 
     def plugin_end(self):
+        if not self.backend_loaded:
+            return
+
         self.xmpp.del_event_handler('pubsub_publish', self.device_list)
         self.xmpp['xep_0163'].remove_interest(OMEMO_DEVICES_NS)
 
