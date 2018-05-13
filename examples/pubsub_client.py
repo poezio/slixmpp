@@ -40,7 +40,7 @@ class PubsubClient(slixmpp.ClientXMPP):
         try:
             yield from getattr(self, self.action)()
         except:
-            logging.error('Could not execute: %s', self.action)
+            logging.exception('Could not execute %s:', self.action)
         self.disconnect()
 
     def nodes(self):
