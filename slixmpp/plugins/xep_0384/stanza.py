@@ -29,11 +29,6 @@ class Device(ElementBase):
     plugin_attrib = name
     interfaces = {'id'}
 
-    def get_payload(self):
-        children = list(self.xml)
-        if len(children) > 0:
-            return children[0]
-
 
 class Encrypted(ElementBase):
     namespace = OMEMO_BASE_NS
