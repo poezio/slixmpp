@@ -7,6 +7,7 @@
 """
 
 from slixmpp import Message
+from slixmpp.plugins.xep_0060.stanza.pubsub import Item
 from slixmpp.plugins.xep_0060.stanza.pubsub_event import EventItem
 from slixmpp.xmlstream import register_stanza_plugin, ElementBase
 
@@ -80,7 +81,7 @@ class SignedPreKeyPublic(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'signedPreKeyPublic'
     plugin_attrib = name
-    interfaces = {'id'}
+    interfaces = {'signedPreKeyId'}
 
 
 class SignedPreKeySignature(ElementBase):
@@ -121,7 +122,7 @@ register_stanza_plugin(Encrypted, Payload)
 register_stanza_plugin(EventItem, Devices)
 register_stanza_plugin(Devices, Device, iterable=True)
 
-register_stanza_plugin(EventItem, Bundle)
+register_stanza_plugin(Item, Bundle)
 register_stanza_plugin(Bundle, SignedPreKeyPublic)
 register_stanza_plugin(Bundle, SignedPreKeySignature)
 register_stanza_plugin(Bundle, IdentityKey)
