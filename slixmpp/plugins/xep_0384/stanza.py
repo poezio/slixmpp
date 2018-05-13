@@ -109,8 +109,7 @@ class PreKeyPublic(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'preKeyPublic'
     plugin_attrib = name
-    # TODO: XEP has mentions of "preKeyId" and "id"
-    interfaces = {'id'}
+    interfaces = {'preKeyId'}
 
 
 register_stanza_plugin(Message, Encrypted)
