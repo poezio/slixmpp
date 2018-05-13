@@ -21,7 +21,7 @@ class PubsubClient(slixmpp.ClientXMPP):
         self.register_plugin('xep_0059')
         self.register_plugin('xep_0060')
 
-        self.actions = ['nodes', 'create', 'delete',
+        self.actions = ['nodes', 'create', 'delete', 'get_configure',
                         'publish', 'get', 'retract',
                         'purge', 'subscribe', 'unsubscribe']
 
@@ -64,6 +64,13 @@ class PubsubClient(slixmpp.ClientXMPP):
             logging.info('Deleted node %s', self.node)
         except XMPPError as error:
             logging.error('Could not delete node %s: %s', self.node, error.format())
+
+    def get_configure(self):
+        try:
+            configuration_form = yield from self['xep_0060'].get_configure_form(self.pubsub_server, self.node)
+            logging.info('Configure form received from node %s: %s', self.node, configuration_form)
+        except XMPPError as error:
+            logging.error('Could not retrieve configure form from node %s: %s', self.node, error.format())
 
     def publish(self):
         payload = ET.fromstring("<test xmlns='test'>%s</test>" % self.data)
@@ -118,7 +125,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.version = '%%prog 0.1'
     parser.usage = "Usage: %%prog [options] <jid> " + \
-                             'nodes|create|delete|purge|subscribe|unsubscribe|publish|retract|get' + \
+                             'nodes|create|delete|get_configure|purge|subscribe|unsubscribe|publish|retract|get' + \
                              ' [<node> <data>]'
 
     parser.add_argument("-q","--quiet", help="set logging to ERROR",
@@ -139,7 +146,7 @@ if __name__ == '__main__':
                         help="password to use")
 
     parser.add_argument("server")
-    parser.add_argument("action", choices=["nodes", "create", "delete", "purge", "subscribe", "unsubscribe", "publish", "retract", "get"])
+    parser.add_argument("action", choices=["nodes", "create", "delete", "get_configure", "purge", "subscribe", "unsubscribe", "publish", "retract", "get"])
     parser.add_argument("node", nargs='?')
     parser.add_argument("data", nargs='?')
 
