@@ -200,6 +200,67 @@ class XEP_0060(BasePlugin):
 
         return iq.send(callback=callback, timeout=timeout, timeout_callback=timeout_callback)
 
+    def get_configure_form(self, jid, node, ifrom=None,
+                           timeout_callback=None, callback=None, timeout=None):
+        """
+        Get the configure form for a pubsub node.
+
+        After filling this form, you should call submit_configure_form() to
+        complete the configuration operation.
+
+        Arguments:
+            jid      -- The JID of the pubsub service.
+            node     -- Optional name of the node to create. If no name is
+                        provided, the server MAY generate a node ID for you.
+                        The server can also assign a different name than the
+                        one you provide; check the result stanza to see if
+                        the server assigned a name.
+            ifrom    -- Specify the sender's JID.
+            timeout  -- The length of time (in seconds) to wait for a response
+                        before exiting the send call if blocking is used.
+                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
+            callback -- Optional reference to a stream handler function. Will
+                        be executed when a reply stanza is received.
+        """
+        iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='get')
+        iq['pubsub']['configure']['node'] = node
+        return iq.send(callback=callback, timeout=timeout, timeout_callback=timeout_callback)
+
+    def submit_configure_form(self, jid, node, config, ifrom=None,
+                              timeout_callback=None, callback=None, timeout=None):
+        """
+        Submit the configure form to a pubsub node.
+
+        Arguments:
+            jid      -- The JID of the pubsub service.
+            node     -- Optional name of the node to create. If no name is
+                        provided, the server MAY generate a node ID for you.
+                        The server can also assign a different name than the
+                        one you provide; check the result stanza to see if
+                        the server assigned a name.
+            config   -- XEP-0004 data form of configuration settings.
+            ifrom    -- Specify the sender's JID.
+            timeout  -- The length of time (in seconds) to wait for a response
+                        before exiting the send call if blocking is used.
+                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
+            callback -- Optional reference to a stream handler function. Will
+                        be executed when a reply stanza is received.
+        """
+        iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='set')
+        iq['pubsub']['configure']['node'] = node
+
+        if config is not None:
+            form_type = 'http://jabber.org/protocol/pubsub#node_config'
+            if 'FORM_TYPE' in config.get_fields():
+                config.field['FORM_TYPE']['value'] = form_type
+            else:
+                config.add_field(var='FORM_TYPE',
+                                 ftype='hidden',
+                                 value=form_type)
+            iq['pubsub']['configure'].append(config)
+
+        return iq.send(callback=callback, timeout=timeout, timeout_callback=timeout_callback)
+
     def subscribe(self, jid, node, bare=True, subscribee=None, options=None,
                   ifrom=None, timeout_callback=None, callback=None,
                   timeout=None):
