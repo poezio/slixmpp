@@ -68,7 +68,7 @@ class PubsubClient(slixmpp.ClientXMPP):
     def get_configure(self):
         try:
             configuration_form = yield from self['xep_0060'].get_node_config(self.pubsub_server, self.node)
-            logging.info('Configure form received from node %s: %s', self.node, configuration_form)
+            logging.info('Configure form received from node %s: %s', self.node, configuration_form['pubsub_owner']['configure']['form'])
         except XMPPError as error:
             logging.error('Could not retrieve configure form from node %s: %s', self.node, error.format())
 
