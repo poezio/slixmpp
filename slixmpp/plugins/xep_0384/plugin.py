@@ -9,6 +9,7 @@
 import logging
 
 from slixmpp.jid import JID
+import base64
 from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
 from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLE_NS
 from slixmpp.plugins.base import BasePlugin, register_plugin
@@ -20,6 +21,14 @@ try:
     import omemo
 except ImportError as e:
     HAS_OMEMO = False
+
+
+def b64enc(data):
+    return base64.b64encode(bytes(bytearray(data))).decode('ASCII')
+
+
+def b64dec(data):
+    return base64.b64decode(data.decode('ASCII'))
 
 
 class XEP_0384(BasePlugin):
