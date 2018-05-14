@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 HAS_OMEMO = True
 try:
     import omemo
+    from slixmpp.plugins.xep_0384.session import SessionManager
 except ImportError as e:
     HAS_OMEMO = False
 
@@ -40,6 +41,10 @@ class XEP_0384(BasePlugin):
     name = 'xep_0384'
     description = 'XEP-0384 OMEMO'
     dependencies = {'xep_0163'}
+    default_config = {
+        'cache_dir': None,
+    }
+
     backend_loaded = HAS_OMEMO
 
     device_ids = {}
@@ -49,6 +54,12 @@ class XEP_0384(BasePlugin):
             log.debug("xep_0384 cannot be loaded as the backend omemo library "
                       "is not available")
             return
+
+        self._omemo = SessionManager(
+            self.xmpp.boundjid,
+            self.cache_dir,
+        )
+        self._device_id = self._omemo.get_own_device_id()
 
         self.xmpp.add_event_handler('pubsub_publish', self.device_list)
 
