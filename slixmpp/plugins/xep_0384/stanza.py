@@ -83,7 +83,7 @@ class SignedPreKeyPublic(ElementBase):
         return self.xml.text
 
     def set_value(self, value):
-        self.xml.text = value
+        self.xml.text = str(value)
 
     def del_value(self):
         self.xml.text = ''
@@ -99,7 +99,7 @@ class SignedPreKeySignature(ElementBase):
         return self.xml.text
 
     def set_value(self, value):
-        self.xml.text = value
+        self.xml.text = str(value)
 
     def del_value(self):
         self.xml.text = ''
@@ -115,7 +115,7 @@ class IdentityKey(ElementBase):
         return self.xml.text
 
     def set_value(self, value):
-        self.xml.text = value
+        self.xml.text = str(value)
 
     def del_value(self):
         self.xml.text = ''
