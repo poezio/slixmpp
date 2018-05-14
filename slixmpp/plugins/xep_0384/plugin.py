@@ -162,4 +162,8 @@ class XEP_0384(BasePlugin):
             jid, OMEMO_DEVICES_NS, payload=payload,
         )
 
+    def is_encrypted(self, msg):
+        return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
+
+
 register_plugin(XEP_0384)
