@@ -114,6 +114,20 @@ class XEP_0384(BasePlugin):
         iq = self._generate_bundle_iq()
         await iq.send()
 
+    async def clear_device_list(self):
+        """Clear devicelist for the account"""
+
+        self_id = Device()
+        self_id['id'] = str(self._device_id)
+        devices = Devices()
+        devices['devices'] = [self_id]
+
+        await self.xmpp['xep_0060'].publish(
+            self.xmpp.boundjid.bare,
+            OMEMO_DEVICES_NS,
+            payload=devices,
+        )
+
     def _store_device_ids(self, jid, items):
         self.device_ids[jid] = []
         for item in items:
