@@ -132,7 +132,17 @@ class PreKeyPublic(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'preKeyPublic'
     plugin_attrib = name
-    interfaces = {'preKeyId'}
+    plugin_multi_attrib = 'prekeys'
+    interfaces = {'preKeyId', 'value'}
+
+    def get_value(self):
+        return self.xml.text
+
+    def set_value(self, value):
+        self.xml.text = str(value)
+
+    def del_value(self):
+        self.xml.text = ''
 
 
 register_stanza_plugin(Message, Encrypted)
