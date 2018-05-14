@@ -13,7 +13,7 @@ from slixmpp.xmlstream import register_stanza_plugin, ElementBase
 
 OMEMO_BASE_NS = 'eu.siacs.conversations.axolotl'
 OMEMO_DEVICES_NS = OMEMO_BASE_NS + '.devicelist'
-OMEMO_BUNDLE_NS = OMEMO_BASE_NS + '.bundle'
+OMEMO_BUNDLES_NS = OMEMO_BASE_NS + '.bundles'
 
 
 class Devices(ElementBase):
