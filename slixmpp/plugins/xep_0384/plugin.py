@@ -11,8 +11,8 @@ import logging
 import base64
 import asyncio
 from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
-from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLE_NS
-from slixmpp.plugins.xep_0384.stanza import Devices, Device
+from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLES_NS
+from slixmpp.plugins.xep_0384.stanza import Devices, Device, PreKeyPublic
 from slixmpp.plugins.base import BasePlugin, register_plugin
 
 log = logging.getLogger(__name__)
@@ -64,6 +64,7 @@ class XEP_0384(BasePlugin):
 
         self.xmpp.add_event_handler('pubsub_publish', self._get_device_list)
 
+        asyncio.ensure_future(self._publish_bundle())
         asyncio.ensure_future(self._set_device_list())
 
     def plugin_end(self):
@@ -75,6 +76,43 @@ class XEP_0384(BasePlugin):
 
     def session_bind(self, _jid):
         self.xmpp['xep_0163'].add_interest(OMEMO_DEVICES_NS)
+
+    def _generate_bundle_iq(self):
+        bundle = self._omemo.get_bundle()
+        log.debug('FOO2 Bundle: %r', bundle.fingerprint)
+
+        iq = self.xmpp.Iq(stype='set')
+        publish = iq['pubsub']['publish']
+        publish['node'] = '%s:%d' % (OMEMO_BUNDLES_NS, self._device_id)
+        payload = publish['item']['bundle']
+        signedPreKeyPublic = b64enc(
+            omemo.wireformat.encodePublicKey(bundle.spk['key'])
+        )
+        payload['signedPreKeyPublic']['value'] = signedPreKeyPublic
+        payload['signedPreKeyPublic']['signedPreKeyId'] = str(bundle.spk['id'])
+        payload['signedPreKeySignature']['value'] = b64enc(
+            bundle.spk_signature
+        )
+        identityKey = b64enc(omemo.wireformat.encodePublicKey(bundle.ik))
+        payload['identityKey']['value'] = identityKey
+
+        prekeys = []
+        for otpk in bundle.otpks:
+            prekey = PreKeyPublic()
+            prekey['preKeyId'] = str(otpk['id'])
+            prekey['value'] = b64enc(
+                omemo.wireformat.encodePublicKey(otpk['key'])
+            )
+            prekeys.append(prekey)
+        payload['prekeys'] = prekeys
+
+        return iq
+
+    async def _publish_bundle(self):
+        # TODO: Check if bundle is already available
+        # Otherwise publish it
+        iq = self._generate_bundle_iq()
+        await iq.send()
 
     def _store_device_ids(self, jid, items):
         self.device_ids[jid] = []
