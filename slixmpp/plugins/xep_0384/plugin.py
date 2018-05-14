@@ -8,7 +8,6 @@
 
 import logging
 
-from slixmpp.jid import JID
 import base64
 from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
 from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLE_NS
@@ -77,7 +76,7 @@ class XEP_0384(BasePlugin):
         if msg['pubsub_event']['items']['node'] != OMEMO_DEVICES_NS:
             return
 
-        jid = JID(msg['from']).bare
+        jid = msg['from'].bare
         items = msg['pubsub_event']['items']
         for item in items:
             device_ids = [d['id'] for d in item['devices']]
