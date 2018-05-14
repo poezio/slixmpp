@@ -27,6 +27,7 @@ class Device(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'device'
     plugin_attrib = name
+    plugin_multi_attrib = 'devices'
     interfaces = {'id'}
 
 
