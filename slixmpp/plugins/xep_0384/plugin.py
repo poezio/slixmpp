@@ -80,6 +80,9 @@ class XEP_0384(BasePlugin):
     def session_bind(self, _jid):
         self.xmpp['xep_0163'].add_interest(OMEMO_DEVICES_NS)
 
+    def my_device_id(self):
+        return self._device_id
+
     def _generate_bundle_iq(self):
         bundle = self._omemo.get_bundle()
         log.debug('FOO2 Bundle: %r', bundle.fingerprint)
