@@ -14,6 +14,7 @@ from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
 from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLES_NS
 from slixmpp.plugins.xep_0384.stanza import Devices, Device, Key, PreKeyPublic
 from slixmpp.plugins.base import BasePlugin, register_plugin
+from slixmpp.exceptions import IqError
 
 log = logging.getLogger(__name__)
 
@@ -153,15 +154,24 @@ class XEP_0384(BasePlugin):
             asyncio.ensure_future(self._set_device_list())
 
     async def _set_device_list(self):
-        iq = await self.xmpp['xep_0060'].get_items(
-            self.xmpp.boundjid.bare, OMEMO_DEVICES_NS,
-        )
         jid = self.xmpp.boundjid.bare
-        items = iq['pubsub']['items']
-        self._store_device_ids(jid, items)
+
+        try:
+            iq = await self.xmpp['xep_0060'].get_items(
+                self.xmpp.boundjid.bare, OMEMO_DEVICES_NS,
+            )
+            log.debug("DEVICES %r", iq)
+            items = iq['pubsub']['items']
+            self._store_device_ids(jid, items)
+        except IqError as iq_err:
+            if iq_err.condition == "item-not-found":
+                log.debug("NO DEVICES")
+                self._store_device_ids(jid, [])
+            else:
+                return  # XXX: Handle this!
 
         # Verify that this device in the list and set it if necessary
-        if self._device_id in self.device_ids[jid]:
+        if self._device_id in self.device_ids.get(jid, []):
             return
 
         self.device_ids[jid].append(self._device_id)
