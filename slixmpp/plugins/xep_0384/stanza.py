@@ -49,7 +49,16 @@ class Key(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'key'
     plugin_attrib = name
-    interfaces = {'rid', 'prekey'}
+    interfaces = {'rid', 'prekey', 'value'}
+
+    def get_value(self):
+        return self.xml.text
+
+    def set_value(self, value):
+        self.xml.text = str(value)
+
+    def del_value(self):
+        self.xml.text = ''
 
 
 class IV(ElementBase):
