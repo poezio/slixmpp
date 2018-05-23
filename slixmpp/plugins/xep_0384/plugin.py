@@ -12,7 +12,7 @@ import base64
 import asyncio
 from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
 from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLES_NS
-from slixmpp.plugins.xep_0384.stanza import Devices, Device, PreKeyPublic
+from slixmpp.plugins.xep_0384.stanza import Devices, Device, Key, PreKeyPublic
 from slixmpp.plugins.base import BasePlugin, register_plugin
 
 log = logging.getLogger(__name__)
@@ -23,6 +23,8 @@ try:
     from slixmpp.plugins.xep_0384.session import SessionManager
 except ImportError as e:
     HAS_OMEMO = False
+
+TRUE_VALUES = {True, 'true', '1'}
 
 
 def b64enc(data):
@@ -178,6 +180,26 @@ class XEP_0384(BasePlugin):
 
     def is_encrypted(self, msg):
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
+
+    def decrypt_message(self, msg):
+        header = msg['omemo_encrypted']['header']
+        payload = msg['omemo_encrypted']['payload']
+
+        jid = msg['from']
+        sid = header['sid']
+
+        key = header.xml.find("{%s}key[@rid='%s']" % (
+            OMEMO_BASE_NS, self._device_id))
+        if key is None:
+            log.debug("Saw encrypted message that wasn't for me, ignoring.")
+            return
+
+        key = Key(key)
+        prekey = key['prekey'] in TRUE_VALUES
+        message = key['value']
+        iv = header['iv']
+
+        return self._omemo.decrypt(jid, sid, iv, message, payload, prekey)
 
 
 register_plugin(XEP_0384)
