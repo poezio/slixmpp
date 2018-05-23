@@ -65,14 +65,33 @@ class IV(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'iv'
     plugin_attrib = name
-    interfaces = set()
+    interfaces = {'value'}
+
+    def get_value(self):
+        return self.xml.text
+
+    def set_value(self, value):
+        self.xml.text = str(value)
+
+    def del_value(self):
+        self.xml.text = ''
 
 
 class Payload(ElementBase):
     namespace = OMEMO_BASE_NS
     name = 'payload'
     plugin_attrib = name
-    interfaces = set()
+    interfaces = {'value'}
+
+    def get_value(self):
+        return self.xml.text
+
+    def set_value(self, value):
+        self.xml.text = str(value)
+
+    def del_value(self):
+        self.xml.text = ''
+
 
 
 class Bundle(ElementBase):

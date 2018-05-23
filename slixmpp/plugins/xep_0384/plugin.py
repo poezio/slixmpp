@@ -185,7 +185,7 @@ class XEP_0384(BasePlugin):
         header = msg['omemo_encrypted']['header']
         payload = msg['omemo_encrypted']['payload']
 
-        jid = msg['from']
+        jid = msg['from'].bare
         sid = header['sid']
 
         key = header.xml.find("{%s}key[@rid='%s']" % (

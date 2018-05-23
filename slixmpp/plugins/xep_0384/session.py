@@ -1,7 +1,7 @@
 import omemo
 from slixmpp.plugins.xep_0384.storage import SQLiteDatabase
 from omemo.util import generateDeviceID
-
+import base64
 
 class SessionManager:
     def __init__(self, own_jid, db_path):
@@ -49,6 +49,10 @@ class SessionManager:
         return self._sm.encryptMessage(jids, plaintext, bundles, devices, callback)
 
     def decrypt(self, jid, sid, iv, message, payload, prekey):
+        iv = base64.b64decode(iv.get_value())
+        payload = base64.b64decode(payload.get_value())
+        message = base64.b64decode(message)
+        sid = int(sid)
         if prekey:
             return self._sm.decryptMessage(jid, sid, iv, message, payload)
         return self._sm.decryptPreKeyMessage(jid, sid, iv, message, payload)
