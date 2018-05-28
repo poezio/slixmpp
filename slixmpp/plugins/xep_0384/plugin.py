@@ -36,6 +36,16 @@ def b64dec(data):
     return base64.b64decode(data.decode('ASCII'))
 
 
+def splitn(s, n):
+    sections = len(s) // n
+    for i in range(sections):
+        yield s[n * i:n * (i + 1)]
+
+
+def format_fingerprint(fp):
+    return ":".join(splitn(fp, 4))
+
+
 class XEP_0384(BasePlugin):
 
     """
@@ -82,6 +92,10 @@ class XEP_0384(BasePlugin):
 
     def my_device_id(self):
         return self._device_id
+
+    def my_fingerprint(self):
+        bundle = self._omemo.get_bundle()
+        return format_fingerprint(bundle.fingerprint)
 
     def _generate_bundle_iq(self):
         bundle = self._omemo.get_bundle()
