@@ -124,6 +124,8 @@ class XEP_0030(BasePlugin):
         for op in self._disco_ops:
             self.api.register(getattr(self.static, op), op, default=True)
 
+        self.domain_infos = {}
+
     def session_bind(self, jid):
         self.add_feature('http://jabber.org/protocol/disco#info')
 
@@ -295,6 +297,31 @@ class XEP_0030(BasePlugin):
                 'local': local,
                 'cached': cached}
         return self.api['has_identity'](jid, node, ifrom, data)
+
+    async def find_identities(category, type_, domain=None, timeout=None):
+        if domain is None:
+            domain = self.xmpp.boundjid.domain
+
+        if domain not in self.domain_infos:
+            infos = [self.xmpp['xep_0030'].get_info(
+                domain, timeout=timeout)]
+            iq_items = await self.xmpp['xep_0030'].get_items(
+                domain, timeout=timeout)
+            items = iq_items['disco_items']['items']
+            infos += [
+                self.xmpp['xep_0030'].get_info(item[0], timeout=timeout)
+                for item in items]
+            info_futures, _ = await asyncio.wait(infos, timeout=timeout)
+
+            self.domain_infos[domain] = [
+                future.result() for future in info_futures]
+
+        results = []
+        for info in self.domain_infos[domain]:
+            for identity in info['disco_info']['identities']:
+                if identity[0] == category and identity[1] == type_:
+                    results.append(info)
+        return results
 
     @future_wrapper
     def get_info(self, jid=None, node=None, local=None,

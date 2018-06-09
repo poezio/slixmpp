@@ -69,17 +69,9 @@ class XEP_0363(BasePlugin):
         self.xmpp.event('http_upload_request', iq)
 
     async def find_upload_service(self, timeout=None):
-        infos = [self.xmpp['xep_0030'].get_info(self.xmpp.boundjid.domain)]
-        iq_items = await self.xmpp['xep_0030'].get_items(
-                self.xmpp.boundjid.domain, timeout=timeout)
-        items = iq_items['disco_items']['items']
-        infos += [self.xmpp['xep_0030'].get_info(item[0]) for item in items]
-        info_futures, _ = await asyncio.wait(infos, timeout=timeout)
-        for future in info_futures:
-            info = future.result()
-            for identity in info['disco_info']['identities']:
-                if identity[0] == 'store' and identity[1] == 'file':
-                    return info
+        results = await self.xmpp['xep_0030'].find_identities('store', 'file')
+        if results:
+            return results[0]
 
     def request_slot(self, jid, filename, size, content_type=None, ifrom=None,
                      timeout=None, callback=None, timeout_callback=None):
