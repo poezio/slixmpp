@@ -6,6 +6,7 @@
     See the file LICENSE for copying permission.
 """
 
+import asyncio
 import logging
 
 from slixmpp import Iq
