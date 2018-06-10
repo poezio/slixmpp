@@ -4,5 +4,5 @@ test:
   image: ubuntu:latest
   script:
     - apt update
-    - apt install -y python3 cython3
+    - apt install -y python3 cython3 gpg
     - ./run_tests.py
