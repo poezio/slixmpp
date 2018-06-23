@@ -138,7 +138,11 @@ class XEP_0153(BasePlugin):
             if iq['type'] == 'error':
                 log.debug('Could not retrieve vCard for %s', jid)
                 return
-            data = iq['vcard_temp']['PHOTO']['BINVAL']
+            try:
+                data = iq['vcard_temp']['PHOTO']['BINVAL']
+            except ValueError:
+                log.debug('Invalid BINVAL in vCard’s PHOTO for %s:', jid, exc_info=True)
+                data = None
             if not data:
                 new_hash = ''
             else:
