@@ -303,13 +303,13 @@ class XEP_0030(BasePlugin):
             domain = self.xmpp.boundjid.domain
 
         if domain not in self.domain_infos:
-            infos = [self.xmpp['xep_0030'].get_info(
+            infos = [self.get_info(
                 domain, timeout=timeout)]
-            iq_items = await self.xmpp['xep_0030'].get_items(
+            iq_items = await self.get_items(
                 domain, timeout=timeout)
             items = iq_items['disco_items']['items']
             infos += [
-                self.xmpp['xep_0030'].get_info(item[0], timeout=timeout)
+                self.get_info(item[0], timeout=timeout)
                 for item in items]
             info_futures, _ = await asyncio.wait(infos, timeout=timeout)
 
