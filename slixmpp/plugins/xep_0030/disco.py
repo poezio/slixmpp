@@ -298,18 +298,19 @@ class XEP_0030(BasePlugin):
                 'cached': cached}
         return self.api['has_identity'](jid, node, ifrom, data)
 
-    async def find_identities(category, type_, domain=None, timeout=None):
+    async def find_identities(category, type_, domain=None, timeout=None,
+                              **kwargs):
         if domain is None:
             domain = self.xmpp.boundjid.domain
 
         if domain not in self.domain_infos:
             infos = [self.get_info(
-                domain, timeout=timeout)]
+                domain, timeout=timeout, **kwargs)]
             iq_items = await self.get_items(
-                domain, timeout=timeout)
+                domain, timeout=timeout, **kwargs)
             items = iq_items['disco_items']['items']
             infos += [
-                self.get_info(item[0], timeout=timeout)
+                self.get_info(item[0], timeout=timeout, **kwargs)
                 for item in items]
             info_futures, _ = await asyncio.wait(infos, timeout=timeout)
 
