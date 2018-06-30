@@ -299,11 +299,11 @@ class XEP_0030(BasePlugin):
         return self.api['has_identity'](jid, node, ifrom, data)
 
     async def find_identities(category, type_, domain=None, timeout=None,
-                              **kwargs):
+                              cached=True, **kwargs):
         if domain is None:
             domain = self.xmpp.boundjid.domain
 
-        if domain not in self.domain_infos:
+        if not cached or domain not in self.domain_infos:
             infos = [self.get_info(
                 domain, timeout=timeout, **kwargs)]
             iq_items = await self.get_items(
