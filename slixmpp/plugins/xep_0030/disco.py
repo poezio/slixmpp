@@ -298,8 +298,8 @@ class XEP_0030(BasePlugin):
                 'cached': cached}
         return self.api['has_identity'](jid, node, ifrom, data)
 
-    async def find_identities(category, type_, domain=None, timeout=None,
-                              cached=True, callback=None, **kwargs):
+    async def get_info_from_domain(self, domain=None, timeout=None,
+                                   cached=True, callback=None, **kwargs):
         if domain is None:
             domain = self.xmpp.boundjid.domain
 
@@ -317,11 +317,7 @@ class XEP_0030(BasePlugin):
             self.domain_infos[domain] = [
                 future.result() for future in info_futures]
 
-        results = []
-        for info in self.domain_infos[domain]:
-            for identity in info['disco_info']['identities']:
-                if identity[0] == category and identity[1] == type_:
-                    results.append(info)
+        results = self.domain_infos[domain]
 
         if callback is not None:
             callback(results)
