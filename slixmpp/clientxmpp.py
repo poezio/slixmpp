@@ -265,8 +265,7 @@ class ClientXMPP(BaseXMPP):
         self.bindfail = False
         self.features = set()
 
-    @asyncio.coroutine
-    def _handle_stream_features(self, features):
+    async def _handle_stream_features(self, features):
         """Process the received stream features.
 
         :param features: The features stanza.
@@ -275,7 +274,7 @@ class ClientXMPP(BaseXMPP):
             if name in features['features']:
                 handler, restart = self._stream_feature_handlers[name]
                 if asyncio.iscoroutinefunction(handler):
-                    result = yield from handler(features)
+                    result = await handler(features)
                 else:
                     result = handler(features)
                 if result and restart:

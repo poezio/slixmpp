@@ -45,8 +45,7 @@ def default_resolver(loop):
     return None
 
 
-@asyncio.coroutine
-def resolve(host, port=None, service=None, proto='tcp',
+async def resolve(host, port=None, service=None, proto='tcp',
             resolver=None, use_ipv6=True, use_aiodns=True, loop=None):
     """Peform DNS resolution for a given hostname.
 
@@ -127,7 +126,7 @@ def resolve(host, port=None, service=None, proto='tcp',
     if not service:
         hosts = [(host, port)]
     else:
-        hosts = yield from get_SRV(host, port, service, proto,
+        hosts = await get_SRV(host, port, service, proto,
                                    resolver=resolver,
                                    use_aiodns=use_aiodns)
         if not hosts:
@@ -141,19 +140,18 @@ def resolve(host, port=None, service=None, proto='tcp',
             results.append((host, '127.0.0.1', port))
 
         if use_ipv6:
-            aaaa = yield from get_AAAA(host, resolver=resolver,
+            aaaa = await get_AAAA(host, resolver=resolver,
                                        use_aiodns=use_aiodns, loop=loop)
             for address in aaaa:
                 results.append((host, address, port))
 
-        a = yield from get_A(host, resolver=resolver,
+        a = await get_A(host, resolver=resolver,
                              use_aiodns=use_aiodns, loop=loop)
         for address in a:
             results.append((host, address, port))
 
     return results
 
-@asyncio.coroutine
 def get_A(host, resolver=None, use_aiodns=True, loop=None):
     """Lookup DNS A records for a given host.
 
@@ -178,7 +176,7 @@ def get_A(host, resolver=None, use_aiodns=True, loop=None):
     # getaddrinfo() method.
     if resolver is None or not use_aiodns:
         try:
-            recs = yield from loop.getaddrinfo(host, None,
+            recs = await loop.getaddrinfo(host, None,
                                                family=socket.AF_INET,
                                                type=socket.SOCK_STREAM)
             return [rec[4][0] for rec in recs]
@@ -189,15 +187,14 @@ def get_A(host, resolver=None, use_aiodns=True, loop=None):
     # Using aiodns:
     future = resolver.query(host, 'A')
     try:
-        recs = yield from future
+        recs = await future
     except Exception as e:
         log.debug('DNS: Exception while querying for %s A records: %s', host, e)
         recs = []
     return [rec.host for rec in recs]
 
 
-@asyncio.coroutine
-def get_AAAA(host, resolver=None, use_aiodns=True, loop=None):
+async def get_AAAA(host, resolver=None, use_aiodns=True, loop=None):
     """Lookup DNS AAAA records for a given host.
 
     If ``resolver`` is not provided, or is ``None``, then resolution will
@@ -224,7 +221,7 @@ def get_AAAA(host, resolver=None, use_aiodns=True, loop=None):
             log.debug("DNS: Unable to query %s for AAAA records: IPv6 is not supported", host)
             return []
         try:
-            recs = yield from loop.getaddrinfo(host, None,
+            recs = await loop.getaddrinfo(host, None,
                                                family=socket.AF_INET6,
                                                type=socket.SOCK_STREAM)
             return [rec[4][0] for rec in recs]
@@ -236,14 +233,13 @@ def get_AAAA(host, resolver=None, use_aiodns=True, loop=None):
     # Using aiodns:
     future = resolver.query(host, 'AAAA')
     try:
-        recs = yield from future
+        recs = await future
     except Exception as e:
         log.debug('DNS: Exception while querying for %s AAAA records: %s', host, e)
         recs = []
     return [rec.host for rec in recs]
 
-@asyncio.coroutine
-def get_SRV(host, port, service, proto='tcp', resolver=None, use_aiodns=True):
+async def get_SRV(host, port, service, proto='tcp', resolver=None, use_aiodns=True):
     """Perform SRV record resolution for a given host.
 
     .. note::
@@ -277,7 +273,7 @@ def get_SRV(host, port, service, proto='tcp', resolver=None, use_aiodns=True):
     try:
         future = resolver.query('_%s._%s.%s' % (service, proto, host),
                                 'SRV')
-        recs = yield from future
+        recs = await future
     except Exception as e:
         log.debug('DNS: Exception while querying for %s SRV records: %s', host, e)
         return []

@@ -35,8 +35,7 @@ class FeatureSession(BasePlugin):
         register_stanza_plugin(Iq, stanza.Session)
         register_stanza_plugin(StreamFeatures, stanza.Session)
 
-    @asyncio.coroutine
-    def _handle_start_session(self, features):
+    async def _handle_start_session(self, features):
         """
         Handle the start of the session.
 
@@ -51,7 +50,7 @@ class FeatureSession(BasePlugin):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq.enable('session')
-        yield from iq.send(callback=self._on_start_session_response)
+        await iq.send(callback=self._on_start_session_response)
 
     def _on_start_session_response(self, response):
         self.xmpp.features.add('session')

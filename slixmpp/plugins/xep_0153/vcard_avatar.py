@@ -98,10 +98,9 @@ class XEP_0153(BasePlugin):
         first_future.add_done_callback(propagate_timeout_exception)
         return future
 
-    @asyncio.coroutine
-    def _start(self, event):
+    async def _start(self, event):
         try:
-            vcard = yield from self.xmpp['xep_0054'].get_vcard(self.xmpp.boundjid.bare)
+            vcard = await self.xmpp['xep_0054'].get_vcard(self.xmpp.boundjid.bare)
             data = vcard['vcard_temp']['PHOTO']['BINVAL']
             if not data:
                 new_hash = ''

@@ -137,8 +137,8 @@ class Socks5Protocol(asyncio.Protocol):
     def resume_writing(self):
         self.paused.set_result(None)
 
-    def write(self, data):
-        yield from self.paused
+    async def write(self, data):
+        await self.paused
         self.transport.write(data)
 
     def _send_methods(self):

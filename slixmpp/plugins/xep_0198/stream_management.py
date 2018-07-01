@@ -174,8 +174,7 @@ class XEP_0198(BasePlugin):
         req = stanza.RequestAck(self.xmpp)
         self.xmpp.send_raw(str(req))
 
-    @asyncio.coroutine
-    def _handle_sm_feature(self, features):
+    async def _handle_sm_feature(self, features):
         """
         Enable or resume stream management.
 
@@ -203,7 +202,7 @@ class XEP_0198(BasePlugin):
                             MatchXPath(stanza.Enabled.tag_name()),
                             MatchXPath(stanza.Failed.tag_name())]))
                 self.xmpp.register_handler(waiter)
-                result = yield from waiter.wait()
+                result = await waiter.wait()
         elif self.sm_id and self.allow_resume and 'bind' not in self.xmpp.features:
             self.enabled = True
             resume = stanza.Resume(self.xmpp)
@@ -219,7 +218,7 @@ class XEP_0198(BasePlugin):
                         MatchXPath(stanza.Resumed.tag_name()),
                         MatchXPath(stanza.Failed.tag_name())]))
             self.xmpp.register_handler(waiter)
-            result = yield from waiter.wait()
+            result = await waiter.wait()
             if result is not None and result.name == 'resumed':
                 return True
         return False

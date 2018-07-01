@@ -287,11 +287,10 @@ class XMLStream(asyncio.BaseProtocol):
         self.event("connecting")
         self._current_connection_attempt = asyncio.ensure_future(self._connect_routine())
 
-    @asyncio.coroutine
-    def _connect_routine(self):
+    async def _connect_routine(self):
         self.event_when_connected = "connected"
 
-        record = yield from self.pick_dns_answer(self.default_domain)
+        record = await self.pick_dns_answer(self.default_domain)
         if record is not None:
             host, address, dns_port = record
             port = dns_port if dns_port else self.address[1]
@@ -307,9 +306,9 @@ class XMLStream(asyncio.BaseProtocol):
         else:
             ssl_context = None
 
-        yield from asyncio.sleep(self.connect_loop_wait)
+        await asyncio.sleep(self.connect_loop_wait)
         try:
-            yield from self.loop.create_connection(lambda: self,
+            await self.loop.create_connection(lambda: self,
                                                    self.address[0],
                                                    self.address[1],
                                                    ssl=ssl_context,
@@ -540,10 +539,9 @@ class XMLStream(asyncio.BaseProtocol):
         ssl_connect_routine = self.loop.create_connection(lambda: self, ssl=ssl_context,
                                                           sock=self.socket,
                                                           server_hostname=self.default_domain)
-        @asyncio.coroutine
-        def ssl_coro():
+        async def ssl_coro():
             try:
-                transp, prot = yield from ssl_connect_routine
+                transp, prot = await ssl_connect_routine
             except ssl.SSLError as e:
                 log.debug('SSL: Unable to connect', exc_info=True)
                 log.error('CERT: Invalid certificate trust chain.')
@@ -671,8 +669,7 @@ class XMLStream(asyncio.BaseProtocol):
             idx += 1
         return False
 
-    @asyncio.coroutine
-    def get_dns_records(self, domain, port=None):
+    async def get_dns_records(self, domain, port=None):
         """Get the DNS records for a domain.
 
         :param domain: The domain in question.
@@ -684,7 +681,7 @@ class XMLStream(asyncio.BaseProtocol):
         resolver = default_resolver(loop=self.loop)
         self.configure_dns(resolver, domain=domain, port=port)
 
-        result = yield from resolve(domain, port,
+        result = await resolve(domain, port,
                                     service=self.dns_service,
                                     resolver=resolver,
                                     use_ipv6=self.use_ipv6,
@@ -692,8 +689,7 @@ class XMLStream(asyncio.BaseProtocol):
                                     loop=self.loop)
         return result
 
-    @asyncio.coroutine
-    def pick_dns_answer(self, domain, port=None):
+    async def pick_dns_answer(self, domain, port=None):
         """Pick a server and port from DNS answers.
 
         Gets DNS answers if none available.
@@ -703,7 +699,7 @@ class XMLStream(asyncio.BaseProtocol):
         :param port: If the results don't include a port, use this one.
         """
         if self.dns_answers is None:
-            dns_records = yield from self.get_dns_records(domain, port)
+            dns_records = await self.get_dns_records(domain, port)
             self.dns_answers = iter(dns_records)
 
         try:
@@ -768,10 +764,9 @@ class XMLStream(asyncio.BaseProtocol):
             # If the callback is a coroutine, schedule it instead of
             # running it directly
             if asyncio.iscoroutinefunction(handler_callback):
-                @asyncio.coroutine
-                def handler_callback_routine(cb):
+                async def handler_callback_routine(cb):
                     try:
-                        yield from cb(data)
+                        await cb(data)
                     except Exception as e:
                         if old_exception:
                             old_exception(e)

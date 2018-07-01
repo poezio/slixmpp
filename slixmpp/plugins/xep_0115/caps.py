@@ -137,8 +137,7 @@ class XEP_0115(BasePlugin):
 
         self.xmpp.event('entity_caps', p)
 
-    @asyncio.coroutine
-    def _process_caps(self, pres):
+    async def _process_caps(self, pres):
         if not pres['caps']['hash']:
             log.debug("Received unsupported legacy caps: %s, %s, %s",
                     pres['caps']['node'],
@@ -169,7 +168,7 @@ class XEP_0115(BasePlugin):
         log.debug("New caps verification string: %s", ver)
         try:
             node = '%s#%s' % (pres['caps']['node'], ver)
-            caps = yield from self.xmpp['xep_0030'].get_info(pres['from'], node,
+            caps = await self.xmpp['xep_0030'].get_info(pres['from'], node,
                                                              coroutine=True)
 
             if isinstance(caps, Iq):
@@ -285,10 +284,9 @@ class XEP_0115(BasePlugin):
         binary = hash(S.encode('utf8')).digest()
         return base64.b64encode(binary).decode('utf-8')
 
-    @asyncio.coroutine
-    def update_caps(self, jid=None, node=None, preserve=False):
+    async def update_caps(self, jid=None, node=None, preserve=False):
         try:
-            info = yield from self.xmpp['xep_0030'].get_info(jid, node, local=True)
+            info = await self.xmpp['xep_0030'].get_info(jid, node, local=True)
             if isinstance(info, Iq):
                 info = info['disco_info']
             ver = self.generate_verstring(info, self.hash)

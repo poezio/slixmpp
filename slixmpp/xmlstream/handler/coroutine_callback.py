@@ -45,10 +45,9 @@ class CoroutineCallback(BaseHandler):
         if not asyncio.iscoroutinefunction(pointer):
             raise ValueError("Given function is not a coroutine")
 
-        @asyncio.coroutine
-        def pointer_wrapper(stanza, *args, **kwargs):
+        async def pointer_wrapper(stanza, *args, **kwargs):
             try:
-                yield from pointer(stanza, *args, **kwargs)
+                await pointer(stanza, *args, **kwargs)
             except Exception as e:
                 stanza.exception(e)
 

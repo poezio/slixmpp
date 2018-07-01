@@ -31,8 +31,7 @@ class IBBytestream(object):
 
         self.recv_queue = asyncio.Queue()
 
-    @asyncio.coroutine
-    def send(self, data, timeout=None):
+    async def send(self, data, timeout=None):
         if not self.stream_started or self.stream_out_closed:
             raise socket.error
         if len(data) > self.block_size:
@@ -56,22 +55,20 @@ class IBBytestream(object):
             iq['ibb_data']['sid'] = self.sid
             iq['ibb_data']['seq'] = seq
             iq['ibb_data']['data'] = data
-            yield from iq.send(timeout=timeout)
+            await iq.send(timeout=timeout)
         return len(data)
 
-    @asyncio.coroutine
-    def sendall(self, data, timeout=None):
+    async def sendall(self, data, timeout=None):
         sent_len = 0
         while sent_len < len(data):
-            sent_len += yield from self.send(data[sent_len:self.block_size], timeout=timeout)
+            sent_len += await self.send(data[sent_len:self.block_size], timeout=timeout)
 
-    @asyncio.coroutine
-    def sendfile(self, file, timeout=None):
+    async def sendfile(self, file, timeout=None):
         while True:
             data = file.read(self.block_size)
             if not data:
                 break
-            yield from self.send(data, timeout=timeout)
+            await self.send(data, timeout=timeout)
 
     def _recv_data(self, stanza):
         new_seq = stanza['ibb_data']['seq']

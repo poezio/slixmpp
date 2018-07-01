@@ -55,18 +55,17 @@ class XEP_0065(BasePlugin):
         """Returns the socket associated to the SID."""
         return self._sessions.get(sid, None)
 
-    @asyncio.coroutine
-    def handshake(self, to, ifrom=None, sid=None, timeout=None):
+    async def handshake(self, to, ifrom=None, sid=None, timeout=None):
         """ Starts the handshake to establish the socks5 bytestreams
         connection.
         """
         if not self._proxies:
-            self._proxies = yield from self.discover_proxies()
+            self._proxies = await self.discover_proxies()
 
         if sid is None:
             sid = uuid4().hex
 
-        used = yield from self.request_stream(to, sid=sid, ifrom=ifrom, timeout=timeout)
+        used = await self.request_stream(to, sid=sid, ifrom=ifrom, timeout=timeout)
         proxy = used['socks']['streamhost_used']['jid']
 
         if proxy not in self._proxies:
@@ -74,16 +73,16 @@ class XEP_0065(BasePlugin):
             return
 
         try:
-            self._sessions[sid] = (yield from self._connect_proxy(
+            self._sessions[sid] = (await self._connect_proxy(
                     self._get_dest_sha1(sid, self.xmpp.boundjid, to),
                     self._proxies[proxy][0],
                     self._proxies[proxy][1]))[1]
         except socket.error:
             return None
-        addr, port = yield from self._sessions[sid].connected
+        addr, port = await self._sessions[sid].connected
 
         # Request that the proxy activate the session with the target.
-        yield from self.activate(proxy, sid, to, timeout=timeout)
+        await self.activate(proxy, sid, to, timeout=timeout)
         sock = self.get_socket(sid)
         self.xmpp.event('stream:%s:%s' % (sid, to), sock)
         return sock
@@ -105,8 +104,7 @@ class XEP_0065(BasePlugin):
             iq['socks'].add_streamhost(proxy, host, port)
         return iq.send(timeout=timeout, callback=callback)
 
-    @asyncio.coroutine
-    def discover_proxies(self, jid=None, ifrom=None, timeout=None):
+    async def discover_proxies(self, jid=None, ifrom=None, timeout=None):
         """Auto-discover the JIDs of SOCKS5 proxies on an XMPP server."""
         if jid is None:
             if self.xmpp.is_component:
@@ -116,7 +114,7 @@ class XEP_0065(BasePlugin):
 
         discovered = set()
 
-        disco_items = yield from self.xmpp['xep_0030'].get_items(jid, timeout=timeout)
+        disco_items = await self.xmpp['xep_0030'].get_items(jid, timeout=timeout)
         disco_items = {item[0] for item in disco_items['disco_items']['items']}
 
         disco_info_futures = {}
@@ -125,7 +123,7 @@ class XEP_0065(BasePlugin):
 
         for item in disco_items:
             try:
-                disco_info = yield from disco_info_futures[item]
+                disco_info = await disco_info_futures[item]
             except XMPPError:
                 continue
             else:
@@ -137,7 +135,7 @@ class XEP_0065(BasePlugin):
 
         for jid in discovered:
             try:
-                addr = yield from self.get_network_address(jid, ifrom=ifrom, timeout=timeout)
+                addr = await self.get_network_address(jid, ifrom=ifrom, timeout=timeout)
                 self._proxies[jid] = (addr['socks']['streamhost']['host'],
                                       addr['socks']['streamhost']['port'])
             except XMPPError:
@@ -182,9 +180,8 @@ class XEP_0065(BasePlugin):
                     streamhost['host'],
                     streamhost['port']))
 
-        @asyncio.coroutine
-        def gather(futures, iq, streamhosts):
-            proxies = yield from asyncio.gather(*futures, return_exceptions=True)
+        async def gather(futures, iq, streamhosts):
+            proxies = await asyncio.gather(*futures, return_exceptions=True)
             for streamhost, proxy in zip(streamhosts, proxies):
                 if isinstance(proxy, ValueError):
                     continue
@@ -194,7 +191,7 @@ class XEP_0065(BasePlugin):
                 proxy = proxy[1]
                 # TODO: what if the future never happens?
                 try:
-                    addr, port = yield from proxy.connected
+                    addr, port = await proxy.connected
                 except socket.error:
                     log.exception('Socket error while connecting to the proxy.')
                     continue

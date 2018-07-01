@@ -50,8 +50,7 @@ class Waiter(BaseHandler):
         """Do not process this handler during the main event loop."""
         pass
 
-    @asyncio.coroutine
-    def wait(self, timeout=None):
+    async def wait(self, timeout=None):
         """Block an event handler while waiting for a stanza to arrive.
 
         Be aware that this will impact performance if called from a
@@ -70,7 +69,7 @@ class Waiter(BaseHandler):
 
         stanza = None
         try:
-            stanza = yield from self._payload.get()
+            stanza = await self._payload.get()
         except TimeoutError:
             log.warning("Timed out waiting for %s", self.name)
         self.stream().remove_handler(self.name)
