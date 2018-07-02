@@ -152,7 +152,7 @@ async def resolve(host, port=None, service=None, proto='tcp',
 
     return results
 
-def get_A(host, resolver=None, use_aiodns=True, loop=None):
+async def get_A(host, resolver=None, use_aiodns=True, loop=None):
     """Lookup DNS A records for a given host.
 
     If ``resolver`` is not provided, or is ``None``, then resolution will
