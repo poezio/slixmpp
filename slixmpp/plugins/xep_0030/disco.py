@@ -6,6 +6,7 @@
     See the file LICENSE for copying permission.
 """
 
+import asyncio
 import logging
 
 from slixmpp import Iq
@@ -122,6 +123,8 @@ class XEP_0030(BasePlugin):
 
         for op in self._disco_ops:
             self.api.register(getattr(self.static, op), op, default=True)
+
+        self.domain_infos = {}
 
     def session_bind(self, jid):
         self.add_feature('http://jabber.org/protocol/disco#info')
@@ -294,6 +297,31 @@ class XEP_0030(BasePlugin):
                 'local': local,
                 'cached': cached}
         return self.api['has_identity'](jid, node, ifrom, data)
+
+    async def get_info_from_domain(self, domain=None, timeout=None,
+                                   cached=True, callback=None, **kwargs):
+        if domain is None:
+            domain = self.xmpp.boundjid.domain
+
+        if not cached or domain not in self.domain_infos:
+            infos = [self.get_info(
+                domain, timeout=timeout, **kwargs)]
+            iq_items = await self.get_items(
+                domain, timeout=timeout, **kwargs)
+            items = iq_items['disco_items']['items']
+            infos += [
+                self.get_info(item[0], timeout=timeout, **kwargs)
+                for item in items]
+            info_futures, _ = await asyncio.wait(infos, timeout=timeout)
+
+            self.domain_infos[domain] = [
+                future.result() for future in info_futures]
+
+        results = self.domain_infos[domain]
+
+        if callback is not None:
+            callback(results)
+        return results
 
     @future_wrapper
     def get_info(self, jid=None, node=None, local=None,
