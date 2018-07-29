@@ -291,7 +291,7 @@ class XEP_0323(BasePlugin):
                 request_delay_sec = dtdiff.seconds + dtdiff.days * 24 * 3600
                 if request_delay_sec <= 0:
                     req_ok = False
-                    error_msg = "Invalid datetime in 'when' flag, cannot set a time in the past. Current time: " + dtnow.isoformat()
+                    error_msg = "Invalid datetime in 'when' flag, cannot set a time in the past (%s). Current time: %s" % (dt.isoformat(), dtnow.isoformat())
 
         if req_ok:
             session = self._new_session()
