@@ -4,6 +4,7 @@ import sys
 import datetime
 import time
 import threading
+import re
 
 from slixmpp.test import *
 from slixmpp.xmlstream import ElementBase
@@ -771,7 +772,7 @@ class TestStreamSensorData(SlixTest):
         # Remove the returned datetime to allow predictable test
         xml_stanza = self._filtered_stanza_prepare()
         error_text = xml_stanza['rejected']['error'] #['text']
-        error_text = error_text[:error_text.find(':')]
+        error_text = re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[\+\-]\d{2}:\d{2})?', '…', error_text)
         xml_stanza['rejected']['error'] = error_text
 
         self._filtered_stanza_check("""
@@ -780,7 +781,7 @@ class TestStreamSensorData(SlixTest):
                 to='master@clayster.com/amr'
                 id='1'>
                 <rejected xmlns='urn:xmpp:iot:sensordata' seqnr='1'>
-                    <error>Invalid datetime in 'when' flag, cannot set a time in the past. Current time</error>
+                    <error>Invalid datetime in 'when' flag, cannot set a time in the past (…). Current time: …</error>
                 </rejected>
             </iq>
             """, xml_stanza)
