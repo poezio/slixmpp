@@ -123,7 +123,7 @@ class XEP_0054(BasePlugin):
         if iq['type'] == 'result':
             self.api['set_vcard'](jid=iq['from'], args=iq['vcard_temp'])
             return
-        elif iq['type'] == 'get':
+        elif iq['type'] == 'get' and self.xmpp.is_component:
             vcard = self.api['get_vcard'](iq['from'].bare)
             if isinstance(vcard, Iq):
                 vcard.send()
