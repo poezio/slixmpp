@@ -116,7 +116,7 @@ class FeatureMechanisms(BasePlugin):
             if value == 'encrypted':
                 if 'starttls' in self.xmpp.features:
                     result[value] = True
-                elif isinstance(self.xmpp.socket, ssl.SSLSocket):
+                elif isinstance(self.xmpp.socket, (ssl.SSLSocket, ssl.SSLObject)):
                     result[value] = True
                 else:
                     result[value] = False
