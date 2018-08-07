@@ -12,7 +12,7 @@ from slixmpp.stanza import StreamFeatures
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream.matcher import MatchXPath
-from slixmpp.xmlstream.handler import Callback
+from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.features.feature_starttls import stanza
 
 
@@ -28,7 +28,7 @@ class FeatureSTARTTLS(BasePlugin):
 
     def plugin_init(self):
         self.xmpp.register_handler(
-                Callback('STARTTLS Proceed',
+                CoroutineCallback('STARTTLS Proceed',
                         MatchXPath(stanza.Proceed.tag_name()),
                         self._handle_starttls_proceed,
                         instream=True))
@@ -58,8 +58,8 @@ class FeatureSTARTTLS(BasePlugin):
             self.xmpp.send(features['starttls'])
             return True
 
-    def _handle_starttls_proceed(self, proceed):
+    async def _handle_starttls_proceed(self, proceed):
         """Restart the XML stream when TLS is accepted."""
         log.debug("Starting TLS")
-        if self.xmpp.start_tls():
+        if await self.xmpp.start_tls():
             self.xmpp.features.add('starttls')
