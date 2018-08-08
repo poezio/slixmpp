@@ -65,9 +65,14 @@ class XEP_0092(BasePlugin):
             iq -- The Iq stanza containing the software version query.
         """
         iq = iq.reply()
-        iq['software_version']['name'] = self.software_name
-        iq['software_version']['version'] = self.version
-        iq['software_version']['os'] = self.os
+        if self.software_name:
+            iq['software_version']['name'] = self.software_name
+            iq['software_version']['version'] = self.version
+            iq['software_version']['os'] = self.os
+        else:
+            iq.error()
+            iq['error']['type'] = 'cancel'
+            iq['error']['condition'] = 'forbidden'
         iq.send()
 
     def get_version(self, jid, ifrom=None, timeout=None, callback=None,
