@@ -9,6 +9,10 @@
 import logging
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
+import asyncio
+# Required for python < 3.7 to use the old ssl implementation
+# and manage to do starttls as an unintended side effect
+asyncio.sslproto._is_sslproto_available = lambda: False
 
 from slixmpp.stanza import Message, Presence, Iq
 from slixmpp.jid import JID, InvalidJID

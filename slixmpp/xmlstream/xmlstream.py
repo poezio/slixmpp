@@ -539,7 +539,17 @@ class XMLStream(asyncio.BaseProtocol):
         self.event_when_connected = "tls_success"
         ssl_context = self.get_ssl_context()
         try:
-            transp = await self.loop.start_tls(self.transport, self, ssl_context)
+            if hasattr(self.loop, 'start_tls'):
+                transp = await self.loop.start_tls(self.transport,
+                                                   self, ssl_context)
+            # Python < 3.7
+            else:
+                transp, _ = await self.loop.create_connection(
+                    lambda: self,
+                    ssl=self.ssl_context,
+                    sock=self.socket,
+                    server_hostname=self.default_domain
+                )
         except ssl.SSLError as e:
             log.debug('SSL: Unable to connect', exc_info=True)
             log.error('CERT: Invalid certificate trust chain.')
@@ -551,7 +561,10 @@ class XMLStream(asyncio.BaseProtocol):
         der_cert = transp.get_extra_info("ssl_object").getpeercert(True)
         pem_cert = ssl.DER_cert_to_PEM_cert(der_cert)
         self.event('ssl_cert', pem_cert)
-        self.connection_made(transp)
+        # If we use the builtin start_tls, the connection_made() protocol
+        # method is not called automatically
+        if hasattr(self.loop, 'start_tls'):
+            self.connection_made(transp)
         return True
 
     def _start_keepalive(self, event):
