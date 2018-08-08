@@ -72,7 +72,7 @@ class XEP_0092(BasePlugin):
         else:
             iq.error()
             iq['error']['type'] = 'cancel'
-            iq['error']['condition'] = 'forbidden'
+            iq['error']['condition'] = 'service-unavailable'
         iq.send()
 
     def get_version(self, jid, ifrom=None, timeout=None, callback=None,
