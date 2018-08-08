@@ -21,7 +21,7 @@ Slixmpp
     which goal is to use asyncio instead of threads to handle networking. See
     :ref:`differences`.
 
-Slixmpp is an :ref:`MIT licensed <license>` XMPP library for Python 3.4+,
+Slixmpp is an :ref:`MIT licensed <license>` XMPP library for Python 3.5+,
 
 Slixmpp's design goals and philosphy are:
 

@@ -3,8 +3,8 @@
 Differences from SleekXMPP
 ==========================
 
-**Python 3.4+ only**
-    slixmpp will only work on python 3.4 and above.
+**Python 3.5+ only**
+    slixmpp will only work on python 3.5 and above.
 
 **Stanza copies**
     The same stanza object is given through all the handlers; a handler that

@@ -1,5 +1,5 @@
 Pre-requisites:
-- Python 3.4
+- Python 3.5+
 - Cython 0.22 and libidn, optionally (making JID faster by compiling the stringprep module)
 
 Install:

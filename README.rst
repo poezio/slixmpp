@@ -1,7 +1,7 @@
 Slixmpp
 #########
 
-Slixmpp is an MIT licensed XMPP library for Python 3.4+. It is a fork of
+Slixmpp is an MIT licensed XMPP library for Python 3.5+. It is a fork of
 SleekXMPP.
 
 Slixmpp's goals is to only rewrite the core of the library (the low level
