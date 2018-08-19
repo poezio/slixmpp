@@ -347,27 +347,7 @@ class JID:
         return self._node
 
     @property
-    def user(self):
-        return self._node
-
-    @property
-    def local(self):
-        return self._node
-
-    @property
-    def username(self):
-        return self._node
-
-    @property
     def domain(self):
-        return self._domain
-
-    @property
-    def server(self):
-        return self._domain
-
-    @property
-    def host(self):
         return self._domain
 
     @property
@@ -382,42 +362,13 @@ class JID:
     def full(self):
         return self._full
 
-    @property
-    def jid(self):
-        return self._full
-
     @node.setter
     def node(self, value):
         self._node = _validate_node(value)
         self._update_bare_full()
 
-    @user.setter
-    def user(self, value):
-        self._node = _validate_node(value)
-        self._update_bare_full()
-
-    @local.setter
-    def local(self, value):
-        self._node = _validate_node(value)
-        self._update_bare_full()
-
-    @username.setter
-    def username(self, value):
-        self._node = _validate_node(value)
-        self._update_bare_full()
-
     @domain.setter
     def domain(self, value):
-        self._domain = _validate_domain(value)
-        self._update_bare_full()
-
-    @server.setter
-    def server(self, value):
-        self._domain = _validate_domain(value)
-        self._update_bare_full()
-
-    @host.setter
-    def host(self, value):
         self._domain = _validate_domain(value)
         self._update_bare_full()
 
@@ -439,10 +390,14 @@ class JID:
         self._node, self._domain, self._resource = _parse_jid(value)
         self._update_bare_full()
 
-    @jid.setter
-    def jid(self, value):
-        self._node, self._domain, self._resource = _parse_jid(value)
-        self._update_bare_full()
+    user = node
+    local = node
+    username = node
+
+    server = domain
+    host = domain
+
+    jid = full
 
     def __str__(self):
         """Use the full JID as the string value."""
