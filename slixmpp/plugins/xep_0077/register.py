@@ -90,6 +90,17 @@ class XEP_0077(BasePlugin):
         iq.enable('register')
         return iq.send(timeout=timeout, callback=callback)
 
+    def set_registration(self, fields, jid=None, ifrom=None,
+                         timeout=None, callback=None):
+        iq = self.xmpp.Iq()
+        iq['type'] = 'set'
+        iq['to'] = jid
+        iq.enable('register')
+        iq['register']['form']['type'] = 'submit'
+        for field in fields:
+            iq['register']['form'].add_field(**field)
+        return iq.send(timeout=timeout, callback=callback)
+
     def cancel_registration(self, jid=None, ifrom=None,
                             timeout=None, callback=None):
         iq = self.xmpp.Iq()
