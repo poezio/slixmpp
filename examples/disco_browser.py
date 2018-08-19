@@ -54,8 +54,7 @@ class Disco(slixmpp.ClientXMPP):
         # our roster.
         self.add_event_handler("session_start", self.start)
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -77,13 +76,13 @@ class Disco(slixmpp.ClientXMPP):
         try:
             if self.get in self.info_types:
                 # function using the callback parameter.
-                info = yield from self['xep_0030'].get_info(jid=self.target_jid,
+                info = await self['xep_0030'].get_info(jid=self.target_jid,
                                                             node=self.target_node)
             if self.get in self.items_types:
                 # The same applies from above. Listen for the
                 # disco_items event or pass a callback function
                 # if you need to process a non-blocking request.
-                items = yield from self['xep_0030'].get_items(jid=self.target_jid,
+                items = await self['xep_0030'].get_items(jid=self.target_jid,
                                                               node=self.target_node)
             if self.get not in self.info_types and self.get not in self.items_types:
                 logging.error("Invalid disco request type.")

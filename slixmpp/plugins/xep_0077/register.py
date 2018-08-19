@@ -59,7 +59,7 @@ class XEP_0077(BasePlugin):
 
     def _force_stream_feature(self, stanza):
         if isinstance(stanza, StreamFeatures):
-            if self.xmpp.use_tls or self.xmpp.use_ssl:
+            if not self.xmpp.disable_starttls:
                 if 'starttls' not in self.xmpp.features:
                     return stanza
                 elif not isinstance(self.xmpp.socket, ssl.SSLSocket):

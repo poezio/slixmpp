@@ -33,10 +33,9 @@ class HttpUpload(slixmpp.ClientXMPP):
 
         self.add_event_handler("session_start", self.start)
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         log.info('Uploading file %s...', self.filename)
-        url = yield from self['xep_0363'].upload_file(self.filename)
+        url = await self['xep_0363'].upload_file(self.filename)
         log.info('Upload success!')
 
         log.info('Sending file to %s', self.recipient)

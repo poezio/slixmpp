@@ -32,87 +32,86 @@ class PubsubClient(slixmpp.ClientXMPP):
 
         self.add_event_handler('session_start', self.start)
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         self.get_roster()
         self.send_presence()
 
         try:
-            yield from getattr(self, self.action)()
+            await getattr(self, self.action)()
         except:
             logging.exception('Could not execute %s:', self.action)
         self.disconnect()
 
-    def nodes(self):
+    async def nodes(self):
         try:
-            result = yield from self['xep_0060'].get_nodes(self.pubsub_server, self.node)
+            result = await self['xep_0060'].get_nodes(self.pubsub_server, self.node)
             for item in result['disco_items']['items']:
                 logging.info('  - %s', str(item))
         except XMPPError as error:
             logging.error('Could not retrieve node list: %s', error.format())
 
-    def create(self):
+    async def create(self):
         try:
-            yield from self['xep_0060'].create_node(self.pubsub_server, self.node)
+            await self['xep_0060'].create_node(self.pubsub_server, self.node)
             logging.info('Created node %s', self.node)
         except XMPPError as error:
             logging.error('Could not create node %s: %s', self.node, error.format())
 
-    def delete(self):
+    async def delete(self):
         try:
-            yield from self['xep_0060'].delete_node(self.pubsub_server, self.node)
+            await self['xep_0060'].delete_node(self.pubsub_server, self.node)
             logging.info('Deleted node %s', self.node)
         except XMPPError as error:
             logging.error('Could not delete node %s: %s', self.node, error.format())
 
-    def get_configure(self):
+    async def get_configure(self):
         try:
-            configuration_form = yield from self['xep_0060'].get_node_config(self.pubsub_server, self.node)
+            configuration_form = await self['xep_0060'].get_node_config(self.pubsub_server, self.node)
             logging.info('Configure form received from node %s: %s', self.node, configuration_form['pubsub_owner']['configure']['form'])
         except XMPPError as error:
             logging.error('Could not retrieve configure form from node %s: %s', self.node, error.format())
 
-    def publish(self):
+    async def publish(self):
         payload = ET.fromstring("<test xmlns='test'>%s</test>" % self.data)
         try:
-            result = yield from self['xep_0060'].publish(self.pubsub_server, self.node, payload=payload)
+            result = await self['xep_0060'].publish(self.pubsub_server, self.node, payload=payload)
             logging.info('Published at item id: %s', result['pubsub']['publish']['item']['id'])
         except XMPPError as error:
             logging.error('Could not publish to %s: %s', self.node, error.format())
 
-    def get(self):
+    async def get(self):
         try:
-            result = yield from self['xep_0060'].get_item(self.pubsub_server, self.node, self.data)
+            result = await self['xep_0060'].get_item(self.pubsub_server, self.node, self.data)
             for item in result['pubsub']['items']['substanzas']:
                 logging.info('Retrieved item %s: %s', item['id'], tostring(item['payload']))
         except XMPPError as error:
             logging.error('Could not retrieve item %s from node %s: %s', self.data, self.node, error.format())
 
-    def retract(self):
+    async def retract(self):
         try:
-            yield from self['xep_0060'].retract(self.pubsub_server, self.node, self.data)
+            await self['xep_0060'].retract(self.pubsub_server, self.node, self.data)
             logging.info('Retracted item %s from node %s', self.data, self.node)
         except XMPPError as error:
             logging.error('Could not retract item %s from node %s: %s', self.data, self.node, error.format())
 
-    def purge(self):
+    async def purge(self):
         try:
-            yield from self['xep_0060'].purge(self.pubsub_server, self.node)
+            await self['xep_0060'].purge(self.pubsub_server, self.node)
             logging.info('Purged all items from node %s', self.node)
         except XMPPError as error:
             logging.error('Could not purge items from node %s: %s', self.node, error.format())
 
-    def subscribe(self):
+    async def subscribe(self):
         try:
-            iq = yield from self['xep_0060'].subscribe(self.pubsub_server, self.node)
+            iq = await self['xep_0060'].subscribe(self.pubsub_server, self.node)
             subscription = iq['pubsub']['subscription']
             logging.info('Subscribed %s to node %s', subscription['jid'], subscription['node'])
         except XMPPError as error:
             logging.error('Could not subscribe %s to node %s: %s', self.boundjid.bare, self.node, error.format())
 
-    def unsubscribe(self):
+    async def unsubscribe(self):
         try:
-            yield from self['xep_0060'].unsubscribe(self.pubsub_server, self.node)
+            await self['xep_0060'].unsubscribe(self.pubsub_server, self.node)
             logging.info('Unsubscribed %s from node %s', self.boundjid.bare, self.node)
         except XMPPError as error:
             logging.error('Could not unsubscribe %s from node %s: %s', self.boundjid.bare, self.node, error.format())

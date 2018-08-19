@@ -36,8 +36,7 @@ class S5BSender(slixmpp.ClientXMPP):
         # and the XML streams are ready for use.
         self.add_event_handler("session_start", self.start)
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -53,14 +52,14 @@ class S5BSender(slixmpp.ClientXMPP):
 
         try:
             # Open the S5B stream in which to write to.
-            proxy = yield from self['xep_0065'].handshake(self.receiver)
+            proxy = await self['xep_0065'].handshake(self.receiver)
 
             # Send the entire file.
             while True:
                 data = self.file.read(1048576)
                 if not data:
                     break
-                yield from proxy.write(data)
+                await proxy.write(data)
 
             # And finally close the stream.
             proxy.transport.write_eof()

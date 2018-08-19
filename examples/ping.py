@@ -38,8 +38,7 @@ class PingTest(slixmpp.ClientXMPP):
         # our roster.
         self.add_event_handler("session_start", self.start)
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -56,7 +55,7 @@ class PingTest(slixmpp.ClientXMPP):
         self.get_roster()
 
         try:
-            rtt = yield from self['xep_0199'].ping(self.pingjid,
+            rtt = await self['xep_0199'].ping(self.pingjid,
                                                    timeout=10)
             logging.info("Success! RTT: %s", rtt)
         except IqError as e:

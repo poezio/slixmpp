@@ -47,8 +47,7 @@ class AvatarDownloader(slixmpp.ClientXMPP):
         self.roster_received.set()
         self.presences_received.clear()
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -65,16 +64,15 @@ class AvatarDownloader(slixmpp.ClientXMPP):
         self.get_roster(callback=self.roster_received_cb)
 
         print('Waiting for presence updates...\n')
-        yield from self.roster_received.wait()
+        await self.roster_received.wait()
         print('Roster received')
-        yield from self.presences_received.wait()
+        await self.presences_received.wait()
         self.disconnect()
 
-    @asyncio.coroutine
-    def on_vcard_avatar(self, pres):
+    async def on_vcard_avatar(self, pres):
         print("Received vCard avatar update from %s" % pres['from'].bare)
         try:
-            result = yield from self['xep_0054'].get_vcard(pres['from'].bare, cached=True,
+            result = await self['xep_0054'].get_vcard(pres['from'].bare, cached=True,
                                                            timeout=5)
         except XMPPError:
             print("Error retrieving avatar for %s" % pres['from'])
@@ -89,14 +87,13 @@ class AvatarDownloader(slixmpp.ClientXMPP):
         with open(filename, 'wb+') as img:
             img.write(avatar['BINVAL'])
 
-    @asyncio.coroutine
-    def on_avatar(self, msg):
+    async def on_avatar(self, msg):
         print("Received avatar update from %s" % msg['from'])
         metadata = msg['pubsub_event']['items']['item']['avatar_metadata']
         for info in metadata['items']:
             if not info['url']:
                 try:
-                    result = yield from self['xep_0084'].retrieve_avatar(msg['from'].bare, info['id'],
+                    result = await self['xep_0084'].retrieve_avatar(msg['from'].bare, info['id'],
                                                                          timeout=5)
                 except XMPPError:
                     print("Error retrieving avatar for %s" % msg['from'])

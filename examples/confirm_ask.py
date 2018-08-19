@@ -51,18 +51,17 @@ class AskConfirm(slixmpp.ClientXMPP):
             else:
                 self.confirmed.set_result(True)
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         log.info('Sending confirm request %s to %s who wants to access %s using '
                  'method %s...' % (self.id, self.recipient, self.url, self.method))
         try:
-            confirmed = yield from self['xep_0070'].ask_confirm(self.recipient,
+            confirmed = await self['xep_0070'].ask_confirm(self.recipient,
                                                                 id=self.id,
                                                                 url=self.url,
                                                                 method=self.method,
                                                                 message='Plz say yes or no for {method} {url} ({id}).')
             if isinstance(confirmed, slixmpp.Message):
-                confirmed = yield from self.confirmed
+                confirmed = await self.confirmed
             else:
                 confirmed = True
         except IqError:

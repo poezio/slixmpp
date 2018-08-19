@@ -79,8 +79,7 @@ class TestInBandByteStreams(SlixTest):
 
         self.assertEqual(events, {'ibb_stream_start', 'callback'})
 
-    @asyncio.coroutine
-    def testSendData(self):
+    async def testSendData(self):
         """Test sending data over an in-band bytestream."""
 
         streams = []
@@ -117,7 +116,7 @@ class TestInBandByteStreams(SlixTest):
 
 
         # Test sending data out
-        yield from stream.send("Testing")
+        await stream.send("Testing")
 
         self.send("""
           <iq type="set" id="2"

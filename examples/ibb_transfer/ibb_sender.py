@@ -39,8 +39,7 @@ class IBBSender(slixmpp.ClientXMPP):
         # our roster.
         self.add_event_handler("session_start", self.start)
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -58,13 +57,13 @@ class IBBSender(slixmpp.ClientXMPP):
 
         try:
             # Open the IBB stream in which to write to.
-            stream = yield from self['xep_0047'].open_stream(self.receiver, use_messages=self.use_messages)
+            stream = await self['xep_0047'].open_stream(self.receiver, use_messages=self.use_messages)
 
             # If you want to send in-memory bytes, use stream.sendall() instead.
-            yield from stream.sendfile(self.file, timeout=10)
+            await stream.sendfile(self.file, timeout=10)
 
             # And finally close the stream.
-            yield from stream.close(timeout=10)
+            await stream.close(timeout=10)
         except (IqError, IqTimeout):
             print('File transfer errored')
         else:

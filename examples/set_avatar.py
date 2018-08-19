@@ -33,8 +33,7 @@ class AvatarSetter(slixmpp.ClientXMPP):
 
         self.filepath = filepath
 
-    @asyncio.coroutine
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -68,20 +67,20 @@ class AvatarSetter(slixmpp.ClientXMPP):
         used_xep84 = False
 
         print('Publish XEP-0084 avatar data')
-        result = yield from self['xep_0084'].publish_avatar(avatar)
+        result = await self['xep_0084'].publish_avatar(avatar)
         if isinstance(result, XMPPError):
             print('Could not publish XEP-0084 avatar')
         else:
             used_xep84 = True
 
         print('Update vCard with avatar')
-        result = yield from self['xep_0153'].set_avatar(avatar=avatar, mtype=avatar_type)
+        result = await self['xep_0153'].set_avatar(avatar=avatar, mtype=avatar_type)
         if isinstance(result, XMPPError):
             print('Could not set vCard avatar')
 
         if used_xep84:
             print('Advertise XEP-0084 avatar metadata')
-            result = yield from self['xep_0084'].publish_avatar_metadata([
+            result = await self['xep_0084'].publish_avatar_metadata([
                 {'id': avatar_id,
                  'type': avatar_type,
                  'bytes': avatar_bytes}
