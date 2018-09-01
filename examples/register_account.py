@@ -28,8 +28,10 @@ class RegisterBot(slixmpp.ClientXMPP):
           workflows will need to check for data forms, etc.
     """
 
+    use_tls = True
+
     def __init__(self, jid, password):
-        slixmpp.ClientXMPP.__init__(self, jid, password)
+        slixmpp.ClientXMPP.__init__(self, jid, password, ibr_registration=True)
 
         # The session_start event will be triggered when
         # the bot establishes its connection with the server
@@ -66,7 +68,7 @@ class RegisterBot(slixmpp.ClientXMPP):
         # We're only concerned about registering, so nothing more to do here.
         self.disconnect()
 
-    def register(self, iq):
+    async def register(self, iq):
         """
         Fill out and submit a registration form.
 
@@ -84,20 +86,28 @@ class RegisterBot(slixmpp.ClientXMPP):
         To get the list of basic registration fields, you can use:
             iq['register']['fields']
         """
-        resp = self.Iq()
-        resp['type'] = 'set'
-        resp['register']['username'] = self.boundjid.user
-        resp['register']['password'] = self.password
+
+        # TODO: Reply with requested fields
+        await iq
+
+        username = self.boundjid.user
+        password = self.password
+
+        fields = [
+            {'ftype': 'hidden', 'var': 'FORM_TYPE',
+             'value': 'jabber:iq:register'},
+            {'ftype': 'text-single', 'var': 'username', 'value': username},
+            {'ftype': 'text-private', 'var': 'password', 'value': password},
+        ]
 
         try:
-            yield from resp.send()
-            logging.info("Account created for %s!" % self.boundjid)
+            await self['xep_0077'].set_registration(fields)
         except IqError as e:
             logging.error("Could not register account: %s" %
-                    e.iq['error']['text'])
-            self.disconnect()
+                          e.iq['error']['text'])
         except IqTimeout:
             logging.error("No response from server.")
+        finally:
             self.disconnect()
 
 
@@ -134,10 +144,10 @@ if __name__ == '__main__':
     # have interdependencies, the order in which you register them does
     # not matter.
     xmpp = RegisterBot(args.jid, args.password)
-    xmpp.register_plugin('xep_0030') # Service Discovery
-    xmpp.register_plugin('xep_0004') # Data forms
-    xmpp.register_plugin('xep_0066') # Out-of-band Data
-    xmpp.register_plugin('xep_0077') # In-band Registration
+    xmpp.register_plugin('xep_0030')  # Service Discovery
+    xmpp.register_plugin('xep_0004')  # Data forms
+    xmpp.register_plugin('xep_0066')  # Out-of-band Data
+    xmpp.register_plugin('xep_0077')  # In-band Registration
 
     # Some servers don't advertise support for inband registration, even
     # though they allow it. If this applies to your server, use:
