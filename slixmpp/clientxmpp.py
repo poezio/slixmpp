@@ -61,7 +61,7 @@ class ClientXMPP(BaseXMPP):
 
     def __init__(self, jid, password, plugin_config=None,
                  plugin_whitelist=None, escape_quotes=True, sasl_mech=None,
-                 lang='en', **kwargs):
+                 lang='en', ibr_registration=False, **kwargs):
         if not plugin_whitelist:
             plugin_whitelist = []
         if not plugin_config:
@@ -127,14 +127,15 @@ class ClientXMPP(BaseXMPP):
 
         # Setup default stream features
         self.register_plugin('feature_starttls')
-        self.register_plugin('feature_bind')
-        self.register_plugin('feature_session')
-        self.register_plugin('feature_rosterver')
-        self.register_plugin('feature_preapproval')
-        self.register_plugin('feature_mechanisms')
+        if not ibr_registration:
+            self.register_plugin('feature_bind')
+            self.register_plugin('feature_session')
+            self.register_plugin('feature_rosterver')
+            self.register_plugin('feature_preapproval')
+            self.register_plugin('feature_mechanisms')
 
-        if sasl_mech:
-            self['feature_mechanisms'].use_mech = sasl_mech
+            if sasl_mech:
+                self['feature_mechanisms'].use_mech = sasl_mech
 
     @property
     def password(self):
