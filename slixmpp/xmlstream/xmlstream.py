@@ -546,7 +546,7 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 transp, _ = await self.loop.create_connection(
                     lambda: self,
-                    ssl=self.ssl_context,
+                    ssl=ssl_context,
                     sock=self.socket,
                     server_hostname=self.default_domain
                 )
