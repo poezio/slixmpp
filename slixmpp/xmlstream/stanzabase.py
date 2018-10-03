@@ -1291,15 +1291,6 @@ class ElementBase(object):
 
     def __bool__(self):
         """Stanza objects should be treated as True in boolean contexts.
-
-        Python 3.x version.
-        """
-        return True
-
-    def __nonzero__(self):
-        """Stanza objects should be treated as True in boolean contexts.
-
-        Python 2.x version.
         """
         return True
 
