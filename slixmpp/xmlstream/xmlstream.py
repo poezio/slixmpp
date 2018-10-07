@@ -558,7 +558,7 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.event('ssl_invalid_chain', e)
             return False
-        except OSError as e:
+        except OSError:
             log.error('SSL: Unable to handle TLS connection.')
             if not self.event_handled('ssl_handshake_error'):
                 self.abort()
