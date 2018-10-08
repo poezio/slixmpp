@@ -626,7 +626,7 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-        self.failUnless(results == ['foo', 'bar', 'baz'],
+        self.assertTrue(results == ['foo', 'bar', 'baz'],
                 'Incomplete command workflow: %s' % results)
 
     def testClientAPICancel(self):
@@ -689,7 +689,7 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-        self.failUnless(results == ['foo', 'bar'],
+        self.assertTrue(results == ['foo', 'bar'],
                 'Incomplete command workflow: %s' % results)
 
     def testClientAPIError(self):
@@ -727,7 +727,7 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-        self.failUnless(results == ['foo'],
+        self.assertTrue(results == ['foo'],
                 'Incomplete command workflow: %s' % results)
 
     def testClientAPIErrorStrippedResponse(self):
@@ -762,7 +762,7 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-        self.failUnless(results == ['foo'],
+        self.assertTrue(results == ['foo'],
                 'Incomplete command workflow: %s' % results)
 
 

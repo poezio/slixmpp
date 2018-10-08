@@ -70,7 +70,7 @@ class TestIqStanzas(SlixTest):
           </iq>
         """)
 
-        self.failUnless(iq['query'] == 'query_ns2', "Query namespace doesn't match")
+        self.assertTrue(iq['query'] == 'query_ns2', "Query namespace doesn't match")
 
         del iq['query']
         self.check(iq, """

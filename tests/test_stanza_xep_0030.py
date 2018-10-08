@@ -258,7 +258,7 @@ class TestDisco(SlixTest):
                     ('client', 'pc', 'no', None),
                     ('client', 'pc', 'en', None),
                     ('client', 'pc', 'fr', None)}
-        self.failUnless(iq['disco_info']['identities'] == expected,
+        self.assertTrue(iq['disco_info']['identities'] == expected,
                 "Identities do not match:\n%s\n%s" % (
                     expected,
                     iq['disco_info']['identities']))
@@ -276,7 +276,7 @@ class TestDisco(SlixTest):
 
         expected = {('client', 'pc', 'no', None)}
         result = iq['disco_info'].get_identities(lang='no')
-        self.failUnless(result == expected,
+        self.assertTrue(result == expected,
                 "Identities do not match:\n%s\n%s" % (
                     expected, result))
 
@@ -337,7 +337,7 @@ class TestDisco(SlixTest):
         iq['disco_info'].add_feature('baz')
 
         expected = {'foo', 'bar', 'baz'}
-        self.failUnless(iq['disco_info']['features'] == expected,
+        self.assertTrue(iq['disco_info']['features'] == expected,
                 "Features do not match:\n%s\n%s" % (
                     expected,
                     iq['disco_info']['features']))
@@ -475,7 +475,7 @@ class TestDisco(SlixTest):
         expected = {('user@localhost', None, None),
                     ('user@localhost', 'foo', None),
                     ('test@localhost', 'bar', 'Tester')}
-        self.failUnless(iq['disco_items']['items'] == expected,
+        self.assertTrue(iq['disco_items']['items'] == expected,
                 "Items do not match:\n%s\n%s" % (
                     expected,
                     iq['disco_items']['items']))

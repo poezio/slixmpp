@@ -16,11 +16,11 @@ class TestOverall(unittest.TestCase):
         """Testing all modules by compiling them"""
         src = '.%sslixmpp' % os.sep
         rx = re.compile('/[.]svn|.*26.*')
-        self.failUnless(compileall.compile_dir(src, rx=rx, quiet=True))
+        self.assertTrue(compileall.compile_dir(src, rx=rx, quiet=True))
 
     def testTabNanny(self):
         """Testing that indentation is consistent"""
-        self.failIf(tabnanny.check('..%sslixmpp' % os.sep))
+        self.assertFalse(tabnanny.check('..%sslixmpp' % os.sep))
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestOverall)

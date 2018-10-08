@@ -35,7 +35,7 @@ class TestStreamDirectInvite(SlixTest):
           </message>
         """)
 
-        self.failUnless(events == [True],
+        self.assertTrue(events == [True],
                 "Event not raised: %s" % events)
 
     def testSentDirectInvite(self):

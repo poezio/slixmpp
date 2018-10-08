@@ -18,7 +18,7 @@ class TestMessageStanzas(SlixTest):
         msg['type'] = 'groupchat'
         msg['body'] = "this is a message"
         msg = msg.reply()
-        self.failUnless(str(msg['to']) == 'room@someservice.someserver.tld')
+        self.assertTrue(str(msg['to']) == 'room@someservice.someserver.tld')
 
     def testHTMLPlugin(self):
         "Test message/html/body stanza"

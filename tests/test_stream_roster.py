@@ -52,7 +52,7 @@ class TestStreamRoster(SlixTest):
                           pending_out=True,
                           groups=['Friends', 'Examples'])
 
-        self.failUnless(len(roster_updates) == 1,
+        self.assertTrue(len(roster_updates) == 1,
                 "Wrong number of roster_update events fired: %s (should be 1)" % len(roster_updates))
 
     def testRosterSet(self):
@@ -89,7 +89,7 @@ class TestStreamRoster(SlixTest):
                           groups=['Friends', 'Examples'])
 
 
-        self.failUnless('roster_update' in events,
+        self.assertTrue('roster_update' in events,
                 "Roster updated event not triggered: %s" % events)
 
     def testRosterPushRemove(self):
@@ -188,7 +188,7 @@ class TestStreamRoster(SlixTest):
           </iq>
         """)
 
-        self.failUnless(events == ['roster_callback'],
+        self.assertTrue(events == ['roster_callback'],
                  "Roster timeout event not triggered: %s." % events)
 
     def testRosterUnicode(self):
@@ -209,7 +209,7 @@ class TestStreamRoster(SlixTest):
                           groups=['Unicode'])
 
         jids = list(self.xmpp.client_roster.keys())
-        self.failUnless(jids == ['andré@foo'],
+        self.assertTrue(jids == ['andré@foo'],
                  "Too many roster entries found: %s" % jids)
 
         self.recv("""
@@ -223,7 +223,7 @@ class TestStreamRoster(SlixTest):
         expected = {'bar': {'status':'Testing',
                             'show':'away',
                             'priority':0}}
-        self.failUnless(result == expected,
+        self.assertTrue(result == expected,
                 "Unexpected roster values: %s" % result)
 
     def testSendLastPresence(self):
