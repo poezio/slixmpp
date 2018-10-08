@@ -17,13 +17,13 @@ class TestAdHocCommandStanzas(SlixTest):
         iq['command']['node'] = 'foo'
 
         iq['command']['action'] = 'execute'
-        self.failUnless(iq['command']['action'] == 'execute')
+        self.assertTrue(iq['command']['action'] == 'execute')
 
         iq['command']['action'] = 'complete'
-        self.failUnless(iq['command']['action'] == 'complete')
+        self.assertTrue(iq['command']['action'] == 'complete')
 
         iq['command']['action'] = 'cancel'
-        self.failUnless(iq['command']['action'] == 'cancel')
+        self.assertTrue(iq['command']['action'] == 'cancel')
 
     def testSetActions(self):
         """Test setting next actions in a command stanza."""
@@ -98,7 +98,7 @@ class TestAdHocCommandStanzas(SlixTest):
                  ('error', "I can't let you do that")]
         iq['command']['notes'] = notes
 
-        self.failUnless(iq['command']['notes'] == notes,
+        self.assertTrue(iq['command']['notes'] == notes,
                 "Notes don't match: %s %s" % (notes, iq['command']['notes']))
 
         self.check(iq, """

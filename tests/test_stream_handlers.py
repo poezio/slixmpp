@@ -112,7 +112,7 @@ class TestHandlers(SlixTest):
         # Check that the waiter is no longer registered
         waiter_exists = self.xmpp.remove_handler('IqWait_test2')
 
-        self.failUnless(waiter_exists == False,
+        self.assertTrue(waiter_exists == False,
             "Waiter handler was not removed.")
 
     def testIqCallback(self):
@@ -145,7 +145,7 @@ class TestHandlers(SlixTest):
           </iq>
         """)
 
-        self.failUnless(events == ['foo'],
+        self.assertTrue(events == ['foo'],
                 "Iq callback was not executed: %s" % events)
 
     def testMultipleHandlersForStanza(self):

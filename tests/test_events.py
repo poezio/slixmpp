@@ -23,7 +23,7 @@ class TestEvents(SlixTest):
         self.xmpp.event("test_event")
 
         msg = "Event was not triggered the correct number of times: %s"
-        self.failUnless(happened == [True, True], msg)
+        self.assertTrue(happened == [True, True], msg)
 
     def testDelEvent(self):
         """Test handler working, then deleted and not triggered"""
@@ -41,7 +41,7 @@ class TestEvents(SlixTest):
         self.xmpp.event("test_event", {})
 
         msg = "Event was not triggered the correct number of times: %s"
-        self.failUnless(happened == [True], msg % happened)
+        self.assertTrue(happened == [True], msg % happened)
 
     def testAddDelAddEvent(self):
         """Test adding, then removing, then adding an event handler."""
@@ -61,7 +61,7 @@ class TestEvents(SlixTest):
         self.xmpp.event("test_event", {})
 
         msg = "Event was not triggered the correct number of times: %s"
-        self.failUnless(happened == [True, True], msg % happened)
+        self.assertTrue(happened == [True, True], msg % happened)
 
     def testDisposableEvent(self):
         """Test disposable handler working, then not being triggered again."""
@@ -78,7 +78,7 @@ class TestEvents(SlixTest):
         self.xmpp.event("test_event", {})
 
         msg = "Event was not triggered the correct number of times: %s"
-        self.failUnless(happened == [True], msg % happened)
+        self.assertTrue(happened == [True], msg % happened)
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestEvents)

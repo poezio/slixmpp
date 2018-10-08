@@ -24,7 +24,7 @@ class TestSetStanzas(SlixTest):
         """
         s = Set(ET.fromstring(xml_string))
         expected = '10'
-        self.failUnless(s['first_index'] == expected)
+        self.assertTrue(s['first_index'] == expected)
 
     def testDelFirstIndex(self):
         xml_string = """
@@ -57,7 +57,7 @@ class TestSetStanzas(SlixTest):
         """
         s = Set(ET.fromstring(xml_string))
         expected = True
-        self.failUnless(s['before'] == expected)
+        self.assertTrue(s['before'] == expected)
 
     def testGetBefore(self):
         xml_string = """
@@ -89,7 +89,7 @@ class TestSetStanzas(SlixTest):
         """
         s = Set(ET.fromstring(xml_string))
         expected = 'id'
-        self.failUnless(s['before'] == expected)
+        self.assertTrue(s['before'] == expected)
 
     def testGetBeforeVal(self):
         xml_string = """

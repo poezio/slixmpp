@@ -1004,4 +1004,3 @@ class XMLStream(asyncio.BaseProtocol):
         :param exception: An unhandled exception object.
         """
         pass
-

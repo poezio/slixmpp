@@ -62,30 +62,30 @@ class TestGmail(SlixTest):
 
         iq = self.Iq(xml=xml)
         mailbox = iq['mailbox']
-        self.failUnless(mailbox['result-time'] == '1118012394209', "result-time doesn't match")
-        self.failUnless(mailbox['url'] == 'http://mail.google.com/mail', "url doesn't match")
-        self.failUnless(mailbox['matched'] == '95', "total-matched incorrect")
-        self.failUnless(mailbox['estimate'] == False, "total-estimate incorrect")
-        self.failUnless(len(mailbox['threads']) == 1, "could not extract message threads")
+        self.assertTrue(mailbox['result-time'] == '1118012394209', "result-time doesn't match")
+        self.assertTrue(mailbox['url'] == 'http://mail.google.com/mail', "url doesn't match")
+        self.assertTrue(mailbox['matched'] == '95', "total-matched incorrect")
+        self.assertTrue(mailbox['estimate'] == False, "total-estimate incorrect")
+        self.assertTrue(len(mailbox['threads']) == 1, "could not extract message threads")
 
         thread = mailbox['threads'][0]
-        self.failUnless(thread['tid'] == '1172320964060972012', "thread tid doesn't match")
-        self.failUnless(thread['participation'] == '1', "thread participation incorrect")
-        self.failUnless(thread['messages'] == '28', "thread message count incorrect")
-        self.failUnless(thread['date'] == '1118012394209', "thread date doesn't match")
-        self.failUnless(thread['url'] == 'http://mail.google.com/mail?view=cv', "thread url doesn't match")
-        self.failUnless(thread['labels'] == 'act1scene3', "thread labels incorrect")
-        self.failUnless(thread['subject'] == 'Put thy rapier up.', "thread subject doesn't match")
-        self.failUnless(thread['snippet'] == "Ay, ay, a scratch, a scratch; marry, 'tis enough.", "snippet doesn't match")
-        self.failUnless(len(thread['senders']) == 3, "could not extract senders")
+        self.assertTrue(thread['tid'] == '1172320964060972012', "thread tid doesn't match")
+        self.assertTrue(thread['participation'] == '1', "thread participation incorrect")
+        self.assertTrue(thread['messages'] == '28', "thread message count incorrect")
+        self.assertTrue(thread['date'] == '1118012394209', "thread date doesn't match")
+        self.assertTrue(thread['url'] == 'http://mail.google.com/mail?view=cv', "thread url doesn't match")
+        self.assertTrue(thread['labels'] == 'act1scene3', "thread labels incorrect")
+        self.assertTrue(thread['subject'] == 'Put thy rapier up.', "thread subject doesn't match")
+        self.assertTrue(thread['snippet'] == "Ay, ay, a scratch, a scratch; marry, 'tis enough.", "snippet doesn't match")
+        self.assertTrue(len(thread['senders']) == 3, "could not extract senders")
 
         sender1 = thread['senders'][0]
-        self.failUnless(sender1['name'] == 'Me', "sender name doesn't match")
-        self.failUnless(sender1['address'] == 'romeo@gmail.com', "sender address doesn't match")
-        self.failUnless(sender1['originator'] == True, "sender originator incorrect")
-        self.failUnless(sender1['unread'] == False, "sender unread incorrectly True")
+        self.assertTrue(sender1['name'] == 'Me', "sender name doesn't match")
+        self.assertTrue(sender1['address'] == 'romeo@gmail.com', "sender address doesn't match")
+        self.assertTrue(sender1['originator'] == True, "sender originator incorrect")
+        self.assertTrue(sender1['unread'] == False, "sender unread incorrectly True")
 
         sender2 = thread['senders'][2]
-        self.failUnless(sender2['unread'] == True, "sender unread incorrectly False")
+        self.assertTrue(sender2['unread'] == True, "sender unread incorrectly False")
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGmail)

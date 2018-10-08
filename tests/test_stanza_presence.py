@@ -15,7 +15,7 @@ class TestPresenceStanzas(SlixTest):
         p = self.Presence()
         p['type'] = 'available'
         self.check(p, "<presence />")
-        self.failUnless(p['type'] == 'available',
+        self.assertTrue(p['type'] == 'available',
             "Incorrect presence['type'] for type 'available': %s" % p['type'])
 
         for showtype in ['away', 'chat', 'dnd', 'xa']:
@@ -23,7 +23,7 @@ class TestPresenceStanzas(SlixTest):
             self.check(p, """
               <presence><show>%s</show></presence>
             """ % showtype)
-            self.failUnless(p['type'] == showtype,
+            self.assertTrue(p['type'] == showtype,
                 "Incorrect presence['type'] for type '%s'" % showtype)
 
         p['type'] = None
@@ -47,10 +47,10 @@ class TestPresenceStanzas(SlixTest):
         c.add_event_handler("changed_status", handlechangedpresence)
         c._handle_presence(p)
 
-        self.failUnless(happened == [],
+        self.assertTrue(happened == [],
             "changed_status event triggered for extra unavailable presence")
         roster = c.roster['crap@wherever']
-        self.failUnless(roster['bill@chadmore.com'].resources == {},
+        self.assertTrue(roster['bill@chadmore.com'].resources == {},
             "Roster updated for superfulous unavailable presence")
 
     def testNickPlugin(self):

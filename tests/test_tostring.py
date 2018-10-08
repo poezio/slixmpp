@@ -25,7 +25,7 @@ class TestToString(SlixTest):
         else:
             xml=original
         result = tostring(xml, **kwargs)
-        self.failUnless(result == expected, "%s: %s" % (message, result))
+        self.assertTrue(result == expected, "%s: %s" % (message, result))
 
     def testXMLEscape(self):
         """Test escaping XML special characters."""
@@ -34,7 +34,7 @@ class TestToString(SlixTest):
         desired = """&lt;foo bar=&quot;baz&quot;&gt;&apos;Hi"""
         desired += """ &amp; welcome!&apos;&lt;/foo&gt;"""
 
-        self.failUnless(escaped == desired,
+        self.assertTrue(escaped == desired,
             "XML escaping did not work: %s." % escaped)
 
     def testEmptyElement(self):
@@ -99,7 +99,7 @@ class TestToString(SlixTest):
         msg['body'] = utf8_message.decode('utf-8')
         expected = '<message><body>\xe0\xb2\xa0_\xe0\xb2\xa0</body></message>'
         result = msg.__str__()
-        self.failUnless(result == expected,
+        self.assertTrue(result == expected,
              "Stanza Unicode handling is incorrect: %s" % result)
 
     def testXMLLang(self):
@@ -112,7 +112,7 @@ class TestToString(SlixTest):
 
         expected = '<message xml:lang="no" />'
         result = msg.__str__()
-        self.failUnless(expected == result,
+        self.assertTrue(expected == result,
             "Serialization with xml:lang failed: %s" % result)
 
 

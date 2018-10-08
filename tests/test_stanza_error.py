@@ -34,7 +34,7 @@ class TestErrorStanzas(SlixTest):
           </message>
         """)
 
-        self.failUnless(msg['error']['condition'] == 'item-not-found', "Error condition doesn't match.")
+        self.assertTrue(msg['error']['condition'] == 'item-not-found', "Error condition doesn't match.")
 
         msg['error']['condition'] = 'resource-constraint'
 

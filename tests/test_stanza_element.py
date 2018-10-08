@@ -17,7 +17,7 @@ class TestElementBase(SlixTest):
                              "{%s}bar" % ns,
                              "{abc}baz",
                              "{%s}more" % ns])
-        self.failUnless(expected == result,
+        self.assertTrue(expected == result,
             "Incorrect namespace fixing result: %s" % str(result))
 
 
@@ -80,7 +80,7 @@ class TestElementBase(SlixTest):
                                     'lang': '',
                                     'bar': 'c',
                                     'baz': ''}]}
-        self.failUnless(values == expected,
+        self.assertTrue(values == expected,
             "Unexpected stanza values:\n%s\n%s" % (str(expected), str(values)))
 
 
@@ -170,13 +170,13 @@ class TestElementBase(SlixTest):
                     'meh': ''}
         for interface, value in expected.items():
             result = stanza[interface]
-            self.failUnless(result == value,
+            self.assertTrue(result == value,
                 "Incorrect stanza interface access result: %s" % result)
 
         # Test plugin interfaces
-        self.failUnless(isinstance(stanza['foobar'], TestStanzaPlugin),
+        self.assertTrue(isinstance(stanza['foobar'], TestStanzaPlugin),
                         "Incorrect plugin object result.")
-        self.failUnless(stanza['foobar']['fizz'] == 'c',
+        self.assertTrue(stanza['foobar']['fizz'] == 'c',
                         "Incorrect plugin subvalue result.")
 
     def testSetItem(self):
@@ -269,7 +269,7 @@ class TestElementBase(SlixTest):
           <foo xmlns="foo" />
         """)
 
-        self.failUnless(stanza._get_attr('bar') == '',
+        self.assertTrue(stanza._get_attr('bar') == '',
             "Incorrect value returned for an unset XML attribute.")
 
         stanza._set_attr('bar', 'a')
@@ -279,7 +279,7 @@ class TestElementBase(SlixTest):
           <foo xmlns="foo" bar="a" baz="b" />
         """)
 
-        self.failUnless(stanza._get_attr('bar') == 'a',
+        self.assertTrue(stanza._get_attr('bar') == 'a',
             "Retrieved XML attribute value is incorrect.")
 
         stanza._set_attr('bar', None)
@@ -289,7 +289,7 @@ class TestElementBase(SlixTest):
           <foo xmlns="foo" />
         """)
 
-        self.failUnless(stanza._get_attr('bar', 'c') == 'c',
+        self.assertTrue(stanza._get_attr('bar', 'c') == 'c',
             "Incorrect default value returned for an unset XML attribute.")
 
     def testGetSubText(self):
@@ -311,7 +311,7 @@ class TestElementBase(SlixTest):
                 return self._get_sub_text("wrapper/bar", default="not found")
 
         stanza = TestStanza()
-        self.failUnless(stanza['bar'] == 'not found',
+        self.assertTrue(stanza['bar'] == 'not found',
             "Default _get_sub_text value incorrect.")
 
         stanza['bar'] = 'found'
@@ -322,7 +322,7 @@ class TestElementBase(SlixTest):
             </wrapper>
           </foo>
         """)
-        self.failUnless(stanza['bar'] == 'found',
+        self.assertTrue(stanza['bar'] == 'found',
             "_get_sub_text value incorrect: %s." % stanza['bar'])
 
     def testSubElement(self):
@@ -481,45 +481,45 @@ class TestElementBase(SlixTest):
         register_stanza_plugin(TestStanza, TestStanzaPlugin)
 
         stanza = TestStanza()
-        self.failUnless(stanza.match("foo"),
+        self.assertTrue(stanza.match("foo"),
             "Stanza did not match its own tag name.")
 
-        self.failUnless(stanza.match("{foo}foo"),
+        self.assertTrue(stanza.match("{foo}foo"),
             "Stanza did not match its own namespaced name.")
 
         stanza['bar'] = 'a'
-        self.failUnless(stanza.match("foo@bar=a"),
+        self.assertTrue(stanza.match("foo@bar=a"),
             "Stanza did not match its own name with attribute value check.")
 
         stanza['baz'] = 'b'
-        self.failUnless(stanza.match("foo@bar=a@baz=b"),
+        self.assertTrue(stanza.match("foo@bar=a@baz=b"),
             "Stanza did not match its own name with multiple attributes.")
 
         stanza['qux'] = 'c'
-        self.failUnless(stanza.match("foo/qux"),
+        self.assertTrue(stanza.match("foo/qux"),
             "Stanza did not match with subelements.")
 
         stanza['qux'] = ''
-        self.failUnless(stanza.match("foo/qux") == False,
+        self.assertTrue(stanza.match("foo/qux") == False,
             "Stanza matched missing subinterface element.")
 
-        self.failUnless(stanza.match("foo/bar") == False,
+        self.assertTrue(stanza.match("foo/bar") == False,
             "Stanza matched nonexistent element.")
 
         stanza['plugin']['attrib'] = 'c'
-        self.failUnless(stanza.match("foo/plugin@attrib=c"),
+        self.assertTrue(stanza.match("foo/plugin@attrib=c"),
             "Stanza did not match with plugin and attribute.")
 
-        self.failUnless(stanza.match("foo/{http://test/slash/bar}plugin"),
+        self.assertTrue(stanza.match("foo/{http://test/slash/bar}plugin"),
             "Stanza did not match with namespaced plugin.")
 
         substanza = TestSubStanza()
         substanza['attrib'] = 'd'
         stanza.append(substanza)
-        self.failUnless(stanza.match("foo/sub@attrib=d"),
+        self.assertTrue(stanza.match("foo/sub@attrib=d"),
             "Stanza did not match with substanzas and attribute.")
 
-        self.failUnless(stanza.match("foo/{baz}sub"),
+        self.assertTrue(stanza.match("foo/{baz}sub"),
             "Stanza did not match with namespaced substanza.")
 
     def testComparisons(self):
@@ -533,19 +533,19 @@ class TestElementBase(SlixTest):
         stanza1 = TestStanza()
         stanza1['bar'] = 'a'
 
-        self.failUnless(stanza1,
+        self.assertTrue(stanza1,
             "Stanza object does not evaluate to True")
 
         stanza2 = TestStanza()
         stanza2['baz'] = 'b'
 
-        self.failUnless(stanza1 != stanza2,
+        self.assertTrue(stanza1 != stanza2,
             "Different stanza objects incorrectly compared equal.")
 
         stanza1['baz'] = 'b'
         stanza2['bar'] = 'a'
 
-        self.failUnless(stanza1 == stanza2,
+        self.assertTrue(stanza1 == stanza2,
             "Equal stanzas incorrectly compared inequal.")
 
     def testKeys(self):
@@ -561,12 +561,12 @@ class TestElementBase(SlixTest):
 
         stanza = TestStanza()
 
-        self.failUnless(set(stanza.keys()) == {'lang', 'bar', 'baz'},
+        self.assertTrue(set(stanza.keys()) == {'lang', 'bar', 'baz'},
             "Returned set of interface keys does not match expected.")
 
         stanza.enable('qux')
 
-        self.failUnless(set(stanza.keys()) == {'lang', 'bar', 'baz', 'qux'},
+        self.assertTrue(set(stanza.keys()) == {'lang', 'bar', 'baz', 'qux'},
             "Incorrect set of interface and plugin keys.")
 
     def testGet(self):
@@ -580,10 +580,10 @@ class TestElementBase(SlixTest):
         stanza = TestStanza()
         stanza['bar'] = 'a'
 
-        self.failUnless(stanza.get('bar') == 'a',
+        self.assertTrue(stanza.get('bar') == 'a',
             "Incorrect value returned by stanza.get")
 
-        self.failUnless(stanza.get('baz', 'b') == 'b',
+        self.assertTrue(stanza.get('baz', 'b') == 'b',
             "Incorrect default value returned by stanza.get")
 
     def testSubStanzas(self):
@@ -608,7 +608,7 @@ class TestElementBase(SlixTest):
         substanza2['qux'] = 'b'
 
         # Test appending substanzas
-        self.failUnless(len(stanza) == 0,
+        self.assertTrue(len(stanza) == 0,
             "Incorrect empty stanza size.")
 
         stanza.append(substanza1)
@@ -617,7 +617,7 @@ class TestElementBase(SlixTest):
             <foobar qux="a" />
           </foo>
         """, use_values=False)
-        self.failUnless(len(stanza) == 1,
+        self.assertTrue(len(stanza) == 1,
             "Incorrect stanza size with 1 substanza.")
 
         stanza.append(substanza2)
@@ -627,7 +627,7 @@ class TestElementBase(SlixTest):
             <foobar qux="b" />
           </foo>
         """, use_values=False)
-        self.failUnless(len(stanza) == 2,
+        self.assertTrue(len(stanza) == 2,
             "Incorrect stanza size with 2 substanzas.")
 
         # Test popping substanzas
@@ -643,7 +643,7 @@ class TestElementBase(SlixTest):
         results = []
         for substanza in stanza:
             results.append(substanza['qux'])
-        self.failUnless(results == ['b', 'a'],
+        self.assertTrue(results == ['b', 'a'],
             "Iteration over substanzas failed: %s." % str(results))
 
     def testCopy(self):
@@ -659,11 +659,11 @@ class TestElementBase(SlixTest):
 
         stanza2 = stanza1.__copy__()
 
-        self.failUnless(stanza1 == stanza2,
+        self.assertTrue(stanza1 == stanza2,
             "Copied stanzas are not equal to each other.")
 
         stanza1['baz'] = 'b'
-        self.failUnless(stanza1 != stanza2,
+        self.assertTrue(stanza1 != stanza2,
             "Divergent stanza copies incorrectly compared equal.")
 
     def testExtension(self):
@@ -701,7 +701,7 @@ class TestElementBase(SlixTest):
           </foo>
         """)
 
-        self.failUnless(stanza['extended'] == 'testing',
+        self.assertTrue(stanza['extended'] == 'testing',
                 "Could not retrieve stanza extension value.")
 
         del stanza['extended']

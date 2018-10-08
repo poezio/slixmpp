@@ -50,7 +50,7 @@ class TestStreamChatStates(SlixTest):
         """)
 
         expected = ['active', 'inactive', 'paused', 'composing', 'gone']
-        self.failUnless(results == expected,
+        self.assertTrue(results == expected,
                 "Chat state event not handled: %s" % results)
 
 

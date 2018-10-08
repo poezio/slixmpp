@@ -61,7 +61,7 @@ class TestRosterStanzas(SlixTest):
         debug = "Roster items don't match after retrieval."
         debug += "\nReturned: %s" % str(iq['roster']['items'])
         debug += "\nExpected: %s" % str(expected)
-        self.failUnless(iq['roster']['items'] == expected, debug)
+        self.assertTrue(iq['roster']['items'] == expected, debug)
 
     def testDelItems(self):
         """Test clearing items from a roster stanza."""

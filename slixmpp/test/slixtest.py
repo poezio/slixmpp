@@ -222,7 +222,7 @@ class SlixTest(unittest.TestCase):
             if Matcher is None:
                 raise ValueError("Unknown matching method.")
             test = Matcher(criteria)
-            self.failUnless(test.match(stanza),
+            self.assertTrue(test.match(stanza),
                     "Stanza did not match using %s method:\n" % method + \
                     "Criteria:\n%s\n" % str(criteria) + \
                     "Stanza:\n%s" % str(stanza))
@@ -280,7 +280,7 @@ class SlixTest(unittest.TestCase):
                 debug += "Generated stanza:\n%s\n" % highlight(tostring(stanza2.xml))
                 result = self.compare(xml, stanza.xml, stanza2.xml)
 
-            self.failUnless(result, debug)
+            self.assertTrue(result, debug)
 
     # ------------------------------------------------------------------
     # Methods for simulating stanza streams.
@@ -487,7 +487,7 @@ class SlixTest(unittest.TestCase):
             recv_xml.clear()
             recv_xml.attrib = attrib
 
-        self.failUnless(
+        self.assertTrue(
             self.compare(xml, recv_xml),
             "Stream headers do not match:\nDesired:\n%s\nReceived:\n%s" % (
                 '%s %s' % (xml.tag, xml.attrib),
@@ -543,7 +543,7 @@ class SlixTest(unittest.TestCase):
         xml = self.parse_xml(header2)
         sent_xml = self.parse_xml(sent_header2)
 
-        self.failUnless(
+        self.assertTrue(
             self.compare(xml, sent_xml),
             "Stream headers do not match:\nDesired:\n%s\nSent:\n%s" % (
                 header, sent_header))
@@ -557,12 +557,12 @@ class SlixTest(unittest.TestCase):
         if sent_data is None:
             self.fail("No stanza was sent.")
         if method == 'exact':
-            self.failUnless(self.compare(xml, sent_xml),
+            self.assertTrue(self.compare(xml, sent_xml),
                 "Features do not match.\nDesired:\n%s\nReceived:\n%s" % (
                     highlight(tostring(xml)), highlight(tostring(sent_xml))))
         elif method == 'mask':
             matcher = MatchXMLMask(xml)
-            self.failUnless(matcher.match(sent_xml),
+            self.assertTrue(matcher.match(sent_xml),
                 "Stanza did not match using %s method:\n" % method + \
                 "Criteria:\n%s\n" % highlight(tostring(xml)) + \
                 "Stanza:\n%s" % highlight(tostring(sent_xml)))
