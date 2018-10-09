@@ -13,7 +13,6 @@ import logging
 from getpass import getpass
 from argparse import ArgumentParser
 from slixmpp.exceptions import IqError, IqTimeout
-from slixmpp import asyncio
 
 import slixmpp
 

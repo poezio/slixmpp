@@ -5,7 +5,6 @@ import logging
 from getpass import getpass
 from argparse import ArgumentParser
 
-import asyncio
 import slixmpp
 from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import ET, tostring

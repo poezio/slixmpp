@@ -18,7 +18,6 @@ from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.exceptions import XMPPError
-from slixmpp import asyncio
 
 class AvatarSetter(slixmpp.ClientXMPP):
 

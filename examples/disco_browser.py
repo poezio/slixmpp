@@ -15,7 +15,6 @@ from argparse import ArgumentParser
 
 import slixmpp
 from slixmpp.exceptions import IqError, IqTimeout
-from slixmpp.xmlstream.asyncio import asyncio
 
 
 class Disco(slixmpp.ClientXMPP):

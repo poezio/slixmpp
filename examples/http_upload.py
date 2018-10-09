@@ -14,7 +14,6 @@ from getpass import getpass
 from argparse import ArgumentParser
 
 import slixmpp
-from slixmpp import asyncio
 
 log = logging.getLogger(__name__)
 

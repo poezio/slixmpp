@@ -9,7 +9,6 @@
     See the file LICENSE for copying permission.
 """
 
-import asyncio
 import logging
 from getpass import getpass
 from argparse import ArgumentParser
