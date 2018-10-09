@@ -62,7 +62,10 @@ class XEP_0163(BasePlugin):
         for ns in namespace:
             self.xmpp['xep_0030'].add_feature('%s+notify' % ns,
                                               jid=jid)
-        asyncio.ensure_future(self.xmpp['xep_0115'].update_caps(jid))
+        asyncio.ensure_future(
+            self.xmpp['xep_0115'].update_caps(jid),
+            loop=self.xmpp.loop,
+        )
 
     def remove_interest(self, namespace, jid=None):
         """
@@ -81,7 +84,10 @@ class XEP_0163(BasePlugin):
         for ns in namespace:
             self.xmpp['xep_0030'].del_feature(jid=jid,
                                               feature='%s+notify' % namespace)
-        asyncio.ensure_future(self.xmpp['xep_0115'].update_caps(jid))
+        asyncio.ensure_future(
+            self.xmpp['xep_0115'].update_caps(jid),
+            loop=self.xmpp.loop,
+        )
 
     def publish(self, stanza, node=None, id=None, options=None, ifrom=None,
                 timeout_callback=None, callback=None, timeout=None):

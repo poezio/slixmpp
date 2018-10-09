@@ -95,7 +95,10 @@ class XEP_0199(BasePlugin):
             self.timeout = timeout
 
         self.keepalive = True
-        handler = lambda event=None: asyncio.ensure_future(self._keepalive(event))
+        handler = lambda event=None: asyncio.ensure_future(
+            self._keepalive(event),
+            loop=self.xmpp.loop,
+        )
         self.xmpp.schedule('Ping keepalive',
                            self.interval,
                            handler,

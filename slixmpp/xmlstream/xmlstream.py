@@ -285,7 +285,10 @@ class XMLStream(asyncio.BaseProtocol):
             self.disable_starttls = disable_starttls
 
         self.event("connecting")
-        self._current_connection_attempt = asyncio.ensure_future(self._connect_routine())
+        self._current_connection_attempt = asyncio.ensure_future(
+            self._connect_routine(),
+            loop=self.loop,
+        )
 
     async def _connect_routine(self):
         self.event_when_connected = "connected"
@@ -306,7 +309,7 @@ class XMLStream(asyncio.BaseProtocol):
         else:
             ssl_context = None
 
-        await asyncio.sleep(self.connect_loop_wait)
+        await asyncio.sleep(self.connect_loop_wait, loop=self.loop)
         try:
             await self.loop.create_connection(lambda: self,
                                                    self.address[0],
@@ -321,7 +324,10 @@ class XMLStream(asyncio.BaseProtocol):
             log.debug('Connection failed: %s', e)
             self.event("connection_failed", e)
             self.connect_loop_wait = self.connect_loop_wait * 2 + 1
-            self._current_connection_attempt = asyncio.ensure_future(self._connect_routine())
+            self._current_connection_attempt = asyncio.ensure_future(
+                self._connect_routine(),
+                loop=self.loop,
+            )
 
     def process(self, *, forever=True, timeout=None):
         """Process all the available XMPP events (receiving or sending data on the
@@ -336,10 +342,10 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.loop.run_until_complete(self.disconnected)
         else:
-            tasks = [asyncio.sleep(timeout)]
+            tasks = [asyncio.sleep(timeout, loop=self.loop)]
             if not forever:
                 tasks.append(self.disconnected)
-            self.loop.run_until_complete(asyncio.wait(tasks))
+            self.loop.run_until_complete(asyncio.wait(tasks, loop=self.loop))
 
     def init_parser(self):
         """init the XML parser. The parser must always be reset for each new
@@ -781,7 +787,10 @@ class XMLStream(asyncio.BaseProtocol):
                             old_exception(e)
                         else:
                             self.exception(e)
-                asyncio.ensure_future(handler_callback_routine(handler_callback))
+                asyncio.ensure_future(
+                    handler_callback_routine(handler_callback),
+                    loop=self.loop,
+                )
             else:
                 try:
                     handler_callback(data)
