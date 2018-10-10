@@ -561,19 +561,19 @@ class TestStreamSensorData(SlixTest):
             </message>
             """)
 
-        self.assertTrue(results, ["accepted","fields","done"])
+        self.assertEqual(results, ["accepted","fields","done"])
         # self.assertIn("nodeId", callback_data);
         self.assertTrue("nodeId" in callback_data)
-        self.assertTrue(callback_data["nodeId"], "Device33")
+        self.assertEqual(callback_data["nodeId"], "Device33")
         # self.assertIn("timestamp", callback_data);
         self.assertTrue("timestamp" in callback_data)
-        self.assertTrue(callback_data["timestamp"], "2000-01-01T00:01:02")
+        self.assertEqual(callback_data["timestamp"], "2000-01-01T00:01:02")
         #self.assertIn("field_Voltage", callback_data);
         self.assertTrue("field_Voltage" in callback_data)
-        self.assertTrue(callback_data["field_Voltage"], {"name": "Voltage", "value": "230.4", "typename": "numeric", "unit": "V", "flags": {"invoiced": "true"}})
+        self.assertEqual(callback_data["field_Voltage"], {"name": "Voltage", "value": "230.4", "typename": "numeric", "unit": "V", "flags": {"invoiced": "true"}})
         #self.assertIn("field_TestBool", callback_data);
         self.assertTrue("field_TestBool" in callback_data)
-        self.assertTrue(callback_data["field_TestBool"], {"name": "TestBool", "value": "true", "typename": "boolean" })
+        self.assertEqual(callback_data["field_TestBool"], {"name": "TestBool", "value": "true", "typename": "boolean" })
 
     def testServiceDiscoveryClient(self):
         self.stream_start(mode='client',
@@ -675,16 +675,16 @@ class TestStreamSensorData(SlixTest):
             </message>
             """)
 
-        self.assertTrue(results, ["accepted","failure"]);
+        self.assertEqual(results, ["accepted","failure"]);
         # self.assertIn("nodeId", callback_data);
         self.assertTrue("nodeId" in callback_data)
-        self.assertTrue(callback_data["nodeId"], "Device33")
+        self.assertEqual(callback_data["nodeId"], "Device33")
         # self.assertIn("timestamp", callback_data);
         self.assertTrue("timestamp" in callback_data)
-        self.assertTrue(callback_data["timestamp"], "2013-03-07T17:13:30")
+        self.assertEqual(callback_data["timestamp"], "2013-03-07T17:13:30")
         # self.assertIn("error_msg", callback_data);
         self.assertTrue("error_msg" in callback_data)
-        self.assertTrue(callback_data["error_msg"], "Timeout.")
+        self.assertEqual(callback_data["error_msg"], "Timeout.")
 
     def testDelayedRequest(self):
         self.stream_start(mode='component',
@@ -1071,19 +1071,19 @@ class TestStreamSensorData(SlixTest):
             </message>
             """)
 
-        self.assertTrue(results, ["queued","started","fields","done"]);
+        self.assertEqual(results, ["queued","started","fields","done"]);
         # self.assertIn("nodeId", callback_data);
         self.assertTrue("nodeId" in callback_data)
-        self.assertTrue(callback_data["nodeId"], "Device33")
+        self.assertEqual(callback_data["nodeId"], "Device33")
         # self.assertIn("timestamp", callback_data);
         self.assertTrue("timestamp" in callback_data)
-        self.assertTrue(callback_data["timestamp"], "2000-01-01T00:01:02")
+        self.assertEqual(callback_data["timestamp"], "2000-01-01T00:01:02")
         # self.assertIn("field_Voltage", callback_data);
         self.assertTrue("field_Voltage" in callback_data)
-        self.assertTrue(callback_data["field_Voltage"], {"name": "Voltage", "value": "230.4", "typename": "numeric", "unit": "V", "flags": {"invoiced": "true"}})
+        self.assertEqual(callback_data["field_Voltage"], {"name": "Voltage", "value": "230.4", "typename": "numeric", "unit": "V", "flags": {"invoiced": "true"}})
         # self.assertIn("field_TestBool", callback_data);
         self.assertTrue("field_TestBool" in callback_data)
-        self.assertTrue(callback_data["field_TestBool"], {"name": "TestBool", "value": "true", "typename": "boolean" })
+        self.assertEqual(callback_data["field_TestBool"], {"name": "TestBool", "value": "true", "typename": "boolean" })
 
 
     def testRequestFieldsCancelAPI(self):
@@ -1139,7 +1139,7 @@ class TestStreamSensorData(SlixTest):
             </iq>
             """)
 
-        self.assertTrue(results, ["accepted","cancelled"])
+        self.assertEqual(results, ["accepted","cancelled"])
 
     def testDelayedRequestCancel(self):
         self.stream_start(mode='component',
