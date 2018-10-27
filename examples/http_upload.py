@@ -17,8 +17,6 @@ import slixmpp
 
 log = logging.getLogger(__name__)
 
-class TimeoutError(Exception):
-    pass
 
 class HttpUpload(slixmpp.ClientXMPP):
 
