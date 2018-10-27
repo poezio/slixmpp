@@ -6,7 +6,6 @@
     See the file LICENSE for copying permission.
 """
 
-import asyncio
 import logging
 import os.path
 
