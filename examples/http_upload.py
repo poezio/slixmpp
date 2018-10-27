@@ -24,11 +24,12 @@ class HttpUpload(slixmpp.ClientXMPP):
     A basic client asking an entity if they confirm the access to an HTTP URL.
     """
 
-    def __init__(self, jid, password, recipient, filename):
+    def __init__(self, jid, password, recipient, filename, domain=None):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
         self.recipient = recipient
         self.filename = filename
+        self.domain = domain
 
         self.add_event_handler("session_start", self.start)
 
@@ -37,7 +38,7 @@ class HttpUpload(slixmpp.ClientXMPP):
         def timeout_callback(arg):
             raise TimeoutError("could not send message in time")
         url = await self['xep_0363'].upload_file(
-            self.filename, timeout=10, timeout_callback=timeout_callback)
+            self.filename, domain=self.domain timeout=10, timeout_callback=timeout_callback)
         log.info('Upload success!')
 
         log.info('Sending file to %s', self.recipient)
@@ -71,6 +72,8 @@ if __name__ == '__main__':
                         help="Recipient JID")
     parser.add_argument("-f", "--file", required=True,
                         help="File to send")
+    parser.add_argument("--domain",
+                        help="Domain to use for HTTP File Upload (leave out for your own server’s)")
 
     args = parser.parse_args()
 
@@ -83,7 +86,7 @@ if __name__ == '__main__':
     if args.password is None:
         args.password = getpass("Password: ")
 
-    xmpp = HttpUpload(args.jid, args.password, args.recipient, args.file)
+    xmpp = HttpUpload(args.jid, args.password, args.recipient, args.file, args.domain)
     xmpp.register_plugin('xep_0071')
     xmpp.register_plugin('xep_0128')
     xmpp.register_plugin('xep_0363')
