@@ -67,8 +67,9 @@ class XEP_0363(BasePlugin):
     def _handle_request(self, iq):
         self.xmpp.event('http_upload_request', iq)
 
-    async def find_upload_service(self, timeout=None, timeout_callback=None):
+    async def find_upload_service(self, domain=None, timeout=None, timeout_callback=None):
         results = await self.xmpp['xep_0030'].get_info_from_domain(
+            domain=domain,
             timeout=timeout, timeout_callback=timeout_callback)
 
         for info in results:
@@ -90,11 +91,12 @@ class XEP_0363(BasePlugin):
                        timeout_callback=timeout_callback)
 
     async def upload_file(self, filename, size=None, content_type=None, *,
-                          input_file=None, ifrom=None, timeout=None,
+                          input_file=None, ifrom=None, domain=None, timeout=None,
                           callback=None, timeout_callback=None):
         ''' Helper function which does all of the uploading process. '''
         if self.upload_service is None:
             info_iq = await self.find_upload_service(
+                domain=domain,
                 timeout=timeout, timeout_callback=timeout_callback)
             if info_iq is None:
                 raise UploadServiceNotFound()
