@@ -34,7 +34,10 @@ class HttpUpload(slixmpp.ClientXMPP):
 
     async def start(self, event):
         log.info('Uploading file %s...', self.filename)
-        url = await self['xep_0363'].upload_file(self.filename)
+        def timeout_callback(arg):
+            raise TimeoutError("could not send message in time")
+        url = await self['xep_0363'].upload_file(
+            self.filename, timeout=10, timeout_callback=timeout_callback)
         log.info('Upload success!')
 
         log.info('Sending file to %s', self.recipient)
