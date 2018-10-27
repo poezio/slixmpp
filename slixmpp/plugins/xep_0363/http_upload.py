@@ -72,9 +72,14 @@ class XEP_0363(BasePlugin):
             domain=domain,
             timeout=timeout, timeout_callback=timeout_callback)
 
+        candidates = []
         for info in results:
             for identity in info['disco_info']['identities']:
                 if identity[0] == 'store' and identity[1] == 'file':
+                    candidates.append(info)
+        for info in candidates:
+            for feature in info['disco_info']['features']:
+                if feature == Request.namespace:
                     return info
 
     def request_slot(self, jid, filename, size, content_type=None, ifrom=None,
