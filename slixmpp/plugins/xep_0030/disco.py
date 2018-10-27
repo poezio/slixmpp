@@ -299,18 +299,18 @@ class XEP_0030(BasePlugin):
         return self.api['has_identity'](jid, node, ifrom, data)
 
     async def get_info_from_domain(self, domain=None, timeout=None,
-                                   cached=True, callback=None, **kwargs):
+                                   cached=True, callback=None):
         if domain is None:
             domain = self.xmpp.boundjid.domain
 
         if not cached or domain not in self.domain_infos:
             infos = [self.get_info(
-                domain, timeout=timeout, **kwargs)]
+                domain, timeout=timeout)]
             iq_items = await self.get_items(
-                domain, timeout=timeout, **kwargs)
+                domain, timeout=timeout)
             items = iq_items['disco_items']['items']
             infos += [
-                self.get_info(item[0], timeout=timeout, **kwargs)
+                self.get_info(item[0], timeout=timeout)
                 for item in items]
             info_futures, _ = await asyncio.wait(
                 infos,
@@ -319,7 +319,7 @@ class XEP_0030(BasePlugin):
             )
 
             self.domain_infos[domain] = [
-                future.result() for future in info_futures]
+                future.result() for future in info_futures if not future.exception()]
 
         results = self.domain_infos[domain]
 
