@@ -68,8 +68,9 @@ class XEP_0363(BasePlugin):
     def _handle_request(self, iq):
         self.xmpp.event('http_upload_request', iq)
 
-    async def find_upload_service(self, timeout=None):
-        results = await self.xmpp['xep_0030'].get_info_from_domain()
+    async def find_upload_service(self, timeout=None, timeout_callback=None):
+        results = await self.xmpp['xep_0030'].get_info_from_domain(
+            timeout=timeout, timeout_callback=timeout_callback)
 
         for info in results:
             for identity in info['disco_info']['identities']:
@@ -94,7 +95,8 @@ class XEP_0363(BasePlugin):
                           callback=None, timeout_callback=None):
         ''' Helper function which does all of the uploading process. '''
         if self.upload_service is None:
-            info_iq = await self.find_upload_service(timeout=timeout)
+            info_iq = await self.find_upload_service(
+                timeout=timeout, timeout_callback=timeout_callback)
             if info_iq is None:
                 raise UploadServiceNotFound()
             self.upload_service = info_iq['from']

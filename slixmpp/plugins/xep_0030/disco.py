@@ -304,13 +304,13 @@ class XEP_0030(BasePlugin):
             domain = self.xmpp.boundjid.domain
 
         if not cached or domain not in self.domain_infos:
-            infos = [self.get_info(
+            infos = [await self.get_info(
                 domain, timeout=timeout, **kwargs)]
             iq_items = await self.get_items(
                 domain, timeout=timeout, **kwargs)
             items = iq_items['disco_items']['items']
             infos += [
-                self.get_info(item[0], timeout=timeout, **kwargs)
+                await self.get_info(item[0], timeout=timeout, **kwargs)
                 for item in items]
             info_futures, _ = await asyncio.wait(
                 infos,
