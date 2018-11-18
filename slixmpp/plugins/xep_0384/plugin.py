@@ -105,7 +105,7 @@ class XEP_0384(BasePlugin):
         try:
             self._omemo = future.result()
         except:
-            log.error("Couldn't load the OMEMO object; ¯\_(ツ)_/¯")
+            log.error("Couldn't load the OMEMO object; ¯\\_(ツ)_/¯")
             raise PluginCouldNotLoad
 
         self.xmpp.add_event_handler('pubsub_publish', self._receive_device_list)

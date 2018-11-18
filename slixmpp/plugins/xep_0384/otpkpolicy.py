@@ -1,7 +1,7 @@
 """
     Slixmpp: The Slick XMPP Library
 
-    Shamelessly copied from Syndace's python-omemo examples.
+    Shamelessly inspired from Syndace's python-omemo examples.
 """
 
 import omemo
