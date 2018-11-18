@@ -8,6 +8,9 @@
 
 import logging
 
+import os
+import json
+import time
 import base64
 import asyncio
 from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
@@ -20,8 +23,11 @@ log = logging.getLogger(__name__)
 
 HAS_OMEMO = True
 try:
-    import omemo
-    from slixmpp.plugins.xep_0384.session import SessionManager
+    from omemo.util import generateDeviceID
+    from omemo_backend_signal import BACKEND as SignalBackend
+    from slixmpp.plugins.xep_0384.session import WrappedSessionManager as SessionManager
+    from slixmpp.plugins.xep_0384.storage import AsyncInMemoryStorage
+    from slixmpp.plugins.xep_0384.otpkpolicy import KeepingOTPKPolicy
 except ImportError as e:
     HAS_OMEMO = False
 
@@ -46,6 +52,10 @@ def format_fingerprint(fp):
     return ":".join(splitn(fp, 4))
 
 
+# XXX: This should probably be moved in plugins/base.py?
+class PluginCouldNotLoad(Exception): pass
+
+
 class XEP_0384(BasePlugin):
 
     """
@@ -65,20 +75,36 @@ class XEP_0384(BasePlugin):
 
     def plugin_init(self):
         if not self.backend_loaded:
-            log.debug("xep_0384 cannot be loaded as the backend omemo library "
+            log.info("xep_0384 cannot be loaded as the backend omemo library "
                       "is not available")
             return
 
-        self._omemo = SessionManager(
-            self.xmpp.boundjid,
-            self.cache_dir,
+        storage = AsyncInMemoryStorage(self.cache_dir)
+        otpkpolicy = KeepingOTPKPolicy()
+        backend = SignalBackend
+        bare_jid = self.xmpp.boundjid.bare
+        device_id = self._load_device_id(self.cache_dir)
+
+        future = SessionManager.create(
+            storage,
+            otpkpolicy,
+            backend,
+            bare_jid,
+            device_id,
         )
-        self._device_id = self._omemo.get_own_device_id()
+        asyncio.ensure_future(future)
 
-        self.xmpp.add_event_handler('pubsub_publish', self._get_device_list)
+        # XXX: This is crap. Rewrite slixmpp plugin system to use async.
+        # The issue here is that I can't declare plugin_init as async because
+        # it's not awaited on.
+        while not future.done():
+            time.sleep(0.1)
 
-        asyncio.ensure_future(self._publish_bundle())
-        asyncio.ensure_future(self._set_device_list())
+        try:
+            self._omemo = future.result()
+        except:
+            log.error("Couldn't load the OMEMO object; ¯\_(ツ)_/¯")
+            raise PluginCouldNotLoad
 
     def plugin_end(self):
         if not self.backend_loaded:
@@ -86,6 +112,20 @@ class XEP_0384(BasePlugin):
 
         self.xmpp.del_event_handler('pubsub_publish', self._get_device_list)
         self.xmpp['xep_0163'].remove_interest(OMEMO_DEVICES_NS)
+
+    def _load_device_id(self, cache_dir):
+        filepath = os.path.join(cache_dir, 'device_id.json')
+        # Try reading file first, decoding, and if file was empty generate
+        # new DeviceID
+        try:
+            with open(filepath, 'r') as f:
+                did = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            did = generateDeviceID()
+            with open(filepath, 'w') as f:
+                json.dump(did, f)
+
+        return did
 
     def session_bind(self, _jid):
         self.xmpp['xep_0163'].add_interest(OMEMO_DEVICES_NS)
