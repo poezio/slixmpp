@@ -36,6 +36,9 @@ except ImportError as e:
 TRUE_VALUES = {True, 'true', '1'}
 
 
+def encode_public_key(key: bytes) -> bytes:
+    return b'\x05' + key
+
 def b64enc(data):
     return base64.b64encode(bytes(bytearray(data))).decode('ASCII')
 
@@ -100,6 +103,7 @@ class XEP_0384(BasePlugin):
 
         self.xmpp.add_event_handler('pubsub_publish', self._receive_device_list)
         asyncio.ensure_future(self._set_device_list())
+        asyncio.ensure_future(self._publish_bundle())
 
     def plugin_end(self):
         if not self.backend_loaded:
@@ -129,41 +133,35 @@ class XEP_0384(BasePlugin):
         return self._device_id
 
     def _generate_bundle_iq(self):
-        bundle = self._omemo.get_bundle()
-        log.debug('FOO2 Bundle: %r', bundle.fingerprint)
+        bundle = self._omemo.public_bundle
 
         iq = self.xmpp.Iq(stype='set')
         publish = iq['pubsub']['publish']
         publish['node'] = '%s:%d' % (OMEMO_BUNDLES_NS, self._device_id)
         payload = publish['item']['bundle']
-        signedPreKeyPublic = b64enc(
-            omemo.wireformat.encodePublicKey(bundle.spk['key'])
-        )
+        signedPreKeyPublic = b64enc(encode_public_key(bundle.spk['key']))
         payload['signedPreKeyPublic']['value'] = signedPreKeyPublic
         payload['signedPreKeyPublic']['signedPreKeyId'] = str(bundle.spk['id'])
         payload['signedPreKeySignature']['value'] = b64enc(
             bundle.spk_signature
         )
-        identityKey = b64enc(omemo.wireformat.encodePublicKey(bundle.ik))
+        identityKey = b64enc(encode_public_key(bundle.ik))
         payload['identityKey']['value'] = identityKey
 
         prekeys = []
         for otpk in bundle.otpks:
             prekey = PreKeyPublic()
             prekey['preKeyId'] = str(otpk['id'])
-            prekey['value'] = b64enc(
-                omemo.wireformat.encodePublicKey(otpk['key'])
-            )
+            prekey['value'] = b64enc(encode_public_key(otpk['key']))
             prekeys.append(prekey)
         payload['prekeys'] = prekeys
 
         return iq
 
     async def _publish_bundle(self):
-        # TODO: Check if bundle is already available
-        # Otherwise publish it
-        iq = self._generate_bundle_iq()
-        await iq.send()
+        if self._omemo.republish_bundle:
+            iq = self._generate_bundle_iq()
+            await iq.send()
 
     def _store_device_ids(self, jid, items):
         device_ids = []
