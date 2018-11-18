@@ -104,7 +104,7 @@ class AsyncInMemoryStorage(omemo.Storage):
 
     def storeActiveDevices(self, callback, bare_jid, devices):
         self.__devices[bare_jid] = self.__devices.get(bare_jid, {})
-        self.__devices[bare_jid]["active"] = devices
+        self.__devices[bare_jid]["active"] = list(devices)
 
         try:
             filepath = os.path.join(self.storage_dir, 'devices.json')
@@ -114,12 +114,30 @@ class AsyncInMemoryStorage(omemo.Storage):
         except Exception as e:
             return callback(False, e)
 
+    def loadInactiveDevices(self, callback, bare_jid):
+        if self.__devices is None:
+            try:
+                filepath = os.path.join(self.storage_dir, 'devices.json')
+                with open(filepath, 'r') as f:
+                    self.__devices = json.load(f)
+            except OSError:
+                return callback(True, None)
+            except json.JSONDecodeError as e:
+                return callback(False, e)
+
+        return callback(True, self.__devices.get(bare_jid, {}).get("inactive", []))
 
     def storeInactiveDevices(self, callback, bare_jid, devices):
         self.__devices[bare_jid] = self.__devices.get(bare_jid, {})
-        self.__devices[bare_jid]["inactive"] = devices
+        self.__devices[bare_jid]["inactive"] = list(devices)
 
-        callback(True, None)
+        try:
+            filepath = os.path.join(self.storage_dir, 'devices.json')
+            with open(filepath, 'w') as f:
+                json.dump(self.__devices, f)
+                return callback(True, None)
+        except Exception as e:
+            return callback(False, e)
 
     def isTrusted(self, callback, bare_jid, device):
         result = False
