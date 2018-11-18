@@ -44,7 +44,7 @@ def b64enc(data):
 
 
 def b64dec(data):
-    return base64.b64decode(data.decode('ASCII'))
+    return base64.b64decode(data)
 
 
 # XXX: This should probably be moved in plugins/base.py?
@@ -232,7 +232,7 @@ class XEP_0384(BasePlugin):
 
     def decrypt_message(self, msg):
         header = msg['omemo_encrypted']['header']
-        payload = msg['omemo_encrypted']['payload']
+        payload = b64dec(msg['omemo_encrypted']['payload']['value'])
 
         jid = msg['from'].bare
         sid = header['sid']
@@ -245,8 +245,8 @@ class XEP_0384(BasePlugin):
 
         key = Key(key)
         isPrekeyMessage = key['prekey'] in TRUE_VALUES
-        message = key['value']
-        iv = header['iv']
+        message = b64dec(key['value'])
+        iv = b64dec(header['iv']['value'])
 
         return self._omemo.decryptMessage(
             jid,
