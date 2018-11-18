@@ -83,14 +83,14 @@ class XEP_0384(BasePlugin):
         otpkpolicy = KeepingOTPKPolicy()
         backend = SignalBackend
         bare_jid = self.xmpp.boundjid.bare
-        device_id = self._load_device_id(self.cache_dir)
+        self._device_id = self._load_device_id(self.cache_dir)
 
         future = SessionManager.create(
             storage,
             otpkpolicy,
             backend,
             bare_jid,
-            device_id,
+            self._device_id,
         )
         asyncio.ensure_future(future)
 
