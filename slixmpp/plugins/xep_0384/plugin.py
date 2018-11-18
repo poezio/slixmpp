@@ -244,11 +244,18 @@ class XEP_0384(BasePlugin):
             return
 
         key = Key(key)
-        prekey = key['prekey'] in TRUE_VALUES
+        isPrekeyMessage = key['prekey'] in TRUE_VALUES
         message = key['value']
         iv = header['iv']
 
-        return self._omemo.decrypt(jid, sid, iv, message, payload, prekey)
+        return self._omemo.decryptMessage(
+            jid,
+            sid,
+            iv,
+            message,
+            isPrekeyMessage,
+            payload,
+        )
 
 
 register_plugin(XEP_0384)
