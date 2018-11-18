@@ -8,6 +8,8 @@
 
 import logging
 
+from typing import List
+
 import os
 import json
 import time
@@ -106,11 +108,14 @@ class XEP_0384(BasePlugin):
             log.error("Couldn't load the OMEMO object; ¯\_(ツ)_/¯")
             raise PluginCouldNotLoad
 
+        self.xmpp.add_event_handler('pubsub_publish', self._receive_device_list)
+        asyncio.ensure_future(self._set_device_list())
+
     def plugin_end(self):
         if not self.backend_loaded:
             return
 
-        self.xmpp.del_event_handler('pubsub_publish', self._get_device_list)
+        self.xmpp.del_event_handler('pubsub_publish', self._receive_device_list)
         self.xmpp['xep_0163'].remove_interest(OMEMO_DEVICES_NS)
 
     def _load_device_id(self, cache_dir):
@@ -174,31 +179,17 @@ class XEP_0384(BasePlugin):
         iq = self._generate_bundle_iq()
         await iq.send()
 
-    async def clear_device_list(self):
-        """Clear devicelist for the account"""
-
-        self_id = Device()
-        self_id['id'] = str(self._device_id)
-        devices = Devices()
-        devices['devices'] = [self_id]
-
-        await self.xmpp['xep_0060'].publish(
-            self.xmpp.boundjid.bare,
-            OMEMO_DEVICES_NS,
-            payload=devices,
-        )
-
     def _store_device_ids(self, jid, items):
-        self.device_ids[jid] = []
+        device_ids = []
         for item in items:
             device_ids = [int(d['id']) for d in item['devices']]
-            self.device_ids[jid] = device_ids
 
             # XXX: There should only be one item so this is fine, but slixmpp
             # loops forever otherwise. ???
             break
+        self._omemo.newDeviceList(device_ids, str(jid))
 
-    def _get_device_list(self, msg):
+    async def _receive_device_list(self, msg):
         if msg['pubsub_event']['items']['node'] != OMEMO_DEVICES_NS:
             return
 
@@ -206,8 +197,10 @@ class XEP_0384(BasePlugin):
         items = msg['pubsub_event']['items']
         self._store_device_ids(jid, items)
 
+        device_ids = await self.get_device_list(jid)
+
         if jid == self.xmpp.boundjid.bare and \
-           self._device_id not in self.device_ids[jid]:
+           self._device_id not in device_ids:
             asyncio.ensure_future(self._set_device_list())
 
     async def _set_device_list(self):
@@ -227,14 +220,17 @@ class XEP_0384(BasePlugin):
             else:
                 return  # XXX: Handle this!
 
+        device_ids = await self.get_device_list(jid)
+        log.debug('FOO: device_ids: %r', device_ids)
+
         # Verify that this device in the list and set it if necessary
-        if self._device_id in self.device_ids.get(jid, []):
+        if self._device_id in device_ids:
             return
 
-        self.device_ids[jid].append(self._device_id)
+        device_ids.append(self._device_id)
 
         devices = []
-        for i in self.device_ids[jid]:
+        for i in device_ids:
             d = Device()
             d['id'] = str(i)
             devices.append(d)
@@ -244,6 +240,11 @@ class XEP_0384(BasePlugin):
         await self.xmpp['xep_0060'].publish(
             jid, OMEMO_DEVICES_NS, payload=payload,
         )
+
+    async def get_device_list(self, jid) -> List[str]:
+        # XXX: Maybe someday worry about inactive devices somehow
+        devices = await self._omemo.getDevices(jid)
+        return devices["active"]
 
     def is_encrypted(self, msg):
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
