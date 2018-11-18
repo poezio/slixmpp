@@ -163,7 +163,7 @@ class XEP_0384(BasePlugin):
             iq = self._generate_bundle_iq()
             await iq.send()
 
-    def _store_device_ids(self, jid, items):
+    async def _store_device_ids(self, jid, items):
         device_ids = []
         for item in items:
             device_ids = [int(d['id']) for d in item['devices']]
@@ -171,7 +171,7 @@ class XEP_0384(BasePlugin):
             # XXX: There should only be one item so this is fine, but slixmpp
             # loops forever otherwise. ???
             break
-        self._omemo.newDeviceList(device_ids, str(jid))
+        return await self._omemo.newDeviceList(device_ids, str(jid))
 
     async def _receive_device_list(self, msg):
         if msg['pubsub_event']['items']['node'] != OMEMO_DEVICES_NS:
@@ -179,12 +179,13 @@ class XEP_0384(BasePlugin):
 
         jid = msg['from'].bare
         items = msg['pubsub_event']['items']
-        self._store_device_ids(jid, items)
+        await self._store_device_ids(jid, items)
 
         device_ids = await self.get_device_list(jid)
+        active_devices = device_ids['active']
 
         if jid == self.xmpp.boundjid.bare and \
-           self._device_id not in device_ids:
+           self._device_id not in active_devices:
             asyncio.ensure_future(self._set_device_list())
 
     async def _set_device_list(self):
@@ -194,27 +195,24 @@ class XEP_0384(BasePlugin):
             iq = await self.xmpp['xep_0060'].get_items(
                 self.xmpp.boundjid.bare, OMEMO_DEVICES_NS,
             )
-            log.debug("DEVICES %r", iq)
             items = iq['pubsub']['items']
-            self._store_device_ids(jid, items)
+            await self._store_device_ids(jid, items)
         except IqError as iq_err:
             if iq_err.condition == "item-not-found":
-                log.debug("NO DEVICES")
-                self._store_device_ids(jid, [])
+                await self._store_device_ids(jid, [])
             else:
                 return  # XXX: Handle this!
 
         device_ids = await self.get_device_list(jid)
-        log.debug('FOO: device_ids: %r', device_ids)
 
         # Verify that this device in the list and set it if necessary
         if self._device_id in device_ids:
             return
 
-        device_ids.append(self._device_id)
+        device_ids['active'].add(self._device_id)
 
         devices = []
-        for i in device_ids:
+        for i in device_ids['active']:
             d = Device()
             d['id'] = str(i)
             devices.append(d)
@@ -227,8 +225,7 @@ class XEP_0384(BasePlugin):
 
     async def get_device_list(self, jid) -> List[str]:
         # XXX: Maybe someday worry about inactive devices somehow
-        devices = await self._omemo.getDevices(jid)
-        return devices["active"]
+        return await self._omemo.getDevices(jid)
 
     def is_encrypted(self, msg):
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
