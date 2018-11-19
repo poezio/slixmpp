@@ -25,10 +25,10 @@ log = logging.getLogger(__name__)
 
 HAS_OMEMO = True
 try:
+    from omemo import SessionManager
     from omemo.util import generateDeviceID
     from omemo_backend_signal import BACKEND as SignalBackend
-    from slixmpp.plugins.xep_0384.session import WrappedSessionManager as SessionManager
-    from slixmpp.plugins.xep_0384.storage import AsyncInMemoryStorage
+    from slixmpp.plugins.xep_0384.storage import SyncFileStorage
     from slixmpp.plugins.xep_0384.otpkpolicy import KeepingOTPKPolicy
 except ImportError as e:
     HAS_OMEMO = False
@@ -74,29 +74,20 @@ class XEP_0384(BasePlugin):
                       "is not available")
             return
 
-        storage = AsyncInMemoryStorage(self.cache_dir)
+        storage = SyncFileStorage(self.cache_dir)
         otpkpolicy = KeepingOTPKPolicy()
         backend = SignalBackend
         bare_jid = self.xmpp.boundjid.bare
         self._device_id = self._load_device_id(self.cache_dir)
 
-        future = SessionManager.create(
-            storage,
-            otpkpolicy,
-            backend,
-            bare_jid,
-            self._device_id,
-        )
-        asyncio.ensure_future(future)
-
-        # XXX: This is crap. Rewrite slixmpp plugin system to use async.
-        # The issue here is that I can't declare plugin_init as async because
-        # it's not awaited on.
-        while not future.done():
-            time.sleep(0.1)
-
         try:
-            self._omemo = future.result()
+            self._omemo = SessionManager.create(
+                storage,
+                otpkpolicy,
+                backend,
+                bare_jid,
+                self._device_id,
+            )
         except:
             log.error("Couldn't load the OMEMO object; ¯\\_(ツ)_/¯")
             raise PluginCouldNotLoad
@@ -163,7 +154,7 @@ class XEP_0384(BasePlugin):
             iq = self._generate_bundle_iq()
             await iq.send()
 
-    async def _store_device_ids(self, jid, items):
+    def _store_device_ids(self, jid, items):
         device_ids = []
         for item in items:
             device_ids = [int(d['id']) for d in item['devices']]
@@ -171,17 +162,17 @@ class XEP_0384(BasePlugin):
             # XXX: There should only be one item so this is fine, but slixmpp
             # loops forever otherwise. ???
             break
-        return await self._omemo.newDeviceList(device_ids, str(jid))
+        return self._omemo.newDeviceList(device_ids, str(jid))
 
-    async def _receive_device_list(self, msg):
+    def _receive_device_list(self, msg):
         if msg['pubsub_event']['items']['node'] != OMEMO_DEVICES_NS:
             return
 
         jid = msg['from'].bare
         items = msg['pubsub_event']['items']
-        await self._store_device_ids(jid, items)
+        self._store_device_ids(jid, items)
 
-        device_ids = await self.get_device_list(jid)
+        device_ids = self.get_device_list(jid)
         active_devices = device_ids['active']
 
         if jid == self.xmpp.boundjid.bare and \
@@ -196,14 +187,14 @@ class XEP_0384(BasePlugin):
                 self.xmpp.boundjid.bare, OMEMO_DEVICES_NS,
             )
             items = iq['pubsub']['items']
-            await self._store_device_ids(jid, items)
+            self._store_device_ids(jid, items)
         except IqError as iq_err:
             if iq_err.condition == "item-not-found":
-                await self._store_device_ids(jid, [])
+                self._store_device_ids(jid, [])
             else:
                 return  # XXX: Handle this!
 
-        device_ids = await self.get_device_list(jid)
+        device_ids = self.get_device_list(jid)
 
         # Verify that this device in the list and set it if necessary
         if self._device_id in device_ids:
@@ -223,9 +214,9 @@ class XEP_0384(BasePlugin):
             jid, OMEMO_DEVICES_NS, payload=payload,
         )
 
-    async def get_device_list(self, jid) -> List[str]:
+    def get_device_list(self, jid) -> List[str]:
         # XXX: Maybe someday worry about inactive devices somehow
-        return await self._omemo.getDevices(jid)
+        return  self._omemo.getDevices(jid)
 
     def is_encrypted(self, msg):
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
