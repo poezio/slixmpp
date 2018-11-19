@@ -8,7 +8,7 @@
 
 import logging
 
-from typing import List
+from typing import List, Union
 
 import os
 import json
@@ -221,7 +221,7 @@ class XEP_0384(BasePlugin):
     def is_encrypted(self, msg):
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
 
-    def decrypt_message(self, msg):
+    def decrypt_message(self, msg) -> Union[None, str]:
         header = msg['omemo_encrypted']['header']
         payload = b64dec(msg['omemo_encrypted']['payload']['value'])
 
@@ -232,14 +232,16 @@ class XEP_0384(BasePlugin):
             OMEMO_BASE_NS, self._device_id))
         if key is None:
             log.debug("Saw encrypted message that wasn't for me, ignoring.")
-            return
+            return None
 
         key = Key(key)
         isPrekeyMessage = key['prekey'] in TRUE_VALUES
         message = b64dec(key['value'])
         iv = b64dec(header['iv']['value'])
 
-        return self._omemo.decryptMessage(
+        # XXX: 'cipher' is part of KeyTransportMessages and is used when no payload
+        # is passed. We do not implement this yet.
+        _cipher, body = self._omemo.decryptMessage(
             jid,
             sid,
             iv,
@@ -247,6 +249,7 @@ class XEP_0384(BasePlugin):
             isPrekeyMessage,
             payload,
         )
+        return body
 
 
 register_plugin(XEP_0384)
