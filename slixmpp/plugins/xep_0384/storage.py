@@ -18,7 +18,6 @@ class SyncFileStorage(omemo.Storage):
         self.__own_data = None
         self.__sessions = {}
         self.__devices = {}
-        self.__trusted = True
 
     def dump(self):
         return copy.deepcopy({
@@ -26,9 +25,6 @@ class SyncFileStorage(omemo.Storage):
             "sessions" : self.__sessions,
             "devices"  : self.__devices
         })
-
-    def trust(self, trusted):
-        self.__trusted = trusted
 
     def loadOwnData(self, _callback):
         if self.__own_data is None:
@@ -115,15 +111,11 @@ class SyncFileStorage(omemo.Storage):
         with open(filepath, 'w') as f:
             json.dump(self.__devices, f)
 
-    def isTrusted(self, callback, bare_jid, device):
-        result = False
+    def trust(self, _trusted: str) -> None:
+        """Set somebody as trusted"""
 
-        if self.__trusted == True:
-            result = True
-        else:
-            result = bare_jid in self.__trusted and device in self.__trusted[bare_jid]
-
-        return result
+    def isTrusted(self, callback, bare_jid: str, device: int) -> bool:
+        return True
 
     @property
     def is_async(self):
