@@ -36,6 +36,8 @@ except ImportError as e:
 TRUE_VALUES = {True, 'true', '1'}
 
 
+# TODO: Upstream bug has been fixed. https://github.com/Syndace/python-omemo/issues/7
+# Use the API provided by the lib.
 def encode_public_key(key: bytes) -> bytes:
     return b'\x05' + key
 
