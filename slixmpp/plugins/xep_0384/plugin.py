@@ -69,6 +69,13 @@ def _load_device_id(cache_dir: str) -> int:
 class PluginCouldNotLoad(Exception): pass
 
 
+# Generic exception
+class XEP0384(Exception): pass
+
+
+class MissingOwnKey(XEP0384): pass
+
+
 class XEP_0384(BasePlugin):
 
     """
@@ -233,8 +240,7 @@ class XEP_0384(BasePlugin):
         key = header.xml.find("{%s}key[@rid='%s']" % (
             OMEMO_BASE_NS, self._device_id))
         if key is None:
-            log.debug("Saw encrypted message that wasn't for me, ignoring.")
-            return None
+            raise MissingOwnKey("Encrypted message is not for us")
 
         key = Key(key)
         isPrekeyMessage = key['prekey'] in TRUE_VALUES
