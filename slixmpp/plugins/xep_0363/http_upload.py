@@ -148,6 +148,8 @@ class XEP_0363(BasePlugin):
                     data=input_file,
                     headers=headers,
                     timeout=timeout)
+            if response.status >= 400:
+                raise FileUploadError("could not upload file: %d (%s)" % (response.status, await response.text()))
             log.info('Response code: %d (%s)', response.status, await response.text())
             response.close()
             return slot['get']['url']
