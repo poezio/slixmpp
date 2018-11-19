@@ -9,15 +9,16 @@ import omemo
 import os
 import copy
 import json
+from typing import Any, Dict, Set, Union
 
 
 class SyncFileStorage(omemo.Storage):
-    def __init__(self, storage_dir):
+    def __init__(self, storage_dir: str) -> None:
         self.storage_dir = storage_dir
         self.__state = None
-        self.__own_data = None
-        self.__sessions = {}
-        self.__devices = {}
+        self.__own_data = None  # type: Union[None, Dict[str, str]]
+        self.__sessions = {}  # type: Dict[str, Dict[int, Any]]
+        self.__devices = {}  # type: Dict[str, Dict[str, Set[int]]]
 
     def dump(self):
         return copy.deepcopy({
@@ -37,7 +38,7 @@ class SyncFileStorage(omemo.Storage):
 
         return self.__own_data
 
-    def storeOwnData(self, _callback, own_bare_jid, own_device_id):
+    def storeOwnData(self, _callback, own_bare_jid: str, own_device_id: int) -> None:
         self.__own_data = {
             'own_bare_jid': own_bare_jid,
             'own_device_id': own_device_id,
@@ -46,8 +47,6 @@ class SyncFileStorage(omemo.Storage):
         filepath = os.path.join(self.storage_dir, 'own_data.json')
         with open(filepath, 'w') as f:
             json.dump(self.__own_data, f)
-
-        return None
 
     def loadState(self, callback):
         if self.__state is None:
@@ -60,20 +59,20 @@ class SyncFileStorage(omemo.Storage):
 
         return self.__state
 
-    def storeState(self, _callback, state):
+    def storeState(self, _callback, state) -> None:
         self.__state = state
         filepath = os.path.join(self.storage_dir, 'omemo.json')
         with open(filepath, 'w') as f:
             json.dump(self.__state, f)
 
-    def loadSession(self, _callback, bare_jid, device_id):
+    def loadSession(self, _callback, bare_jid: str, device_id: int):
         return self.__sessions.get(bare_jid, {}).get(device_id, None)
 
-    def storeSession(self, callback, bare_jid, device_id, session):
+    def storeSession(self, callback, bare_jid: str, device_id: int, session) -> None:
         self.__sessions[bare_jid] = self.__sessions.get(bare_jid, {})
         self.__sessions[bare_jid][device_id] = session
 
-    def loadActiveDevices(self, _callback, bare_jid):
+    def loadActiveDevices(self, _callback, bare_jid: str) -> Union[None, Set[int]]:
         if self.__devices is None:
             try:
                 filepath = os.path.join(self.storage_dir, 'devices.json')
@@ -84,7 +83,7 @@ class SyncFileStorage(omemo.Storage):
 
         return self.__devices.get(bare_jid, {}).get("active", [])
 
-    def storeActiveDevices(self, _callback, bare_jid, devices):
+    def storeActiveDevices(self, _callback, bare_jid: str, devices: Set[int]) -> None:
         self.__devices[bare_jid] = self.__devices.get(bare_jid, {})
         self.__devices[bare_jid]["active"] = list(devices)
 
@@ -92,7 +91,7 @@ class SyncFileStorage(omemo.Storage):
         with open(filepath, 'w') as f:
             json.dump(self.__devices, f)
 
-    def loadInactiveDevices(self, _callback, bare_jid):
+    def loadInactiveDevices(self, _callback, bare_jid: str) -> Union[None, Set[int]]:
         if self.__devices is None:
             try:
                 filepath = os.path.join(self.storage_dir, 'devices.json')
@@ -103,7 +102,7 @@ class SyncFileStorage(omemo.Storage):
 
         return self.__devices.get(bare_jid, {}).get("inactive", [])
 
-    def storeInactiveDevices(self, _callback, bare_jid, devices):
+    def storeInactiveDevices(self, _callback, bare_jid: str, devices: Set[int]) -> None:
         self.__devices[bare_jid] = self.__devices.get(bare_jid, {})
         self.__devices[bare_jid]["inactive"] = list(devices)
 
@@ -118,5 +117,5 @@ class SyncFileStorage(omemo.Storage):
         return True
 
     @property
-    def is_async(self):
+    def is_async(self) -> bool:
         return False
