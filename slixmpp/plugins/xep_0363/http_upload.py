@@ -30,6 +30,10 @@ class UploadServiceNotFound(FileUploadError):
 class FileTooBig(FileUploadError):
     pass
 
+class HTTPError(FileUploadError):
+    def __str__(self):
+        return 'Could not upload file: %d (%s)' % (self.args[0], self.args[1])
+
 class XEP_0363(BasePlugin):
     ''' This plugin only supports Python 3.5+ '''
 
@@ -149,7 +153,7 @@ class XEP_0363(BasePlugin):
                     headers=headers,
                     timeout=timeout)
             if response.status >= 400:
-                raise FileUploadError("could not upload file: %d (%s)" % (response.status, await response.text()))
+                raise HTTPError(response.status, await response.text())
             log.info('Response code: %d (%s)', response.status, await response.text())
             response.close()
             return slot['get']['url']
