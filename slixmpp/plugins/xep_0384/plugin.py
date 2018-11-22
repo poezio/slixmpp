@@ -36,12 +36,6 @@ except (ImportError,):
 TRUE_VALUES = {True, 'true', '1'}
 
 
-# TODO: Upstream bug has been fixed. https://github.com/Syndace/python-omemo/issues/7
-# Use the API provided by the lib.
-def encode_public_key(key: bytes) -> bytes:
-    return b'\x05' + key
-
-
 def b64enc(data: bytes) -> str:
     return base64.b64encode(bytes(bytearray(data))).decode('ASCII')
 
@@ -99,7 +93,7 @@ class XEP_0384(BasePlugin):
 
         storage = SyncFileStorage(self.cache_dir)
         otpkpolicy = KeepingOTPKPolicy()
-        backend = SignalBackend
+        self._omemo_backend = SignalBackend
         bare_jid = self.xmpp.boundjid.bare
         self._device_id = _load_device_id(self.cache_dir)
 
@@ -107,7 +101,7 @@ class XEP_0384(BasePlugin):
             self._omemo = SessionManager.create(
                 storage,
                 otpkpolicy,
-                backend,
+                self._omemo_backend,
                 bare_jid,
                 self._device_id,
             )
@@ -133,26 +127,26 @@ class XEP_0384(BasePlugin):
         return self._device_id
 
     def _generate_bundle_iq(self) -> Iq:
-        bundle = self._omemo.public_bundle
+        bundle = self._omemo.public_bundle.serialize(self._omemo_backend)
 
         iq = self.xmpp.Iq(stype='set')
         publish = iq['pubsub']['publish']
         publish['node'] = '%s:%d' % (OMEMO_BUNDLES_NS, self._device_id)
         payload = publish['item']['bundle']
-        signedPreKeyPublic = b64enc(encode_public_key(bundle.spk['key']))
+        signedPreKeyPublic = b64enc(bundle['spk']['key'])
         payload['signedPreKeyPublic']['value'] = signedPreKeyPublic
-        payload['signedPreKeyPublic']['signedPreKeyId'] = str(bundle.spk['id'])
+        payload['signedPreKeyPublic']['signedPreKeyId'] = str(bundle['spk']['id'])
         payload['signedPreKeySignature']['value'] = b64enc(
-            bundle.spk_signature
+            bundle['spk_signature']
         )
-        identityKey = b64enc(encode_public_key(bundle.ik))
+        identityKey = b64enc(bundle['ik'])
         payload['identityKey']['value'] = identityKey
 
         prekeys = []
-        for otpk in bundle.otpks:
+        for otpk in bundle['otpks']:
             prekey = PreKeyPublic()
             prekey['preKeyId'] = str(otpk['id'])
-            prekey['value'] = b64enc(encode_public_key(otpk['key']))
+            prekey['value'] = b64enc(otpk['key'])
             prekeys.append(prekey)
         payload['prekeys'] = prekeys
 
