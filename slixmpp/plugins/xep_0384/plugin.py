@@ -8,7 +8,7 @@
 
 import logging
 
-from typing import List, Union
+from typing import Dict, List, Union
 
 import os
 import json
@@ -16,10 +16,11 @@ import base64
 import asyncio
 from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
 from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLES_NS
-from slixmpp.plugins.xep_0384.stanza import Devices, Device, Key, PreKeyPublic
+from slixmpp.plugins.xep_0384.stanza import Devices, Device, Encrypted, Key, PreKeyPublic
 from slixmpp.plugins.base import BasePlugin, register_plugin
 from slixmpp.exceptions import IqError
 from slixmpp.stanza import Message, Iq
+from slixmpp.jid import JID
 
 log = logging.getLogger(__name__)
 
@@ -253,5 +254,47 @@ class XEP_0384(BasePlugin):
         )
         return body
 
+    async def encrypt_message(self, plaintext: str, recipients: List[JID]) -> Encrypted:
+        """
+        Returns an encrypted payload to be placed into a message.
+
+        The API for getting an encrypted payload consists of trying first
+        and fixing errors progressively. The actual sending happens once the
+        application (us) thinks we're good to go.
+        """
+
+        recipients = [jid.bare for jid in recipients]
+        bundles = {}  # type: Dict[str, Dict[str, ExtendedPublicBundle]]
+
+        while True:
+            errors = []
+
+            self._omemo.encryptMessage(
+                recipients,
+                plaintext.encode('utf-8'),
+                bundles,
+                callback=lambda *args: errors.append(args),
+                always_trust=True,
+                dry_run=True,
+            )
+
+            if not errors:
+                break
+
+            for (exn, key, val) in errors:
+                pass
+
+            break
+
+        # Attempt encryption
+        payload = Encrypted()
+        payload['omemo_encrypted'] = self._omemo.encryptMessage(
+            recipients,
+            plaintext.encode('utf-8'),
+            bundles,
+            always_trust=True,
+        )
+
+        return payload
 
 register_plugin(XEP_0384)
