@@ -8,7 +8,7 @@
 
 import logging
 
-from typing import Any, Dict, List, Set, Union
+from typing import Any, Dict, List, Set, Tuple, Union
 
 import os
 import json
@@ -74,6 +74,9 @@ class MissingOwnKey(XEP0384): pass
 
 
 class NoEligibleDevices(XEP0384): pass
+
+
+class EncryptionPrepareException(XEP0384): pass
 
 
 class XEP_0384(BasePlugin):
@@ -298,7 +301,10 @@ class XEP_0384(BasePlugin):
         recipients = [jid.bare for jid in recipients]
         bundles = {}  # type: Dict[str, Dict[int, ExtendedPublicBundle]]
 
+        old_errors = None  # type: Union[None, List[Tuple[Exception, Any, Any]]]
         while True:
+            # Try to encrypt and resolve errors until there is no error at all
+            # or if we hit the same set of errors.
             errors = []
 
             self._omemo.encryptMessage(
@@ -313,9 +319,13 @@ class XEP_0384(BasePlugin):
             if not errors:
                 break
 
+            if errors == old_errors:
+                raise EncryptionPrepareException
+
+            old_errors = errors
+
             no_eligible_devices = set()  # type: Set[str]
             for (exn, key, val) in errors:
-
                 if isinstance(exn, MissingBundleException):
                     bundle = await self._fetch_bundle(key, val)
                     if bundle is not None:
@@ -340,8 +350,6 @@ class XEP_0384(BasePlugin):
 
             if no_eligible_devices:
                 raise NoEligibleDevices(no_eligible_devices)
-
-            break
 
         # Attempt encryption
         payload = Encrypted()
