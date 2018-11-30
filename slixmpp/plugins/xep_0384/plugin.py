@@ -314,6 +314,8 @@ class XEP_0384(BasePlugin):
                 break
 
             for (exn, key, val) in errors:
+                no_eligible_devices = []
+
                 if isinstance(exn, MissingBundleException):
                     bundle = await self._fetch_bundle(key, val)
                     if bundle is not None:
@@ -334,7 +336,10 @@ class XEP_0384(BasePlugin):
                     if any(self._fetching_bundle(key, *err) for err in errors):
                         continue
 
-                    raise NoEligibleDevices(key)
+                    no_eligible_devices.append(key)
+
+                if no_eligible_devices:
+                    raise NoEligibleDevices(no_eligible_devices)
 
             break
 
