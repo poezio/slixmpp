@@ -8,7 +8,7 @@
 
 import logging
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import os
 import json
@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 HAS_OMEMO = True
 try:
-    from omemo.exceptions import MissingBundleException
+    from omemo.exceptions import MissingBundleException, NoEligibleDevicesException
     from omemo import SessionManager, ExtendedPublicBundle
     from omemo.util import generateDeviceID
     from omemo.backends import Backend
@@ -71,6 +71,9 @@ class XEP0384(Exception): pass
 
 
 class MissingOwnKey(XEP0384): pass
+
+
+class NoEligibleDevices(XEP0384): pass
 
 
 class XEP_0384(BasePlugin):
@@ -280,6 +283,9 @@ class XEP_0384(BasePlugin):
         )
         return body
 
+    def _fetching_bundle(self, jid: str, exn: Exception, key: str, _val: Any) -> bool:
+        return isinstance(exn, MissingBundleException) and key == jid
+
     async def encrypt_message(self, plaintext: str, recipients: List[JID]) -> Encrypted:
         """
         Returns an encrypted payload to be placed into a message.
@@ -313,6 +319,22 @@ class XEP_0384(BasePlugin):
                     if bundle is not None:
                         devices = bundles.setdefault(key, {})
                         devices[val] = bundle
+                elif isinstance(exn, NoEligibleDevicesException):
+                    # This error is apparently returned every time the omemo
+                    # lib couldn't find a device to encrypt to for a
+                    # particular JID.
+                    # In case there is also an MissingBundleException in the
+                    # returned errors, ignore this and retry later, assuming
+                    # the fetching of the bundle succeeded. TODO: Ensure that it
+                    # did.
+                    # This exception is mostly useful when a contact does not
+                    # do OMEMO, or hasn't published any device list for any
+                    # other reason.
+
+                    if any(self._fetching_bundle(key, *err) for err in errors):
+                        continue
+
+                    raise NoEligibleDevices(key)
 
             break
 
