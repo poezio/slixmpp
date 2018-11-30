@@ -290,7 +290,7 @@ class XEP_0384(BasePlugin):
         """
 
         recipients = [jid.bare for jid in recipients]
-        bundles = {}  # type: Dict[str, Dict[str, ExtendedPublicBundle]]
+        bundles = {}  # type: Dict[str, Dict[int, ExtendedPublicBundle]]
 
         while True:
             errors = []
