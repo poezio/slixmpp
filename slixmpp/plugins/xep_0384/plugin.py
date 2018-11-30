@@ -8,7 +8,7 @@
 
 import logging
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Set, Union
 
 import os
 import json
@@ -313,7 +313,7 @@ class XEP_0384(BasePlugin):
             if not errors:
                 break
 
-            no_eligible_devices = []
+            no_eligible_devices = set()  # type: Set[str]
             for (exn, key, val) in errors:
 
                 if isinstance(exn, MissingBundleException):
@@ -336,7 +336,7 @@ class XEP_0384(BasePlugin):
                     if any(self._fetching_bundle(key, *err) for err in errors):
                         continue
 
-                    no_eligible_devices.append(key)
+                    no_eligible_devices.add(key)
 
             if no_eligible_devices:
                 raise NoEligibleDevices(no_eligible_devices)
