@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 HAS_OMEMO = True
 try:
-    from omemo.exceptions import MissingBundleException, NoEligibleDevicesException
+    import omemo.exceptions
     from omemo import SessionManager, ExtendedPublicBundle
     from omemo.util import generateDeviceID
     from omemo.backends import Backend
@@ -304,7 +304,7 @@ class XEP_0384(BasePlugin):
         return body
 
     def _fetching_bundle(self, jid: str, exn: Exception, key: str, _val: Any) -> bool:
-        return isinstance(exn, MissingBundleException) and key == jid
+        return isinstance(exn, omemo.exceptions.MissingBundleException) and key == jid
 
     async def encrypt_message(self, plaintext: str, recipients: List[JID]) -> Encrypted:
         """
@@ -343,12 +343,12 @@ class XEP_0384(BasePlugin):
 
             no_eligible_devices = set()  # type: Set[str]
             for (exn, key, val) in errors:
-                if isinstance(exn, MissingBundleException):
+                if isinstance(exn, omemo.exceptions.MissingBundleException):
                     bundle = await self._fetch_bundle(key, val)
                     if bundle is not None:
                         devices = bundles.setdefault(key, {})
                         devices[val] = bundle
-                elif isinstance(exn, NoEligibleDevicesException):
+                elif isinstance(exn, omemo.exceptions.NoEligibleDevicesException):
                     # This error is apparently returned every time the omemo
                     # lib couldn't find a device to encrypt to for a
                     # particular JID.
