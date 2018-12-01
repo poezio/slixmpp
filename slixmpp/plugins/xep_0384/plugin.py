@@ -306,14 +306,12 @@ class XEP_0384(BasePlugin):
                 payload,
             )
             return body
-        except (omemo.exceptions.NoSessionException,) as e:
+        except (omemo.exceptions.NoSessionException,):
             # This might happen when the sender is sending using a session
             # that we don't know about (deleted session storage, etc.). In
             # this case we can't decrypt the message and it's going to be lost
             # in any case, but we want to tell the user, always.
-            # TODO: get ahold of bare_jid and device_id to pass in the
-            # exception.
-            raise NoAvailableSession
+            raise NoAvailableSession(jid, sid)
         finally:
             asyncio.ensure_future(self._publish_bundle())
 
