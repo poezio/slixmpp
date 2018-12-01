@@ -314,6 +314,8 @@ class XEP_0384(BasePlugin):
             # TODO: get ahold of bare_jid and device_id to pass in the
             # exception.
             raise NoAvailableSession
+        finally:
+            asyncio.ensure_future(self._publish_bundle())
 
     def _fetching_bundle(self, jid: str, exn: Exception, key: str, _val: Any) -> bool:
         return isinstance(exn, omemo.exceptions.MissingBundleException) and key == jid
