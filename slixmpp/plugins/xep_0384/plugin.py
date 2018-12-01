@@ -73,6 +73,9 @@ class XEP0384(Exception): pass
 class MissingOwnKey(XEP0384): pass
 
 
+class NoAvailableSession(XEP0384): pass
+
+
 class NoEligibleDevices(XEP0384): pass
 
 
@@ -293,15 +296,24 @@ class XEP_0384(BasePlugin):
 
         # XXX: 'cipher' is part of KeyTransportMessages and is used when no payload
         # is passed. We do not implement this yet.
-        _cipher, body = self._omemo.decryptMessage(
-            jid,
-            sid,
-            iv,
-            message,
-            isPrekeyMessage,
-            payload,
-        )
-        return body
+        try:
+            _cipher, body = self._omemo.decryptMessage(
+                jid,
+                sid,
+                iv,
+                message,
+                isPrekeyMessage,
+                payload,
+            )
+            return body
+        except (omemo.exceptions.NoSessionException,) as e:
+            # This might happen when the sender is sending using a session
+            # that we don't know about (deleted session storage, etc.). In
+            # this case we can't decrypt the message and it's going to be lost
+            # in any case, but we want to tell the user, always.
+            # TODO: get ahold of bare_jid and device_id to pass in the
+            # exception.
+            raise NoAvailableSession
 
     def _fetching_bundle(self, jid: str, exn: Exception, key: str, _val: Any) -> bool:
         return isinstance(exn, omemo.exceptions.MissingBundleException) and key == jid
