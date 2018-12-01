@@ -47,8 +47,8 @@ def b64dec(data: str) -> bytes:
     return base64.b64decode(data)
 
 
-def _load_device_id(cache_dir: str) -> int:
-    filepath = os.path.join(cache_dir, 'device_id.json')
+def _load_device_id(data_dir: str) -> int:
+    filepath = os.path.join(data_dir, 'device_id.json')
     # Try reading file first, decoding, and if file was empty generate
     # new DeviceID
     try:
@@ -92,7 +92,7 @@ class XEP_0384(BasePlugin):
     description = 'XEP-0384 OMEMO'
     dependencies = {'xep_0163'}
     default_config = {
-        'cache_dir': None,
+        'data_dir': None,
     }
 
     backend_loaded = HAS_OMEMO
@@ -103,11 +103,11 @@ class XEP_0384(BasePlugin):
                      "is not available")
             return
 
-        storage = SyncFileStorage(self.cache_dir)
+        storage = SyncFileStorage(self.data_dir)
         otpkpolicy = KeepingOTPKPolicy()
         self._omemo_backend = SignalBackend
         bare_jid = self.xmpp.boundjid.bare
-        self._device_id = _load_device_id(self.cache_dir)
+        self._device_id = _load_device_id(self.data_dir)
 
         try:
             self._omemo = SessionManager.create(
