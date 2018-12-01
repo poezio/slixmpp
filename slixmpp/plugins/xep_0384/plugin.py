@@ -161,6 +161,23 @@ class XEP_0384(BasePlugin):
 
         return iq
 
+    def _generate_encrypted_payload(self, encrypted) -> Encrypted:
+        tag = Encrypted()
+
+        tag['header']['sid'] = str(encrypted['sid'])
+        tag['header']['iv']['value'] = b64enc(encrypted['iv'])
+        tag['payload']['value'] = b64enc(encrypted['payload'])
+
+        for message in encrypted['messages']:
+            key = Key()
+            key['value'] = b64enc(message['message'])
+            key['rid'] = str(message['rid'])
+            if message['pre_key']:
+                key['prekey'] = '1'
+            tag['header'].append(key)
+
+        return tag
+
     async def _publish_bundle(self) -> None:
         if self._omemo.republish_bundle:
             iq = self._generate_bundle_iq()
@@ -352,14 +369,12 @@ class XEP_0384(BasePlugin):
                 raise NoEligibleDevices(no_eligible_devices)
 
         # Attempt encryption
-        payload = Encrypted()
-        payload['omemo_encrypted'] = self._omemo.encryptMessage(
+        encrypted = self._omemo.encryptMessage(
             recipients,
             plaintext.encode('utf-8'),
             bundles,
             always_trust=True,
         )
-
-        return payload
+        return self._generate_encrypted_payload(encrypted)
 
 register_plugin(XEP_0384)
