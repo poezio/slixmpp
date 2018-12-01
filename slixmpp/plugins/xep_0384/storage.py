@@ -67,11 +67,23 @@ class SyncFileStorage(omemo.Storage):
             json.dump(self.__state, f)
 
     def loadSession(self, _callback, bare_jid: str, device_id: int):
+        if not self.__sessions:
+            try:
+                filepath = os.path.join(self.storage_dir, 'sessions.json')
+                with open(filepath, 'r') as f:
+                    self.__sessions = json.load(f)
+            except OSError:
+                return None
+
         return self.__sessions.get(bare_jid, {}).get(device_id, None)
 
     def storeSession(self, callback, bare_jid: str, device_id: int, session) -> None:
         self.__sessions[bare_jid] = self.__sessions.get(bare_jid, {})
         self.__sessions[bare_jid][device_id] = session
+
+        filepath = os.path.join(self.storage_dir, 'sessions.json')
+        with open(filepath, 'w') as f:
+            json.dump(self.__sessions, f)
 
     def loadActiveDevices(self, _callback, bare_jid: str) -> Union[None, List[int]]:
         if not self.__devices:
