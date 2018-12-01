@@ -279,7 +279,7 @@ class XEP_0384(BasePlugin):
         payload = b64dec(msg['omemo_encrypted']['payload']['value'])
 
         jid = msg['from'].bare
-        sid = header['sid']
+        sid = int(header['sid'])
 
         key = header.xml.find("{%s}key[@rid='%s']" % (
             OMEMO_BASE_NS, self._device_id))
