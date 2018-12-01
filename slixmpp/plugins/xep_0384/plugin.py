@@ -17,7 +17,7 @@ import asyncio
 from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
 from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLES_NS
 from slixmpp.plugins.xep_0384.stanza import Bundle, Devices, Device, Encrypted, Key, PreKeyPublic
-from slixmpp.plugins.base import BasePlugin, register_plugin
+from slixmpp.plugins.base import BasePlugin
 from slixmpp.exceptions import IqError
 from slixmpp.stanza import Message, Iq
 from slixmpp.jid import JID
@@ -388,5 +388,3 @@ class XEP_0384(BasePlugin):
             always_trust=True,
         )
         return self._generate_encrypted_payload(encrypted)
-
-register_plugin(XEP_0384)
