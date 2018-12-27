@@ -516,13 +516,13 @@ else:
         def setup(self, name):
             authzid = self.credentials['authzid']
             if not authzid:
-                authzid = 'xmpp@%s' % self.credentials['service-name']
+                authzid = 'xmpp@' + self.credentials['service-name'].decode()
 
             _, self.gss = kerberos.authGSSClientInit(authzid)
             self.step = 0
 
         def process(self, challenge=b''):
-            b64_challenge = b64encode(challenge)
+            b64_challenge = b64encode(challenge).decode('ascii')
             try:
                 if self.step == 0:
                     result = kerberos.authGSSClientStep(self.gss, b64_challenge)
@@ -536,7 +536,7 @@ else:
 
                     kerberos.authGSSClientUnwrap(self.gss, b64_challenge)
                     resp = kerberos.authGSSClientResponse(self.gss)
-                    kerberos.authGSSClientWrap(self.gss, resp, username)
+                    kerberos.authGSSClientWrap(self.gss, resp, username.decode())
 
                 resp = kerberos.authGSSClientResponse(self.gss)
             except kerberos.GSSError as e:
