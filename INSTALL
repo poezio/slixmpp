@@ -1,6 +1,7 @@
 Pre-requisites:
 - Python 3.5+
 - Cython 0.22 and libidn, optionally (making JID faster by compiling the stringprep module)
+- GnuPG, for testing
 
 Install:
 > python3 setup.py install
