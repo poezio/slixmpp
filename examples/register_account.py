@@ -87,9 +87,6 @@ class RegisterBot(slixmpp.ClientXMPP):
             iq['register']['fields']
         """
 
-        # TODO: Reply with requested fields
-        await iq
-
         username = self.boundjid.user
         password = self.password
 
@@ -107,16 +104,6 @@ class RegisterBot(slixmpp.ClientXMPP):
                           e.iq['error']['text'])
         except IqTimeout:
             logging.error("No response from server.")
-        finally:
-            self.del_event_handler('register', self.register)
-
-            self.register_plugin('feature_bind')
-            self.register_plugin('feature_session')
-            self.register_plugin('feature_rosterver')
-            self.register_plugin('feature_preapproval')
-            self.register_plugin('feature_mechanisms')
-
-            self.reconnect()
 
 
 if __name__ == '__main__':

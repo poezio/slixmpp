@@ -127,15 +127,17 @@ class ClientXMPP(BaseXMPP):
 
         # Setup default stream features
         self.register_plugin('feature_starttls')
-        if not ibr_registration:
-            self.register_plugin('feature_bind')
-            self.register_plugin('feature_session')
-            self.register_plugin('feature_rosterver')
-            self.register_plugin('feature_preapproval')
-            self.register_plugin('feature_mechanisms')
+        if ibr_registration:
+            self.register_plugin('xep_0077')
 
-            if sasl_mech:
-                self['feature_mechanisms'].use_mech = sasl_mech
+        self.register_plugin('feature_bind')
+        self.register_plugin('feature_session')
+        self.register_plugin('feature_rosterver')
+        self.register_plugin('feature_preapproval')
+        self.register_plugin('feature_mechanisms')
+
+        if sasl_mech:
+            self['feature_mechanisms'].use_mech = sasl_mech
 
     @property
     def password(self):

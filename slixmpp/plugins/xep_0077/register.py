@@ -31,7 +31,8 @@ class XEP_0077(BasePlugin):
     default_config = {
         'create_account': True,
         'force_registration': False,
-        'order': 50
+        'order': 50,
+        'restart_if_successful': True,
     }
 
     def plugin_init(self):
@@ -70,15 +71,16 @@ class XEP_0077(BasePlugin):
                 self.xmpp.del_filter('in', self._force_stream_feature)
         return stanza
 
-    def _handle_register_feature(self, features):
+    async def _handle_register_feature(self, features):
         if 'mechanisms' in self.xmpp.features:
             # We have already logged in with an account
             return False
 
         if self.create_account and self.xmpp.event_handled('register'):
-            form = self.get_registration()
-            self.xmpp.event('register', form)
-            return True
+            form = await self.get_registration()
+            await self.xmpp.event_async('register', form)
+            # TODO: Use the config value instead.
+            # return self.restart_if_successful
         return False
 
     def get_registration(self, jid=None, ifrom=None,

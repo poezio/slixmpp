@@ -761,6 +761,48 @@ class XMLStream(asyncio.BaseProtocol):
         """
         return len(self.__event_handlers.get(name, []))
 
+    async def event_async(self, name, data={}):
+        """Manually trigger a custom event.
+
+        :param name: The name of the event to trigger.
+        :param data: Data that will be passed to each event handler.
+                     Defaults to an empty dictionary, but is usually
+                     a stanza object.
+        """
+        log.debug("Event async triggered: %s", name)
+
+        handlers = self.__event_handlers.get(name, [])
+        for handler in handlers:
+            handler_callback, disposable = handler
+            old_exception = getattr(data, 'exception', None)
+
+            # If the callback is a coroutine, schedule it instead of
+            # running it directly
+            if asyncio.iscoroutinefunction(handler_callback):
+                try:
+                    await handler_callback(data)
+                except Exception as e:
+                    if old_exception:
+                        old_exception(e)
+                    else:
+                        self.exception(e)
+            else:
+                try:
+                    handler_callback(data)
+                except Exception as e:
+                    if old_exception:
+                        old_exception(e)
+                    else:
+                        self.exception(e)
+            if disposable:
+                # If the handler is disposable, we will go ahead and
+                # remove it now instead of waiting for it to be
+                # processed in the queue.
+                try:
+                    self.__event_handlers[name].remove(handler)
+                except ValueError:
+                    pass
+
     def event(self, name, data={}):
         """Manually trigger a custom event.
 
