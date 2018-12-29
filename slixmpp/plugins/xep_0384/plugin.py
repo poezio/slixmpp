@@ -80,6 +80,24 @@ def _parse_bundle(backend: Backend, bundle: Bundle) -> ExtendedPublicBundle:
     return ExtendedPublicBundle.parse(backend, identity_key, spk, spk_signature, otpks)
 
 
+def _generate_encrypted_payload(encrypted) -> Encrypted:
+    tag = Encrypted()
+
+    tag['header']['sid'] = str(encrypted['sid'])
+    tag['header']['iv']['value'] = b64enc(encrypted['iv'])
+    tag['payload']['value'] = b64enc(encrypted['payload'])
+
+    for message in encrypted['messages']:
+        key = Key()
+        key['value'] = b64enc(message['message'])
+        key['rid'] = str(message['rid'])
+        if message['pre_key']:
+            key['prekey'] = '1'
+        tag['header'].append(key)
+
+    return tag
+
+
 # XXX: This should probably be moved in plugins/base.py?
 class PluginCouldNotLoad(Exception): pass
 
@@ -181,23 +199,6 @@ class XEP_0384(BasePlugin):
         payload['prekeys'] = prekeys
 
         return iq
-
-    def _generate_encrypted_payload(self, encrypted) -> Encrypted:
-        tag = Encrypted()
-
-        tag['header']['sid'] = str(encrypted['sid'])
-        tag['header']['iv']['value'] = b64enc(encrypted['iv'])
-        tag['payload']['value'] = b64enc(encrypted['payload'])
-
-        for message in encrypted['messages']:
-            key = Key()
-            key['value'] = b64enc(message['message'])
-            key['rid'] = str(message['rid'])
-            if message['pre_key']:
-                key['prekey'] = '1'
-            tag['header'].append(key)
-
-        return tag
 
     async def _publish_bundle(self) -> None:
         if self._omemo.republish_bundle:
@@ -388,4 +389,4 @@ class XEP_0384(BasePlugin):
             bundles,
             always_trust=True,
         )
-        return self._generate_encrypted_payload(encrypted)
+        return _generate_encrypted_payload(encrypted)
