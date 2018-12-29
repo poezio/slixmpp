@@ -179,6 +179,7 @@ register_stanza_plugin(Header, Key)
 register_stanza_plugin(Header, IV)
 register_stanza_plugin(Encrypted, Payload)
 
+register_stanza_plugin(Item, Devices)
 register_stanza_plugin(EventItem, Devices)
 register_stanza_plugin(Devices, Device, iterable=True)
 
