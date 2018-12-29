@@ -157,7 +157,8 @@ class XEP_0384(BasePlugin):
             log.error("Couldn't load the OMEMO object; ¯\\_(ツ)_/¯")
             raise PluginCouldNotLoad
 
-        self.xmpp.add_event_handler('pubsub_publish', self._receive_device_list)
+        self.xmpp['xep_0060'].map_node_event(OMEMO_DEVICES_NS, 'omemo_device_list')
+        self.xmpp.add_event_handler('omemo_device_list_publish', self._receive_device_list)
         asyncio.ensure_future(self._set_device_list())
         asyncio.ensure_future(self._publish_bundle())
 
@@ -165,7 +166,7 @@ class XEP_0384(BasePlugin):
         if not self.backend_loaded:
             return
 
-        self.xmpp.del_event_handler('pubsub_publish', self._receive_device_list)
+        self.xmpp.remove_event_handler('omemo_device_list_publish', self._receive_device_list)
         self.xmpp['xep_0163'].remove_interest(OMEMO_DEVICES_NS)
 
     def session_bind(self, _jid):
