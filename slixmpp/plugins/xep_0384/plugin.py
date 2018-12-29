@@ -17,6 +17,7 @@ import asyncio
 from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
 from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLES_NS
 from slixmpp.plugins.xep_0384.stanza import Bundle, Devices, Device, Encrypted, Key, PreKeyPublic
+from slixmpp.plugins.xep_0060.stanza import Items, EventItems
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.exceptions import IqError, IqTimeout
 from slixmpp.stanza import Message, Iq
@@ -220,26 +221,32 @@ class XEP_0384(BasePlugin):
 
         return _parse_bundle(self._omemo_backend, bundle)
 
+    async def _fetch_device_list(self, jid: JID) -> None:
+        jid = JID(jid)
+        iq = await self.xmpp['xep_0060'].get_items(jid, OMEMO_DEVICES_NS)
+        return await self._read_device_list(jid, iq['pubsub']['items'])
+
     def _store_device_ids(self, jid: str, items) -> None:
         device_ids = []  # type: List[int]
         items = list(items)
         device_ids = [int(d['id']) for d in items[0]['devices']]
         return self._omemo.newDeviceList(str(jid), device_ids)
 
-    def _receive_device_list(self, msg: Message) -> None:
-        if msg['pubsub_event']['items']['node'] != OMEMO_DEVICES_NS:
-            return
+    async def _receive_device_list(self, msg: Message) -> None:
+        return await self._read_device_list(msg['from'], msg['pubsub_event']['items'])
 
-        jid = msg['from'].bare
-        items = msg['pubsub_event']['items']
-        self._store_device_ids(jid, items)
+    async def _read_device_list(self, jid: JID, items: Union[Items, EventItems]) -> None:
+        bare_jid = jid.bare
+        self._store_device_ids(bare_jid, items)
 
-        device_ids = self.get_device_list(jid)
+        device_ids = self.get_device_list(bare_jid)
         active_devices = device_ids['active']
 
-        if jid == self.xmpp.boundjid.bare and \
+        if bare_jid == self.xmpp.boundjid.bare and \
            self._device_id not in active_devices:
-            asyncio.ensure_future(self._set_device_list())
+            await self._set_device_list()
+
+        return None
 
     async def _set_device_list(self) -> None:
         jid = self.xmpp.boundjid.bare
