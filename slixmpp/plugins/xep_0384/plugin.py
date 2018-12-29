@@ -98,6 +98,10 @@ def _generate_encrypted_payload(encrypted) -> Encrypted:
     return tag
 
 
+def _fetching_bundle(self, jid: str, exn: Exception, key: str, _val: Any) -> bool:
+    return isinstance(exn, omemo.exceptions.MissingBundleException) and key == jid
+
+
 # XXX: This should probably be moved in plugins/base.py?
 class PluginCouldNotLoad(Exception): pass
 
@@ -314,9 +318,6 @@ class XEP_0384(BasePlugin):
         finally:
             asyncio.ensure_future(self._publish_bundle())
 
-    def _fetching_bundle(self, jid: str, exn: Exception, key: str, _val: Any) -> bool:
-        return isinstance(exn, omemo.exceptions.MissingBundleException) and key == jid
-
     async def encrypt_message(self, plaintext: str, recipients: List[JID]) -> Encrypted:
         """
         Returns an encrypted payload to be placed into a message.
@@ -371,7 +372,7 @@ class XEP_0384(BasePlugin):
                     # do OMEMO, or hasn't published any device list for any
                     # other reason.
 
-                    if any(self._fetching_bundle(key, *err) for err in errors):
+                    if any(_fetching_bundle(key, *err) for err in errors):
                         continue
 
                     no_eligible_devices.add(key)
