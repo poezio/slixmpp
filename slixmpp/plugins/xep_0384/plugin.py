@@ -18,7 +18,7 @@ from slixmpp.plugins.xep_0384.stanza import OMEMO_BASE_NS
 from slixmpp.plugins.xep_0384.stanza import OMEMO_DEVICES_NS, OMEMO_BUNDLES_NS
 from slixmpp.plugins.xep_0384.stanza import Bundle, Devices, Device, Encrypted, Key, PreKeyPublic
 from slixmpp.plugins.base import BasePlugin
-from slixmpp.exceptions import IqError
+from slixmpp.exceptions import IqError, IqTimeout
 from slixmpp.stanza import Message, Iq
 from slixmpp.jid import JID
 
@@ -212,7 +212,10 @@ class XEP_0384(BasePlugin):
 
     async def _fetch_bundle(self, jid: str, device_id: int) -> Union[None, ExtendedPublicBundle]:
         node = '%s:%d' % (OMEMO_BUNDLES_NS, device_id)
-        iq = await self.xmpp['xep_0060'].get_items(jid, node)
+        try:
+            iq = await self.xmpp['xep_0060'].get_items(jid, node)
+        except (IqError, IqTimeout):
+            return None
         bundle = iq['pubsub']['items']['item']['bundle']
 
         return _parse_bundle(self._omemo_backend, bundle)
