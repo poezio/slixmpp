@@ -62,6 +62,24 @@ def _load_device_id(data_dir: str) -> int:
     return did
 
 
+def _parse_bundle(backend: Backend, bundle: Bundle) -> ExtendedPublicBundle:
+    identity_key = b64dec(bundle['identityKey']['value'].strip())
+    spk = {
+        'id': int(bundle['signedPreKeyPublic']['signedPreKeyId']),
+        'key': b64dec(bundle['signedPreKeyPublic']['value'].strip()),
+    }
+    spk_signature = b64dec(bundle['signedPreKeySignature']['value'].strip())
+
+    otpks = []
+    for prekey in bundle['prekeys']:
+        otpks.append({
+            'id': int(prekey['preKeyId']),
+            'key': b64dec(prekey['value'].strip()),
+        })
+
+    return ExtendedPublicBundle.parse(backend, identity_key, spk, spk_signature, otpks)
+
+
 # XXX: This should probably be moved in plugins/base.py?
 class PluginCouldNotLoad(Exception): pass
 
@@ -191,24 +209,7 @@ class XEP_0384(BasePlugin):
         iq = await self.xmpp['xep_0060'].get_items(jid, node)
         bundle = iq['pubsub']['items']['item']['bundle']
 
-        return self._parse_bundle(self._omemo_backend, bundle)
-
-    def _parse_bundle(self, backend: Backend, bundle: Bundle) -> ExtendedPublicBundle:
-        ik = b64dec(bundle['identityKey']['value'].strip())
-        spk = {
-            'id': int(bundle['signedPreKeyPublic']['signedPreKeyId']),
-            'key': b64dec(bundle['signedPreKeyPublic']['value'].strip()),
-        }
-        spk_signature = b64dec(bundle['signedPreKeySignature']['value'].strip())
-
-        otpks = []
-        for prekey in bundle['prekeys']:
-            otpks.append({
-                'id': int(prekey['preKeyId']),
-                'key': b64dec(prekey['value'].strip()),
-            })
-
-        return ExtendedPublicBundle.parse(backend, ik, spk, spk_signature, otpks)
+        return _parse_bundle(self._omemo_backend, bundle)
 
     def _store_device_ids(self, jid: str, items) -> None:
         device_ids = []  # type: List[int]
