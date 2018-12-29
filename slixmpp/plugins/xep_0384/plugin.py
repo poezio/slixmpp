@@ -215,13 +215,9 @@ class XEP_0384(BasePlugin):
 
     def _store_device_ids(self, jid: str, items) -> None:
         device_ids = []  # type: List[int]
-        for item in items:
-            device_ids = [int(d['id']) for d in item['devices']]
-
-            # XXX: There should only be one item so this is fine, but slixmpp
-            # loops forever otherwise. ???
-            break
-        return self._omemo.newDeviceList(device_ids, str(jid))
+        items = list(items)
+        device_ids = [int(d['id']) for d in items[0]['devices']]
+        return self._omemo.newDeviceList(str(jid), device_ids)
 
     def _receive_device_list(self, msg: Message) -> None:
         if msg['pubsub_event']['items']['node'] != OMEMO_DEVICES_NS:
