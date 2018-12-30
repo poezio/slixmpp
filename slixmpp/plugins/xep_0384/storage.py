@@ -8,7 +8,7 @@
 import os
 import copy
 import json
-from typing import Any, Dict, List, Set, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 import omemo
 
@@ -17,7 +17,7 @@ class SyncFileStorage(omemo.Storage):
     def __init__(self, storage_dir: str) -> None:
         self.storage_dir = storage_dir
         self.__state = None
-        self.__own_data = None  # type: Union[None, Dict[str, Union[str, int]]]
+        self.__own_data = None  # type: Optional[Dict[str, Union[str, int]]]
         self.__sessions = {}  # type: Dict[str, Dict[int, Any]]
         self.__devices = {}  # type: Dict[str, Dict[str, Union[List[int], Dict[int, int]]]]
         self.__trust = {}  # type: Dict[str, Dict[int, Dict[str, Any]]]
@@ -92,7 +92,7 @@ class SyncFileStorage(omemo.Storage):
         filepath = os.path.join(self.storage_dir, 'sessions.json')
         os.remove(filepath)
 
-    def loadActiveDevices(self, _callback, bare_jid: str) -> Union[None, List[int]]:
+    def loadActiveDevices(self, _callback, bare_jid: str) -> Optional[List[int]]:
         if not self.__devices:
             try:
                 filepath = os.path.join(self.storage_dir, 'devices.json')
@@ -111,7 +111,7 @@ class SyncFileStorage(omemo.Storage):
         with open(filepath, 'w') as f:
             json.dump(self.__devices, f)
 
-    def loadInactiveDevices(self, _callback, bare_jid: str) -> Union[None, Dict[int, int]]:
+    def loadInactiveDevices(self, _callback, bare_jid: str) -> Optional[Dict[int, int]]:
         if not self.__devices:
             try:
                 filepath = os.path.join(self.storage_dir, 'devices.json')
@@ -138,7 +138,7 @@ class SyncFileStorage(omemo.Storage):
         with open(filepath, 'w') as f:
             json.dump(self.__trust, f)
 
-    def loadTrust(self, _callback, bare_jid: str, device_id: int) -> Union[None, Dict[str, Any]]:
+    def loadTrust(self, _callback, bare_jid: str, device_id: int) -> Optional[Dict[str, Any]]:
         if not self.__trust:
             try:
                 filepath = os.path.join(self.storage_dir, 'trust.json')
