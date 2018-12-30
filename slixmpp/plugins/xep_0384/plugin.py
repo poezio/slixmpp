@@ -8,7 +8,7 @@
 
 import logging
 
-from typing import Any, Dict, List, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import os
 import json
@@ -88,19 +88,23 @@ def _generate_encrypted_payload(encrypted) -> Encrypted:
     tag['header']['iv']['value'] = b64enc(encrypted['iv'])
     tag['payload']['value'] = b64enc(encrypted['payload'])
 
-    for message in encrypted['messages']:
-        key = Key()
-        key['value'] = b64enc(message['message'])
-        key['rid'] = str(message['rid'])
-        if message['pre_key']:
-            key['prekey'] = '1'
-        tag['header'].append(key)
+    for bare_jid, devices in encrypted['keys'].items():
+        for rid, device in devices.items():
+            key = Key()
+            key['value'] = b64enc(device['data'])
+            key['rid'] = str(rid)
+            if device['pre_key']:
+                key['prekey'] = '1'
+            tag['header'].append(key)
 
     return tag
 
 
-def _fetching_bundle(self, jid: str, exn: Exception, key: str, _val: Any) -> bool:
-    return isinstance(exn, omemo.exceptions.MissingBundleException) and key == jid
+def _exn_matching_jid(jid: str, exn: Exception) -> bool:
+    if not hasattr(exn, 'bare_jid'):
+        return False
+
+    return isinstance(exn, omemo.exceptions.OMEMOException) and exn.bare_jid == jid
 
 
 # XXX: This should probably be moved in plugins/base.py?
@@ -121,6 +125,9 @@ class NoEligibleDevices(XEP0384): pass
 
 
 class EncryptionPrepareException(XEP0384): pass
+
+
+class UntrustedException(XEP0384): pass
 
 
 class XEP_0384(BasePlugin):
@@ -286,10 +293,16 @@ class XEP_0384(BasePlugin):
         """Return active device ids"""
         return self._omemo.getDevices(jid).get('active', [])
 
+    def trust(self, jid: JID, device_id: int, ik: bytes) -> None:
+        self._omemo.trust(jid.bare, device_id, ik)
+
+    def distrust(self, jid: JID, device_id: int, ik: bytes) -> None:
+        self._omemo.distrust(jid.bare, device_id, ik)
+
     def is_encrypted(self, msg: Message) -> bool:
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
 
-    def decrypt_message(self, msg: Message) -> Union[None, str]:
+    def decrypt_message(self, msg: Message) -> Optional[str]:
         header = msg['omemo_encrypted']['header']
         payload = b64dec(msg['omemo_encrypted']['payload']['value'])
 
@@ -309,7 +322,7 @@ class XEP_0384(BasePlugin):
         # XXX: 'cipher' is part of KeyTransportMessages and is used when no payload
         # is passed. We do not implement this yet.
         try:
-            _cipher, body = self._omemo.decryptMessage(
+            body = self._omemo.decryptMessage(
                 jid,
                 sid,
                 iv,
@@ -324,6 +337,11 @@ class XEP_0384(BasePlugin):
             # this case we can't decrypt the message and it's going to be lost
             # in any case, but we want to tell the user, always.
             raise NoAvailableSession(jid, sid)
+        except (omemo.exceptions.UntrustedException,) as e:
+            # TODO: Pass the exception down to the lib user
+            # raise UntrustedException(e)
+            self.trust(JID(e.bare_jid), e.device, e.ik)
+            return self.decrypt_message(msg)
         finally:
             asyncio.ensure_future(self._publish_bundle())
 
@@ -343,32 +361,32 @@ class XEP_0384(BasePlugin):
         while True:
             # Try to encrypt and resolve errors until there is no error at all
             # or if we hit the same set of errors.
-            errors = []
+            errors = []  # type: List[omemo.exceptions.OMEMOException]
 
-            self._omemo.encryptMessage(
-                recipients,
-                plaintext.encode('utf-8'),
-                bundles,
-                callback=lambda *args: errors.append(args),
-                always_trust=True,
-                dry_run=True,
-            )
-
-            if not errors:
-                break
+            try:
+                encrypted = self._omemo.encryptMessage(
+                    recipients,
+                    plaintext.encode('utf-8'),
+                    bundles,
+                )
+                return _generate_encrypted_payload(encrypted)
+            except omemo.exceptions.EncryptionProblemsException as e:
+                errors = e.problems
 
             if errors == old_errors:
-                raise EncryptionPrepareException
+                raise EncryptionPrepareException(errors)
 
             old_errors = errors
 
             no_eligible_devices = set()  # type: Set[str]
-            for (exn, key, val) in errors:
-                if isinstance(exn, omemo.exceptions.MissingBundleException):
-                    bundle = await self._fetch_bundle(key, val)
+            for exn in errors:
+                if isinstance(exn, omemo.exceptions.NoDevicesException):
+                    await self._fetch_device_list(exn.bare_jid)
+                elif isinstance(exn, omemo.exceptions.MissingBundleException):
+                    bundle = await self._fetch_bundle(exn.bare_jid, exn.device)
                     if bundle is not None:
-                        devices = bundles.setdefault(key, {})
-                        devices[val] = bundle
+                        devices = bundles.setdefault(exn.bare_jid, {})
+                        devices[exn.device] = bundle
                 elif isinstance(exn, omemo.exceptions.NoEligibleDevicesException):
                     # This error is apparently returned every time the omemo
                     # lib couldn't find a device to encrypt to for a
@@ -381,19 +399,14 @@ class XEP_0384(BasePlugin):
                     # do OMEMO, or hasn't published any device list for any
                     # other reason.
 
-                    if any(_fetching_bundle(key, *err) for err in errors):
+                    if any(_exn_matching_jid(exn.bare_jid, err) for err in errors):
                         continue
 
-                    no_eligible_devices.add(key)
+                    no_eligible_devices.add(exn.bare_jid)
+                elif isinstance(exn, omemo.exceptions.UntrustedException):
+                    # TODO: Pass the exception down to the lib user
+                    # raise UntrustedException(exn.bare_jid, exn.device, exn.ik)
+                    self._omemo.trust(exn.bare_jid, exn.device, exn.ik)
 
             if no_eligible_devices:
                 raise NoEligibleDevices(no_eligible_devices)
-
-        # Attempt encryption
-        encrypted = self._omemo.encryptMessage(
-            recipients,
-            plaintext.encode('utf-8'),
-            bundles,
-            always_trust=True,
-        )
-        return _generate_encrypted_payload(encrypted)
