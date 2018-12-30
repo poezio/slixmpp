@@ -19,7 +19,8 @@ class SyncFileStorage(omemo.Storage):
         self.__state = None
         self.__own_data = None  # type: Union[None, Dict[str, Union[str, int]]]
         self.__sessions = {}  # type: Dict[str, Dict[int, Any]]
-        self.__devices = {}  # type: Dict[str, Dict[str, List[int]]]
+        self.__devices = {}  # type: Dict[str, Dict[str, Union[List[int], Dict[int, int]]]]
+        self.__trust = {}  # type: Dict[str, Dict[int, Dict[str, Any]]]
 
     def dump(self):
         return copy.deepcopy({
@@ -49,7 +50,7 @@ class SyncFileStorage(omemo.Storage):
         with open(filepath, 'w') as f:
             json.dump(self.__own_data, f)
 
-    def loadState(self, callback):
+    def loadState(self, _callback):
         if self.__state is None:
             try:
                 filepath = os.path.join(self.storage_dir, 'omemo.json')
@@ -85,6 +86,12 @@ class SyncFileStorage(omemo.Storage):
         with open(filepath, 'w') as f:
             json.dump(self.__sessions, f)
 
+    def deleteSession(self, callback, bare_jid: str, device_id: int) -> None:
+        self.__sessions[bare_jid] = {}
+
+        filepath = os.path.join(self.storage_dir, 'sessions.json')
+        os.remove(filepath)
+
     def loadActiveDevices(self, _callback, bare_jid: str) -> Union[None, List[int]]:
         if not self.__devices:
             try:
@@ -104,7 +111,7 @@ class SyncFileStorage(omemo.Storage):
         with open(filepath, 'w') as f:
             json.dump(self.__devices, f)
 
-    def loadInactiveDevices(self, _callback, bare_jid: str) -> Union[None, List[int]]:
+    def loadInactiveDevices(self, _callback, bare_jid: str) -> Union[None, Dict[int, int]]:
         if not self.__devices:
             try:
                 filepath = os.path.join(self.storage_dir, 'devices.json')
@@ -113,21 +120,53 @@ class SyncFileStorage(omemo.Storage):
             except OSError:
                 return None
 
-        return self.__devices.get(bare_jid, {}).get("inactive", [])
+        return self.__devices.get(bare_jid, {}).get("inactive", {})
 
-    def storeInactiveDevices(self, _callback, bare_jid: str, devices: Set[int]) -> None:
+    def storeInactiveDevices(self, _callback, bare_jid: str, devices: Dict[int, int]) -> None:
         self.__devices[bare_jid] = self.__devices.get(bare_jid, {})
-        self.__devices[bare_jid]["inactive"] = list(devices)
+        self.__devices[bare_jid]["inactive"] = devices
 
         filepath = os.path.join(self.storage_dir, 'devices.json')
         with open(filepath, 'w') as f:
             json.dump(self.__devices, f)
 
-    def trust(self, _trusted: str) -> None:
-        """Set somebody as trusted"""
+    def storeTrust(self, _callback, bare_jid: str, device_id: int, trust: Dict[str, Any]) -> None:
+        self.__trust[bare_jid] = self.__trust.get(bare_jid, {})
+        self.__trust[bare_jid][device_id] = trust
 
-    def isTrusted(self, callback, bare_jid: str, device: int) -> bool:
-        return True
+        filepath = os.path.join(self.storage_dir, 'trust.json')
+        with open(filepath, 'w') as f:
+            json.dump(self.__trust, f)
+
+    def loadTrust(self, _callback, bare_jid: str, device_id: int) -> Union[None, Dict[str, Any]]:
+        if not self.__trust:
+            try:
+                filepath = os.path.join(self.storage_dir, 'trust.json')
+                with open(filepath, 'r') as f:
+                    self.__trust = json.load(f)
+            except OSError:
+                return None
+
+        return self.__trust.get(bare_jid, {}).get(device_id)
+
+    def listJIDs(self, _callback) -> List[str]:
+        return (self.__devices.keys())
+
+    def deleteJID(self, _callback, bare_jid: str) -> None:
+        self.__session[bare_jid] = {}
+        filepath = os.path.join(self.storage_dir, 'sessions.json')
+        with open(filepath, 'w') as f:
+            json.dump(self.__sessions, f)
+
+        self.__devices[bare_jid] = {}
+        filepath = os.path.join(self.storage_dir, 'devices.json')
+        with open(filepath, 'w') as f:
+            json.dump(self.__devices, f)
+
+        self.__trust[bare_jid] = {}
+        filepath = os.path.join(self.storage_dir, 'trust.json')
+        with open(filepath, 'w') as f:
+            json.dump(self.__trust, f)
 
     @property
     def is_async(self) -> bool:
