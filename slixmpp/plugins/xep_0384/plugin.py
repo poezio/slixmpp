@@ -240,10 +240,9 @@ class XEP_0384(BasePlugin):
         self._store_device_ids(bare_jid, items)
 
         device_ids = self.get_device_list(bare_jid)
-        active_devices = device_ids['active']
 
         if bare_jid == self.xmpp.boundjid.bare and \
-           self._device_id not in active_devices:
+           self._device_id not in device_ids:
             await self._set_device_list()
 
         return None
@@ -272,7 +271,7 @@ class XEP_0384(BasePlugin):
         device_ids['active'].add(self._device_id)
 
         devices = []
-        for i in device_ids['active']:
+        for i in device_ids:
             d = Device()
             d['id'] = str(i)
             devices.append(d)
@@ -284,8 +283,8 @@ class XEP_0384(BasePlugin):
         )
 
     def get_device_list(self, jid: str) -> List[str]:
-        # XXX: Maybe someday worry about inactive devices somehow
-        return  self._omemo.getDevices(jid)
+        """Return active device ids"""
+        return self._omemo.getDevices(jid).get('active', [])
 
     def is_encrypted(self, msg: Message) -> bool:
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
