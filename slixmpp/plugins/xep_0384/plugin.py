@@ -218,7 +218,7 @@ class XEP_0384(BasePlugin):
             iq = self._generate_bundle_iq()
             await iq.send()
 
-    async def _fetch_bundle(self, jid: str, device_id: int) -> Union[None, ExtendedPublicBundle]:
+    async def _fetch_bundle(self, jid: str, device_id: int) -> Optional[ExtendedPublicBundle]:
         node = '%s:%d' % (OMEMO_BUNDLES_NS, device_id)
         try:
             iq = await self.xmpp['xep_0060'].get_items(jid, node)
@@ -357,7 +357,7 @@ class XEP_0384(BasePlugin):
         recipients = [jid.bare for jid in recipients]
         bundles = {}  # type: Dict[str, Dict[int, ExtendedPublicBundle]]
 
-        old_errors = None  # type: Union[None, List[Tuple[Exception, Any, Any]]]
+        old_errors = None  # type: Optional[List[Tuple[Exception, Any, Any]]]
         while True:
             # Try to encrypt and resolve errors until there is no error at all
             # or if we hit the same set of errors.
