@@ -100,13 +100,6 @@ def _generate_encrypted_payload(encrypted) -> Encrypted:
     return tag
 
 
-def _exn_matching_jid(jid: str, exn: Exception) -> bool:
-    if not hasattr(exn, 'bare_jid'):
-        return False
-
-    return isinstance(exn, omemo.exceptions.OMEMOException) and exn.bare_jid == jid
-
-
 # XXX: This should probably be moved in plugins/base.py?
 class PluginCouldNotLoad(Exception): pass
 
@@ -119,9 +112,6 @@ class MissingOwnKey(XEP0384): pass
 
 
 class NoAvailableSession(XEP0384): pass
-
-
-class NoEligibleDevices(XEP0384): pass
 
 
 class EncryptionPrepareException(XEP0384): pass
@@ -387,26 +377,18 @@ class XEP_0384(BasePlugin):
                     if bundle is not None:
                         devices = bundles.setdefault(exn.bare_jid, {})
                         devices[exn.device] = bundle
-                elif isinstance(exn, omemo.exceptions.NoEligibleDevicesException):
-                    # This error is apparently returned every time the omemo
-                    # lib couldn't find a device to encrypt to for a
-                    # particular JID.
-                    # In case there is also an MissingBundleException in the
-                    # returned errors, ignore this and retry later, assuming
-                    # the fetching of the bundle succeeded. TODO: Ensure that it
-                    # did.
-                    # This exception is mostly useful when a contact does not
-                    # do OMEMO, or hasn't published any device list for any
-                    # other reason.
-
-                    if any(_exn_matching_jid(exn.bare_jid, err) for err in errors):
-                        continue
-
-                    no_eligible_devices.add(exn.bare_jid)
                 elif isinstance(exn, omemo.exceptions.UntrustedException):
                     # TODO: Pass the exception down to the lib user
                     # raise UntrustedException(exn.bare_jid, exn.device, exn.ik)
                     self._omemo.trust(exn.bare_jid, exn.device, exn.ik)
-
-            if no_eligible_devices:
-                raise NoEligibleDevices(no_eligible_devices)
+                elif isinstance(exn, omemo.exceptions.NoEligibleDevicesException):
+                    # This error is returned by the library to specify that
+                    # encryption is not possible to any device of a user.
+                    # This always comes with a more specific exception, (empty
+                    # device list, missing bundles, trust issues, etc.).
+                    # This does the heavy lifting of state management, and
+                    # seeing if it's possible to encrypt at all, or not.
+                    # This exception is only passed to the user, that should
+                    # decide what to do with it, as there isn't much we can if
+                    # other issues can't be resolved.
+                    continue
