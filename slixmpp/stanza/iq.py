@@ -187,6 +187,10 @@ class Iq(RootStanza):
 
         future = asyncio.Future()
 
+        # Prevents handlers from existing forever.
+        if timeout is None:
+            timeout = 120
+
         def callback_success(result):
             type_ = result['type']
             if type_ == 'result':
