@@ -146,10 +146,7 @@ def escape(text, use_cdata=False):
                '"': '&quot;'}
 
     if not use_cdata:
-        text = list(text)
-        for i, c in enumerate(text):
-            text[i] = escapes.get(c, c)
-        return ''.join(text)
+        return ''.join(escapes.get(c, c) for c in text)
     else:
         escape_needed = False
         for c in text:
