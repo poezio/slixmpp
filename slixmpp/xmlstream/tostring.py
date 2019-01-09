@@ -45,11 +45,12 @@ def tostring(xml=None, xmlns='', stream=None, outbuffer='',
     output = [outbuffer]
 
     # Extract the element's tag name.
-    tag_name = xml.tag.split('}', 1)[-1]
+    tag_split = xml.tag.split('}', 1)
+    tag_name = tag_split[-1]
 
     # Extract the element's namespace if it is defined.
     if '}' in xml.tag:
-        tag_xmlns = xml.tag.split('}', 1)[0][1:]
+        tag_xmlns = tag_split[0][1:]
     else:
         tag_xmlns = ''
 
@@ -82,8 +83,9 @@ def tostring(xml=None, xmlns='', stream=None, outbuffer='',
         if '}' not in attrib:
             output.append(' %s="%s"' % (attrib, value))
         else:
-            attrib_ns = attrib.split('}')[0][1:]
-            attrib = attrib.split('}')[1]
+            attrib_split = attrib.split('}')
+            attrib_ns = attrib_split[0][1:]
+            attrib = attrib_split[1]
             if attrib_ns == XML_NS:
                 output.append(' xml:%s="%s"' % (attrib, value))
             elif stream and attrib_ns in stream.namespace_map:
