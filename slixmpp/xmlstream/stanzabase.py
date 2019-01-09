@@ -177,8 +177,9 @@ def fix_ns(xpath, split=False, propagate_ns=True, default_ns=''):
         if '}' in ns_block:
             # Apply the found namespace to following elements
             # that do not have namespaces.
-            namespace = ns_block.split('}')[0]
-            elements = ns_block.split('}')[1].split('/')
+            ns_block_split = ns_block.split('}')
+            namespace = ns_block_split[0]
+            elements = ns_block_split[1].split('/')
         else:
             # Apply the stanza's namespace to the following
             # elements since no namespace was provided.
