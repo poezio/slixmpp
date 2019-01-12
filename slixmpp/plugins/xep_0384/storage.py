@@ -78,7 +78,7 @@ class SyncFileStorage(omemo.Storage):
 
         return self.__sessions.get(bare_jid, {}).get(device_id, None)
 
-    def storeSession(self, callback, bare_jid: str, device_id: int, session) -> None:
+    def storeSession(self, _callback, bare_jid: str, device_id: int, session) -> None:
         self.__sessions[bare_jid] = self.__sessions.get(bare_jid, {})
         self.__sessions[bare_jid][device_id] = session
 
@@ -86,11 +86,8 @@ class SyncFileStorage(omemo.Storage):
         with open(filepath, 'w') as f:
             json.dump(self.__sessions, f)
 
-    def deleteSession(self, callback, bare_jid: str, device_id: int) -> None:
-        self.__sessions[bare_jid] = {}
-
-        filepath = os.path.join(self.storage_dir, 'sessions.json')
-        os.remove(filepath)
+    def deleteSession(self, _callback, bare_jid: str, device_id: int) -> None:
+        return self.storeSession(None, bare_jid, device_id, {})
 
     def loadActiveDevices(self, _callback, bare_jid: str) -> Optional[List[int]]:
         if not self.__devices:
