@@ -153,7 +153,7 @@ class SyncFileStorage(omemo.Storage):
         return set(self.__devices.keys())
 
     def deleteJID(self, _callback, bare_jid: str) -> None:
-        self.__session[bare_jid] = {}
+        self.__sessions[bare_jid] = {}
         filepath = os.path.join(self.storage_dir, 'sessions.json')
         with open(filepath, 'w') as f:
             json.dump(self.__sessions, f)
