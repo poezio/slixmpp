@@ -149,8 +149,8 @@ class SyncFileStorage(omemo.Storage):
 
         return self.__trust.get(bare_jid, {}).get(device_id)
 
-    def listJIDs(self, _callback) -> List[str]:
-        return (self.__devices.keys())
+    def listJIDs(self, _callback) -> Set[str]:
+        return set(self.__devices.keys())
 
     def deleteJID(self, _callback, bare_jid: str) -> None:
         self.__session[bare_jid] = {}
