@@ -141,6 +141,11 @@ class XEP_0384(BasePlugin):
                      "is not available")
             return
 
+        if not self.data_dir:
+            log.info("xep_0384 canoot be loaded as there is not data directory "
+                     "specified")
+            return None
+
         storage = SyncFileStorage(self.data_dir)
         otpkpolicy = KeepingOTPKPolicy()
         self._omemo_backend = SignalBackend
