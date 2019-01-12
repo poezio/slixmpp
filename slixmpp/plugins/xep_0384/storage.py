@@ -22,6 +22,14 @@ class SyncFileStorage(omemo.Storage):
         self.__devices = {}  # type: Dict[str, Dict[str, Union[List[int], Dict[int, int]]]]
         self.__trust = {}  # type: Dict[str, Dict[int, Dict[str, Any]]]
 
+        self.filenames = {
+            'own_data': 'own_data.json',
+            'state': 'omemo.json',
+            'sessions': 'sessions.json',
+            'devices': 'devices.json',
+            'trust': 'trust.json',
+        }
+
     def dump(self):
         return copy.deepcopy({
             "state"    : self.__state,
@@ -32,7 +40,7 @@ class SyncFileStorage(omemo.Storage):
     def loadOwnData(self, _callback) -> Optional[Dict[str, Union[str, int]]]:
         if self.__own_data is None:
             try:
-                filepath = os.path.join(self.storage_dir, 'own_data.json')
+                filepath = os.path.join(self.storage_dir, self.filenames['own_data'])
                 with open(filepath, 'r') as f:
                     self.__own_data = json.load(f)
             except OSError:
@@ -46,14 +54,14 @@ class SyncFileStorage(omemo.Storage):
             'own_device_id': own_device_id,
         }
 
-        filepath = os.path.join(self.storage_dir, 'own_data.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['own_data'])
         with open(filepath, 'w') as f:
             json.dump(self.__own_data, f)
 
     def loadState(self, _callback) -> Any:
         if self.__state is None:
             try:
-                filepath = os.path.join(self.storage_dir, 'omemo.json')
+                filepath = os.path.join(self.storage_dir, self.filenames['state'])
                 with open(filepath, 'r') as f:
                     self.__state = json.load(f)
             except OSError:
@@ -63,14 +71,14 @@ class SyncFileStorage(omemo.Storage):
 
     def storeState(self, _callback, state: Any) -> None:
         self.__state = state
-        filepath = os.path.join(self.storage_dir, 'omemo.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['state'])
         with open(filepath, 'w') as f:
             json.dump(self.__state, f)
 
     def loadSession(self, _callback, bare_jid: str, device_id: int) -> Any:
         if not self.__sessions:
             try:
-                filepath = os.path.join(self.storage_dir, 'sessions.json')
+                filepath = os.path.join(self.storage_dir, self.filenames['sessions'])
                 with open(filepath, 'r') as f:
                     self.__sessions = json.load(f)
             except OSError:
@@ -82,7 +90,7 @@ class SyncFileStorage(omemo.Storage):
         self.__sessions[bare_jid] = self.__sessions.get(bare_jid, {})
         self.__sessions[bare_jid][device_id] = session
 
-        filepath = os.path.join(self.storage_dir, 'sessions.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['sessions'])
         with open(filepath, 'w') as f:
             json.dump(self.__sessions, f)
 
@@ -92,7 +100,7 @@ class SyncFileStorage(omemo.Storage):
     def loadActiveDevices(self, _callback, bare_jid: str) -> Optional[List[int]]:
         if not self.__devices:
             try:
-                filepath = os.path.join(self.storage_dir, 'devices.json')
+                filepath = os.path.join(self.storage_dir, self.filenames['devices'])
                 with open(filepath, 'r') as f:
                     self.__devices = json.load(f)
             except OSError:
@@ -104,14 +112,14 @@ class SyncFileStorage(omemo.Storage):
         self.__devices[bare_jid] = self.__devices.get(bare_jid, {})
         self.__devices[bare_jid]["active"] = list(devices)
 
-        filepath = os.path.join(self.storage_dir, 'devices.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['devices'])
         with open(filepath, 'w') as f:
             json.dump(self.__devices, f)
 
     def loadInactiveDevices(self, _callback, bare_jid: str) -> Optional[Dict[int, int]]:
         if not self.__devices:
             try:
-                filepath = os.path.join(self.storage_dir, 'devices.json')
+                filepath = os.path.join(self.storage_dir, self.filenames['devices'])
                 with open(filepath, 'r') as f:
                     self.__devices = json.load(f)
             except OSError:
@@ -123,7 +131,7 @@ class SyncFileStorage(omemo.Storage):
         self.__devices[bare_jid] = self.__devices.get(bare_jid, {})
         self.__devices[bare_jid]["inactive"] = devices
 
-        filepath = os.path.join(self.storage_dir, 'devices.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['devices'])
         with open(filepath, 'w') as f:
             json.dump(self.__devices, f)
 
@@ -131,14 +139,14 @@ class SyncFileStorage(omemo.Storage):
         self.__trust[bare_jid] = self.__trust.get(bare_jid, {})
         self.__trust[bare_jid][device_id] = trust
 
-        filepath = os.path.join(self.storage_dir, 'trust.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['trust'])
         with open(filepath, 'w') as f:
             json.dump(self.__trust, f)
 
     def loadTrust(self, _callback, bare_jid: str, device_id: int) -> Optional[Dict[str, Any]]:
         if not self.__trust:
             try:
-                filepath = os.path.join(self.storage_dir, 'trust.json')
+                filepath = os.path.join(self.storage_dir, self.filenames['trust'])
                 with open(filepath, 'r') as f:
                     self.__trust = json.load(f)
             except OSError:
@@ -151,17 +159,17 @@ class SyncFileStorage(omemo.Storage):
 
     def deleteJID(self, _callback, bare_jid: str) -> None:
         self.__sessions[bare_jid] = {}
-        filepath = os.path.join(self.storage_dir, 'sessions.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['sessions'])
         with open(filepath, 'w') as f:
             json.dump(self.__sessions, f)
 
         self.__devices[bare_jid] = {}
-        filepath = os.path.join(self.storage_dir, 'devices.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['devices'])
         with open(filepath, 'w') as f:
             json.dump(self.__devices, f)
 
         self.__trust[bare_jid] = {}
-        filepath = os.path.join(self.storage_dir, 'trust.json')
+        filepath = os.path.join(self.storage_dir, self.filenames['trust'])
         with open(filepath, 'w') as f:
             json.dump(self.__trust, f)
 
