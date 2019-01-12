@@ -131,24 +131,26 @@ class XEP_0384(BasePlugin):
     dependencies = {'xep_0163'}
     default_config = {
         'data_dir': None,
+        'storage_backend': SyncFileStorage,
+        'otpk_policy': KeepingOTPKPolicy,
+        'omemo_backend': SignalBackend,
     }
 
     backend_loaded = HAS_OMEMO
 
-    def plugin_init(self):
+    def plugin_init(self) -> None:
         if not self.backend_loaded:
             log.info("xep_0384 cannot be loaded as the backend omemo library "
                      "is not available")
-            return
+            return None
 
         if not self.data_dir:
             log.info("xep_0384 canoot be loaded as there is not data directory "
                      "specified")
             return None
 
-        storage = SyncFileStorage(self.data_dir)
-        otpkpolicy = KeepingOTPKPolicy()
-        self._omemo_backend = SignalBackend
+        storage = self.storage_backend(self.data_dir)
+        otpkpolicy = self.otpk_policy()
         bare_jid = self.xmpp.boundjid.bare
         self._device_id = _load_device_id(self.data_dir)
 
@@ -156,7 +158,7 @@ class XEP_0384(BasePlugin):
             self._omemo = SessionManager.create(
                 storage,
                 otpkpolicy,
-                self._omemo_backend,
+                self.omemo_backend,
                 bare_jid,
                 self._device_id,
             )
@@ -168,6 +170,7 @@ class XEP_0384(BasePlugin):
         self.xmpp.add_event_handler('omemo_device_list_publish', self._receive_device_list)
         asyncio.ensure_future(self._set_device_list())
         asyncio.ensure_future(self._publish_bundle())
+        return None
 
     def plugin_end(self):
         if not self.backend_loaded:
@@ -183,7 +186,7 @@ class XEP_0384(BasePlugin):
         return self._device_id
 
     def _generate_bundle_iq(self) -> Iq:
-        bundle = self._omemo.public_bundle.serialize(self._omemo_backend)
+        bundle = self._omemo.public_bundle.serialize(self._omemo)
 
         iq = self.xmpp.Iq(stype='set')
         publish = iq['pubsub']['publish']
@@ -221,7 +224,7 @@ class XEP_0384(BasePlugin):
             return None
         bundle = iq['pubsub']['items']['item']['bundle']
 
-        return _parse_bundle(self._omemo_backend, bundle)
+        return _parse_bundle(self._omemo, bundle)
 
     async def _fetch_device_list(self, jid: JID) -> None:
         jid = JID(jid)
