@@ -26,7 +26,7 @@ class XEP_0223(BasePlugin):
     dependencies = {'xep_0163', 'xep_0060', 'xep_0004'}
 
     profile = {'pubsub#persist_items': True,
-               'pubsub#send_last_published_item': 'never'}
+               'pubsub#access_model': 'whitelist'}
 
     def configure(self, node, ifrom=None, callback=None, timeout=None):
         """
