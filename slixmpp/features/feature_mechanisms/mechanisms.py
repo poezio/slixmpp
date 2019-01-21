@@ -97,7 +97,10 @@ class FeatureMechanisms(BasePlugin):
                 jid = self.xmpp.requested_jid.bare
                 result[value] = creds.get('email', jid)
             elif value == 'channel_binding':
-                result[value] = self.xmpp.socket.get_channel_binding()
+                if isinstance(self.xmpp.socket, (ssl.SSLSocket, ssl.SSLObject)):
+                    result[value] = self.xmpp.socket.get_channel_binding()
+                else:
+                    result[value] = None
             elif value == 'host':
                 result[value] = creds.get('host', self.xmpp.requested_jid.domain)
             elif value == 'realm':
