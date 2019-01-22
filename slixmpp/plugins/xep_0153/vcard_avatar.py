@@ -167,10 +167,7 @@ class XEP_0153(BasePlugin):
         data = pres['vcard_temp_update']['photo']
         if data is None:
             return
-        elif data == '' or data != self.api['get_hash'](pres['from']):
-            ifrom = pres['to'] if self.xmpp.is_component else None
-            self.api['reset_hash'](pres['from'], ifrom=ifrom)
-            self.xmpp.event('vcard_avatar_update', pres)
+        self.xmpp.event('vcard_avatar_update', pres)
 
     # =================================================================
 
