@@ -239,9 +239,12 @@ class XEP_0384(BasePlugin):
         device_ids = [int(d['id']) for d in items[0]['devices']]
         return self._omemo.newDeviceList(str(jid), device_ids)
 
-    async def _receive_device_list(self, msg: Message) -> None:
+    def _receive_device_list(self, msg: Message) -> None:
         """Handler for received PEP OMEMO_DEVICES_NS payloads"""
-        return await self._read_device_list(msg['from'], msg['pubsub_event']['items'])
+        asyncio.ensure_future(
+            self._read_device_list(msg['from'],
+            msg['pubsub_event']['items']),
+        )
 
     async def _read_device_list(self, jid: JID, items: Union[Items, EventItems]) -> None:
         """Read items and devices if we need to set the device list again or not"""
