@@ -32,7 +32,7 @@ try:
     from omemo.util import generateDeviceID
     from omemo.backends import Backend
     from omemo_backend_signal import BACKEND as SignalBackend
-    from slixmpp.plugins.xep_0384.storage import SyncFileStorage
+    from omemo.implementation import JSONFileStorage
     from slixmpp.plugins.xep_0384.otpkpolicy import KeepingOTPKPolicy
 except (ImportError,):
     HAS_OMEMO = False
@@ -131,7 +131,7 @@ class XEP_0384(BasePlugin):
     dependencies = {'xep_0163'}
     default_config = {
         'data_dir': None,
-        'storage_backend': SyncFileStorage,
+        'storage_backend': JSONFileStorage,
         'otpk_policy': KeepingOTPKPolicy,
         'omemo_backend': SignalBackend,
     }
