@@ -227,24 +227,29 @@ class XEP_0384(BasePlugin):
         return _parse_bundle(self._omemo, bundle)
 
     async def _fetch_device_list(self, jid: JID) -> None:
+        """Manually query PEP OMEMO_DEVICES_NS nodes"""
         jid = JID(jid)
         iq = await self.xmpp['xep_0060'].get_items(jid, OMEMO_DEVICES_NS)
         return await self._read_device_list(jid, iq['pubsub']['items'])
 
-    def _store_device_ids(self, jid: str, items) -> None:
+    def _store_device_ids(self, jid: str, items: Union[Items, EventItems]) -> None:
+        """Store Device list"""
         device_ids = []  # type: List[int]
         items = list(items)
         device_ids = [int(d['id']) for d in items[0]['devices']]
         return self._omemo.newDeviceList(str(jid), device_ids)
 
     async def _receive_device_list(self, msg: Message) -> None:
+        """Handler for received PEP OMEMO_DEVICES_NS payloads"""
         return await self._read_device_list(msg['from'], msg['pubsub_event']['items'])
 
     async def _read_device_list(self, jid: JID, items: Union[Items, EventItems]) -> None:
+        """Read items and devices if we need to set the device list again or not"""
         bare_jid = jid.bare
         self._store_device_ids(bare_jid, items)
 
-        device_ids = self.get_device_list(bare_jid)
+        items = list(items)
+        device_ids = [int(d['id']) for d in items[0]['devices']]
 
         if bare_jid == self.xmpp.boundjid.bare and \
            self._device_id not in device_ids:
@@ -252,28 +257,23 @@ class XEP_0384(BasePlugin):
 
         return None
 
-    async def _set_device_list(self) -> None:
-        jid = self.xmpp.boundjid.bare
+    async def _set_device_list(self, device_ids: Optional[Set[int]] = None) -> None:
+        own_jid = self.xmpp.boundjid
 
         try:
             iq = await self.xmpp['xep_0060'].get_items(
-                self.xmpp.boundjid.bare, OMEMO_DEVICES_NS,
+                own_jid.bare, OMEMO_DEVICES_NS,
             )
             items = iq['pubsub']['items']
-            self._store_device_ids(jid, items)
+            self._store_device_ids(own_jid.bare, items)
         except IqError as iq_err:
             if iq_err.condition == "item-not-found":
-                self._store_device_ids(jid, [])
+                self._store_device_ids(own_jid.bare, [])
             else:
                 return  # XXX: Handle this!
 
-        device_ids = self.get_device_list(jid)
-
-        # Verify that this device in the list and set it if necessary
-        if self._device_id in device_ids:
-            return
-
-        device_ids['active'].add(self._device_id)
+        if device_ids is None:
+            device_ids = self.get_device_list(own_jid)
 
         devices = []
         for i in device_ids:
@@ -284,12 +284,12 @@ class XEP_0384(BasePlugin):
         payload['devices'] = devices
 
         await self.xmpp['xep_0060'].publish(
-            jid, OMEMO_DEVICES_NS, payload=payload,
+            own_jid.bare, OMEMO_DEVICES_NS, payload=payload,
         )
 
-    def get_device_list(self, jid: str) -> List[str]:
-        """Return active device ids"""
-        return self._omemo.getDevices(jid).get('active', [])
+    def get_device_list(self, jid: JID) -> List[str]:
+        """Return active device ids. Always contains our own device id."""
+        return self._omemo.getDevices(jid.bare).get('active', [])
 
     def trust(self, jid: JID, device_id: int, ik: bytes) -> None:
         self._omemo.trust(jid.bare, device_id, ik)
