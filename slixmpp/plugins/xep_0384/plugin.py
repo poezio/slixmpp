@@ -168,8 +168,6 @@ class XEP_0384(BasePlugin):
 
         self.xmpp['xep_0060'].map_node_event(OMEMO_DEVICES_NS, 'omemo_device_list')
         self.xmpp.add_event_handler('omemo_device_list_publish', self._receive_device_list)
-        asyncio.ensure_future(self._set_device_list())
-        asyncio.ensure_future(self._publish_bundle())
         return None
 
     def plugin_end(self):
@@ -181,6 +179,8 @@ class XEP_0384(BasePlugin):
 
     def session_bind(self, _jid):
         self.xmpp['xep_0163'].add_interest(OMEMO_DEVICES_NS)
+        asyncio.ensure_future(self._set_device_list())
+        asyncio.ensure_future(self._publish_bundle())
 
     def my_device_id(self) -> int:
         return self._device_id
