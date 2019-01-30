@@ -303,7 +303,7 @@ class XEP_0384(BasePlugin):
     def is_encrypted(self, msg: Message) -> bool:
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
 
-    def decrypt_message(self, msg: Message) -> Optional[str]:
+    def decrypt_message(self, msg: Message, allow_untrusted: bool = False) -> Optional[str]:
         header = msg['omemo_encrypted']['header']
         payload = b64dec(msg['omemo_encrypted']['payload']['value'])
 
@@ -330,6 +330,7 @@ class XEP_0384(BasePlugin):
                 message,
                 isPrekeyMessage,
                 payload,
+                allow_untrusted=allow_untrusted,
             )
             return body
         except (omemo.exceptions.NoSessionException,):
@@ -389,9 +390,7 @@ class XEP_0384(BasePlugin):
                         devices = bundles.setdefault(exn.bare_jid, {})
                         devices[exn.device] = bundle
                 elif isinstance(exn, omemo.exceptions.UntrustedException):
-                    # TODO: Pass the exception down to the lib user
-                    # raise UntrustedException(exn.bare_jid, exn.device, exn.ik)
-                    self._omemo.trust(exn.bare_jid, exn.device, exn.ik)
+                    raise UntrustedException(exn.bare_jid, exn.device, exn.ik)
                 elif isinstance(exn, omemo.exceptions.NoEligibleDevicesException):
                     # This error is returned by the library to specify that
                     # encryption is not possible to any device of a user.
