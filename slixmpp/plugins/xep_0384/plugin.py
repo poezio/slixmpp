@@ -303,7 +303,7 @@ class XEP_0384(BasePlugin):
     def is_encrypted(self, msg: Message) -> bool:
         return msg.xml.find('{%s}encrypted' % OMEMO_BASE_NS) is not None
 
-    def decrypt_message(self, msg: Message) -> Optional[str]:
+    def decrypt_message(self, msg: Message, allow_untrusted: bool = False) -> Optional[str]:
         header = msg['omemo_encrypted']['header']
         payload = b64dec(msg['omemo_encrypted']['payload']['value'])
 
@@ -330,6 +330,7 @@ class XEP_0384(BasePlugin):
                 message,
                 isPrekeyMessage,
                 payload,
+                allow_untrusted=allow_untrusted,
             )
             return body
         except (omemo.exceptions.NoSessionException,):
