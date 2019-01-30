@@ -340,10 +340,7 @@ class XEP_0384(BasePlugin):
             # in any case, but we want to tell the user, always.
             raise NoAvailableSession(jid, sid)
         except (omemo.exceptions.UntrustedException,) as e:
-            # TODO: Pass the exception down to the lib user
-            # raise UntrustedException(e)
-            self.trust(JID(e.bare_jid), e.device, e.ik)
-            return self.decrypt_message(msg)
+            raise UntrustedException(e)
         finally:
             asyncio.ensure_future(self._publish_bundle())
 
