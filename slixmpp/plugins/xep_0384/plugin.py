@@ -144,7 +144,7 @@ class XEP_0384(BasePlugin):
         if not self.backend_loaded:
             log.info("xep_0384 cannot be loaded as the backend omemo library "
                      "is not available")
-            return None
+            raise PluginCouldNotLoad
 
         if not self.data_dir:
             log.info("xep_0384 canoot be loaded as there is not data directory "
@@ -183,9 +183,10 @@ class XEP_0384(BasePlugin):
         self.xmpp['xep_0163'].remove_interest(OMEMO_DEVICES_NS)
 
     def session_bind(self, _jid):
-        self.xmpp['xep_0163'].add_interest(OMEMO_DEVICES_NS)
-        asyncio.ensure_future(self._set_device_list())
-        asyncio.ensure_future(self._publish_bundle())
+        if self.backend_loaded:
+            self.xmpp['xep_0163'].add_interest(OMEMO_DEVICES_NS)
+            asyncio.ensure_future(self._set_device_list())
+            asyncio.ensure_future(self._publish_bundle())
 
     def my_device_id(self) -> int:
         return self._device_id
