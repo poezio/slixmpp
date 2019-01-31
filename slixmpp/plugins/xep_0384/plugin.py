@@ -130,7 +130,7 @@ class XEP_0384(BasePlugin):
     dependencies = {'xep_0163'}
     default_config = {
         'data_dir': None,
-        'storage_backend': JSONFileStorage,
+        'storage_backend': None,
         'otpk_policy': DefaultOTPKPolicy,
         'omemo_backend': SignalBackend,
     }
@@ -148,7 +148,10 @@ class XEP_0384(BasePlugin):
                      "specified")
             return None
 
-        storage = self.storage_backend(self.data_dir)
+        storage = self.storage_backend
+        if self.storage_backend is None:
+            storage = JSONFileStorage(self.data_dir)
+
         otpkpolicy = self.otpk_policy()
         bare_jid = self.xmpp.boundjid.bare
         self._device_id = _load_device_id(self.data_dir)
