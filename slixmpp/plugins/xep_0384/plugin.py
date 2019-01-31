@@ -119,6 +119,9 @@ class EncryptionPrepareException(XEP0384): pass
 class UntrustedException(XEP0384): pass
 
 
+class UndecidedException(XEP0384): pass
+
+
 class XEP_0384(BasePlugin):
 
     """
@@ -346,7 +349,12 @@ class XEP_0384(BasePlugin):
         finally:
             asyncio.ensure_future(self._publish_bundle())
 
-    async def encrypt_message(self, plaintext: str, recipients: List[JID]) -> Encrypted:
+    async def encrypt_message(
+        self,
+        plaintext: str,
+        recipients: List[JID],
+        expect_problems: Optional[Dict[JID, List[int]]] = None,
+    ) -> Encrypted:
         """
         Returns an encrypted payload to be placed into a message.
 
@@ -364,11 +372,15 @@ class XEP_0384(BasePlugin):
             # or if we hit the same set of errors.
             errors = []  # type: List[omemo.exceptions.OMEMOException]
 
+            if expect_problems is not None:
+                expect_problems = {jid.bare: did for (jid, did) in expect_problems.items()}
+
             try:
                 encrypted = self._omemo.encryptMessage(
                     recipients,
                     plaintext.encode('utf-8'),
                     bundles,
+                    expect_problems=expect_problems,
                 )
                 return _generate_encrypted_payload(encrypted)
             except omemo.exceptions.EncryptionProblemsException as e:
@@ -389,7 +401,15 @@ class XEP_0384(BasePlugin):
                         devices = bundles.setdefault(exn.bare_jid, {})
                         devices[exn.device] = bundle
                 elif isinstance(exn, omemo.exceptions.UntrustedException):
-                    raise UntrustedException(exn.bare_jid, exn.device, exn.ik)
+                    # On UntrustedException, there are two possibilities.
+                    # Either trust has not been explicitely set yet, and is
+                    # 'undecided', or the device is explicitely not
+                    # trusted. When undecided, we need to ask our user to make
+                    # a choice. If untrusted, then we can safely tell the
+                    # OMEMO lib to not encrypt to this device
+                    if self._omemo.getTrustForDevice(exn.bare_jid, exn.device) is None:
+                        raise UndecidedException(exn.bare_jid, exn.device, exn.ik)
+                    expect_problems.setdefault(exn.bare_jid, []).append(exn.device)
                 elif isinstance(exn, omemo.exceptions.NoEligibleDevicesException):
                     # This error is returned by the library to specify that
                     # encryption is not possible to any device of a user.
