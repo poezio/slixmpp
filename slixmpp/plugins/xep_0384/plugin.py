@@ -152,7 +152,7 @@ class XEP_0384(BasePlugin):
         if self.storage_backend is None:
             storage = JSONFileStorage(self.data_dir)
 
-        otpkpolicy = self.otpk_policy()
+        otpkpolicy = self.otpk_policy
         bare_jid = self.xmpp.boundjid.bare
         self._device_id = _load_device_id(self.data_dir)
 
