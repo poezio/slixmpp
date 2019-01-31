@@ -104,12 +104,12 @@ class BaseXMPP(XMLStream):
         #: :attr:`use_message_ids` to `True` will assign all outgoing
         #: messages an ID. Some plugin features require enabling
         #: this option.
-        self.use_message_ids = False
+        self.use_message_ids = True
 
         #: Presence updates may optionally be tagged with ID values.
         #: Setting :attr:`use_message_ids` to `True` will assign all
         #: outgoing messages an ID.
-        self.use_presence_ids = False
+        self.use_presence_ids = True
 
         #: The API registry is a way to process callbacks based on
         #: JID+node combinations. Each callback in the registry is

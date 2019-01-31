@@ -361,6 +361,7 @@ class SlixTest(unittest.TestCase):
         # Some plugins require messages to have ID values. Set
         # this to True in tests related to those plugins.
         self.xmpp.use_message_ids = False
+        self.xmpp.use_presence_ids = False
 
     def make_header(self, sto='',
                           sfrom='',
