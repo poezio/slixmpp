@@ -28,12 +28,11 @@ log = logging.getLogger(__name__)
 HAS_OMEMO = True
 try:
     import omemo.exceptions
-    from omemo import SessionManager, ExtendedPublicBundle
+    from omemo import SessionManager, ExtendedPublicBundle, DefaultOTPKPolicy
     from omemo.util import generateDeviceID
     from omemo.backends import Backend
     from omemo_backend_signal import BACKEND as SignalBackend
     from omemo.implementation import JSONFileStorage
-    from slixmpp.plugins.xep_0384.otpkpolicy import KeepingOTPKPolicy
 except (ImportError,):
     HAS_OMEMO = False
 
@@ -132,7 +131,7 @@ class XEP_0384(BasePlugin):
     default_config = {
         'data_dir': None,
         'storage_backend': JSONFileStorage,
-        'otpk_policy': KeepingOTPKPolicy,
+        'otpk_policy': DefaultOTPKPolicy,
         'omemo_backend': SignalBackend,
     }
 
