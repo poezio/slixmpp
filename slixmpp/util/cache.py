@@ -18,11 +18,17 @@ class Cache:
     def store(self, key, value):
         raise NotImplementedError
 
+    def remove(self, key):
+        raise NotImplemented
+
 class PerJidCache:
     def retrieve_by_jid(self, jid, key):
         raise NotImplementedError
 
     def store_by_jid(self, jid, key, value):
+        raise NotImplementedError
+
+    def remove_by_jid(self, jid, key):
         raise NotImplementedError
 
 class MemoryCache(Cache):
@@ -34,6 +40,11 @@ class MemoryCache(Cache):
 
     def store(self, key, value):
         self.cache[key] = value
+        return True
+
+    def remove(self, key):
+        if key in self.cache:
+            del self.cache[key]
         return True
 
 class MemoryPerJidCache(PerJidCache):
@@ -49,6 +60,12 @@ class MemoryPerJidCache(PerJidCache):
     def store_by_jid(self, jid, key, value):
         cache = self.cache.setdefault(jid, {})
         cache[key] = value
+        return True
+
+    def remove_by_jid(self, jid, key):
+        cache = self.cache.get(jid, None)
+        if cache is not None and key in cache:
+            del cache[key]
         return True
 
 class FileSystemStorage:
@@ -80,6 +97,15 @@ class FileSystemStorage:
             log.debug('Failed to store %s to cache:', key, exc_info=True)
             return False
 
+    def _remove(self, directory, key):
+        filename = os.path.join(directory, key.replace('/', '_'))
+        try:
+            os.remove(filename)
+        except OSError:
+            log.debug('Failed to remove %s from cache:', key, exc_info=True)
+            return False
+        return True
+
 class FileSystemCache(Cache, FileSystemStorage):
     def __init__(self, directory, cache_type, *, encode=None, decode=None, binary=False):
         FileSystemStorage.__init__(self, encode, decode, binary)
@@ -90,6 +116,9 @@ class FileSystemCache(Cache, FileSystemStorage):
 
     def store(self, key, value):
         return self._store(self.base_dir, key, value)
+
+    def remove(self, key):
+        return self._remove(self.base_dir, key)
 
 class FileSystemPerJidCache(PerJidCache, FileSystemStorage):
     def __init__(self, directory, cache_type, *, encode=None, decode=None, binary=False):
@@ -103,3 +132,7 @@ class FileSystemPerJidCache(PerJidCache, FileSystemStorage):
     def store_by_jid(self, jid, key, value):
         directory = os.path.join(self.base_dir, jid)
         return self._store(directory, key, value)
+
+    def remove_by_jid(self, jid, key):
+        directory = os.path.join(self.base_dir, jid)
+        return self._remove(directory, key)
