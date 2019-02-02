@@ -34,9 +34,14 @@ class TestCacheClass(SlixTest):
         )
 
     def testFileSystemCache(self):
+        def failing_decode(value):
+            if value == "failme":
+                raise Exception("you failed")
+            return value
         with TemporaryDirectory() as tmpdir:
-            cache = FileSystemCache(tmpdir, "test")
+            cache = FileSystemCache(tmpdir, "test", decode=failing_decode)
             cache.store("test", "test_value")
+            cache.store("test2", "failme")
             self.assertEqual(
                 cache.retrieve("test"),
                 "test_value"
@@ -44,6 +49,11 @@ class TestCacheClass(SlixTest):
             cache.remove("test")
             self.assertEqual(
                 cache.retrieve("test"),
+                None
+            )
+
+            self.assertEqual(
+                cache.retrieve("test2"),
                 None
             )
 

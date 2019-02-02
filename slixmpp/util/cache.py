@@ -84,7 +84,10 @@ class FileSystemStorage:
             log.debug('%s not present in cache', key)
         except OSError:
             log.debug('Failed to read %s from cache:', key, exc_info=True)
-            return None
+        except Exception:
+            log.debug('Failed to decode %s from cache:', key, exc_info=True)
+            log.debug('Removing %s entry', key)
+            self._remove(directory, key)
 
     def _store(self, directory, key, value):
         filename = os.path.join(directory, key.replace('/', '_'))
@@ -96,6 +99,8 @@ class FileSystemStorage:
         except OSError:
             log.debug('Failed to store %s to cache:', key, exc_info=True)
             return False
+        except Exception:
+            log.debug('Failed to encode %s to cache:', key, exc_info=True)
 
     def _remove(self, directory, key):
         filename = os.path.join(directory, key.replace('/', '_'))
