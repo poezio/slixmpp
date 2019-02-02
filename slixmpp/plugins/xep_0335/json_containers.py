@@ -10,6 +10,7 @@ from slixmpp import Message
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.xep_0335 import JSON_Container
+from slixmpp.plugins.xep_0335 import stanza
 
 
 class XEP_0335(BasePlugin):

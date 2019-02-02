@@ -8,6 +8,7 @@
 
 from slixmpp.plugins.base import register_plugin
 
+from slixmpp.plugins.xep_0335 import stanza
 from slixmpp.plugins.xep_0335.stanza import JSON_Container
 from slixmpp.plugins.xep_0335.json_containers import XEP_0335
 
