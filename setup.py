@@ -20,8 +20,7 @@ from run_tests import TestCommand
 from slixmpp.version import __version__
 
 VERSION = __version__
-DESCRIPTION = ('Slixmpp is an elegant Python library for XMPP (aka Jabber, '
-               'Google Talk, etc).')
+DESCRIPTION = ('Slixmpp is an elegant Python library for XMPP (aka Jabber).')
 with open('README.rst', encoding='utf8') as readme:
     LONG_DESCRIPTION = readme.read()
 
