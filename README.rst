@@ -113,6 +113,7 @@ Slixmpp Credits
     - Gasper Zejn (`Gasper Zejn <mailto:zejn@kiberpipa.org>`_)
     - Krzysztof Kotlenga (`Krzysztof Kotlenga <mailto:pocek@users.sf.net>`_)
     - Tsukasa Hiiragi (`Tsukasa Hiiragi <mailto:bakalolka@gmail.com>`_)
+    - Maxime Buquet (`pep <xmpp:pep@bouah.net?message>`_)
 
 Credits (SleekXMPP)
 -------------------
