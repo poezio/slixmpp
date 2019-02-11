@@ -1040,7 +1040,7 @@ class ElementBase(object):
             elements = self.xml.findall(element_path)
             try:
                 parent = self.xml.find(parent_path)
-            except TypeError:
+            except:
                 parent = None
                 
             if elements:
