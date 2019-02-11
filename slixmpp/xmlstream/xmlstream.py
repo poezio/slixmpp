@@ -19,7 +19,8 @@ import ssl
 import weakref
 import uuid
 
-import xml.etree.ElementTree as ET
+# import xml.etree.ElementTree as ET
+from lxml import etree as ET
 
 from slixmpp.xmlstream.asyncio import asyncio
 from slixmpp.xmlstream import tostring
