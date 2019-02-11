@@ -17,7 +17,8 @@ from __future__ import with_statement, unicode_literals
 import copy
 import logging
 import weakref
-from xml.etree import cElementTree as ET
+# from xml.etree import cElementTree as ET
+from lxml import etree as ET
 
 from slixmpp.xmlstream import JID
 from slixmpp.xmlstream.tostring import tostring
