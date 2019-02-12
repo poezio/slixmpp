@@ -78,7 +78,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     author='Florent Le Coz',
     author_email='louiz@louiz.org',
-    url='https://dev.louiz.org/projects/slixmpp',
+    url='https://lab.louiz.org/poezio/slixmpp',
     license='MIT',
     platforms=['any'],
     packages=packages,

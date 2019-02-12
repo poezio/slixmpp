@@ -14,7 +14,7 @@ Slixmpp
         `slixmpp@muc.poez.io <xmpp:slixmpp@muc.poez.io?join>`_
 
     **Reporting bugs**
-        You can report bugs at http://dev.louiz.org/projects/slixmpp/issues.
+        You can report bugs at http://lab.louiz.org/poezio/slixmpp/issues.
 
 .. note::
     slixmpp is a friendly fork of `SleekXMPP <https://github.com/fritzy/SleekXMPP>`_
