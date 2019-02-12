@@ -11,7 +11,7 @@ Create and Run a Server Component
     <xmpp:slixmpp@muc.poez.io?join>`_.
 
 If you have not yet installed Slixmpp, do so now by either checking out a version
-with `Git <http://git.poez.io/slixmpp>`_.
+with `Git <https://lab.louiz.org/poezio/slixmpp>`_.
 
 Many XMPP applications eventually graduate to requiring to run as a server
 component in order to meet scalability requirements. To demonstrate how to

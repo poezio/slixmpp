@@ -4,9 +4,9 @@ Slixmpp
 .. sidebar:: Get the Code
 
     The latest source code for Slixmpp may be found on the `Git repo
-    <http://git.poez.io/slixmpp>`_. ::
+    <https://lab.louiz.org/poezio/slixmpp>`_. ::
 
-        git clone git://git.poez.io/slixmpp
+        git clone https://lab.louiz.org/poezio/slixmpp
 
     An XMPP chat room is available for discussing and getting help with slixmpp.
 

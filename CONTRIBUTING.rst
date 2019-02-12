@@ -5,7 +5,7 @@ To contribute, the preferred way is to commit your changes on some
 publicly-available git repository (on a fork `on github
 <https://github.com/poezio/slixmpp>`_ or on your own repository) and to
 notify the developers with either:
- - a ticket `on the bug tracker <https://dev.poez.io/new>`_
+ - a ticket `on the bug tracker <https://lab.louiz.org/poezio/slixmpp/issues/new>`_
  - a pull request on github
  - a simple message on `the XMPP MUC <xmpp:slixmpp@muc.poez.io>`_
 

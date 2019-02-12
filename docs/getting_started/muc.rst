@@ -11,7 +11,7 @@ Multi-User Chat (MUC) Bot
     <xmpp:slixmpp@muc.poez.io?join>`_.
 
 If you have not yet installed Slixmpp, do so now by either checking out a version
-from `Git <http://git.poez.io/slixmpp>`_.
+from `Git <https://lab.louiz.org/poezio/slixmpp>`_.
 
 Now that you've got the basic gist of using Slixmpp by following the
 echobot example (:ref:`echobot`), we can use one of the bundled plugins

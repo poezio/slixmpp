@@ -11,7 +11,7 @@ Slixmpp Quickstart - Echo Bot
     <xmpp:slixmpp@muc.poez.io?join>`_.
 
 If you have not yet installed Slixmpp, do so now by either checking out a version
-with `Git <http://git.poez.io/slixmpp>`_.
+with `Git <https://lab.louiz.org/poezio/slixmpp>`_.
 
 As a basic starting project, we will create an echo bot which will reply to any
 messages sent to it. We will also go through adding some basic command line configuration
@@ -329,7 +329,7 @@ The Final Product
 -----------------
 
 Here then is what the final result should look like after working through the guide above. The code
-can also be found in the Slixmpp `examples directory <http://git.poez.io/slixmpp/tree/examples>`_.
+can also be found in the Slixmpp `examples directory <https://lab.louiz.org/poezio/slixmpp/tree/master/examples>`_.
 
 .. compound::
 
