@@ -310,6 +310,8 @@ class XMLStream(asyncio.BaseProtocol):
             ssl_context = None
 
         await asyncio.sleep(self.connect_loop_wait, loop=self.loop)
+        if self._current_connection_attempt is None:
+            return
         try:
             await self.loop.create_connection(lambda: self,
                                                    self.address[0],
@@ -323,6 +325,8 @@ class XMLStream(asyncio.BaseProtocol):
         except OSError as e:
             log.debug('Connection failed: %s', e)
             self.event("connection_failed", e)
+            if self._current_connection_attempt is None:
+                return
             self.connect_loop_wait = self.connect_loop_wait * 2 + 1
             self._current_connection_attempt = asyncio.ensure_future(
                 self._connect_routine(),
