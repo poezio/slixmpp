@@ -55,6 +55,11 @@ class XEP_0380(BasePlugin):
     def has_eme(self, msg):
         return msg.xml.find('{%s}encryption' % Encryption.namespace) is not None
 
+    def add_eme(self, msg: Message, namespace: str) -> Message:
+        msg['eme']['name'] = self.mechanisms[namespace]
+        msg['eme']['namespace'] = namespace
+        return msg
+
     def replace_body_with_eme(self, msg):
         eme = msg['eme']
         namespace = eme['namespace']
