@@ -49,9 +49,6 @@ class XEP_0380(BasePlugin):
 
         register_stanza_plugin(Message, Encryption)
 
-    def plugin_end(self):
-        self.xmpp.remove_handler('Chat State')
-
     def session_bind(self, jid):
         self.xmpp.plugin['xep_0030'].add_feature(Encryption.namespace)
 
