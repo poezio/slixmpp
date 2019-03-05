@@ -348,7 +348,7 @@ class XEP_0030(BasePlugin):
                         combination handled by this Slixmpp instance and
                         no stanzas need to be sent.
                         Otherwise, a disco stanza must be sent to the
-                        remove JID to retrieve the info.
+                        remote JID to retrieve the info.
             cached   -- If true, then look for the disco info data from
                         the local cache system. If no results are found,
                         send the query as usual. The self.use_cache
