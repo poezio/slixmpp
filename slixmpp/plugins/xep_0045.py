@@ -9,7 +9,7 @@ from __future__ import with_statement
 
 import logging
 
-from slixmpp import Presence
+from slixmpp import Presence, Message
 from slixmpp.plugins import BasePlugin, register_plugin
 from slixmpp.xmlstream import register_stanza_plugin, ElementBase, JID, ET
 from slixmpp.xmlstream.handler.callback import Callback
@@ -181,7 +181,7 @@ class XEP_0045(BasePlugin):
         if got_online:
             self.xmpp.event("muc::%s::got_online" % entry['room'], pr)
 
-    def handle_groupchat_message(self, msg):
+    def handle_groupchat_message(self, msg: Message) -> None:
         """ Handle a message event in a muc.
         """
         self.xmpp.event('groupchat_message', msg)
@@ -195,10 +195,14 @@ class XEP_0045(BasePlugin):
 
 
 
-    def handle_groupchat_subject(self, msg):
+    def handle_groupchat_subject(self, msg: Message) -> None:
         """ Handle a message coming from a muc indicating
         a change of subject (or announcing it when joining the room)
         """
+        # See poezio#3452. A message containing subject _and_ (body or thread)
+        # is not a subject change.
+        if msg['body'] or msg['thread']:
+            return None
         self.xmpp.event('groupchat_subject', msg)
 
     def jid_in_room(self, room, jid):
