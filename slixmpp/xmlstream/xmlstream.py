@@ -467,8 +467,8 @@ class XMLStream(asyncio.BaseProtocol):
         at most `wait` seconds.  After the given number of seconds has
         passed without a response from the serveur, or when the server
         successfully responds with a closure of its own stream, abort() is
-        called. If wait is 0.0, this is almost equivalent to calling abort()
-        directly.
+        called. If wait is 0.0, this will call abort() directly without closing
+        the stream.
 
         Does nothing if we are not connected.
 
@@ -478,7 +478,8 @@ class XMLStream(asyncio.BaseProtocol):
         self.disconnect_reason = reason
         self.cancel_connection_attempt()
         if self.transport:
-            self.send_raw(self.stream_footer)
+            if wait > 0.0:
+                self.send_raw(self.stream_footer)
             self.schedule('Disconnect wait', wait,
                           self.abort, repeat=False)
 
