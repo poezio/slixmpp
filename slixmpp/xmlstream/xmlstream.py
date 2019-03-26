@@ -294,6 +294,10 @@ class XMLStream(asyncio.BaseProtocol):
             loop=self.loop,
         )
 
+    def connect_callback(self, event):
+        # ignore event, call connect with default params
+        self.connect()
+
     async def _connect_routine(self):
         self.event_when_connected = "connected"
 
@@ -501,7 +505,7 @@ class XMLStream(asyncio.BaseProtocol):
         """
         log.debug("reconnecting...")
         self.disconnect(wait, reason)
-        self.add_event_handler('disconnected', self.connect, disposable=True)
+        self.add_event_handler('disconnected', self.connect_callback, disposable=True)
 
     def configure_socket(self):
         """Set timeout and other options for self.socket.
