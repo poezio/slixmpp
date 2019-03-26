@@ -501,7 +501,7 @@ class XMLStream(asyncio.BaseProtocol):
         """
         log.debug("reconnecting...")
         self.disconnect(wait, reason)
-        self.add_event_handler('disconnected', self.connect, disposable=True)
+        self.add_event_handler('disconnected', lambda event: self.connect(), disposable=True)
 
     def configure_socket(self):
         """Set timeout and other options for self.socket.
