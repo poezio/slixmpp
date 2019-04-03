@@ -130,7 +130,7 @@ def time(hour=None, min=None, sec=None, micro=None, offset=None, obj=False):
         sec = now.second
     if micro is None:
         micro = now.microsecond
-    if offset is None:
+    if offset in (None, 0):
         offset = tzutc()
     elif not isinstance(offset, dt.tzinfo):
         offset = tzoffset(None, offset)
@@ -177,7 +177,7 @@ def datetime(year=None, month=None, day=None, hour=None,
         sec = now.second
     if micro is None:
         micro = now.microsecond
-    if offset is None:
+    if offset in (None, 0):
         offset = tzutc()
     elif not isinstance(offset, dt.tzinfo):
         offset = tzoffset(None, offset)
