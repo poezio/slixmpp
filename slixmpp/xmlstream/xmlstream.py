@@ -215,6 +215,9 @@ class XMLStream(asyncio.BaseProtocol):
         #: ``_xmpp-client._tcp`` service.
         self.dns_service = None
 
+        #: The reason why we are disconnecting from the server
+        self.disconnect_reason = None
+
         #: An asyncio Future being done when the stream is disconnected.
         self.disconnected = asyncio.Future()
 
@@ -268,6 +271,7 @@ class XMLStream(asyncio.BaseProtocol):
                                localhost
 
         """
+        self.disconnect_reason = None
         self.cancel_connection_attempt()
         if host and port:
             self.address = (host, int(port))
@@ -402,7 +406,9 @@ class XMLStream(asyncio.BaseProtocol):
                     if self.xml_depth == 0:
                         # The stream's root element has closed,
                         # terminating the stream.
+                        self.end_session_on_disconnect = True
                         log.debug("End of stream received")
+                        self.disconnect_reason = "End of stream"
                         self.abort()
                     elif self.xml_depth == 1:
                         # A stanza is an XML element that is a direct child of
@@ -437,7 +443,7 @@ class XMLStream(asyncio.BaseProtocol):
         closure of the TCP connection
         """
         log.info("connection_lost: %s", (exception,))
-        self.event("disconnected")
+        self.event("disconnected", self.disconnect_reason or exception and exception.strerror)
         if self.end_session_on_disconnect:
             self.event('session_end')
         # All these objects are associated with one TCP connection.  Since
@@ -457,22 +463,24 @@ class XMLStream(asyncio.BaseProtocol):
             self._current_connection_attempt.cancel()
             self._current_connection_attempt = None
 
-    def disconnect(self, wait=2.0):
+    def disconnect(self, wait=2.0, reason=None):
         """Close the XML stream and wait for an acknowldgement from the server for
         at most `wait` seconds.  After the given number of seconds has
         passed without a response from the serveur, or when the server
         successfully responds with a closure of its own stream, abort() is
-        called. If wait is 0.0, this is almost equivalent to calling abort()
-        directly.
+        called. If wait is 0.0, this will call abort() directly without closing
+        the stream.
 
         Does nothing if we are not connected.
 
         :param wait: Time to wait for a response from the server.
 
         """
+        self.disconnect_reason = reason
         self.cancel_connection_attempt()
         if self.transport:
-            self.send_raw(self.stream_footer)
+            if wait > 0.0:
+                self.send_raw(self.stream_footer)
             self.schedule('Disconnect wait', wait,
                           self.abort, repeat=False)
 
@@ -488,13 +496,13 @@ class XMLStream(asyncio.BaseProtocol):
             self.disconnected.set_result(True)
             self.disconnected = asyncio.Future()
 
-    def reconnect(self, wait=2.0):
+    def reconnect(self, wait=2.0, reason="Reconnecting"):
         """Calls disconnect(), and once we are disconnected (after the timeout, or
         when the server acknowledgement is received), call connect()
         """
         log.debug("reconnecting...")
-        self.disconnect(wait)
-        self.add_event_handler('disconnected', self.connect, disposable=True)
+        self.disconnect(wait, reason)
+        self.add_event_handler('disconnected', lambda event: self.connect(), disposable=True)
 
     def configure_socket(self):
         """Set timeout and other options for self.socket.
