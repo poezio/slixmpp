@@ -40,7 +40,7 @@ class XEP_0202(BasePlugin):
     }
 
     def plugin_init(self):
-        """Start the XEP-0203 plugin."""
+        """Start the XEP-0202 plugin."""
 
         if not self.local_time:
             def default_local_time(jid):
