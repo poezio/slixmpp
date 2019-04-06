@@ -123,5 +123,5 @@ class EntityTime(ElementBase):
         if not isinstance(value, dt.datetime):
             date = xep_0082.parse(value)
         date = date.astimezone(tzutc())
-        value = xep_0082.format_datetime(date)[:-1]
+        value = xep_0082.format_datetime(date)
         self._set_sub_text('utc', value)
