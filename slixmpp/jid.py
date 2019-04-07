@@ -16,6 +16,7 @@ import socket
 
 from copy import deepcopy
 from functools import lru_cache
+from typing import Optional
 
 from slixmpp.stringprep import nodeprep, resourceprep, idna, StringprepError
 
@@ -71,7 +72,7 @@ def _parse_jid(data):
     return node, domain, resource
 
 
-def _validate_node(node):
+def _validate_node(node: Optional[str]):
     """Validate the local, or username, portion of a JID.
 
     :raises InvalidJID:
@@ -93,7 +94,7 @@ def _validate_node(node):
     return node
 
 
-def _validate_domain(domain):
+def _validate_domain(domain: str):
     """Validate the domain portion of a JID.
 
     IP literal addresses are left as-is, if valid. Domain names
@@ -152,7 +153,7 @@ def _validate_domain(domain):
     return domain
 
 
-def _validate_resource(resource):
+def _validate_resource(resource: Optional[str]):
     """Validate the resource portion of a JID.
 
     :raises InvalidJID:
@@ -174,7 +175,7 @@ def _validate_resource(resource):
     return resource
 
 
-def _unescape_node(node):
+def _unescape_node(node: str):
     """Unescape a local portion of a JID.
 
     .. note::
@@ -199,7 +200,11 @@ def _unescape_node(node):
     return ''.join(unescaped)
 
 
-def _format_jid(local=None, domain=None, resource=None):
+def _format_jid(
+        local: Optional[str] = None,
+        domain: Optional[str] = None,
+        resource: Optional[str] = None,
+    ):
     """Format the given JID components into a full or bare JID.
 
     :param string local: Optional. The local portion of the JID.
@@ -237,12 +242,17 @@ class UnescapedJID:
 
     __slots__ = ('_node', '_domain', '_resource')
 
-    def __init__(self, node, domain, resource):
+    def __init__(
+            self,
+            node: Optional[str],
+            domain: Optional[str],
+            resource: Optional[str],
+        ):
         self._node = node
         self._domain = domain
         self._resource = resource
 
-    def __getattribute__(self, name):
+    def __getattribute__(self, name: str):
         """Retrieve the given JID component.
 
         :param name: one of: user, server, domain, resource,
@@ -301,7 +311,7 @@ class JID:
 
     __slots__ = ('_node', '_domain', '_resource', '_bare', '_full')
 
-    def __init__(self, jid=None):
+    def __init__(self, jid: Optional[str] = None):
         if not jid:
             self._node = ''
             self._domain = ''
@@ -363,17 +373,17 @@ class JID:
         return self._full
 
     @node.setter
-    def node(self, value):
+    def node(self, value: str):
         self._node = _validate_node(value)
         self._update_bare_full()
 
     @domain.setter
-    def domain(self, value):
+    def domain(self, value: str):
         self._domain = _validate_domain(value)
         self._update_bare_full()
 
     @bare.setter
-    def bare(self, value):
+    def bare(self, value: str):
         node, domain, resource = _parse_jid(value)
         assert not resource
         self._node = node
@@ -381,12 +391,12 @@ class JID:
         self._update_bare_full()
 
     @resource.setter
-    def resource(self, value):
+    def resource(self, value: str):
         self._resource = _validate_resource(value)
         self._update_bare_full()
 
     @full.setter
-    def full(self, value):
+    def full(self, value: str):
         self._node, self._domain, self._resource = _parse_jid(value)
         self._update_bare_full()
 
