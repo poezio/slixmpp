@@ -96,24 +96,10 @@ class XEP_0050(BasePlugin):
         register_stanza_plugin(Iq, Command)
         register_stanza_plugin(Command, Form, iterable=True)
 
-        self.xmpp.add_event_handler('command_execute',
-                                    self._handle_command_start)
-        self.xmpp.add_event_handler('command_next',
-                                    self._handle_command_next)
-        self.xmpp.add_event_handler('command_cancel',
-                                    self._handle_command_cancel)
-        self.xmpp.add_event_handler('command_complete',
-                                    self._handle_command_complete)
+        self.xmpp.add_event_handler('command', self._handle_command_all)
 
     def plugin_end(self):
-        self.xmpp.del_event_handler('command_execute',
-                                    self._handle_command_start)
-        self.xmpp.del_event_handler('command_next',
-                                    self._handle_command_next)
-        self.xmpp.del_event_handler('command_cancel',
-                                    self._handle_command_cancel)
-        self.xmpp.del_event_handler('command_complete',
-                                    self._handle_command_complete)
+        self.xmpp.del_event_handler('command', self._handle_command_all)
         self.xmpp.remove_handler('Ad-Hoc Execute')
         self.xmpp['xep_0030'].del_feature(feature=Command.namespace)
         self.xmpp['xep_0030'].set_items(node=Command.namespace, items=tuple())
@@ -201,7 +187,26 @@ class XEP_0050(BasePlugin):
 
     def _handle_command(self, iq):
         """Raise command events based on the command action."""
+        self.xmpp.event('command', iq)
         self.xmpp.event('command_%s' % iq['command']['action'], iq)
+
+    def _handle_command_all(self, iq: Iq) -> None:
+        action = iq['command']['action']
+        sessionid = iq['command']['sessionid']
+        session = self.sessions.get(sessionid)
+
+        if session is None:
+            return self._handle_command_start(iq)
+
+        if action in ('next', 'execute'):
+            return self._handle_command_next(iq)
+        if action == 'prev':
+            return self._handle_command_prev(iq)
+        if action == 'complete':
+            return self._handle_command_complete(iq)
+        if action == 'cancel':
+            return self._handle_command_cancel(iq)
+        return None
 
     def _handle_command_start(self, iq):
         """
