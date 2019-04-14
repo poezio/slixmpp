@@ -89,9 +89,9 @@ class XEP_0050(BasePlugin):
         self.commands = {}
 
         self.xmpp.register_handler(
-                Callback("Ad-Hoc Execute",
-                         StanzaPath('iq@type=set/command'),
-                         self._handle_command))
+            Callback("Ad-Hoc Execute",
+                     StanzaPath('iq@type=set/command'),
+                     self._handle_command))
 
         register_stanza_plugin(Iq, Command)
         register_stanza_plugin(Command, Form, iterable=True)
@@ -468,7 +468,7 @@ class XEP_0050(BasePlugin):
                                                **kwargs)
 
     def send_command(self, jid, node, ifrom=None, action='execute',
-                    payload=None, sessionid=None, flow=False, **kwargs):
+                     payload=None, sessionid=None, flow=False, **kwargs):
         """
         Create and send a command stanza, without using the provided
         workflow management APIs.
