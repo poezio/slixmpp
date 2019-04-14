@@ -32,10 +32,10 @@ class IoT_TestDevice(slixmpp.ClientXMPP):
         slixmpp.ClientXMPP.__init__(self, jid, password)
         self.add_event_handler("session_start", self.session_start)
         self.add_event_handler("message", self.message)
-        self.device=None
-        self.releaseMe=False
-        self.beServer=True
-        self.clientJID=None
+        self.device = None
+        self.releaseMe = False
+        self.beServer = True
+        self.clientJID = None
 
     def datacallback(self,from_jid,result,nodeId=None,timestamp=None,fields=None,error_msg=None):
         """
@@ -46,11 +46,11 @@ class IoT_TestDevice(slixmpp.ClientXMPP):
 
     def beClientOrServer(self,server=True,clientJID=None ):
         if server:
-            self.beServer=True
-            self.clientJID=None
+            self.beServer = True
+            self.clientJID = None
         else:
-            self.beServer=False
-            self.clientJID=clientJID
+            self.beServer = False
+            self.clientJID = clientJID
 
     def testForRelease(self):
         # todo thread safe
@@ -58,24 +58,24 @@ class IoT_TestDevice(slixmpp.ClientXMPP):
 
     def doReleaseMe(self):
         # todo thread safe
-        self.releaseMe=True
+        self.releaseMe = True
 
     def addDevice(self, device):
-        self.device=device
+        self.device = device
 
     def session_start(self, event):
         self.send_presence()
         self.get_roster()
         # tell your preffered friend that you are alive
-        self.send_message(mto='jocke@jabber.sust.se', mbody=self.boundjid.bare +' is now online use xep_323 stanza to talk to me')
+        self.send_message(mto='jocke@jabber.sust.se', mbody=self.boundjid.bare + ' is now online use xep_323 stanza to talk to me')
 
         if not(self.beServer):
-            session=self['xep_0323'].request_data(self.boundjid.full,self.clientJID,self.datacallback)
+            session = self['xep_0323'].request_data(self.boundjid.full,self.clientJID,self.datacallback)
 
     def message(self, msg):
         if msg['type'] in ('chat', 'normal'):
             logging.debug("got normal chat message" + str(msg))
-            ip=urlopen('http://icanhazip.com').read()
+            ip = urlopen('http://icanhazip.com').read()
             msg.reply("Hi I am " + self.boundjid.full + " and I am on IP " + ip).send()
         else:
             logging.debug("got unknown message type %s", str(msg['type']))
@@ -87,14 +87,14 @@ class TheDevice(Device):
     """
     def __init__(self,nodeId):
         Device.__init__(self,nodeId)
-        self.counter=0
+        self.counter = 0
 
     def refresh(self,fields):
         """
         the implementation of the refresh method
         """
         self._set_momentary_timestamp(self._get_timestamp())
-        self.counter+=self.counter
+        self.counter += self.counter
         self._add_field_momentary_data(self, "Temperature", self.counter)
 
 if __name__ == '__main__':
