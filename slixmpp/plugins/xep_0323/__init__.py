@@ -15,4 +15,4 @@ from slixmpp.plugins.xep_0323 import stanza
 
 register_plugin(XEP_0323)
 
-xep_0323=XEP_0323
+xep_0323 = XEP_0323
