@@ -12,7 +12,7 @@
 from slixmpp.test import *
 import slixmpp.plugins.xep_0325 as xep_0325
 
-namespace='sn'
+namespace = 'sn'
 
 class TestControlStanzas(SlixTest):
 
