@@ -15,8 +15,8 @@ class GoogleAuth(ElementBase):
     plugin_attrib = 'google'
     interfaces = {'client_uses_full_bind_result', 'service'}
 
-    discovery_attr= '{%s}client-uses-full-bind-result' % namespace
-    service_attr= '{%s}service' % namespace
+    discovery_attr = '{%s}client-uses-full-bind-result' % namespace
+    service_attr = '{%s}service' % namespace
 
     def setup(self, xml):
         """Don't create XML for the plugin."""

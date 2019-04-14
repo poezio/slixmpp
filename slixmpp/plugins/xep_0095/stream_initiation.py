@@ -39,7 +39,7 @@ class XEP_0095(BasePlugin):
         self._methods = {}
         self._methods_order = []
         self._pending_lock = threading.Lock()
-        self._pending= {}
+        self._pending = {}
 
         self.register_method(SOCKS5, 'xep_0065', 100)
         self.register_method(IBB, 'xep_0047', 50)

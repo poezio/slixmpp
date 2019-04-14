@@ -19,11 +19,11 @@ class TestToString(SlixTest):
         expected result.
         """
         if not expected:
-            expected=original
+            expected = original
         if isinstance(original, str):
             xml = ET.fromstring(original)
         else:
-            xml=original
+            xml = original
         result = tostring(xml, **kwargs)
         self.assertTrue(result == expected, "%s: %s" % (message, result))
 

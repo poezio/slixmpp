@@ -771,9 +771,9 @@ class GPG(object):
         return result
 
     def delete_keys(self, fingerprints, secret=False):
-        which='key'
+        which = 'key'
         if secret:
-            which='secret-key'
+            which = 'secret-key'
         if _is_sequence(fingerprints):
             fingerprints = ' '.join(fingerprints)
         args = ['--batch --delete-%s "%s"' % (which, fingerprints)]
@@ -784,9 +784,9 @@ class GPG(object):
 
     def export_keys(self, keyids, secret=False):
         "export the indicated keys. 'keyid' is anything gpg accepts"
-        which=''
+        which = ''
         if secret:
-            which='-secret-key'
+            which = '-secret-key'
         if _is_sequence(keyids):
             keyids = ' '.join(['"%s"' % k for k in keyids])
         args = ["--armor --export%s %s" % (which, keyids)]
@@ -816,9 +816,9 @@ class GPG(object):
 
         """
 
-        which='keys'
+        which = 'keys'
         if secret:
-            which='secret-keys'
+            which = 'secret-keys'
         args = "--list-%s --fixed-list-mode --fingerprint --with-colons" % (which,)
         args = [args]
         p = self._open_subprocess(args)
