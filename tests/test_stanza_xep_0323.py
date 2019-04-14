@@ -3,7 +3,7 @@
 from slixmpp.test import *
 import slixmpp.plugins.xep_0323 as xep_0323
 
-namespace='sn'
+namespace = 'sn'
 
 class TestSensorDataStanzas(SlixTest):
 
@@ -373,7 +373,7 @@ class TestSensorDataStanzas(SlixTest):
         """
         test of StringIds follow spec
         """
-        emptyStringIdXML='<message xmlns="jabber:client"><fields xmlns="urn:xmpp:iot:sensordata" /></message>'
+        emptyStringIdXML = '<message xmlns="jabber:client"><fields xmlns="urn:xmpp:iot:sensordata" /></message>'
 
         msg = self.Message()
         msg['fields']['stringIds'] = "Nisse"
