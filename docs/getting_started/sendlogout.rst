@@ -47,11 +47,11 @@ the roster. Next, we want to send our message, and to do that we will use :meth:
         self.send_message(mto=self.recipient, mbody=self.msg)
 
 Finally, we need to disconnect the client using :meth:`disconnect <slixmpp.xmlstream.XMLStream.disconnect>`.
-Now, sent stanzas are placed in a queue to pass them to the send thread. If we were to call
-:meth:`disconnect <slixmpp.xmlstream.XMLStream.disconnect>` without any parameters, then it is possible
-for the client to disconnect before the send queue is processed and the message is actually
-sent on the wire. To ensure that our message is processed, we use
-:meth:`disconnect(wait=True) <slixmpp.xmlstream.XMLStream.disconnect>`.
+Now, sent stanzas are placed in a queue to pass them to the send thread.
+:meth:`disconnect <slixmpp.xmlstream.XMLStream.disconnect>` by default will wait for an
+acknowledgement from the server for at least `2.0` seconds. This time is configurable with
+the `wait` parameter. If `0.0` is passed for `wait`, :meth:`disconnect
+<slixmpp.xmlstream.XMLStream.disconnect>` will not close the connection gracefully.
 
 .. code-block:: python
 
@@ -61,12 +61,12 @@ sent on the wire. To ensure that our message is processed, we use
 
         self.send_message(mto=self.recipient, mbody=self.msg)
 
-        self.disconnect(wait=True)
+        self.disconnect()
 
 .. warning::
 
     If you happen to be adding stanzas to the send queue faster than the send thread
-    can process them, then :meth:`disconnect(wait=True) <slixmpp.xmlstream.XMLStream.disconnect>`
+    can process them, then :meth:`disconnect() <slixmpp.xmlstream.XMLStream.disconnect>`
     will block and not disconnect.
 
 Final Product
