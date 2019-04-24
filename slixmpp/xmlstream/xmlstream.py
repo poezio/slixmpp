@@ -476,6 +476,13 @@ class XMLStream(asyncio.BaseProtocol):
         :param wait: Time to wait for a response from the server.
 
         """
+        # Compat: docs/getting_started/sendlogout.rst has been promoting
+        # `disconnect(wait=True)` for ages. This doesn't mean anything to the
+        # schedule call below. It would fortunately be converted to `1` later
+        # down the call chain. Praise the implicit casts lord.
+        if wait == True:
+            wait = 2.0
+
         self.disconnect_reason = reason
         self.cancel_connection_attempt()
         if self.transport:
