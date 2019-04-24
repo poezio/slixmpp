@@ -12,6 +12,8 @@
     :license: MIT, see LICENSE for more details
 """
 
+from typing import Optional
+
 import functools
 import logging
 import socket as Socket
@@ -463,7 +465,7 @@ class XMLStream(asyncio.BaseProtocol):
             self._current_connection_attempt.cancel()
             self._current_connection_attempt = None
 
-    def disconnect(self, wait=2.0, reason=None):
+    def disconnect(self, wait: float = 2.0, reason: Optional[str] = None) -> None:
         """Close the XML stream and wait for an acknowldgement from the server for
         at most `wait` seconds.  After the given number of seconds has
         passed without a response from the serveur, or when the server
