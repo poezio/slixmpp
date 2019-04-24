@@ -468,7 +468,7 @@ class XMLStream(asyncio.BaseProtocol):
     def disconnect(self, wait: float = 2.0, reason: Optional[str] = None) -> None:
         """Close the XML stream and wait for an acknowldgement from the server for
         at most `wait` seconds.  After the given number of seconds has
-        passed without a response from the serveur, or when the server
+        passed without a response from the server, or when the server
         successfully responds with a closure of its own stream, abort() is
         called. If wait is 0.0, this will call abort() directly without closing
         the stream.
