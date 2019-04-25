@@ -162,7 +162,7 @@ class XEP_0045(BasePlugin):
             return
         self.xmpp.roster[pr['from']].ignore_updates = True
         entry = pr['muc'].get_stanza_values()
-        entry['show'] = pr['show'] if pr['show'] in pr.showtypes else None
+        entry['show'] = pr['show']
         entry['status'] = pr['status']
         entry['alt_nick'] = pr['nick']
         if pr['type'] == 'unavailable':
