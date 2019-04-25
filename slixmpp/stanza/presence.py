@@ -75,6 +75,15 @@ class Presence(RootStanza):
             if self.stream is not None and self.stream.use_presence_ids:
                 self['id'] = self.stream.new_id()
 
+    def get_show(self):
+        """
+        Return the value of the <show> child element, if valid.
+        """
+        show = self._get_sub_text('show')
+        if show is not None and show in self.showtypes:
+            return show
+        return None
+
     def set_show(self, show):
         """
         Set the value of the <show> element.
