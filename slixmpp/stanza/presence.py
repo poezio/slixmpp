@@ -99,10 +99,10 @@ class Presence(RootStanza):
     def get_type(self):
         """
         Return the value of the <presence> stanza's type attribute, or
-        the value of the <show> element if valid.
+        the value of the <show> element.
         """
         out = self._get_attr('type')
-        if not out and self['show'] in self.showtypes:
+        if not out:
             out = self['show']
         if not out or out is None:
             out = 'available'
