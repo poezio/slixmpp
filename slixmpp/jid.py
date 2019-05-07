@@ -423,7 +423,10 @@ class JID:
         if isinstance(other, UnescapedJID):
             return False
         if not isinstance(other, JID):
-            other = JID(other)
+            try:
+                other = JID(other)
+            except:
+                return False
 
         return (self._node == other._node and
                 self._domain == other._domain and
