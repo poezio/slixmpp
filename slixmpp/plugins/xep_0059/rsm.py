@@ -141,7 +141,7 @@ class XEP_0059(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature(Set.namespace)
 
-    def iterate(self, stanza, interface, results='substanzas',
+    def iterate(self, stanza, interface, results='substanzas',reverse=False,
                 recv_interface=None, pre_cb=None, post_cb=None):
         """
         Create a new result set iterator for a given stanza query.
