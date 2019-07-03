@@ -3,7 +3,7 @@
     Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
     This file is part of Slixmpp.
 
-    See the file LICENSE for copying permissio
+    See the file LICENSE for copying permission
 """
 
 import logging
@@ -42,7 +42,7 @@ class XEP_0313(BasePlugin):
         register_stanza_plugin(stanza.Fin, self.xmpp['xep_0059'].stanza.Set)
 
     def retrieve(self, jid=None, start=None, end=None, with_jid=None, ifrom=None,
-                 timeout=None, callback=None, iterator=False, rsm=None):
+                 reverse=False, timeout=None, callback=None, iterator=False, rsm=None):
         iq = self.xmpp.Iq()
         query_id = iq['id']
 
@@ -72,7 +72,7 @@ class XEP_0313(BasePlugin):
                 result['mam']['results'] = results
 
         if iterator:
-            return self.xmpp['xep_0059'].iterate(iq, 'mam', 'results',
+            return self.xmpp['xep_0059'].iterate(iq, 'mam', 'results', reverse=reverse,
                                                  recv_interface='mam_fin',
                                                  pre_cb=pre_cb, post_cb=post_cb)
 

@@ -169,6 +169,6 @@ class XEP_0059(BasePlugin):
             results   -- The name of the interface containing the
                          query results (typically just 'substanzas').
         """
-        return ResultIterator(stanza, interface, results,
+        return ResultIterator(stanza, interface, results, reverse=reverse,
                               recv_interface=recv_interface, pre_cb=pre_cb,
                               post_cb=post_cb)
