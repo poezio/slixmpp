@@ -68,13 +68,5 @@ class TestStanzaBase(SlixTest):
         self.assertTrue(stanza['payload'] == [],
             "Stanza reply did not empty stanza payload.")
 
-    def testError(self):
-        """Test marking a stanza as an error."""
-        stanza = StanzaBase()
-        stanza['type'] = 'get'
-        stanza.error()
-        self.assertTrue(stanza['type'] == 'error',
-            "Stanza type is not 'error' after calling error()")
-
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestStanzaBase)

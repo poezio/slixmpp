@@ -1374,14 +1374,6 @@ class StanzaBase(ElementBase):
     #: The default XMPP client namespace
     namespace = 'jabber:client'
 
-    #: There is a small set of attributes which apply to all XMPP stanzas:
-    #: the stanza type, the to and from JIDs, the stanza ID, and, especially
-    #: in the case of an Iq stanza, a payload.
-    interfaces = {'type', 'to', 'from', 'id', 'payload'}
-
-    #: A basic set of allowed values for the ``'type'`` interface.
-    types = {'get', 'set', 'error', None, 'unavailable', 'normal', 'chat'}
-
     def __init__(self, stream=None, xml=None, stype=None,
                  sto=None, sfrom=None, sid=None, parent=None):
         self.stream = stream
