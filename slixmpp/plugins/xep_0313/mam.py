@@ -90,6 +90,13 @@ class XEP_0313(BasePlugin):
 
         return iq.send(timeout=timeout, callback=wrapped_cb)
 
+    def get_preferences(self, timeout=None, callback=None):
+        iq = self.xmpp.Iq()
+        iq['type'] = 'get'
+        query_id = iq['id']
+        iq['mam_prefs']['query_id'] = query_id
+        return iq.send(timeout=timeout, callback=callback)
+
     def set_preferences(self, jid=None, default=None, always=None, never=None,
                         ifrom=None, block=True, timeout=None, callback=None):
         iq = self.xmpp.Iq()
