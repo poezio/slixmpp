@@ -96,6 +96,9 @@ class Message(RootStanza):
 
         self.xml.attrib['id'] = value
 
+        if not self.stream.use_origin_id:
+            return None
+
         sub = self.xml.find(ORIGIN_NAME)
         if sub is not None:
             sub.attrib['id'] = value
