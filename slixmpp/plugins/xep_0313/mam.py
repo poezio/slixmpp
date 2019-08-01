@@ -98,7 +98,7 @@ class XEP_0313(BasePlugin):
         return iq.send(timeout=timeout, callback=callback)
 
     def set_preferences(self, jid=None, default=None, always=None, never=None,
-                        ifrom=None, block=True, timeout=None, callback=None):
+                        ifrom=None, timeout=None, callback=None):
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
         iq['to'] = jid
@@ -106,7 +106,7 @@ class XEP_0313(BasePlugin):
         iq['mam_prefs']['default'] = default
         iq['mam_prefs']['always'] = always
         iq['mam_prefs']['never'] = never
-        return iq.send(block=block, timeout=timeout, callback=callback)
+        return iq.send(timeout=timeout, callback=callback)
 
     def get_configuration_commands(self, jid, **kwargs):
         return self.xmpp['xep_0030'].get_items(
