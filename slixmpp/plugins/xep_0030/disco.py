@@ -300,6 +300,8 @@ class XEP_0030(BasePlugin):
 
     async def get_info_from_domain(self, domain=None, timeout=None,
                                    cached=True, callback=None):
+        """Fetch disco#info of specified domain and one disco#items level below"""
+
         if domain is None:
             domain = self.xmpp.boundjid.domain
 
