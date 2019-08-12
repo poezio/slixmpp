@@ -340,6 +340,13 @@ class SlixTest(unittest.TestCase):
         self.xmpp.default_lang = None
         self.xmpp.peer_default_lang = None
 
+        def new_id():
+            self.xmpp._id += 1
+            return str(self.xmpp._id)
+
+        self.xmpp._id = 0
+        self.xmpp.new_id = new_id
+
         # Must have the stream header ready for xmpp.process() to work.
         if not header:
             header = self.xmpp.stream_header

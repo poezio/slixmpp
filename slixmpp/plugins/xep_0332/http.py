@@ -114,7 +114,6 @@ class XEP_0332(BasePlugin):
             iq['http-req']['data'] = data
         return iq.send(
             timeout=kwargs.get('timeout', None),
-            block=kwargs.get('block', True),
             callback=kwargs.get('callback', None),
             timeout_callback=kwargs.get('timeout_callback', None)
         )
@@ -135,7 +134,6 @@ class XEP_0332(BasePlugin):
             iq['http-resp']['data'] = data
         return iq.send(
             timeout=kwargs.get('timeout', None),
-            block=kwargs.get('block', True),
             callback=kwargs.get('callback', None),
             timeout_callback=kwargs.get('timeout_callback', None)
         )
@@ -153,7 +151,6 @@ class XEP_0332(BasePlugin):
             iq['id'] = kwargs["id"]
         return iq.send(
             timeout=kwargs.get('timeout', None),
-            block=kwargs.get('block', True),
             callback=kwargs.get('callback', None),
             timeout_callback=kwargs.get('timeout_callback', None)
         )
