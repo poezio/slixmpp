@@ -201,11 +201,6 @@ class XMLStream(asyncio.BaseProtocol):
         self.__event_handlers = {}
         self.__filters = {'in': [], 'out': [], 'out_sync': []}
 
-        self._id = 0
-
-        #: We use an ID prefix to ensure that all ID values are unique.
-        self._id_prefix = '%s-' % uuid.uuid4()
-
         # Current connection attempt (Future)
         self._current_connection_attempt = None
 
@@ -243,12 +238,7 @@ class XMLStream(asyncio.BaseProtocol):
         ID values. Using this method ensures that all new ID values
         are unique in this stream.
         """
-        self._id += 1
-        return self.get_id()
-
-    def get_id(self):
-        """Return the current unique stream ID in hexadecimal form."""
-        return "%s%X" % (self._id_prefix, self._id)
+        return uuid.uuid4().hex
 
     def connect(self, host='', port=0, use_ssl=False,
                 force_starttls=True, disable_starttls=False):
@@ -478,6 +468,13 @@ class XMLStream(asyncio.BaseProtocol):
         :param wait: Time to wait for a response from the server.
 
         """
+        # Compat: docs/getting_started/sendlogout.rst has been promoting
+        # `disconnect(wait=True)` for ages. This doesn't mean anything to the
+        # schedule call below. It would fortunately be converted to `1` later
+        # down the call chain. Praise the implicit casts lord.
+        if wait == True:
+            wait = 2.0
+
         self.disconnect_reason = reason
         self.cancel_connection_attempt()
         if self.transport:
