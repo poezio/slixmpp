@@ -41,7 +41,7 @@ class XEP_0313(BasePlugin):
         register_stanza_plugin(stanza.MAM, self.xmpp['xep_0059'].stanza.Set)
         register_stanza_plugin(stanza.Fin, self.xmpp['xep_0059'].stanza.Set)
 
-    def retrieve(self, jid=None, start=None, end=None, with_jid=None, ifrom=None,
+    def retrieve(self, jid=None, start=None, end=None, before=None, with_jid=None, ifrom=None,
                  reverse=False, timeout=None, callback=None, iterator=False, rsm=None):
         iq = self.xmpp.Iq()
         query_id = iq['id']
@@ -52,6 +52,7 @@ class XEP_0313(BasePlugin):
         iq['mam']['queryid'] = query_id
         iq['mam']['start'] = start
         iq['mam']['end'] = end
+        iq['mam']['rsm']['before'] = before
         iq['mam']['with'] = with_jid
         if rsm:
             for key, value in rsm.items():
