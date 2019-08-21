@@ -352,6 +352,7 @@ class SlixTest(unittest.TestCase):
             header = self.xmpp.stream_header
 
         self.xmpp.data_received(header)
+        self.wait_for_send_queue()
 
         if skip:
             self.xmpp.socket.next_sent()
@@ -599,6 +600,7 @@ class SlixTest(unittest.TestCase):
                             'id', 'stanzapath', 'xpath', and 'mask'.
                             Defaults to the value of self.match_method.
         """
+        self.wait_for_send_queue()
         sent = self.xmpp.socket.next_sent(timeout)
         if data is None and sent is None:
             return
@@ -614,6 +616,14 @@ class SlixTest(unittest.TestCase):
                    method=method,
                    defaults=defaults,
                    use_values=use_values)
+
+    def wait_for_send_queue(self):
+        loop = asyncio.get_event_loop()
+        future = asyncio.ensure_future(self.xmpp.run_filters(), loop=loop)
+        queue = self.xmpp.waiting_queue
+        print(queue)
+        loop.run_until_complete(queue.join())
+        future.cancel()
 
     def stream_close(self):
         """
