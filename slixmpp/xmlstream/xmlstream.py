@@ -927,7 +927,7 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.send_raw(data)
             self.waiting_queue.task_done()
-    
+
     def send(self, data, use_filters=True):
         """A wrapper for :meth:`send_raw()` for sending stanza objects.
 
