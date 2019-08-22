@@ -902,30 +902,33 @@ class XMLStream(asyncio.BaseProtocol):
         """
         while True:
             (data, use_filters) = await self.waiting_queue.get()
-            if isinstance(data, ElementBase):
-                if use_filters:
-                    for filter in self.__filters['out']:
-                        if iscoroutinefunction(filter):
-                            data = await filter(data)
-                        else:
-                            data = filter(data)
-                        if data is None:
-                            return
+            try:
+                if isinstance(data, ElementBase):
+                    if use_filters:
+                        for filter in self.__filters['out']:
+                            if iscoroutinefunction(filter):
+                                data = await filter(data)
+                            else:
+                                data = filter(data)
+                            if data is None:
+                                return
 
-            if isinstance(data, ElementBase):
-                if use_filters:
-                    for filter in self.__filters['out_sync']:
-                        if iscoroutinefunction(filter):
-                            data = await filter(data)
-                        else:
-                            data = filter(data)
-                        if data is None:
-                            return
-                str_data = tostring(data.xml, xmlns=self.default_ns,
-                                    stream=self, top_level=True)
-                self.send_raw(str_data)
-            else:
-                self.send_raw(data)
+                if isinstance(data, ElementBase):
+                    if use_filters:
+                        for filter in self.__filters['out_sync']:
+                            if iscoroutinefunction(filter):
+                                data = await filter(data)
+                            else:
+                                data = filter(data)
+                            if data is None:
+                                return
+                    str_data = tostring(data.xml, xmlns=self.default_ns,
+                                        stream=self, top_level=True)
+                    self.send_raw(str_data)
+                else:
+                    self.send_raw(data)
+            except:
+                log.error('Could not send stanza %s', data, exc_info=True)
             self.waiting_queue.task_done()
 
     def send(self, data, use_filters=True):
