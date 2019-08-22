@@ -911,7 +911,7 @@ class XMLStream(asyncio.BaseProtocol):
                             else:
                                 data = filter(data)
                             if data is None:
-                                return
+                                raise Exception('Empty stanza')
 
                 if isinstance(data, ElementBase):
                     if use_filters:
@@ -921,7 +921,7 @@ class XMLStream(asyncio.BaseProtocol):
                             else:
                                 data = filter(data)
                             if data is None:
-                                return
+                                raise Exception('Empty stanza')
                     str_data = tostring(data.xml, xmlns=self.default_ns,
                                         stream=self, top_level=True)
                     self.send_raw(str_data)
