@@ -10,6 +10,9 @@ from slixmpp.stanza.rootstanza import RootStanza
 from slixmpp.xmlstream import StanzaBase, ET
 
 
+ORIGIN_NAME = '{urn:xmpp:sid:0}origin-id'
+
+
 class Message(RootStanza):
 
     """
@@ -63,6 +66,8 @@ class Message(RootStanza):
         if self['id'] == '':
             if self.stream is not None and self.stream.use_message_ids:
                 self['id'] = self.stream.new_id()
+            else:
+                del self['origin_id']
 
     def get_type(self):
         """
@@ -75,6 +80,43 @@ class Message(RootStanza):
         :rtype: str
         """
         return self._get_attr('type', 'normal')
+
+    def get_id(self):
+        return self._get_attr('id') or ''
+
+    def get_origin_id(self):
+        sub = self.xml.find(ORIGIN_NAME)
+        if sub is not None:
+            return sub.attrib.get('id') or ''
+        return ''
+
+    def _set_ids(self, value) -> None:
+        if value is None or value == '':
+            return None
+
+        self.xml.attrib['id'] = value
+
+        if not self.stream.use_origin_id:
+            return None
+
+        sub = self.xml.find(ORIGIN_NAME)
+        if sub is not None:
+            sub.attrib['id'] = value
+        else:
+            sub = ET.Element(ORIGIN_NAME)
+            sub.attrib['id'] = value
+            self.xml.append(sub)
+
+    def set_id(self, value):
+        return self._set_ids(value)
+
+    def set_origin_id(self, value: str):
+        return self._set_ids(value)
+
+    def del_origin_id(self):
+        sub = self.xml.find(ORIGIN_NAME)
+        if sub is not None:
+            self.xml.remove(sub)
 
     def get_parent_thread(self):
         """Return the message thread's parent thread.
@@ -140,6 +182,8 @@ class Message(RootStanza):
         new_message['parent_thread'] = self['parent_thread']
 
         del new_message['id']
+        if self.stream is not None and self.stream.use_message_ids:
+            new_message['id'] = self.stream.new_id()
 
         if body is not None:
             new_message['body'] = body
