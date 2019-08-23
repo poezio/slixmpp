@@ -111,6 +111,9 @@ class BaseXMPP(XMLStream):
         #: outgoing messages an ID.
         self.use_presence_ids = True
 
+        #: XEP-0359 <origin-id/> tag that gets added to <message/> stanzas.
+        self.use_origin_id = True
+
         #: The API registry is a way to process callbacks based on
         #: JID+node combinations. Each callback in the registry is
         #: marked with:
