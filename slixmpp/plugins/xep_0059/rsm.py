@@ -79,6 +79,8 @@ class ResultIterator:
         """
         if self._stop:
             raise StopAsyncIteration
+        if self.query[self.interface]['rsm']['before'] is None:
+            self.query[self.interface]['rsm']['before'] = self.reverse
         self.query['id'] = self.query.stream.new_id()
         self.query[self.interface]['rsm']['max'] = str(self.amount)
 
