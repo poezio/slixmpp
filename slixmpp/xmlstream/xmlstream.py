@@ -34,6 +34,10 @@ from slixmpp.xmlstream.resolver import resolve, default_resolver
 RESPONSE_TIMEOUT = 30
 
 log = logging.getLogger(__name__)
+class ContinueQueue(Exception):
+    """
+    Exception raised in the send queue to "continue" from within an inner loop
+    """
 
 class NotConnectedError(Exception):
     """
@@ -896,10 +900,11 @@ class XMLStream(asyncio.BaseProtocol):
         """
         return xml
 
-    async def _continue_slow_send(self,
+    async def _continue_slow_send(
+            self,
             task: asyncio.Task,
             already_used: Set[Callable[[ElementBase], Optional[StanzaBase]]]
-        ) -> None:
+    ) -> None:
         """
         Used when an item in the send queue has taken too long to process.
 
@@ -934,7 +939,6 @@ class XMLStream(asyncio.BaseProtocol):
         """
         Background loop that processes stanzas to send.
         """
-        class ContinueQueue(Exception): pass
         while True:
             (data, use_filters) = await self.waiting_queue.get()
             try:
@@ -961,21 +965,21 @@ class XMLStream(asyncio.BaseProtocol):
                             else:
                                 data = filter(data)
                             if data is None:
-                                raise Exception('Empty stanza')
+                                raise ContinueQueue('Empty stanza')
 
                 if isinstance(data, ElementBase):
                     if use_filters:
                         for filter in self.__filters['out_sync']:
                             data = filter(data)
                             if data is None:
-                                raise Exception('Empty stanza')
+                                raise ContinueQueue('Empty stanza')
                     str_data = tostring(data.xml, xmlns=self.default_ns,
                                         stream=self, top_level=True)
                     self.send_raw(str_data)
                 else:
                     self.send_raw(data)
             except ContinueQueue as exc:
-                log.info('Stanza in send queue not sent: %s', exc)
+                log.debug('Stanza in send queue not sent: %s', exc)
             except Exception:
                 log.error('Exception raised in send queue:', exc_info=True)
             self.waiting_queue.task_done()
