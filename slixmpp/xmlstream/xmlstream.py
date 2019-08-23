@@ -12,7 +12,7 @@
     :license: MIT, see LICENSE for more details
 """
 
-from typing import Optional
+from typing import Optional, Set, Callable
 
 import functools
 import logging
@@ -896,10 +896,18 @@ class XMLStream(asyncio.BaseProtocol):
         """
         return xml
 
-    async def continue_slow_send(self, task, already_used):
-        log.debug('rescheduled task: %s', task)
+    async def _continue_slow_send(self,
+            task: asyncio.Task,
+            already_used: Set[Callable[[ElementBase], Optional[StanzaBase]]]
+        ) -> None:
+        """
+        Used when an item in the send queue has taken too long to process.
+
+        This is away from the send queue and can take as much time as needed.
+        :param asyncio.Task task: the Task wrapping the coroutine
+        :param set already_used: Filters already used on this outgoing stanza
+        """
         data = await task
-        log.debug('data for rescheduled task %s : %s', task, data)
         for filter in self.__filters['out']:
             if filter in already_used:
                 continue
@@ -921,10 +929,12 @@ class XMLStream(asyncio.BaseProtocol):
         else:
             self.send_raw(data)
 
+
     async def run_filters(self):
         """
         Background loop that processes stanzas to send.
         """
+        class ContinueQueue(Exception): pass
         while True:
             (data, use_filters) = await self.waiting_queue.get()
             try:
@@ -935,9 +945,17 @@ class XMLStream(asyncio.BaseProtocol):
                             already_run_filters.add(filter)
                             if iscoroutinefunction(filter):
                                 task = asyncio.create_task(filter(data))
-                                completed, pending = await wait({task}, timeout=1)
+                                completed, pending = await wait(
+                                    {task},
+                                    timeout=1,
+                                )
                                 if pending:
-                                    asyncio.ensure_future(self.continue_slow_send(task, already_run_filters))
+                                    asyncio.ensure_future(
+                                        self._continue_slow_send(
+                                            task,
+                                            already_run_filters
+                                        )
+                                    )
                                     raise Exception("Slow coro, rescheduling")
                                 data = task.result()
                             else:
@@ -956,8 +974,10 @@ class XMLStream(asyncio.BaseProtocol):
                     self.send_raw(str_data)
                 else:
                     self.send_raw(data)
-            except:
-                log.error('Could not send stanza %s', data, exc_info=True)
+            except ContinueQueue as exc:
+                log.info('Stanza in send queue not sent: %s', exc)
+            except Exception:
+                log.error('Exception raised in send queue:', exc_info=True)
             self.waiting_queue.task_done()
 
     def send(self, data, use_filters=True):
