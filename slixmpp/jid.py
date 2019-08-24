@@ -425,7 +425,7 @@ class JID:
         if not isinstance(other, JID):
             try:
                 other = JID(other)
-            except InvalidJid:
+            except InvalidJID:
                 return NotImplemented
 
         return (self._node == other._node and
