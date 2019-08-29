@@ -142,7 +142,7 @@ class XEP_0059(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature(Set.namespace)
 
-    def iterate(self, stanza, interface, results='substanzas',reverse=False,
+    def iterate(self, stanza, interface, results='substanzas', amount=10, reverse=False,
                 recv_interface=None, pre_cb=None, post_cb=None):
         """
         Create a new result set iterator for a given stanza query.
@@ -170,6 +170,6 @@ class XEP_0059(BasePlugin):
             results   -- The name of the interface containing the
                          query results (typically just 'substanzas').
         """
-        return ResultIterator(stanza, interface, results, reverse=reverse,
+        return ResultIterator(stanza, interface, results, amount, reverse=reverse,
                               recv_interface=recv_interface, pre_cb=pre_cb,
                               post_cb=post_cb)
