@@ -53,9 +53,12 @@ class XEP_0313(BasePlugin):
         iq['mam']['start'] = start
         iq['mam']['end'] = end
         iq['mam']['with'] = with_jid
+        amount = 10
         if rsm:
             for key, value in rsm.items():
                 iq['mam']['rsm'][key] = str(value)
+                if key is 'max':
+                    amount = value
 
         cb_data = {}
         def pre_cb(query):
@@ -72,8 +75,8 @@ class XEP_0313(BasePlugin):
                 result['mam']['results'] = results
 
         if iterator:
-            return self.xmpp['xep_0059'].iterate(iq, 'mam', 'results', reverse=reverse,
-                                                 recv_interface='mam_fin',
+            return self.xmpp['xep_0059'].iterate(iq, 'mam', 'results', amount=amount,
+                                                 reverse=reverse, recv_interface='mam_fin',
                                                  pre_cb=pre_cb, post_cb=post_cb)
 
         collector = Collector(
