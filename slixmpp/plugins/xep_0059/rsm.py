@@ -25,7 +25,7 @@ class ResultIterator:
     An iterator for Result Set Management
     """
 
-    def __init__(self, query, interface, results='substanzas', amount=10,
+    def __init__(self, query, interface, results='substanzas',
                        start=None, reverse=False, recv_interface=None,
                        pre_cb=None, post_cb=None):
         """
@@ -35,7 +35,6 @@ class ResultIterator:
            recv_interface -- The substanza of the query to receive, for example disco_items
            results   -- The query stanza's interface which provides a
                         countable list of query results.
-           amount    -- The max amounts of items to request per iteration
            start     -- From which item id to start
            reverse   -- If True, page backwards through the results
            pre_cb    -- Callback to run before sending the stanza
@@ -50,7 +49,6 @@ class ResultIterator:
 
         """
         self.query = query
-        self.amount = amount
         self.start = start
         self.interface = interface
         if recv_interface:
@@ -82,7 +80,6 @@ class ResultIterator:
         if self.query[self.interface]['rsm']['before'] is None:
             self.query[self.interface]['rsm']['before'] = self.reverse
         self.query['id'] = self.query.stream.new_id()
-        self.query[self.interface]['rsm']['max'] = str(self.amount)
 
         if self.start and self.reverse:
             self.query[self.interface]['rsm']['before'] = self.start
