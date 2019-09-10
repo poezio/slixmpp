@@ -297,6 +297,7 @@ class XEP_0115(BasePlugin):
             self.cache_caps(ver, info)
             self.assign_verstring(jid, ver)
 
+            log.debug("Caps for ver='%s': %s" % (ver, info))
             if self.xmpp.sessionstarted and self.broadcast:
                 if self.xmpp.is_component or preserve:
                     for contact in self.xmpp.roster[jid]:
