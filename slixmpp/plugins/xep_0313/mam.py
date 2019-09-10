@@ -14,7 +14,7 @@ from typing import Any, Dict, Callable, Optional, Awaitable
 from slixmpp import JID
 from slixmpp.stanza import Message, Iq
 from slixmpp.xmlstream.handler import Collector
-from slixmpp.xmlstream.matcher import StanzaPath
+from slixmpp.xmlstream.matcher import MatchXMLMask
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0313 import stanza
@@ -87,11 +87,21 @@ class XEP_0313(BasePlugin):
                     amount = value
         cb_data = {}
 
+        stanza_mask = self.xmpp.Message()
+        stanza_mask.xml.remove(stanza_mask.xml.find('{urn:xmpp:sid:0}origin-id'))
+        del stanza_mask['id']
+        del stanza_mask['lang']
+        stanza_mask['from'] = jid
+        stanza_mask['mam_result']['queryid'] = query_id
+        xml_mask = str(stanza_mask)
+
         def pre_cb(query: Iq) -> None:
+            stanza_mask['mam_result']['queryid'] = query['id']
+            xml_mask = str(stanza_mask)
             query['mam']['queryid'] = query['id']
             collector = Collector(
                 'MAM_Results_%s' % query_id,
-                StanzaPath('message/mam_result@queryid=%s' % query['id']))
+                MatchXMLMask(xml_mask))
             self.xmpp.register_handler(collector)
             cb_data['collector'] = collector
 
@@ -107,7 +117,7 @@ class XEP_0313(BasePlugin):
 
         collector = Collector(
             'MAM_Results_%s' % query_id,
-            StanzaPath('message/mam_result@queryid=%s' % query_id))
+            MatchXMLMask(xml_mask))
         self.xmpp.register_handler(collector)
 
         def wrapped_cb(iq: Iq) -> None:
