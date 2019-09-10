@@ -1011,7 +1011,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         :param string data: Any bytes or utf-8 string value.
         """
-        log.debug("SEND: %s", data)
+        log.debug("SEND: %s", data, stack_info=True)
         if not self.transport:
             raise NotConnectedError()
         if isinstance(data, str):
