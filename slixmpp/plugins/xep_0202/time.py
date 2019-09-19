@@ -50,7 +50,7 @@ class XEP_0202(BasePlugin):
 
         self.xmpp.register_handler(
             Callback('Entity Time',
-                 StanzaPath('iq/entity_time'),
+                 StanzaPath('iq@type=get/entity_time'),
                  self._handle_time_request))
         register_stanza_plugin(Iq, stanza.EntityTime)
 
