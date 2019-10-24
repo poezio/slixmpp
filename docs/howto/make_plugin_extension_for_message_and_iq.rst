@@ -1,7 +1,7 @@
 How to make own slixmpp plugin for Message and IQ extension
 ===========================================================
 
-At first to create a plugin, we need two jabber accounts and two minimal custom slixmpp clients for proper testing. There we create two minimal implementations. In this tutorial I'll call the first one ''client serwer'', second just ''client'', both I'll call ''clients''. Next step is to create autorun which improves our testing, and lets us test it fast with command arguments without sending our login and password by accident in `__name__ == "__main__"` when we end our plugin and send it with client
+At first to create a plugin, we need two jabber accounts and two minimal custom slixmpp clients for proper testing. There we create two minimal implementations. In this tutorial I'll call the first one ''client server'', second just ''client'', both I'll call ''clients''. Next step is to create autorun which improves our testing, and lets us test it fast with command arguments without sending our login and password by accident in `__name__ == "__main__"` when we end our plugin and send it with client
 
 About libraries used there:
 ---------------------------
@@ -26,8 +26,8 @@ Minimal implementations code:
 -----------------------------
 Both clients at the beginning are exactly the same. My base implementation is just shortened version of official EchoBOT implementation drawed from official tutorial. So, there is a code, and after you paste it into a second window, you can read my explainations. 
 
-Minimal Client and ClientSerwer implementations:
-++++++++++++++++++++++++++++++++++++++++++++++++
+Minimal `Client` and `ResponseClient` implementations:
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 .. code-block:: python
 
@@ -37,13 +37,13 @@ Minimal Client and ClientSerwer implementations:
     
     import slixmpp
     
-    class ClientSerwer(slixmpp.ClientXMPP):
+    class ResponseClient(slixmpp.ClientXMPP):
         def __init__(self, cmd_args):
             slixmpp.ClientXMPP.__init__(self, cmd_args.jid, cmd_args.password)
             
     
     if __name__ == '__main__':
-        parser = ArgumentParser(description=SerwerClient.__doc__)
+        parser = ArgumentParser(description=ResponseClient.__doc__)
     
         parser.add_argument("-q", "--quiet", help="set logging to ERROR",
                             action="store_const", dest="loglevel",
@@ -74,7 +74,7 @@ Minimal Client and ClientSerwer implementations:
             args.password = getpass("Password: ")
     
         try:
-            xmpp = ClientSerwer(args)
+            xmpp = ResponseClient(args)
             #xmpp.register_plugin('our_plugin_name', module=our_plugin)
     
             xmpp.connect()
@@ -84,7 +84,7 @@ Minimal Client and ClientSerwer implementations:
             exit(0)
 
 Now, we can create secound file with changing just Class name to Client.
-I named them as client.py and serwer.py. First one should send 'IQ' or 'Message', second one respond. 
+I named them as client.py and response.py. First one should send 'IQ' or 'Message', second one respond with different stanza. 
 
 There we extend base ClientXMPP in slixmpp module and we can add our extensions. But before it, we should create base running script for faster testing, there is a ready script with shell running command with two threads.
 
@@ -102,7 +102,7 @@ Simple running script
         subprocess.run("python client.py --debug -j JID -p PASSWORD", shell=True, universal_newlines=True)
     
     def start_server(threadName, delay):
-        subprocess.run("python serwer.py --debug -j JID -p PASSWORD", shell=True, universal_newlines=True)
+        subprocess.run("python server.py --debug -j JID -p PASSWORD", shell=True, universal_newlines=True)
     
     if __name__ == "__main__":
         sys.path.insert(0, './tutorial_plugin/') #Change secound parameters if path is different, and Clients not in that subfolder
@@ -120,7 +120,7 @@ JID parameter is our 'login' for jabber. And there we can recognise it as shorte
 
 PASSWORD parameter is our password for that jabber account.
 
-That way, if our folder with clients is in github or some other platform, when we send just data in `tutorial_plugin/`, we don't send it with our jid and password by accident. Additionaly, we can test if it is working fast, just with calling our script without loging in every time.
+That way, if our folder with both clients is in github or some other platform, when we send just data in `tutorial_plugin/`, we don't send it with our jid and password by accident. Additionaly, we can test if it is working fast, just with calling our script without loging in every time.
 
 Plugin base code
 ----------------
@@ -144,57 +144,55 @@ Now, we can start to create our plugin, at first we should create some another p
     
     log = logging.getLogger(__name__)
     
-    class OurPlugin(BasePlugin):
+    class Ope(BasePlugin):
         def plugin_init(self):
             """Plugin init is called one time, when plugins are initialized and independent of another plugins. If some function depends of another module, to make sure if depended module is loaded succesfully, then this feature should be placed in post_init. post_init are called right after plugin_init, then secound time after all another plugins are started. This allows two plugins depended of each other, and initialized with random order."""
             self.description = "OurPluginExtension"                             ##~ String data for Human readable and find plugin by another plugin with method.
-            self.xep = "OPE"                                            ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable adnotation.
+            self.xep = "ope"                                            ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
             #~ self.is_extension = True                                    ##~ Information if this plugin extend something, default False
             
             BasePlugin.post_init(self)                                  ##~ Initialize base plugin post init, to achieve this method and be sure to registred handlers and tags extension be saved.
             self.xmpp.register_handler( 
                 Callback('request',
-                         StanzaPath('iq/{{{}}}ope'.format(OurExtension.namespace)),
-                         self.__handleIq))                             ##~ Register handler where to transfer iq stanzas, to check if is extended and fullfilled by DNSPlugin, and raise correct event for client extended by plugin.
-    
+                         StanzaPath('iq/{{{ns}}}ope'.format(ns=ExampleTag.namespace)),
+                         self.__handle_iq))                             ##~ Register handler where to transfer iq stanzas, to check if is extended and fullfilled by DNSPlugin, and raise correct event for client extended by plugin.
+
             self.xmpp.register_handler(
                 Callback('request',
-                        StanzaPath('message/eme'),
-                        self.__handleMessage))
-    
-            register_stanza_plugin(Iq, OurExtension)                       ##~ Register tags extension for Iq object, otherwise iq['dns'] will be string field instead container where we can manage our fields and create sub elements.
-            register_stanza_plugin(Message, OurExtension)
+                        StanzaPath('message/{{{ns}}}ope'.format(ns=ExampleTag.namespace)),
+                        self.__handle_message))
+
+            register_stanza_plugin(Iq, ExampleTag)                       ##~ Register tags extension for Iq object, otherwise iq['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
+            register_stanza_plugin(Message, ExampleTag)
     
         def post_init(self):
             """Post init is called two times, one after plugin_init, and secound time after all plugins do its own post_init. There should be placed function with dependency of another plugin. Two calls of post_init allows to init plugins in random order even depended of each other. Make sure you not place there functions which called two times make your module two times do that same things all along client use that module."""
             pass
     
-        def __handleIq(self, iq):
+        def __handle_iq(self, iq):
             """Catch iq stanzas and filter which are extended by our plugin, the next step is to raise correct event and/or build respond for that event if important for plugin logic elements are valid.
             :arg Iq iq: iq stanza which can be extended by filled plugin tag, otherwise no one event will be raised || Required"""
-            if iq['plugin']
-                #~ Do some stuff
-                # new_iq = Iq.make_iq(ito=iq['from'], itype="get")
-                logging.debug(iq) #~ Call info for us to testing and see it in console log.
-                self.xmpp.event('event_name_iq', new_iq) #~ Call event which can be handled by clients to send or something other what you want.
+            #~ Do some stuff
+            # new_iq = Iq.make_iq(ito=iq['from'], itype="get")
+            logging.debug(iq) #~ Call info for us to testing and see it in console log.
+            self.xmpp.event('ope_iq', new_iq) #~ Call event which can be handled by clients to send or something other what you want.
     
-        def __handleMessage(self, msg):
+        def __handle_message(self, msg):
             """Catch Message objects and filter which are extended by our plugin, the next step is to raise correct event and/or build respond for that event if important for plugin logic elements are valid.
             :arg Message msg: Message which can be extended by filled plugin tag, otherwise no one event will be raised || Required"""
-            if msg['plugin']
-                #~ Do some stuff
-                logging.debug(msg) #~ Call info for us to testing and see it in console log.
-                self.xmpp.event('event_name_msg', msg) #~ Call event which can be handled by clients to send or something other what you want.
+            #~ Do some stuff
+            logging.debug(msg) #~ Call info for us to testing and see it in console log.
+            self.xmpp.event('ope_message', msg) #~ Call event which can be handled by clients to send or something other what you want.
     
-    """Note: There are not many differences about __handleIq and __handleMessage, but Iq to send back must be rebuilded, message we can freely modify and send back without creating new object. Iq have limited lifetime."""
+    """Note: There are not many differences about __handle_iq and __handle_message, but Iq to send back must be rebuilded, message we can freely modify and send back without creating new object. Iq have limited lifetime."""
     
-    class OurExtension(ElementBase):
-        name = "plugin"                                                 ##~ The name of the root XML element of that extension.
-        namespace = "https://haael.net/ns/blockchain"                   ##~ The namespace our stanza object lives in, like <plugin xmlns={namespace} (...)</plugin>
+    class ExampleTag(ElementBase):
+        name = "example_tag"                                                 ##~ The name of the root XML element of that extension.
+        namespace = "https://example.net/our_extension"                   ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>
     
-        plugin_attrib = "plugin"                                        ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: plugin_object['plugin'] now `'plugin'` is name of ours ElementBase extension.
+        plugin_attrib = "example_tag"                                        ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ours ElementBase extension.
         
-        interfaces = {"another", "data"}                                ##~ A list of dictionary-like keys that can be used with the stanza object. For example `plugin_object['plugin']` gives us {"another": "some", "data": "some"}, whenever `'plugin'` is name of ours ElementBase extension.
+        interfaces = {"another", "data"}                                ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
     
         def fill_interfaces(self, another, data):
             #Some validation if it is necessary
@@ -203,10 +201,10 @@ Now, we can start to create our plugin, at first we should create some another p
         
         def add_field(self, tag, dictionary_with_elements, text):
             #If we want to fill with additionaly tags our element, then we can do it that way for example:
-            itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Initialize ET with our tag, for example: <plugin (...)> <our_tag namespace="https://haael.net/ns/blockchain"/></plugin>
-            itemXML.attrib.update(dictionary_with_elements) #~ There we add some fields inside tag, for example: <our_tag namespace=(...) inner_data="some"/>
-            itemXML.text = text #~ Fill field inside tag, for example: <our_tag (...)>our_text</our_tag>
-            self.xml.append(itemXML) #~ Add that all what we set, as inner tag for our plugin tag.
+            itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Initialize ET with our tag, for example: <example_tag (...)> <inside_tag namespace="https://example.net/our_extension"/></example_tag>
+            itemXML.attrib.update(dictionary_with_elements) #~ There we add some fields inside tag, for example: <inside_tag namespace=(...) inner_data="some"/>
+            itemXML.text = text #~ Fill field inside tag, for example: <inside_tag (...)>our_text</inside_tag>
+            self.xml.append(itemXML) #~ Add that all what we set, as inner tag inside `example_tag` tag.
 
 Adding plugin to Clients:
 +++++++++++++++++++++++++
@@ -224,8 +222,8 @@ Next step is to register our plugin, to be visible and used in our Client. For d
 .. code-block:: python
 
         try:
-            xmpp = ClientSerwer(args)
-            #xmpp.register_plugin('our_plugin_name', module=our_plugin)
+            xmpp = ResponseClient(args)
+            #xmpp.register_plugin('Ope', module=base_plugin)
 
 
 Now, the last line from that fragment, should be uncommented and changed.
@@ -236,7 +234,7 @@ Keyword paramter `module` is a source, how our file with plugin is represented, 
 
 Now we have registred our plugin for clients. Do the same in both of them.
 
-Now we want to send a message from our Client, to SerwerClient, to do it, we should remember a few things.
+Now we want to send a message from our Client, to ResponseClient, to do it, we should remember a few things.
 
 Message object must have some body, otherwise base protocol doesn't allow us to send it to our recipient.
 
@@ -245,7 +243,7 @@ At `__init__` method, we can't send message, because already we aren't sure our 
 Get started with signals:
 -------------------------
 
-Let's look about code below:
+Let's look at the code below:
 
 .. code-block:: python
 
@@ -264,9 +262,9 @@ First parameter is a name of the signal, let's take a look backwards at our plug
 
 .. code-block:: python
 
-            self.xmpp.event('event_name_iq', new_iq)
+            self.xmpp.event('ope_iq', new_iq)
     (...)
-            self.xmpp.event('event_name_msg', msg)
+            self.xmpp.event('ope_message', msg)
     
 There we can find our signals names and objects which we pass with signals, which we after can handle.
 
@@ -289,7 +287,7 @@ Start signal with extended message sending:
                                         mbody="OUR_MESSAGE", # There is body of our message, which basicaly our recipient see if we send it. There body can't be empty in messages, otherwise, our recipient don't ever receive it. 
                                         mtype="chat") # Default is chat, so we can avoid specify it. But we can call another type, then we should look to documentation about allowed types.
         # Now we want to extend message with our tags. To do it, we can just call it as extended message:
-        msg_object['plugin'].fill_interfaces(another="some", data="stuff")
+        msg_object['example_tag'].fill_interfaces(another="some", data="stuff")
 
         #Last thing to do, is do something with our message. I think you know what to do with messages, just send it :).
         msg_object.send()
@@ -297,17 +295,17 @@ Start signal with extended message sending:
 Catching our signal from plugin:
 ++++++++++++++++++++++++++++++++
 
-Now, if our Client is ready to send Message, we should adapt our ClientSerwer to receive and show our success.
+Now, if our Client is ready to send Message, we should adapt our ResponseClient to receive and show our success.
 
 You remember when I was talking about `add_event_handler`. Find your signal's name, and read code below:
 
 .. code-block:: python
 
-    class SerwerClient(slixmpp.ClientXMPP):
+    class ResponseClient(slixmpp.ClientXMPP):
         def __init__(self, cmd_args):
             slixmpp.ClientXMPP.__init__(self, cmd_args.jid, cmd_args.password)
             
-            self.add_event_handler("event_name_msg", self.receive_plugin_message)
+            self.add_event_handler("ope_message", self.receive_plugin_message)
     
         def receive_plugin_message(self, msg):
             print("SUCCESS!!")
@@ -325,9 +323,15 @@ Otherwise, stop for a moment, check if anything you rewrite or copy/paste isn't 
 
 .. code-block:: xml
 
-    <message type="chat" from=YOU xml:lang="en" to=RECIPIENT><hidden xmlns="https://haael.net/ns/blockchain" seriously="True">hidden_message</hidden><body>It's really not hidden message here</body></message>
+    <message type="chat" from=YOU xml:lang="en" to=RECIPIENT><example_tag xmlns="https://example.net/our_extension" another="some" data="stuff"/><body>OUR_MESSAGE</body></message>
 
 #Tip: I show how to add text into subtags, if you want to do this example, you should consider how logically achieve `text` field inside your main tag. It's simple, but if you want to consider it little more, and try to resolve it on your own, don't read any further before you solve it or give up. It can be possible to achieve it inside plugin, and with client. With client, it is simple after we call `msg_object['plugin'].fill_interfaces`, we can edit text by Object attribute of Message Class, like this: `msg_object['plugin'].text = "some text"`. Or inside fill_interfaces function, with editing our self.xml object like in add_field method, so just by adding `self.xml.text = "some_text"`. This is simple way of editing our xml to hold any information we want.
+
+With some text inside, should look like this:
+
+.. code-block:: xml
+
+    <message type="chat" from=YOU xml:lang="en" to=RECIPIENT><example_tag xmlns="https://example.net/our_extension" another="some" data="stuff">SOME_TEXT</example_tag><body>OUR_MESSAGE</body></message>
 
 Access to Message object
 ++++++++++++++++++++++++
@@ -336,9 +340,9 @@ There, you should have some personalized example of plugin, great. Remember or d
 
 With Iq stanza there is not many changes to adapt this example. There is just a few names to change and instead of using shortened jid, we have to use full jid of our recipient to send the iq.
 
-So, we make our serwer now responsible. We want to get data from custom message, and send back Iq stanza from ClientSerwer to Client.
+So, we make our server now responsible. We want to get data from custom message, and send back Iq stanza from ResponseClient to Client.
 
-To do it, at first we have to withdraw some data, for example, there we want to get text inside our plugin tag, one field of our tag, body from message and information who is the recipient of ClientSerwer Iq. At first step, we can consider handling `'session_start'` but, if our session hasen't already started. Then we don't receive message, so our ClientSerwer still doesn't need to have start method.
+To do it, at first we have to withdraw some data, for example, there we want to get text inside our plugin tag, one field of our tag, body from message and information who is the recipient of ResponseClient Iq. At first step, we can consider handling `'session_start'` but, if our session hasen't already started. Then we don't receive message, so our ResponseClient still doesn't need to have start method.
 
 Let's get information from our message, We can easly have an access to Message attributes like with dictionary: ['element_name']
 
@@ -349,7 +353,7 @@ Before we start, we should look how it is accessible:
     def receive_plugin_message(self, msg):
         print("SUCCESS!!")
         print(msg['body'])
-        print(msg['plugin']['data'])
+        print(msg['example_tag']['data'])
         print("SUCCESS!!")
 
 Run it with these changes (applying your changed names, if you changed them) and you should see body of your previous message, and that what you declare with fill_interfaces on Client side as `'data'` field for plugin message.
@@ -357,11 +361,11 @@ Run it with these changes (applying your changed names, if you changed them) and
 Start with Iq Stanza objects
 ----------------------------
 
-Now, you should know how to access message elements, you can assign it to variables. It will always be as string type which you can edit, parse or do some else. For Iq is also necessary to get this user online, because, if you log in with the same bare (jid before slash, user and domain) to your jabber on many devices, full jid will be different for all of them. The difference concerns only a part of jid after slash, for example, look at this jids, two from different devices, had different resources: `slixmpp_plugin@jabber.at/41327421879132`, `slixmpp_plugin@jabber.at/7893241740109` but log in are with that same bare `slixmpp_plugin@jabber.at` and that same password. If you want to force constant jid, you can log in with your full jid using this shema: [user@]domain[/resource]. But, two devices can't be logged at the same time, with that same user, domain and resource. 
+Now, you should know how to access message elements, you can assign it to variables. It will always be as string type which you can edit, parse or do some else. For Iq is also necessary to get this user online, because, if you log in with the same bare (jid before slash, user and domain) to your jabber on many devices, full jid will be different for all of them. The difference concerns only a part of jid after slash, for example, look at this jids, two from different devices, had different resources: `slixmpp_plugin@jabber.at/41327421879132`, `slixmpp_plugin@jabber.at/7893241740109` but log in are with that same bare `slixmpp_plugin@jabber.at` and that same password. If you want to force constant jid, you can log in with your full jid using this shema: [user@]domain[/resource]. But, two devices can't be logged at the same time, with that same JID and resource. 
 
 Okay, I think now you understand what is bare and resource in full jid. Now, we can start to extend our Iq stanza. After we collect data interesting for us from Message, then we can send back Iq to our client. Like last time, we should create eligible object and send it to another user, in this case this user will be a sender and our Client.
 
-At first, we should create another function for our ClientSerwer with a proper name to sending Iq.
+At first, we should create another function for our ResponseClient with a proper name to sending Iq.
 
 Method to extract data from message to our Iq
 +++++++++++++++++++++++++++++++++++++++++++++
@@ -393,8 +397,8 @@ Calling our method which extract data
         send_iq_response(   to=msg["from"],
                             mbody=msg["body"],
                             type="result",
-                            pdata=msg["plugin"]["data"],
-                            panother=msg["plugin"]["another"])
+                            pdata=msg["example_tag"]["data"],
+                            panother=msg["example_tag"]["another"])
 
 Okay, we are calling now our method with send_iq_response, now we have to build iq, and by doing it is almost the same way like in message object, but there are differences in name of parameters, instead 'm` we are calling parameters with 'i' prefix.
 
@@ -410,7 +414,7 @@ Build our Iq Stanza object
         plugin_another = kwargs.pop("panother", "")
         plugin_text = mbody
         iq = Iq.make_iq(ito=iq_to, itype=iq_type)
-        iq['plugin'].fill_interfaces(plugin_another, plugin_data, text=plugin_text)
+        iq['example_tag'].fill_interfaces(plugin_another, plugin_data, text=plugin_text)
 
 But there, we will have an error. Because our fill_interfaces last time when I showed it had only two arguments. Then we should extend it a litte, with backward compatibility. And additionaly, text is our optional argument. So, go back to our basic_plugin.py and find fill_interfaces method, and correct it like in example below:
 
@@ -427,7 +431,7 @@ Little extension for plugin method
         if text:
             self.xml.text = text
 
-Now our fill_interfaces shouldn't call an error when called, we can go back to our send_iq_response in ClientSerwer. Only one line is still missing: `iq.send()`. When we are sending our Iq, we can handle receiving it inside our Client. We should handle signal, as we desired in __handleIq method. In my example, it is `"event_name_iq"`. When we know the signal's name, we should create a method to handle our signal and register this method for that signal with `'add_event_handler'` method in __init__. Now our Client should look like this:
+Now our fill_interfaces shouldn't call an error when called, we can go back to our send_iq_response in ResponseClient. Only one line is still missing: `iq.send()`. When we are sending our Iq, we can handle receiving it inside our Client. We should handle signal, as we desired in __handle_iq method. In my example, it is `"event_name_iq"`. When we know the signal's name, we should create a method to handle our signal and register this method for that signal with `'add_event_handler'` method in __init__. Now our Client should look like this:
 
 Catch signal with Iq stanza
 +++++++++++++++++++++++++++
@@ -441,7 +445,7 @@ Client should look like:
             slixmpp.ClientXMPP.__init__(self, cmd_args.jid, cmd_args.password)
             
             self.add_event_handler("session_start", self.start)
-            self.add_event_handler("event_name_iq", self.receive_plugin_iq)
+            self.add_event_handler("ope_iq", self.receive_plugin_iq)
     
         def start(self, event):
             self.send_presence()
@@ -450,7 +454,7 @@ Client should look like:
             msg_object = self.make_message( mto="RECIPIENT_JID",
                                             mbody="OUR_MESSAGE",
                                             mtype="chat")
-            msg_object['plugin'].fill_interfaces(another="some", data="stuff")
+            msg_object['example_tag'].fill_interfaces(another="some", data="stuff")
             msg_object.send()
             
         def receive_plugin_iq(self, iq):
@@ -459,23 +463,23 @@ Client should look like:
             print("SUCCESS!!")
             self.disconnect()
         
-SerwerClient should look like:
+ResponseClient should look like:
 
 .. code-block:: python
 
-    class SerwerClient(slixmpp.ClientXMPP):
+    class ResponseClient(slixmpp.ClientXMPP):
         def __init__(self, cmd_args):
             slixmpp.ClientXMPP.__init__(self, cmd_args.jid, cmd_args.password)
             
-            self.add_event_handler("event_name_msg", self.receive_plugin_message)
+            self.add_event_handler("ope_msg", self.receive_plugin_message)
     
         def receive_plugin_message(self, msg):
             print("RECEIVED:", msg)
             send_iq_response(   to=msg["from"],
                                 mbody=msg["body"],
                                 type="result",
-                                pdata=msg["plugin"]["data"],
-                                panother=msg["plugin"]["another"])
+                                pdata=msg["example_tag"]["data"],
+                                panother=msg["example_tag"]["another"])
     
         def send_iq_response(self, to, mbody, **kwargs):
             iq_to = to
@@ -484,7 +488,7 @@ SerwerClient should look like:
             plugin_another = kwargs.pop("panother", "")
             plugin_text = mbody
             iq = Iq.make_iq(ito=iq_to, itype=iq_type)
-            iq['plugin'].fill_interfaces(plugin_another, plugin_data, text=plugin_text)
+            iq['example_tag'].fill_interfaces(plugin_another, plugin_data, text=plugin_text)
             iq.send()
             self.disconnect()
 
@@ -493,7 +497,7 @@ Test it, if something is calling an error, return to previous steps and make sur
 
 At the end, I think you should know and understand how to extend iq stanzas and messages. Now, it is your idea how to extend it, what to add inside `#doing some stuff` etc.
 
-For example you can send with xmpp data from numpy to serwer, serwer will process this and send you a respond after doing some work. But elements like this, should be processed inside plugin, Clients implementation just have to decide what to do with this, who is confidental to receive that information etc. For example, you can set a password, create permission table, and authorize only people which have sent proper password :)
+For example you can send with xmpp data from numpy to server, server will process this and send you a respond after doing some work. But elements like this, should be processed inside plugin, Clients implementation just have to decide what to do with this, who is confidental to receive that information etc. For example, you can set a password, create permission table, and authorize only people which have sent proper password :)
 
 Usefull reference:
 ------------------
@@ -503,4 +507,5 @@ In this link, you should find another useful methods: https://slixmpp.readthedoc
 There, you should find reference to many different tricks with slixmpp and additional explainations: https://buildmedia.readthedocs.org/media/pdf/slixmpp/latest/slixmpp.pdf
 
 If I do some mistakes or something isn't readable, please tell me about that, there is my jabber: maciej.pawlowski@jabber.at
+
 
