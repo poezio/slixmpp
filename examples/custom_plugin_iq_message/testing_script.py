@@ -1,6 +1,5 @@
 # /usr/bin/python3
 import subprocess
-import _thread
 import time
 
 
@@ -17,8 +16,7 @@ if __name__ == "__main__":
     sender_jid = "SENDER_JID"
     sender_password = "SENDER_PASSWORD"
 
-    example_file = "./test_iq_tag.xml"
-    #~ example_file = "./test_example_tag.xml"
+    example_file = "./test_example_tag.xml"
 
     responder_path = "./example/responder.py"
     responder_jid = "RESPONDER_JID"
@@ -35,9 +33,9 @@ if __name__ == "__main__":
     
     # Create two threads as follows
     try:
-        _thread.start_new_thread( start_shell, SENDER_TEST )
-        time.sleep(6)
-        _thread.start_new_thread( start_shell, RESPON_TEST )
+        start_shell(RESPON_TEST)
+        time.sleep(4)
+        start_shell(SENDER_TEST)
         while True:
             time.sleep(0.5)
     except:

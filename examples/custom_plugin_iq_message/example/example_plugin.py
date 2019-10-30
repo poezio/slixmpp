@@ -16,21 +16,21 @@ class OurPlugin(BasePlugin):
     def plugin_init(self):
         self.description = "OurPluginExtension"   ##~ String data for Human readable and find plugin by another plugin with method.
         self.xep = "ope"                          ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
-        
-        #~ BasePlugin.post_init(self)                                  ##~ Initialize base plugin post init, to achieve this method and be sure to registred handlers and tags extension be saved.
+
+        #~ ns = "https://example.net/our_extension"
         self.xmpp.register_handler(
                     Callback('ExampleGet Event:example_tag',    ##~ Name of this Callback
-                    StanzaPath('iq@type=get/example_tag'),      ##~ Handle only Iq with type get and example_tag
+                    StanzaPath("iq@type=get/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),      ##~ Handle only Iq with type get and example_tag
                     self.__handle_get_iq))                      ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
-                    StanzaPath('iq@type=result/example_tag'),   ##~ Handle only Iq with type get and example_tag
+                    StanzaPath("iq@type=result/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),   ##~ Handle only Iq with type get and example_tag
                     self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
-                    StanzaPath('iq@type=error/example_tag'),    ##~ Handle only Iq with type get and example_tag
+                    StanzaPath("iq@type=error/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),    ##~ Handle only Iq with type get and example_tag
                     self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
@@ -66,31 +66,25 @@ class ExampleTag(ElementBase):
     
     interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
 
-    def setup_from_element_tree(self, et_extension_tag_xml):
-        if et_extension_tag_xml.tag == "iq":
-            et_extension_tag_xml = et_extension_tag_xml[0]
-        self.xml.attrib.update(et_extension_tag_xml.attrib)
-        self.xml.text = et_extension_tag_xml.text
-        for inner_tag in et_extension_tag_xml:
-            self.xml.append(inner_tag)
-
     def setup_from_string(self, string):
         et_extension_tag_xml = ET.fromstring(string)
-        self.setup_from_element_tree(et_extension_tag_xml)
+        self.setup_from_lxml(et_extension_tag_xml)
 
     def setup_from_file(self, path):
         et_extension_tag_xml = ET.parse(path).getroot()
-        self.setup_from_element_tree(et_extension_tag_xml)
+        self.setup_from_lxml(et_extension_tag_xml)
 
     def setup_from_lxml(self, lxml):
-        if isinstance(lxml, ET.Element):
-            self.setup_from_element_tree(lxml)
+        self.xml.attrib.update(lxml.attrib)
+        self.xml.text = lxml.text
+        for inner_tag in lxml:
+            self.xml.append(inner_tag)
 
     def get_boolean(self):
-        return self.xml.attrib.get("boolean")
+        return self.xml.attrib["boolean"]
 
     def get_some_string(self):
-        return self.xml.attrib.get("some_string")
+        return self.xml.attrib["some_string"]
         
     def get_text(self, text):
         return self.xml.text

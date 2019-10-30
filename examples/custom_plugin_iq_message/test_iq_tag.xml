@@ -1,1 +1,0 @@
-<iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="2" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>

@@ -6,13 +6,12 @@ import slixmpp
 import example_plugin
 
 class Responder(slixmpp.ClientXMPP):
-    def __init__(self, args):
-        slixmpp.ClientXMPP.__init__(self, args.jid, args.password)
+    def __init__(self, jid, password):
+        slixmpp.ClientXMPP.__init__(self, jid, password)
         
         self.add_event_handler("session_start", self.start)
-        self.add_event_handler("example_tag_get_iq", self.print_it)
-        #~ self.add_event_handler("example_tag_message", self.print_it)
-        self.add_event_handler("message", self.print_it)
+        self.add_event_handler("example_tag_get_iq", self.example_tag_get_iq)
+        self.add_event_handler("example_tag_message", self.example_tag_message)
 
     def start(self, event):
         # Two, not required methods, but allows another users to see us available, and receive that information.
@@ -21,8 +20,21 @@ class Responder(slixmpp.ClientXMPP):
         
         #~ self.send_example_iq()
 
-    def print_it(self, stanza):
-        print(stanza)
+    def example_tag_get_iq(self, iq):
+        print(iq)
+        if not bool(iq['example_tag'].get_boolean()):
+            iq.reply(clear=False)
+            iq["type"] = "error"
+        else:
+            reply = iq.reply()
+            print(iq, reply)
+        iq.send()
+            
+            
+        
+    def example_tag_message(self, msg):
+        print(msg) # Message is standalone object, it can be replied, but 
+            #~ print(stanza)
         
     #~ def send_example_iq(self):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
@@ -61,12 +73,14 @@ if __name__ == '__main__':
     if args.password is None:
         args.password = getpass("Password: ")
 
-    try:
-        xmpp = Responder(args)
-        xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
+    xmpp = Responder(args.jid, args.password)
+    xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
 
-        xmpp.connect()
+    xmpp.connect()
+    try:
         xmpp.process()
     except KeyboardInterrupt:
-        xmpp.disconnect()
-        exit(0)
+        try:
+            xmpp.disconnect()
+        except:
+            pass

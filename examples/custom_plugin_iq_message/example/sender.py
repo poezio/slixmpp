@@ -8,15 +8,15 @@ from slixmpp.xmlstream import ET
 import example_plugin
 
 class Sender(slixmpp.ClientXMPP):
-    def __init__(self, args):
-        slixmpp.ClientXMPP.__init__(self, args.jid, args.password)
+    def __init__(self, jid, password, to, path):
+        slixmpp.ClientXMPP.__init__(self, jid, password)
 
-        self.to = args.to
-        self.path = args.path
+        self.to = to
+        self.path = path
 
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("example_tag_result_iq", self.example_tag_result_iq)
-        self.add_event_handler("example_tag_error_iq", self.example_tag_result_iq)
+        self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
 
     def start(self, event):
         # Two, not required methods, but allows another users to see us available, and receive that information.
@@ -36,9 +36,16 @@ class Sender(slixmpp.ClientXMPP):
         self.send_example_iq_tag_from_element_tree(self.to, et)
         # <iq xml:lang="en" from="SENDER/RESOURCE" id="3" to="RESPONDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
 
+        self.send_example_iq_to_get_error(self.to)
+
 
     def example_tag_result_iq(self, iq):
-        pass
+        print(iq)
+        #~ self.disconnect()
+
+    def example_tag_error_iq(self, iq):
+        print(iq)
+        #~ self.disconnect()
 
     def send_example_iq(self, to):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
@@ -87,7 +94,15 @@ class Sender(slixmpp.ClientXMPP):
         iq['example_tag'].setup_from_lxml(et)
 
         iq.send()
-        
+
+    def send_example_iq_to_get_error(self, to):
+        #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
+        iq = self.make_iq(ito=to,
+                          itype="get",
+                          id=4)
+        iq['example_tag'].set_boolean(False) # For example, false boolean is our condition to receive error respond
+
+        iq.send()
     
 if __name__ == '__main__':
     parser = ArgumentParser(description=Sender.__doc__)
@@ -118,12 +133,14 @@ if __name__ == '__main__':
     if args.password is None:
         args.password = getpass("Password: ")
 
-    try:
-        xmpp = Sender(args)
-        xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
+    xmpp = Sender(args.jid, args.password, args.to, args.path)
+    xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
 
-        xmpp.connect()
+    xmpp.connect()
+    try:
         xmpp.process()
     except KeyboardInterrupt:
-        xmpp.disconnect()
-        exit(0)
+        try:
+            xmpp.disconnect()
+        except:
+            pass
