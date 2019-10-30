@@ -1,0 +1,1 @@
+<example_tag some_string="StringFromFile">Info_inside_tag<inside_tag first_field="3" secound_field="4" /></example_tag>
