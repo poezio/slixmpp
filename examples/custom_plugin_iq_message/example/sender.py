@@ -3,6 +3,8 @@ from argparse import ArgumentParser
 from getpass import getpass
 
 import slixmpp
+from slixmpp.xmlstream import ET
+
 import example_plugin
 
 class Sender(slixmpp.ClientXMPP):
@@ -24,10 +26,15 @@ class Sender(slixmpp.ClientXMPP):
         self.send_example_iq(self.to)
         # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
         self.send_example_iq_with_inner_tag(self.to)
-        # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="2" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
+        # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="1" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
         self.send_example_message(self.to)
         # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
-        self.send_example_iq_tag_from_file(self.path)
+        self.send_example_iq_tag_from_file(self.to, self.path)
+        # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
+
+        et = ET.fromstring('<iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="3" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>')
+        self.send_example_iq_tag_from_element_tree(self.to, et)
+        # <iq xml:lang="en" from="SENDER/RESOURCE" id="3" to="RESPONDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
 
 
     def example_tag_result_iq(self, iq):
@@ -46,7 +53,7 @@ class Sender(slixmpp.ClientXMPP):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
         iq = self.make_iq(ito=to,
                           itype="get",
-                          id=2)
+                          id=1)
         iq['example_tag'].set_some_string("Another_string")
         iq['example_tag'].set_text("Info_inside_tag")
         
@@ -63,7 +70,25 @@ class Sender(slixmpp.ClientXMPP):
         msg['example_tag'].set_text("Info_inside_tag_message")
         msg.send()
 
+    def send_example_iq_tag_from_file(self, to, path):
+        #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
+        iq = self.make_iq(ito=to,
+                          itype="get",
+                          id=2)
+        iq['example_tag'].setup_from_file(path)
 
+        iq.send()
+
+    def send_example_iq_tag_from_element_tree(self, to, et):
+        #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
+        iq = self.make_iq(ito=to,
+                          itype="get",
+                          id=3)
+        iq['example_tag'].setup_from_lxml(et)
+
+        iq.send()
+        
+    
 if __name__ == '__main__':
     parser = ArgumentParser(description=Sender.__doc__)
 
@@ -80,7 +105,7 @@ if __name__ == '__main__':
                         help="password to use")
     parser.add_argument("-t", "--to", dest="to",
                         help="JID to send the message/iq to")
-    parser.add_argument("-a", "--path", dest="path",
+    parser.add_argument("--path", dest="path",
                         help="path to load example_tag content")
 
     args = parser.parse_args()

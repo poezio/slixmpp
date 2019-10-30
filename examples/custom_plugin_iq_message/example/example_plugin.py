@@ -66,19 +66,25 @@ class ExampleTag(ElementBase):
     
     interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
 
+    def setup_from_element_tree(self, et_extension_tag_xml):
+        if et_extension_tag_xml.tag == "iq":
+            et_extension_tag_xml = et_extension_tag_xml[0]
+        self.xml.attrib.update(et_extension_tag_xml.attrib)
+        self.xml.text = et_extension_tag_xml.text
+        for inner_tag in et_extension_tag_xml:
+            self.xml.append(inner_tag)
+
     def setup_from_string(self, string):
-        extension_tag_XML = ET.fromstring(string)
-        #~ if extension_tag_XML.tag == "iq":
-            #~ pass
-        self.xml = extension_tag_XML
+        et_extension_tag_xml = ET.fromstring(string)
+        self.setup_from_element_tree(et_extension_tag_xml)
 
     def setup_from_file(self, path):
-        with open(path, "r") as file_xml:
-            extension_tag_XML = file_xml.read()
-        self.setup_from_string(extension_tag_XML)
+        et_extension_tag_xml = ET.parse(path).getroot()
+        self.setup_from_element_tree(et_extension_tag_xml)
 
     def setup_from_lxml(self, lxml):
-        pass
+        if isinstance(lxml, ET.Element):
+            self.setup_from_element_tree(lxml)
 
     def get_boolean(self):
         return self.xml.attrib.get("boolean")

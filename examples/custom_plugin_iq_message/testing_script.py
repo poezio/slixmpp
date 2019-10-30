@@ -17,12 +17,21 @@ if __name__ == "__main__":
     sender_jid = "SENDER_JID"
     sender_password = "SENDER_PASSWORD"
 
+    example_file = "./test_iq_tag.xml"
+    #~ example_file = "./test_example_tag.xml"
+
     responder_path = "./example/responder.py"
     responder_jid = "RESPONDER_JID"
     responder_password = "RESPONDER_PASSWORD"
 
-    SENDER_TEST = (" ".join([prefix, "python3", sender_path, "-j", sender_jid, "-p", sender_password, postfix],)
-    RESPON_TEST = (" ".join([prefix, "python3", responder_path, "-j", responder_jid, "-p", responder_password, postfix],)
+    SENDER_TEST = (" ".join([prefix, "python3", sender_path,
+                             "-j", sender_jid, "-p", sender_password,
+                             "-t", responder_jid, "--path", example_file,
+                             postfix]),)
+
+    RESPON_TEST = (" ".join([prefix, "python3", responder_path,
+                             "-j", responder_jid, "-p", responder_password,
+                             postfix]),)
     
     # Create two threads as follows
     try:
