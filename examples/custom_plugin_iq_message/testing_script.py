@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # Create two threads as follows
     try:
         start_shell(RESPON_TEST)
-        time.sleep(4)
+        time.sleep(7)
         start_shell(SENDER_TEST)
         while True:
             time.sleep(0.5)

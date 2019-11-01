@@ -18,32 +18,23 @@ class Responder(slixmpp.ClientXMPP):
         self.send_presence()
         self.get_roster()
         
-        #~ self.send_example_iq()
-
     def example_tag_get_iq(self, iq):
-        print(iq)
-        if not bool(iq['example_tag'].get_boolean()):
+        if iq["example_tag"].get_some_string() == None:
+            print("PRE-ERROR", iq)
             iq.reply(clear=False)
-            iq["type"] = "error"
+            iq["error"]["condition"] = "feature-not-implemented"
+            iq["error"]["text"] = "Without boolean value returns error."
+            print("ERROR", iq)
+            iq.send()
         else:
-            reply = iq.reply()
-            print(iq, reply)
-        iq.send()
-            
-            
-        
+            print("GET", iq)
+            iq.reply()
+            iq["example_tag"].fill_interfaces(True, "Reply_string")
+            print("RESULT", iq)
+            iq.send()
+
     def example_tag_message(self, msg):
         print(msg) # Message is standalone object, it can be replied, but 
-            #~ print(stanza)
-        
-    #~ def send_example_iq(self):
-        #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
-        #~ iq = self.make_iq(ito="test-slixmpp-bot@xmpp.jp/1762397490042511769727982537",
-                          #~ itype="get")
-        #~ iq['example_tag'].set_boolean(True)
-        #~ iq['example_tag'].set_some_string("Another_string")
-        #~ iq['example_tag'].set_text("Info_inside_tag")
-        #~ iq.send()
 
 
 if __name__ == '__main__':

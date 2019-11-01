@@ -81,10 +81,10 @@ class ExampleTag(ElementBase):
             self.xml.append(inner_tag)
 
     def get_boolean(self):
-        return self.xml.attrib["boolean"]
+        return self.xml.attrib.get("boolean", None)
 
     def get_some_string(self):
-        return self.xml.attrib["some_string"]
+        return self.xml.attrib.get("some_string", None)
         
     def get_text(self, text):
         return self.xml.text

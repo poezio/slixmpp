@@ -1,6 +1,7 @@
 import logging
 from argparse import ArgumentParser
 from getpass import getpass
+import time
 
 import slixmpp
 from slixmpp.xmlstream import ET
@@ -22,30 +23,37 @@ class Sender(slixmpp.ClientXMPP):
         # Two, not required methods, but allows another users to see us available, and receive that information.
         self.send_presence()
         self.get_roster()
+
+        time.sleep(10)
         
         self.send_example_iq(self.to)
         # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
+        
         self.send_example_iq_with_inner_tag(self.to)
         # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="1" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
+        
         self.send_example_message(self.to)
         # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
+        
         self.send_example_iq_tag_from_file(self.to, self.path)
         # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
 
-        et = ET.fromstring('<iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="3" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>')
+        et = ET.fromstring('<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>')
         self.send_example_iq_tag_from_element_tree(self.to, et)
-        # <iq xml:lang="en" from="SENDER/RESOURCE" id="3" to="RESPONDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
+        # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
 
         self.send_example_iq_to_get_error(self.to)
+        # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" /></iq>
+        # ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
 
 
     def example_tag_result_iq(self, iq):
-        print(iq)
-        #~ self.disconnect()
+        print("RESULT", iq)
+        self.disconnect()
 
     def example_tag_error_iq(self, iq):
-        print(iq)
-        #~ self.disconnect()
+        print("ERROR", iq)
+        self.disconnect()
 
     def send_example_iq(self, to):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
@@ -100,8 +108,7 @@ class Sender(slixmpp.ClientXMPP):
         iq = self.make_iq(ito=to,
                           itype="get",
                           id=4)
-        iq['example_tag'].set_boolean(False) # For example, false boolean is our condition to receive error respond
-
+        iq['example_tag'].set_boolean(True) # For example, our condition to receive error respond is example_tag without boolean value.
         iq.send()
     
 if __name__ == '__main__':
