@@ -24,7 +24,7 @@ class Sender(slixmpp.ClientXMPP):
         self.send_presence()
         self.get_roster()
 
-        time.sleep(10)
+        time.sleep(6) # There we need delay only with running script, becouse sending iq to offline user is not delivering.
         
         self.send_example_iq(self.to)
         # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
@@ -38,27 +38,30 @@ class Sender(slixmpp.ClientXMPP):
         self.send_example_iq_tag_from_file(self.to, self.path)
         # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
 
-        et = ET.fromstring('<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>')
+        string = '<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>'
+        et = ET.fromstring(string)
         self.send_example_iq_tag_from_element_tree(self.to, et)
         # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
 
         self.send_example_iq_to_get_error(self.to)
         # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" /></iq>
         # ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
+        
+        self.send_example_iq_tag_from_string(self.to, string)
+        # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
 
 
     def example_tag_result_iq(self, iq):
-        print("RESULT", iq)
-        self.disconnect()
+        logging.info(str(iq))
+        #~ self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
 
     def example_tag_error_iq(self, iq):
-        print("ERROR", iq)
-        self.disconnect()
+        logging.info(str(iq))
+        #~ self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with error type.
 
     def send_example_iq(self, to):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
-        iq = self.make_iq(ito=to,
-                          itype="get")
+        iq = self.make_iq(ito=to, itype="get")
         iq['example_tag'].set_boolean(True)
         iq['example_tag'].set_some_string("Another_string")
         iq['example_tag'].set_text("Info_inside_tag")
@@ -66,9 +69,7 @@ class Sender(slixmpp.ClientXMPP):
 
     def send_example_iq_with_inner_tag(self, to):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
-        iq = self.make_iq(ito=to,
-                          itype="get",
-                          id=1)
+        iq = self.make_iq(ito=to, itype="get", id=1)
         iq['example_tag'].set_some_string("Another_string")
         iq['example_tag'].set_text("Info_inside_tag")
         
@@ -87,28 +88,29 @@ class Sender(slixmpp.ClientXMPP):
 
     def send_example_iq_tag_from_file(self, to, path):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
-        iq = self.make_iq(ito=to,
-                          itype="get",
-                          id=2)
+        iq = self.make_iq(ito=to, itype="get", id=2)
         iq['example_tag'].setup_from_file(path)
 
         iq.send()
 
     def send_example_iq_tag_from_element_tree(self, to, et):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
-        iq = self.make_iq(ito=to,
-                          itype="get",
-                          id=3)
+        iq = self.make_iq(ito=to, itype="get", id=3)
         iq['example_tag'].setup_from_lxml(et)
 
         iq.send()
 
     def send_example_iq_to_get_error(self, to):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
-        iq = self.make_iq(ito=to,
-                          itype="get",
-                          id=4)
+        iq = self.make_iq(ito=to, itype="get", id=4)
         iq['example_tag'].set_boolean(True) # For example, our condition to receive error respond is example_tag without boolean value.
+        iq.send()
+
+    def send_example_iq_tag_from_string(self, to, string):
+        #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
+        iq = self.make_iq(ito=to, itype="get", id=5)
+        iq['example_tag'].setup_from_string(string)
+
         iq.send()
     
 if __name__ == '__main__':

@@ -1,15 +1,17 @@
 # /usr/bin/python3
 import subprocess
+import threading
 import time
-
 
 def start_shell(shell_string):
     subprocess.run(shell_string, shell=True, universal_newlines=True)
 
 if __name__ == "__main__":
-    #~ prefix = "xterm -e" # Separate terminal
+    #~ prefix = "x-terminal-emulator -e" # Separate terminal for every client, you can replace xterm with your terminal
+    #~ prefix = "xterm -e" # Separate terminal for every client, you can replace xterm with your terminal
     prefix = ""
     #~ postfix = " -d" # Debug
+    #~ postfix = " -q" # Quiet
     postfix = ""
 
     sender_path = "./example/sender.py"
@@ -22,20 +24,18 @@ if __name__ == "__main__":
     responder_jid = "RESPONDER_JID"
     responder_password = "RESPONDER_PASSWORD"
 
-    SENDER_TEST = (" ".join([prefix, "python3", sender_path,
-                             "-j", sender_jid, "-p", sender_password,
-                             "-t", responder_jid, "--path", example_file,
-                             postfix]),)
+    # Remember about rights to run your python files. (`chmod +x ./file.py`)
+    SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
+                   " -t {responder_jid} --path {example_file} {postfix}"
 
-    RESPON_TEST = (" ".join([prefix, "python3", responder_path,
-                             "-j", responder_jid, "-p", responder_password,
-                             postfix]),)
+    RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
+                   " -p {responder_password} {postfix}"
     
-    # Create two threads as follows
     try:
-        start_shell(RESPON_TEST)
-        time.sleep(7)
-        start_shell(SENDER_TEST)
+        responder = threading.Thread(target=start_shell, args=(RESPON_TEST, ))
+        sender = threading.Thread(target=start_shell, args=(SENDER_TEST, ))
+        responder.start()
+        sender.start()
         while True:
             time.sleep(0.5)
     except:

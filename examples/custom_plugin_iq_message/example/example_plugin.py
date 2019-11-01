@@ -43,19 +43,19 @@ class OurPlugin(BasePlugin):
 
     # All iq types are: get, set, error, result
     def __handle_get_iq(self, iq):
-        # Do something with iq
+        # Do something with received iq
         self.xmpp.event('example_tag_get_iq', iq)           ##~ Call event which can be handled by clients to send or something other what you want.
         
     def __handle_result_iq(self, iq):
-        # Do something with iq
+        # Do something with received iq
         self.xmpp.event('example_tag_result_iq', iq)        ##~ Call event which can be handled by clients to send or something other what you want.
 
     def __handle_error_iq(self, iq):
-        # Do something with iq
+        # Do something with received iq
         self.xmpp.event('example_tag_error_iq', iq)         ##~ Call event which can be handled by clients to send or something other what you want.
 
     def __handle_message(self, msg):
-        # Do something with message
+        # Do something with received message
         self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by clients to send or something other what you want.
 
 class ExampleTag(ElementBase):

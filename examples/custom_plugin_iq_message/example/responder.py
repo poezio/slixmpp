@@ -18,23 +18,20 @@ class Responder(slixmpp.ClientXMPP):
         self.send_presence()
         self.get_roster()
         
-    def example_tag_get_iq(self, iq):
+    def example_tag_get_iq(self, iq): # Iq stanza always should have a respond. If user is offline, it call an error.
+        logging.info(iq)
         if iq["example_tag"].get_some_string() == None:
-            print("PRE-ERROR", iq)
             iq.reply(clear=False)
             iq["error"]["condition"] = "feature-not-implemented"
-            iq["error"]["text"] = "Without boolean value returns error."
-            print("ERROR", iq)
+            iq["error"]["text"] = "Without some_string value returns error."
             iq.send()
         else:
-            print("GET", iq)
             iq.reply()
             iq["example_tag"].fill_interfaces(True, "Reply_string")
-            print("RESULT", iq)
-            iq.send()
+        iq.send()
 
     def example_tag_message(self, msg):
-        print(msg) # Message is standalone object, it can be replied, but 
+        logging.info(msg) # Message is standalone object, it can be replied, but no error arrives if not.
 
 
 if __name__ == '__main__':
