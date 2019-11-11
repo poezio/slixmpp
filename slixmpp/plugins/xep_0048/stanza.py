@@ -6,6 +6,7 @@
     See the file LICENSE for copying permission.
 """
 
+from slixmpp import JID
 from slixmpp.xmlstream import ET, ElementBase, register_stanza_plugin
 
 
@@ -51,6 +52,12 @@ class Conference(ElementBase):
         del self['autojoin']
         if value in ('1', 'true', True):
             self._set_attr('autojoin', 'true')
+
+    def set_jid(self, value):
+        del self['jid']
+        if isinstance(value, JID):
+            value = value.full
+        self._set_attr('jid', value)
 
 
 class URL(ElementBase):
