@@ -25,18 +25,18 @@ class OurPlugin(BasePlugin):
 
         self.xmpp.register_handler(
                     Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
-                    StanzaPath("iq@type=result/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),   ##~ Handle only Iq with type get and example_tag
+                    StanzaPath("iq@type=result/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),   ##~ Handle only Iq with type result and example_tag
                     self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
-                    StanzaPath("iq@type=error/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),    ##~ Handle only Iq with type get and example_tag
+                    StanzaPath("iq@type=error/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),    ##~ Handle only Iq with type error and example_tag
                     self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleMessage Event:example_tag',##~ Name of this Callback
-                    StanzaPath('message/example_tag'),          ##~ Handle only Iq with type get and example_tag
-                    self.__handle_message))                     ##~ Method which catch proper Iq, should raise proper event for client.
+                    StanzaPath('message/example_tag'),          ##~ Handle only Message with example_tag
+                    self.__handle_message))                     ##~ Method which catch proper Message, should raise proper event for client.
 
         register_stanza_plugin(Iq, ExampleTag)                  ##~ Register tags extension for Iq object, otherwise iq['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
         register_stanza_plugin(Message, ExampleTag)                  ##~ Register tags extension for Iq object, otherwise iq['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
