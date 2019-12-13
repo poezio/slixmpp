@@ -95,7 +95,6 @@ class Sender(slixmpp.ClientXMPP):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
         iq = self.make_iq(ito=to, itype="get", id=2)
         iq['example_tag'].setup_from_file(path)
-        print(type(iq['example_tag']))
 
         iq.send()
 
