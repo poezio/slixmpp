@@ -24,7 +24,7 @@ class Sender(slixmpp.ClientXMPP):
         self.send_presence()
         self.get_roster()
 
-        time.sleep(6) # There we need delay only with running script, becouse sending iq to offline user is not delivering.
+        self.disconnect_counter = 6 # This is only for disconnect when we receive all replies for sended Iq
         
         self.send_example_iq(self.to)
         # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
@@ -53,12 +53,16 @@ class Sender(slixmpp.ClientXMPP):
 
 
     def example_tag_result_iq(self, iq):
+        self.disconnect_counter -= 1
         logging.info(str(iq))
-        #~ self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
+        if not self.disconnect_counter:
+            self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
 
     def example_tag_error_iq(self, iq):
+        self.disconnect_counter -= 1
         logging.info(str(iq))
-        #~ self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with error type.
+        if not self.disconnect_counter:
+            self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
 
     def send_example_iq(self, to):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
@@ -91,6 +95,7 @@ class Sender(slixmpp.ClientXMPP):
         #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
         iq = self.make_iq(ito=to, itype="get", id=2)
         iq['example_tag'].setup_from_file(path)
+        print(type(iq['example_tag']))
 
         iq.send()
 

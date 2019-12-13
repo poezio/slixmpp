@@ -17,29 +17,33 @@ class OurPlugin(BasePlugin):
         self.description = "OurPluginExtension"   ##~ String data for Human readable and find plugin by another plugin with method.
         self.xep = "ope"                          ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
 
-        #~ ns = "https://example.net/our_extension"
+        namespace = ExampleTag.namespace
         self.xmpp.register_handler(
                     Callback('ExampleGet Event:example_tag',    ##~ Name of this Callback
-                    StanzaPath("iq@type=get/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),      ##~ Handle only Iq with type get and example_tag
+                    #~ StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Handle only Iq with type get and example_tag
+                    StanzaPath("iq@type=get/{{{ns}}}example_tag".format(ns=namespace)),      ##~ Handle only Iq with type get and example_tag
                     self.__handle_get_iq))                      ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
-                    StanzaPath("iq@type=result/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),   ##~ Handle only Iq with type result and example_tag
+                    #~ StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type result and example_tag
+                    StanzaPath("iq@type=result/{{{ns}}}example_tag".format(ns=namespace)),   ##~ Handle only Iq with type result and example_tag
                     self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
-                    StanzaPath("iq@type=error/{{{ns}}}example_tag".format(ns="https://example.net/our_extension")),    ##~ Handle only Iq with type error and example_tag
+                    #~ StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Handle only Iq with type error and example_tag
+                    StanzaPath("iq@type=error/{{{ns}}}example_tag".format(ns=namespace)),    ##~ Handle only Iq with type error and example_tag
                     self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleMessage Event:example_tag',##~ Name of this Callback
-                    StanzaPath('message/example_tag'),          ##~ Handle only Message with example_tag
+                    #~ StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Handle only Message with example_tag
+                    StanzaPath('message/{{{ns}}}example_tag'.format(ns=namespace)),          ##~ Handle only Message with example_tag
                     self.__handle_message))                     ##~ Method which catch proper Message, should raise proper event for client.
 
         register_stanza_plugin(Iq, ExampleTag)                  ##~ Register tags extension for Iq object, otherwise iq['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
-        register_stanza_plugin(Message, ExampleTag)                  ##~ Register tags extension for Iq object, otherwise iq['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
+        register_stanza_plugin(Message, ExampleTag)             ##~ Register tags extension for Message object, otherwise message['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
 
     # All iq types are: get, set, error, result
     def __handle_get_iq(self, iq):
@@ -67,16 +71,20 @@ class ExampleTag(ElementBase):
     interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
 
     def setup_from_string(self, string):
+        """Initialize tag element from string"""
         et_extension_tag_xml = ET.fromstring(string)
         self.setup_from_lxml(et_extension_tag_xml)
 
     def setup_from_file(self, path):
+        """Initialize tag element from file containing adjusted data"""
         et_extension_tag_xml = ET.parse(path).getroot()
         self.setup_from_lxml(et_extension_tag_xml)
 
     def setup_from_lxml(self, lxml):
+        """Add ET data to self xml structure."""
         self.xml.attrib.update(lxml.attrib)
         self.xml.text = lxml.text
+        self.xml.tail = lxml.tail
         for inner_tag in lxml:
             self.xml.append(inner_tag)
 
