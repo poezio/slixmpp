@@ -20,26 +20,22 @@ class OurPlugin(BasePlugin):
         namespace = ExampleTag.namespace
         self.xmpp.register_handler(
                     Callback('ExampleGet Event:example_tag',    ##~ Name of this Callback
-                    #~ StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Handle only Iq with type get and example_tag
-                    StanzaPath("iq@type=get/{{{ns}}}example_tag".format(ns=namespace)),      ##~ Handle only Iq with type get and example_tag
+                    StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Handle only Iq with type get and example_tag
                     self.__handle_get_iq))                      ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
-                    #~ StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type result and example_tag
-                    StanzaPath("iq@type=result/{{{ns}}}example_tag".format(ns=namespace)),   ##~ Handle only Iq with type result and example_tag
+                    StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type result and example_tag
                     self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
-                    #~ StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Handle only Iq with type error and example_tag
-                    StanzaPath("iq@type=error/{{{ns}}}example_tag".format(ns=namespace)),    ##~ Handle only Iq with type error and example_tag
+                    StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Handle only Iq with type error and example_tag
                     self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
 
         self.xmpp.register_handler(
                     Callback('ExampleMessage Event:example_tag',##~ Name of this Callback
-                    #~ StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Handle only Message with example_tag
-                    StanzaPath('message/{{{ns}}}example_tag'.format(ns=namespace)),          ##~ Handle only Message with example_tag
+                    StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Handle only Message with example_tag
                     self.__handle_message))                     ##~ Method which catch proper Message, should raise proper event for client.
 
         register_stanza_plugin(Iq, ExampleTag)                  ##~ Register tags extension for Iq object, otherwise iq['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
