@@ -4,6 +4,7 @@ import sys
 import datetime
 import time
 import threading
+import unittest
 import re
 
 from slixmpp.test import *
@@ -11,6 +12,7 @@ from slixmpp.xmlstream import ElementBase
 from slixmpp.plugins.xep_0323.device import Device
 
 
+@unittest.skip('')
 class TestStreamSensorData(SlixTest):
 
     """
