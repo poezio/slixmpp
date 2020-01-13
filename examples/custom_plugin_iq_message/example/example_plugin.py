@@ -43,6 +43,12 @@ class OurPlugin(BasePlugin):
 
     # All iq types are: get, set, error, result
     def __handle_get_iq(self, iq):
+        if iq.get_some_string is None:
+            error = iq.reply(clear=False)
+            error["type"] = "error"
+            error["error"]["condition"] = "missing-data"
+            error["error"]["text"] = "Without some_string value returns error."
+            error.send()
         # Do something with received iq
         self.xmpp.event('example_tag_get_iq', iq)           ##~ Call event which can be handled by clients to send or something other what you want.
         
@@ -83,6 +89,10 @@ class ExampleTag(ElementBase):
         self.xml.tail = lxml.tail
         for inner_tag in lxml:
             self.xml.append(inner_tag)
+
+    def setup_from_dict(self, data):
+        #There should keys should be also validated
+        self.xml.attrib.update(data)
 
     def get_boolean(self):
         return self.xml.attrib.get("boolean", None)
