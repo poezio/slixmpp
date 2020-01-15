@@ -45,7 +45,8 @@ class XEP_0027(BasePlugin):
         'gpg_home': '',
         'use_agent': True,
         'keyring': None,
-        'key_server': 'pgp.mit.edu'
+        'key_server': 'pgp.mit.edu',
+        'passphrase': ''
     }
 
     def plugin_init(self):
@@ -110,7 +111,7 @@ class XEP_0027(BasePlugin):
                    '\n' + \
                    '%s\n' + \
                    '-----END PGP MESSAGE-----\n'
-        dec = self.gpg.decrypt(template % data)
+        dec = self.gpg.decrypt(template % data, passphrase=self.passphrase)
         return dec.data
 
     def verify(self, data, sig, jid=None):
