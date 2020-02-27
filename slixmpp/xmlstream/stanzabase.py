@@ -17,7 +17,7 @@ from __future__ import with_statement, unicode_literals
 import copy
 import logging
 import weakref
-from xml.etree import cElementTree as ET
+import xml.etree.ElementTree as ET
 
 from slixmpp.xmlstream import JID
 from slixmpp.xmlstream.tostring import tostring
@@ -1037,8 +1037,11 @@ class ElementBase(object):
             parent_path = "/".join(path[:len(path) - level - 1])
 
             elements = self.xml.findall(element_path)
-            parent = self.xml.find(parent_path)
-
+			if parent_path == '':
+                parent_path = None             
+            if parent_path is not None:     
+                parent = self.xml.find(parent_path)
+                        
             if elements:
                 if parent is None:
                     parent = self.xml
