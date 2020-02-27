@@ -1037,8 +1037,12 @@ class ElementBase(object):
             parent_path = "/".join(path[:len(path) - level - 1])
 
             elements = self.xml.findall(element_path)
-            parent = self.xml.find(parent_path)
-
+            
+            if parent_path == '':
+                parent_path = None             
+            if parent_path is not None:     
+                parent = self.xml.find(parent_path)
+                        
             if elements:
                 if parent is None:
                     parent = self.xml
