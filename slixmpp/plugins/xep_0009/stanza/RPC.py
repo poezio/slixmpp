@@ -7,7 +7,7 @@
 """
 
 from slixmpp.xmlstream.stanzabase import ElementBase
-from xml.etree import cElementTree as ET
+import xml.etree.ElementTree as ET
 
 
 class RPCQuery(ElementBase):
