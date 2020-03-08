@@ -1,11 +1,12 @@
-# How to make a slixmpp plugins for Messages and IQ extensions
+How to make a slixmpp plugins for Messages and IQ extensions
+=======================================================================
 
-## Introduction and requirements
+Introduction and requirements
+-----------------
 
-- `'python3'`
+* `'python3'`
 
 Code used in the following tutorial is written in python  3.6 or newer.
-
 For backward compatibility, replace the f-strings functionality with older string formatting: `'"{}".format("content")'` or `'%s, "content"'`.
 
 Ubuntu linux installation steps:
@@ -14,14 +15,13 @@ Ubuntu linux installation steps:
 
     sudo apt-get install python3.6
 
-- `'slixmpp'`
-- `'argparse'`
-- `'logging'`
-- `'subprocess'`
-- `'threading'`
+* `'slixmpp'`
+* `'argparse'`
+* `'logging'`
+* `'subprocess'`
+* `'threading'`
 
-Check if these libraries and the proper python version are available for your environment.
-Every one of these, except the slixmpp, is a standard python library. To not have them installed by default is an unusual situation.
+Check if these libraries and the proper python version are available at your environment. Every one of these, except the slixmpp, is a standard python library. However, it may happend that some of them may not be installed.
 
 .. code-block:: python
 
@@ -44,10 +44,10 @@ Example output:
     1.1
     ~ $ python3 -c "import logging; print(logging.__version__)"
     0.5.1.2    
-    ~ $ python3 -m subprocess #This should return nothing
-    ~ $ python3 -m threading #This should return nothing
+    ~ $ python3 -m subprocess #Should return nothing
+    ~ $ python3 -m threading #Should return nothing
 
-If some of the libraries throw `'ImportError'` or `'no module named ...'` error, try to install them with:
+If some of the libraries throw `'ImportError'` or `'no module named ...'` error, install them with:
 
 On ubuntu linux:
 
@@ -57,31 +57,32 @@ On ubuntu linux:
     #or
     easy_install slixmpp
 
-If some of the libraries throws NameError, reinstall the whole package.
+If some of the libraries throws NameError, reinstall the whole package once again.
 
-- `Jabber accounts`
+* `Jabber accounts`
 
-For the testing purposes, two private jabber accounts are required. They can be created on one of many available sites, for example:
+For the testing purposes, two private jabber accounts are required. They can be created on one of many available sites:
 
 [https://www.google.com/search?q=jabber+server+list](https://www.google.com/search?q=jabber+server+list)
 
-## Client launch script
+Client launch script
+-----------------------------
 
-The client launch script should be created outside of the main project location. This allows us to easly obtain the results when needed. It is recommended for the script to be outside of the project location in order to avoid accidental lekeage of our credencial details to the git platform.
+The client launch script should be created outside of the main project location. This allows to easly obtain the results when needed and prevents accidental lekeage of credencial details to the git platform.
 
-As the example, I created a file  `'test_slixmpp'` in `'/usr/bin'` directory and give it the execute permission:
+As the example, a file `'test_slixmpp'` can be created in `'/usr/bin'` directory, with executive permission:
 
 .. code-block:: bash
 
     /usr/bin $ chmod 711 test_slixmpp
 
-This file contains:
+This file should be readable and writable only with superuser permission. This file contains a simple structure for logging credentials:
 
 .. code-block:: python
 
     #!/usr/bin/python3
     #File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
-    
+
     import subprocess
     import threading
     import time
@@ -90,8 +91,8 @@ This file contains:
         subprocess.run(shell_string, shell=True, universal_newlines=True)
     
     if __name__ == "__main__":
-        #~ prefix = "x-terminal-emulator -e" # Separate terminal for every client; you can replace xterm with your terminal
-        #~ prefix = "xterm -e" # Separate terminal for every client; you can replace xterm with your terminal
+        #~ prefix = "x-terminal-emulator -e" # Separate terminal for every client; can be replaced with other terminal
+        #~ prefix = "xterm -e"
         prefix = ""
         #~ postfix = " -d" # Debug
         #~ postfix = " -q" # Quiet
@@ -107,11 +108,11 @@ This file contains:
         responder_jid = "RESPONDER_JID"
         responder_password = "RESPONDER_PASSWORD"
     
-        # Remember about rights to run your python files. (`chmod +x ./file.py`)
-        SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \\
+        # Remember about the executable permission. (`chmod +x ./file.py`)
+        SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
                        " -t {responder_jid} --path {example_file} {postfix}"
     
-        RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \\
+        RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
                        " -p {responder_password} {postfix}"
         
         try:
@@ -124,16 +125,16 @@ This file contains:
         except:
            print ("Error: unable to start thread")
 
-The `'subprocess.run()'`function is compatible with Python 3.5+. If the backward compatybility is needed, replace it with `'call'` method and adjust accordingly. The launch script should be convinient in use and easy to reconfigure again. We can adapt it to our needs, so it saves our time in the future.
+The `'subprocess.run()'`function is compatible with Python 3.5+. If the backward compatybility is needed, replace it with `'subprocess.call'` method and adjust accordingly. 
 
-We can define there the logging credentials, the paths derived from `'sys.argv[...]'` or `'os.getcwd()'`, set the parameters for the debugging purposes, mock the testing xml file and many more. Whichever parameters are used, the script testing itself should be fast and effortless. 
+The launch script should be convinient in use and easy to reconfigure again. The proper preparation of it now, can help saving time in the future. We can define there the logging credentials, the project paths (from `'sys.argv[...]'` or `'os.getcwd()'`), set the parameters for the debugging purposes, mock the testing xml file and many more. Whichever parameters are used, the script testing itself should be fast and effortless. The proper preparation of it now, can help saving time in the future.
 
-[TODO] Before closed, make it open till proper paths to file be created (about full jid later).
-In case of manually testing the larger applications, it would be a good practise to introduce the unique  name (consequently, different commands) for each client. In case of any errors, it will be easier to find the client that caused it.
+In case of manually testing the larger applications, it would be a good practise to introduce the unique names (consequently, different commands) for each client. In case of any errors, it will be easier to find the client that caused it.
 
-## Creating the client and the plugin
+Creating the client and the plugin
+----------------------------
 
-Two clients should be created in order to check if everything works correctly. I created the `'sender'` and the `'responder'` clients. The minimal amount of code needed for effective building and testing of the plugin is the following:
+Two slimxmpp clients should be created in order to check if everything works correctly (here: the `'sender'` and the `'responder'`). The minimal amount of code needed for effective building and testing of the plugin is the following:
 
 .. code-block:: python
 
@@ -156,12 +157,12 @@ Two clients should be created in order to check if everything works correctly. I
             self.path = path
             
             self.add_event_handler("session_start", self.start)
-    
+
     def start(self, event):
-        # Two, not required methods, but allows another users to see us available, and receive that information.
+        # Two, not required methods, but allows another users to see if the client is online.
         self.send_presence()
         self.get_roster()
-    
+
     if __name__ == '__main__':
         parser = ArgumentParser(description=Sender.__doc__)
     
@@ -192,8 +193,8 @@ Two clients should be created in order to check if everything works correctly. I
             args.password = getpass("Password: ")
     
         xmpp = Sender(args.jid, args.password, args.to, args.path)
-        #xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
-    
+        #xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is the example_plugin class name.
+
         xmpp.connect()
         try:
             xmpp.process()
@@ -220,10 +221,10 @@ Two clients should be created in order to check if everything works correctly. I
             self.add_event_handler("session_start", self.start)
             
         def start(self, event):
-            # Two, not required methods, but allows another users to see us available, and receive that information.
+        # Two, not required methods, but allows another users to see if the client is online.
             self.send_presence()
             self.get_roster()
-    
+
     if __name__ == '__main__':
         parser = ArgumentParser(description=Responder.__doc__)
     
@@ -252,7 +253,7 @@ Two clients should be created in order to check if everything works correctly. I
             args.password = getpass("Password: ")
     
         xmpp = Responder(args.jid, args.password)
-        xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
+        #xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is the example_plugin class name.
     
         xmpp.connect()
         try:
@@ -284,35 +285,36 @@ Next file to create is `'example_plugin.py'`. It can be placed in the same catal
     
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"                 ##~ String data for Human readable and find plugin by another plugin with method.
-            self.xep = "ope"                                        ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
+            self.description = "OurPluginExtension"                 ##~ String data readable by humans and to find plugin by another plugin.
+            self.xep = "ope"                                        ##~ String data readable by humans and to find plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` field, with 'xep_OPE' prefix.
     
             namespace = ExampleTag.namespace
-    
-    
-    class ExampleTag(ElementBase):
-        name = "example_tag"                                        ##~ The name of the root XML element of that extension.
-        namespace = "<https://example.net/our_extension>"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace
-    
-        plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ours ElementBase extension. And this should be that same as name.
-        
-        interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
 
-If it is not in the same directory, then the symbolic link to the localisation reachable by the clients should be established:
+
+    class ExampleTag(ElementBase):
+        name = "example_tag"                                        ##~ The name of the root XML element for that extension.
+        namespace = "<https://example.net/our_extension>"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. Should be changed to your own namespace.
+    
+        plugin_attrib = "example_tag"                               ##~ The name under which the data in plugin can be accessed. In particular, this object is reachable from the outside with: stanza_object['example_tag']. The `'example_tag'` is name of ElementBase extension and should be that same as the name.
+        
+        interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ElementBase extension.
+
+If the plugin is not in the same directory as the clients, then the symbolic link to the localisation reachable by the clients should be established:
 
 .. code-block:: bash
 
     ln -s $Path_to_example_plugin_py $Path_to_clients_destinations
 
-The other solution is to relative import it (with the use of dots '.') to get the proper path.
+The other solution is to relative import it (with dots '.') to get the proper path.
 
-## First run and the event handlers
+First run and the event handlers
+-----------------------------------------------
 
-To check if everything is okay, we can use the start method. Right after the client is ready, the event `'session_start'` should be raised.
+To check if everything is okay, we can use the `'start'` method (which triggers the `'session_start'` event). Right after the client is ready, the signal will be sent.
 
-In the `'__init__'` method, the handler for event call `'session_start'` is created. When it is called,  the `'def start(self, event):'` method will be executed. During the first run, add the line: `'logging.info("I'm running")'` to both of the clients' code (the sender and the responder) and use `'test_slixmpp'` command.
+In the `'__init__'` method, the handler for event call `'session_start'` is created. When it is called,  the `'def start(self, event):'` method will be executed. During the first run, add the line: `'logging.info("I'm running")'` to both the sender and the responder, and use `'test_slixmpp'` command.
 
-Now, the `'def start(self, event):'` method should look like this:
+The `'def start(self, event):'` method should look like this:
 
 .. code-block:: python
 
@@ -320,16 +322,17 @@ Now, the `'def start(self, event):'` method should look like this:
         # Two, not required methods, but allows another users to see us available, and receive that information.
         self.send_presence()
         self.get_roster()
-    
+
         #>>>>>>>>>>>>
         logging.info("I'm running")
         #<<<<<<<<<<<<
 
-If everything works fine, we can comment this line out and go to the first example: sending a message.
+If everything works fine, we can comment this line out.
 
-## Building the message object
+Building the message object
+-------------------------
 
-In this section of the tutorial, the example sender class should get a recipient (jid of responder) from command line arguments, stored in test_slixmpp. An access to this argument is stored in the `'self.to'`attribute.
+The example sender class should get a recipient name and address (jid of responder) from command line arguments, stored in test_slixmpp. An access to this argument is stored in the `'self.to'`attribute.
 
 Code example:
 
@@ -345,7 +348,7 @@ Code example:
             self.path = path
             
             self.add_event_handler("session_start", self.start)
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
@@ -360,7 +363,7 @@ Code example:
             msg.send()
             #<<<<<<<<<<<<
 
-In the example below, we are using the build-in method of making the message object. It contains a string "example_message" and is called right after the `'start'` method.
+In the example below, we are using the build-in method `'make_message'`. It creates a string "example_message" and sends it at the end of `'start'` method. The message will be sent once, after the script launch.
 
 To receive this message, the responder should have a proper handler to the signal with the message object and the method to decide what to do with this message. As it is shown in the example below:
 
@@ -377,7 +380,7 @@ To receive this message, the responder should have a proper handler to the signa
             #>>>>>>>>>>>>
             self.add_event_handler("message", self.message)
             #<<<<<<<<<<<<
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
@@ -387,11 +390,11 @@ To receive this message, the responder should have a proper handler to the signa
         def message(self, msg):
             #Show all inside msg
             logging.info(msg)
-            #Show only body attribute, like dictionary access
+            #Show only body attribute
             logging.info(msg['body'])
         #<<<<<<<<<<<<
-
-Expanding the message with new tags
+//TODO from here
+Expanding the message with new tag
 ++++++++++++++++++++++++++++
 
 To expand the Message object with our tag, the plugin should be registered as the extension for the Message object:
@@ -402,8 +405,8 @@ To expand the Message object with our tag, the plugin should be registered as th
     
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"                 ##~ String data for Human readable and find plugin by another plugin with method.
-            self.xep = "ope"                                        ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
+            self.description = "OurPluginExtension"                 ##~ String data readable by humans and to find plugin by another plugin.
+            self.xep = "ope"                 ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
     
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>

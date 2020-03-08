@@ -6,9 +6,8 @@ Wstęp i wymagania
 
 * `'python3'`
 
-Kod użyty w tutorialu jest kompatybilny z pythonem w wersji 3.6+.
-
-Dla wstecznej kompatybilności z wcześniejszymi wersjami, wystarczy zastąpić f-strings starszym formatowaniem napisów `'"{}".format("content")'` lub `'%s, "content"'`.
+Kod użyty w tutorialu jest kompatybilny z pythonem w wersji 3.6 lub nowszej.
+Dla wstecznej kompatybilności z wcześniejszymi wersjami należy zastąpić f-strings starszym formatowaniem napisów `'"{}".format("content")'` lub `'%s, "content"'`.
 
 Instalacja dla Ubuntu linux:
 
@@ -16,14 +15,13 @@ Instalacja dla Ubuntu linux:
 
     sudo apt-get install python3.6
 
-* `'slixmpp'` 
+* `'slixmpp'`
 * `'argparse'`
 * `'logging'`
 * `'subprocess'`
 * `'threading'`
 
-Sprawdź czy powyżej wymienione bibliteki są dostępne w twoim środowisku wykonawczym. (Wszystkie z wyjątkiem slixmpp są w standardowej bibliotece pythona, jednak czasem kompilując źródła samodzielnie, część ze standardowych bibliotek może nie być zainstalowana z pythonem.
-
+Wszystkie biblioteki wymienione powyżej, za wyjątkiem slixmpp, należą do standardowej biblioteki pythona. Zdaża się, że kompilując źródła samodzielnie, część z nich może nie zostać zainstalowana.
 
 .. code-block:: python
 
@@ -34,7 +32,7 @@ Sprawdź czy powyżej wymienione bibliteki są dostępne w twoim środowisku wyk
     python3 -m subprocess
     python3 -m threading
 
-Mój wynik komend:
+Wynik w terminalu:
 
 .. code-block:: bash
 
@@ -46,12 +44,12 @@ Mój wynik komend:
     1.1
     ~ $ python3 -c "import logging; print(logging.__version__)"
     0.5.1.2    
-    ~ $ python3 -m subprocess #To nie powinno nic zwrócić
-    ~ $ python3 -m threading #To nie powinno nic zwrócić
+    ~ $ python3 -m subprocess # Nie powinno nic zwrócić
+    ~ $ python3 -m threading # Nie powinno nic zwrócić
 
-Jeśli któraś z bibliotek zwróci `'ImportError'` lub `'no module named ...'`, dla potrzeb tutorialu powinny zostać zainstalowane jak na przykładzie poniżej:
+Jeśli któraś z bibliotek zwróci `'ImportError'` lub `'no module named ...'`, należy je zainstalować zgodnie z przykładem poniżej:
 
-Instalacja na Ubuntu linux:
+Instalacja Ubuntu linux:
 
 .. code-block:: bash
 
@@ -59,27 +57,27 @@ Instalacja na Ubuntu linux:
     #or
     easy_install slixmpp
 
-Jeśli jakaś biblioteka zwróci NameError, zainstaluj pakiet ponownie.
+Jeśli jakaś biblioteka zwróci NameError, należy zainstalować pakiet ponownie.
 
 * `Konta dla Jabber`
 
-Do testowania, na potrzeby tutorialu będą niezbędne dwa prywatne konta jabbera.
-Aby stworzyć nowe konto, w sieci istnieje dużo dostępnych darmowych serwerów: 
+Do testowania niezbędne będą dwa prywatne konta jabbera.
+Można je stworzyć na jednym z dostępnych darmowych serwerów: 
 
 https://www.google.com/search?q=jabber+server+list
 
 Skrypt uruchamiający klientów
 -----------------------------
 
-Poza lokalizacją projektu, powinniśmy stworzyć skrypt uruchamiający klientów testowo aby szybko móc sprawdzić czy rezultat jest prawidłowy. Ważne aby skrypt był poza projektem aby na przykład uniknąć przypadkowego wysłania na platformę gita swoich danych logowania.
+Skrypt pozwalający testować klientów powinien zostać stworzony poza lokalizacją projektu. Pozwoli to szybko sprawdzać wyniki skryptów oraz uniemożliwi przypadkowe wysłanie swoich danych na gita.
 
-Na moim urządzeniu stworzyłem w ścieżce `'/usr/bin'` plik o nazwie `'test_slixmpp'` i dodałem uprawnienia do wykonywania go:
+Przykładowo, można stworzyć plik o nazwie `'test_slixmpp'` w lokalizacji `'/usr/bin'` i nadać mu uprawnienia wykonywawcze:
 
 .. code-block:: bash
 
     /usr/bin $ chmod 711 test_slixmpp
 
-Ten plik w tej formie powinniśmy móc edytować i czytać wyłącznie z uprawnieniami superuser. Plik zawiera prostą strukturę która pozwoli nam zapisać swoje dane logowania.
+Taki plik powinien wymagać uprawnień superuser do odczytu i edycji. Plik zawiera prostą strukturę, która pozwoli nam zapisać dane logowania.
 
 .. code-block:: python
 
@@ -95,7 +93,7 @@ Ten plik w tej formie powinniśmy móc edytować i czytać wyłącznie z uprawni
     
     if __name__ == "__main__":
         #~ prefix = "x-terminal-emulator -e" # Oddzielny terminal dla każdego klienta, można zastąpić własnym emulatorem terminala
-        #~ prefix = "xterm -e" # Oddzielny terminal dla każdego klienta, można zastąpić własnym emulatorem terminala
+        #~ prefix = "xterm -e"
         prefix = ""
         #~ postfix = " -d" # Debug
         #~ postfix = " -q" # Quiet
@@ -111,7 +109,7 @@ Ten plik w tej formie powinniśmy móc edytować i czytać wyłącznie z uprawni
         responder_jid = "RESPONDER_JID"
         responder_password = "RESPONDER_PASSWORD"
     
-        # Remember about rights to run your python files. (`chmod +x ./file.py`)
+        # Pamiętaj o nadaniu praw do wykonywania (`chmod +x ./file.py`)
         SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
                        " -t {responder_jid} --path {example_file} {postfix}"
     
@@ -128,16 +126,16 @@ Ten plik w tej formie powinniśmy móc edytować i czytać wyłącznie z uprawni
         except:
            print ("Error: unable to start thread")
 
-Funkcja `'subprocess.run()'` jest kompatybilna z Pythonem 3.5+. Więc dla jeszcze wcześniejszej kompatybilności można dopasować argumenty i podmienić na metodę `'subprocess.call()'`.
+Funkcja `'subprocess.run()'` jest kompatybilna z Pythonem 3.5+. Dla uzyskania wcześniejszej kompatybilności można podmienić ją metodą `'subprocess.call()'` i dostosować argumenty.
 
-Skrypt uruchomieniowy powinien być dopasowany do naszych potrzeb, można pobierać ścieżki do projektu z linii komend, wybierać z jaką flagą mają zostać uruchomione programy i wiele innych rzeczy które będą nam potrzebne. W tym punkcie musimy dostosować skrypt do swoich potrzeb co zaoszczędzi nam masę czasu w trakcie pracy.
+Skrypt uruchomieniowy powinien być dostosowany do naszych potrzeb: można w nim pobierać ścieżki do projektu z linii komend (przez `'sys.argv[...]'` lub `'os.getcwd()'`), wybierać z jaką flagą mają zostać uruchomione programy oraz wiele innych. Jego należyte przygotowanie pozwoli zaoszczędzić czas i nerwy podczas późniejszych prac.
 
-Dla testowania większych aplikacji podczas tworzenia pluginu, w mojej opinii szczególnie użyteczne są osobne linie poleceń dla każdego klienta aby zachować czytelność który i co zwraca, bądź który powoduje błąd.
+W przypadku testowania większych aplikacji, w tworzeniu pluginu szczególnie użyteczne jest nadanie unikalnych nazwy dla każdego klienta (w konsekwencji: różne linie poleceń). Pozwala to szybko okreslić, który klient co zwraca, bądź który powoduje błąd.
 
 Stworzenie klienta i pluginu
 ----------------------------
 
-W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp, aby sprawdzić czy nasz skrypt uruchomieniowy działa poprawnie. I stworzyłem klientów: `'sender'` i `'responder'`. Poniżej minimalna implementacja dla efektywnego testowania gdzie będziemy testować nasz plugin w trakcie jego projektowania:
+W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp (w przykładach: `'sender'` i `'responder'`), aby sprawdzić czy nasz skrypt uruchomieniowy działa poprawnie. Poniżej przedstawiona została minimalna niezbędna implementacja, która może testować plugin w trakcie jego projektowania:
 
 .. code-block:: python
 
@@ -162,7 +160,7 @@ W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp, aby s
             self.add_event_handler("session_start", self.start)
 
     def start(self, event):
-		# Dwie niewymagane metody, pozwalające innym użytkownikom zobaczyć że jesteśmy online i wyświetlić tą informację
+		# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostepność online.
         self.send_presence()
         self.get_roster()
 
@@ -196,8 +194,8 @@ W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp, aby s
             args.password = getpass("Password: ")
     
         xmpp = Sender(args.jid, args.password, args.to, args.path)
-        #xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin jest nazwą klasy naszego example_plugin
-            
+        #xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin jest nazwą klasy example_plugin.
+
         xmpp.connect()
         try:
             xmpp.process()
@@ -224,7 +222,7 @@ W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp, aby s
             self.add_event_handler("session_start", self.start)
             
         def start(self, event):
-			# Dwie niewymagane metody, pozwalające innym użytkownikom zobaczyć że jesteśmy online i wyświetlić tą informację
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
             self.send_presence()
             self.get_roster()
 
@@ -256,7 +254,7 @@ W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp, aby s
             args.password = getpass("Password: ")
     
         xmpp = Responder(args.jid, args.password)
-        xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin jest nazwą klasy naszego example_plugin
+        xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin jest nazwą klasy example_plugin
     
         xmpp.connect()
         try:
@@ -267,7 +265,7 @@ W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp, aby s
             except:
                 pass
 
-Następny plik który powinniśmy stworzyć to `'example_plugin'` ze ścieżką dostępną dla importu z poziomu klientów. Domyślnie umieszczam w tej samej lokalizacji co klientów.
+Następny plik, który należy stworzyć to `'example_plugin'`. Powinien być w lokalizacji dostepnej dla klientów (domyślnie w tej samej, co skrypty klientów).
 
 .. code-block:: python
 
@@ -289,38 +287,40 @@ Następny plik który powinniśmy stworzyć to `'example_plugin'` ze ścieżką 
     class OurPlugin(BasePlugin):
         def plugin_init(self):
             self.description = "OurPluginExtension"                 ##~ Napis czytelny dla człowieka i dla znalezienia pluginu przez inny plugin
-            self.xep = "ope"                                        ##~ Napis czytelny dla człowieka i dla znalezienia pluginu przez inny plugin dodając to do `slixmpp/plugins/__init__.py` do pola `__all__` z prefixem xep 'xep_OPE'. W innym wypadku jest to tylko notka czytelna dla ludzi
+            self.xep = "ope"                                        ##~ Napis czytelny dla człowieka i dla znalezienia pluginu przez inny plugin poprzez dodanie tego do `slixmpp/plugins/__init__.py`, w polu `__all__` z prefixem xep 'xep_OPE'.
     
             namespace = ExampleTag.namespace
 
 
     class ExampleTag(ElementBase):
-        name = "example_tag"                                        ##~ Nazwa naszego głównego taga dla XML w tym rozszerzeniu.
-        namespace = "https://example.net/our_extension"             ##~ Namespace dla naszego obiektu jest definiowana w tym miejscu, powinna się odnosić do naszego portalu, w wiadomości wygląda tak: <example_tag xmlns={namespace} (...)</example_tag>
+        name = "example_tag"                                        ##~ Nazwa głównego tagu dla XML w tym rozszerzeniu.
+        namespace = "https://example.net/our_extension"             ##~ Namespace obiektu jest definiowana w tym miejscu, powinien się odnosić do nazwy portalu xmpp; w wiadomości wygląda tak: <example_tag xmlns={namespace} (...)</example_tag>
     
-        plugin_attrib = "example_tag"                               ##~ Nazwa pod którą będziemy odwoływać się do danych zawartych w tym pluginie. Bardziej szczegółowo, tutaj rejestrujemy nazwę naszego obiektu by móc się do niego odwoływać z zewnątrz. Będziemy mogli się do niego odwoływać na przykład jak do słownika: stanza_object['example_tag']. `'example_tag'` staje się naszą nazwą pluginu i powinno być takie samo jak name.
+        plugin_attrib = "example_tag"                               ##~ Nazwa pod którą można odwoływać się do danych zawartych w tym pluginie. Bardziej szczegółowo: tutaj rejestrujemy nazwę obiektu by móc się do niego odwoływać z zewnątrz. Można się do niego odwoływać jak do słownika: stanza_object['example_tag'], gdzie `'example_tag'` staje się nazwą pluginu i powinno być takie samo jak name.
         
-        interfaces = {"boolean", "some_string"}                     ##~ Zbiór kluczy dla słownika atrybutów naszego elementu które mogą być użyte w naszym elemencie. Na przykład `stanza_object['example_tag']` poda nam informacje o: {"boolean": "some", "some_string": "some"}, tam gdzie `'example_tag'` jest nazwą naszego elementu.
+        interfaces = {"boolean", "some_string"}                     ##~ Zbiór kluczy dla słownika atrybutów elementu które mogą być użyte w elemencie. Na przykład `stanza_object['example_tag']` poda informacje o: {"boolean": "some", "some_string": "some"}, tam gdzie `'example_tag'` jest elementu.
 
-Jeżeli powyższy plugin nie jest w naszej lokalizacji a klienci powinni pozostać poza repozytorium, możemy w miejscu klientów dodać dowiązanie symboliczne do lokalizacji pluginu aby był dostępny z poziomu klientów:
+Jeżeli powyższy plugin nie jest w domyślnej lokalizacji, a klienci powinni pozostać poza repozytorium, możemy w miejscu klientów dodać dowiązanie symboliczne do lokalizacji pluginu:
+
 .. code-block:: bash
 
     ln -s $Path_to_example_plugin_py $Path_to_clients_destinations
 
-Jeszcze innym wyjściem jest import relatywny z użyciem kropek aby dostać się do właściwej ścieżki.
+Jeszcze innym wyjściem jest import relatywny z użyciem kropek '.' aby dostać się do właściwej ścieżki.
 
 Pierwsze uruchomienie i przechwytywanie eventów
 -----------------------------------------------
 
-Aby sprawdzić czy wszystko działa prawidłowo, możemy użyć metody `'start'`, ponieważ przypiszemy do niego event `'session_start'`, ten sygnał zostanie wywołany zaraz po tym gdy klient będzie gotów do działania, a własna metoda pozwoli nam zdefiniować odpowiednią czynność dla tego sygnału.
+Aby sprawdzić czy wszystko działa prawidłowo, można użyć metody `'start'`. Jest jej przypisany event `'session_start'`. Sygnał ten zostanie wysłany w momencie, w którym klient będzie gotów do działania. Stworzenie własnej metoda pozwoli na zdefiniowanie działania tego sygnału.
 
-W metodzie `'__init__'` tworzymy przekierowanie dla wywołania eventu `'session_start'` i kiedy zostanie wywołany, nasza metoda `'def start(self, event):'` będzie wykonana. Na pierwszy krok, dodajmy linię  `'logging.info("I'm running")'` dla obu klientów (sender i responder) i użyjmy naszej komendy `'test_slixmpp'`.
+W metodzie `'__init__'` zostało stworzone przekierowanie eventu `'session_start'`. Kiedy zostanie on wywołany, metoda `'def start(self, event):'` zostanie wykonana. Jako pierwszy krok procesie tworzenia, można dodać linię `'logging.info("I'm running")'` w obu klientach (sender i responder), a nastepnie użyć komendy `'test_slixmpp'`.
 
-Teraz metoda `'def start(self, event):'` powinna wyglądać tak:
+Metoda `'def start(self, event):'` powinna wyglądać tak:
 
 .. code-block:: python
 
     def start(self, event):
+        # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
         self.send_presence()
         self.get_roster()
 
@@ -328,13 +328,14 @@ Teraz metoda `'def start(self, event):'` powinna wyglądać tak:
         logging.info("I'm running")
         #<<<<<<<<<<<<
 
-Jeśli oba klienty uruchomiły się poprawnie, możemy zakomentować te linię i wysłać naszą pierwszą wiadomość z pomocą następnego rozdziału.
+Jeżeli oba klienty uruchomiły się poprawnie, można zakomentować tą linię.
 
-Budowanie obiektu Message 
+Budowanie obiektu Message
 -------------------------
 
-W tym rozdziale, wysyłający powinien dostać informację do kogo należy wysłać wiadomość z linii komend za pomocą naszego skryptu testowego.
-W poniższym przykładzie, dostęp do tej informacji mamy za pośrednictwem atrybutu `'selt.to'`:
+Wysyłający powinien posiadać informację o tym, do kogo należy wysłać wiadomość. Nazwę i scieżkę odbiorcy można przekazać, na przykład, przez argumenty wywołania skryptu w lini komend. W poniższym przykładzie, są one trzymane w atrybucie `'self.to'`.
+
+Przykład:
 
 .. code-block:: python
 
@@ -350,6 +351,7 @@ W poniższym przykładzie, dostęp do tej informacji mamy za pośrednictwem atry
             self.add_event_handler("session_start", self.start)
 
         def start(self, event):
+        # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
             self.send_presence()
             self.get_roster()
             #>>>>>>>>>>>>
@@ -362,10 +364,9 @@ W poniższym przykładzie, dostęp do tej informacji mamy za pośrednictwem atry
             msg.send()
             #<<<<<<<<<<<<
 
-W przykładzie, używamy wbudowanej metody `'make_message'` która tworzy dla nas wiadomość o treści `'example_message'` i wysyła ją pod koniec działania metody start. Czyli wyśle ją raz, zaraz po uruchomieniu. 
+W przykładzie powyżej, używana jest wbudowana metoda `'make_message'`, która tworzy wiadomość o treści `'example_message'` i wysyła ją pod koniec działania metody start. Czyli: wiadomość ta zostanie wysłana raz, zaraz po uruchomieniu skryptu. 
 
-Aby otrzymać tą wiadomość, responder powinien wykorzystać odpowiedni event którego wywołanie jest wbudowane. Ta metoda decyduje co zrobić gdy dotrze do nas wiadomość której nie został przypisany inny event (na przykład naszej rozszerzonej w dalszej części) oraz posiada treść.
-Przykład kodu:
+Aby otrzymać tę wiadomość, responder powinien wykorzystać odpowiedni event: metodę, która określa co zrobić, gdy zostanie odebrana wiadomość której nie został przypisany żaden inny event. Przykład takiego kodu:
 
 .. code-block:: python
 
@@ -382,17 +383,18 @@ Przykład kodu:
             #<<<<<<<<<<<<
 
         def start(self, event):
+        # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
             self.send_presence()
             self.get_roster()
     
         #>>>>>>>>>>>>
         def message(self, msg):
-            #Pokazuje cały XML naszej wiadomości
+            #Pokazuje cały XML wiadomości
             logging.info(msg)
-            #Pokazuje wyłącznie pole 'body' wiadomości, podobnie jak dostęp do słownika
+            #Pokazuje wyłącznie pole 'body' wiadomości
             logging.info(msg['body'])
         #<<<<<<<<<<<<
-
+//TODO from here
 Rozszerzenie Message o nasz tag
 +++++++++++++++++++++++++++++++
 
@@ -404,12 +406,12 @@ Aby rozszerzyć obiekt Message wybranym tagiem ze specjalnymi polami, plugin pow
     
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"
-            self.xep = "ope"
+            self.description = "OurPluginExtension"                 ##~ String do przeczytania przez ludzi oraz do znalezienia pluginu przez inny plugin.
+            self.xep = "ope"                 ##~ String do przeczytania przez ludzi oraz do znalezienia pluginu przez inny plugin przez dodanie go do `slixmpp/plugins/__init__.py`, do metody `__all__` z 'xep_OPE'.
     
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>
-            register_stanza_plugin(Message, ExampleTag)             ##~ Rejetrujemy rozszerzony tag dla obiektu Message, w innym wypadku  message['example_tag'] będzie polem napisowym, zamiast rozszerzeniem które będzie mogło zawierać swoje atrybuty i pod-elementy.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Rejetrujemy rozszerzony tag dla obiektu Message. Jeśli to nie zostanie zrobione, message['example_tag'] będzie polem tekstowym, a nie rozszerzeniem i nie będzie mogło zawierać atrybutów i podelementów.
             #<<<<<<<<<<<<
 
     class ExampleTag(ElementBase):
@@ -428,7 +430,7 @@ Aby rozszerzyć obiekt Message wybranym tagiem ze specjalnymi polami, plugin pow
             self.xml.attrib['some_string'] = some_string
         #<<<<<<<<<<<<
 
-Teraz dzięki rejestracji tagu, możemy rozszerzyć naszą wiadomość.
+Teraz dzięki rejestracji tagu, możemy rozszerzyć wiadomość.
 
 .. code-block:: python
 
@@ -456,12 +458,12 @@ Teraz dzięki rejestracji tagu, możemy rozszerzyć naszą wiadomość.
             #<<<<<<<<<<<<
             msg.send()
 
-Teraz po uruchomieniu, logging powinien pokazać nam Message wraz z tagiem `'example_tag'` zawartym w środku <message><example_tag/></message>, wraz z naszym napisem `'Work'` oraz nadanym namespace.
+Po uruchomieniu, logging powinien wyświetlić Message wraz z tagiem `'example_tag'` zawartym w środku <message><example_tag/></message>, wraz z napisem `'Work'` oraz nadanym namespace.
 
 Nadanie oddzielnego sygnału dla rozszerzonej wiadomości
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Jeśli nie sprecyzujemy swojego eventu, zarówno rozszerzona jak i podstawowa wiadomość będą przechwytywane przez sygnał `'message'`. Aby nadać im oddzielny event, musimy zarejestrować odpowiedni handler dla naszego namespace oraz tagu aby stworzyć unikalną kombinację, która pozwoli nam przechwycić wyłącznie pożądane wiadomości (lub Iq object).
+Jeśli event nie zostanie sprecyzowany, to zarówno rozszerzona jak i podstawowa wiadomość będą przechwytywane przez sygnał `'message'`. Aby nadać im oddzielny event, należy zarejestrować odpowiedni handler dla namespace'a i tagu, aby stworzyć unikalną kombinację, która pozwoli na przechwycenie wyłącznie pożądanych wiadomości (lub Iq object).
 
 .. code-block:: python
 
@@ -487,16 +489,16 @@ Jeśli nie sprecyzujemy swojego eventu, zarówno rozszerzona jak i podstawowa wi
             self.xmpp.event('example_tag_message', msg)          ##~ Wywołuje event, który może zostać przechwycony i obsłużony przez klienta, jako argument przekazujemy obiekt który chcemy dopiąć do eventu.
             #<<<<<<<<<<<<
 
-Obiekt StanzaPath powinien być poprawnie zainicjalizowany, oto schemat aby zrobić to poprawnie:
+Obiekt StanzaPath powinien być poprawnie zainicjalizowany, według schematu:
 `'NAZWA_OBIEKTU[@type=TYP_OBIEKTU][/{NAMESPACE}[TAG]]'`
 
-* Dla NAZWA_OBIEKTU możemy użyć `'message'` lub `'iq'`.
-* Dla TYP_OBIEKTU jeśli obiektem jest message, możemy sprecyzować typ dla message, np. `'chat'`
-* Dla TYP_OBIEKTU jeśli obiektem jest iq, możemy sprecyzować typ spośród: `'get, set, error or result'`
-* Dla NAMESPACE zawsze to powinien być namespace z naszego rozszerzenia tagu.
-* Dla TAG powinno zawierać nasz tag, `'example_tag'` w tym przypadku.
+* Dla NAZWA_OBIEKTU można użyć `'message'` lub `'iq'`.
+* Dla TYP_OBIEKTU, jeśli obiektem jest message, można sprecyzować typ dla message, np. `'chat'`
+* Dla TYP_OBIEKTU, jeśli obiektem jest iq, można sprecyzować typ spośród: `'get, set, error or result'`
+* Dla NAMESPACE to powinien być namespace zgodny z rozszerzeniem tagu.
+* TAG powinien zawierać tag, tutaj: `'example_tag'`.
 
-Teraz, przechwytujemy wszystkie message które zawierają nasz namespace wewnątrz `'example_tag'`, możemy jak w programowaniu agentowym sprawdzić co zawiera, czy na pewno posiada wymagane pola itd. przed wysłaniem do klienta za pośrednictwem eventu `'example_tag_message'`.
+Teraz, rogram przechwyci wszystkie message, które zawierają sprecyzowany namespace wewnątrz `'example_tag'`. Można też, jak w programowaniu agentowym, sprawdzić co message zawiera, czy na pewno posiada wymagane pola itd. Następnie wiadomośc jest wysyłana do klienta za pośrednictwem eventu `'example_tag_message'`.
 
 .. code-block:: python
 
@@ -524,9 +526,7 @@ Teraz, przechwytujemy wszystkie message które zawierają nasz namespace wewnąt
             msg.send()
             #<<<<<<<<<<<<
             
-Powinniśmy zapamiętać linię z naszego pluginu: `'self.xmpp.event('example_tag_message', msg)'`
-
-W tej linii zdefiniowaliśmy nazwę eventu aby go przechwycić wewnątrz pliku responder.py. Jest nim `'example_tag_message'`.
+Należy zapamiętać linię pluginu: `'self.xmpp.event('example_tag_message', msg)'`. W tej linii została zdefiniowana nazwa eventu do przechwycenia wewnątrz pliku responder.py. Tutaj: `'example_tag_message'`.
 
 .. code-block:: python
 
@@ -547,10 +547,11 @@ W tej linii zdefiniowaliśmy nazwę eventu aby go przechwycić wewnątrz pliku r
     
         #>>>>>>>>>>>>
         def example_tag_message(self, msg):
-            logging.info(msg) # Message jest obiektem który nie wymaga wiadomości zwrotnej. Może zostać zwrócona odpowiedź, ale nie jest to sposób komunikacji maszyn, więc żaden timeout error nie zostanie wywołany gdy nie zostanie zwrócona. (W przypadku Iq już tak)
+            logging.info(msg) # Message jest obiektem który nie wymaga wiadomości zwrotnej. Może zostać zwrócona odpowiedź, ale nie jest to sposób komunikacji maszyn, więc żaden timeout error nie zostanie wywołany gdy nie zostanie zwrócona. (W przypadku Iq jest inaczej).
         #<<<<<<<<<<<<
 
-Teraz możemy odesłać wiadomość, ale nic się nie stanie jeśli tego nie zrobimy. Natomiast kolejny obiekt do komunikacji (Iq) wymaga odpowiedzi jeśli został wysłany, więc obydwaj klienci powinni być online. W innym wypadku, klient otrzyma automatyczny error z powodu timeout jeśli cel Iq nie odpowie za pomocą Iq o tym samym Id.
+Teraz można odesłać wiadomość, ale nic się nie stanie jeśli to nie zostanie zrobione. 
+Natomiast kolejny obiekt komunikacji (Iq) już będzie wymagał odpowiedzi, więc obydwaj klienci powinni pozostawać online. W innym wypadku, klient otrzyma automatyczny error z powodu timeout jeśli cell Iq nie odpowie za pomocą Iq o tym samym Id.
 
 Użyteczne metody i inne
 -----------------------
@@ -558,7 +559,7 @@ Użyteczne metody i inne
 Modyfikacja przykładowego obiektu `Message` na `Iq`.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Aby przerobić przykładowy obiekt Message na obiekt Iq, musimy zarejestrować nowy handler dla Iq podobnie jak dla wiadomości w rozdziale `,,Rozszerzenie Message o nasz tag''`. Tym razem, przykład będzie zawierał kilka typów Iq z oddzielnymi typami, jest to użyteczne aby kod był czytelny, oraz odpowiednia weryfikacja lub działanie zostało podjęte pomijając sprawdzanie typu. Wszystkie Iq powinny odesłać odpowiedź z tym samym Id do wysyłającego wraz z odpowiedzią, inaczej wysyłający dostanie Iq zwrotne typu error, zawierające informacje o przekroczonym czasie oczekiwania (timeout). Dlatego jest to bardziej wymiana informacji pomiędzy maszynami niż ludźmi którzy mogą zareagować zbyt wolno i stracić szansę na odpowiedź.
+Aby przerobić przykładowy obiekt Message na obiekt Iq, należy zarejestrować nowy handler dla Iq, podobnie jak zostało to przedstawione w rozdziale `"Rozszerzenie Message o nasz tag"`. Tym razem, przykład będzie zawierał kilka typów Iq z oddzielnymi typami. Poprawia to czytelność kodu oraz weryfikację poprawności działania. Wszystkie Iq powinny odesłać odpowiedź z tym samym Id do wysyłającego wraz z odpowiedzią. W przeciwnym wypadku, wysyłający dostanie Iq zwrotne typu error, zawierające informacje o przekroczonym czasie oczekiwania (timeout).
 
 .. code-block:: python
 
@@ -611,7 +612,7 @@ Aby przerobić przykładowy obiekt Message na obiekt Iq, musimy zarejestrować n
         def __handle_message(self, msg):
             self.xmpp.event('example_tag_message', msg)
 
-Eventy wywołane przez powyższe handlery, mogą zostać przechwycone jak w przypadku eventu `'example_tag_message'`.
+Eventy wywołane przez powyższe handlery mogą zostać przechwycone tak, jak w przypadku eventu `'example_tag_message'`.
     
 .. code-block:: python
 
@@ -628,13 +629,13 @@ Eventy wywołane przez powyższe handlery, mogą zostać przechwycone jak w przy
             #<<<<<<<<<<<<
     
             #>>>>>>>>>>>>
-        def example_tag_get_iq(self, iq): # Iq stanza powinno zawsze zostać zwrócone, w innym wypadku wysyłający dostanie informacje z błędem że odbiorca jest offline.
+        def example_tag_get_iq(self, iq): # Iq stanza powinno zawsze zostać zwrócone, w innym wypadku wysyłający dostanie informacje z błędem.
             logging.info(str(iq))
             reply = iq.reply(clear=False)
             reply.send()
             #<<<<<<<<<<<<
 
-Domyślnie parametr `'clear'` dla `'Iq.reply'` jest ustawiony na True, wtedy to co jest zawarte wewnątrz Iq (z kilkoma wyjątkami) powinno zostać zdefiniowane ponownie. Jedyne informacje które zostaną w Iq po metodzie reply, nawet gdy parametr clean jest ustawiony na True, to ID tego Iq oraz JID wysyłającego.
+Domyślnie parametr `'clear'` dla `'Iq.reply'` jest ustawiony na True. Wtedy to, co jest zawarte wewnątrz Iq (z kilkoma wyjątkami) powinno zostać zdefiniowane ponownie. Jedyne informacje które zostaną w Iq po metodzie reply, nawet gdy parametr clean jest ustawiony na True, to ID tego Iq oraz JID wysyłającego.
 
 .. code-block:: python
 
@@ -683,7 +684,7 @@ Domyślnie parametr `'clear'` dla `'Iq.reply'` jest ustawiony na True, wtedy to 
 Dostęp do elementów
 +++++++++++++++++++
 
-Aby dostać się do pól wewnątrz Message lub Iq, jest kilka możliwości. Po pierwsze, z poziomu klienta, można dostać zawartość jak ze słownika:
+Jest kilka możliwości dostania się do pól wewnątrz Message lub Iq. Po pierwsze, z poziomu klienta, można dostać zawartość jak ze słownika:
 
 .. code-block:: python
 
@@ -701,7 +702,7 @@ Aby dostać się do pól wewnątrz Message lub Iq, jest kilka możliwości. Po p
             logging.info(iq.get('example_tag').get('boolean'))
             #<<<<<<<<<<<<
 
-Z rozszerzenia ExampleTag, dostęp do elementów jest podobny, tyle że nie musimy już precyzować tagu którego dotyczy. Dodatkową zaletą jest fakt niejednolitego dostępu, na przykład do parametru `'text'` między rozpoczęciem a zakończeniem tagu, co obrazuje poniższy przykład, ujednolicając metody do obiektowych getterów i setterów.
+Z rozszerzenia ExampleTag, dostęp do elementów jest podobny, tyle że, nie wymagane jest określanie tagu, którego dotyczy. Dodatkową zaletą jest fakt niejednolitego dostępu, na przykład do parametru `'text'` między rozpoczęciem a zakończeniem tagu. Pokazuje to poniższy przykład, ujednolicając metody obiektowych getterów i setterów.
 
 .. code-block:: python
 
@@ -731,7 +732,7 @@ Z rozszerzenia ExampleTag, dostęp do elementów jest podobny, tyle że nie musi
 
 Atrybut `'self.xml'` jest dziedziczony z klasy `'ElementBase'` i jest to dosłownie `'Element'` z pakietu `'ElementTree'`. 
 
-Kiedy odpowiednie gettery i settery są stworzone, umożliwia sprawdzenie czy na pewno podany argument spełnia normy pluginu lub konwersję na pożądany typ. Dodatkowo kod staje się bardziej przejrzysty w standardach programowania obiektowego, jak na poniższym przykładzie:
+Kiedy odpowiednie gettery i settery są tworzone, można sprawdzić, czy na pewno podany argument spełnia normy pluginu lub konwersję na pożądany typ. Dodatkowo, kod staje się bardziej przejrzysty w standardach programowania obiektowego, jak na poniższym przykładzie:
 	
 .. code-block:: python
 
@@ -760,7 +761,7 @@ Kiedy odpowiednie gettery i settery są stworzone, umożliwia sprawdzenie czy na
 Wczytanie ExampleTag ElementBase z pliku XML, łańcucha znaków i innych obiektów
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Żeby wczytać wcześniej zdefiniowany napis, z pliku albo lxml (ElementTree) jest dużo możliwości, tutaj pokażę przykład wykorzystując parsowanie typu napisowego do lxml (ElementTree) i przekazanie atrybutów.
+Jest wiele możliwości na wczytanie wcześniej zdefiniowanego napisu z pliku albo lxml (ElementTree). Poniższy przykład wykorzystuje parsowanie typu napisowego do lxml (ElementTree) i przekazanie atrybutów.
 
 .. code-block:: python
 
@@ -798,7 +799,7 @@ Wczytanie ExampleTag ElementBase z pliku XML, łańcucha znaków i innych obiekt
                 self.xml.append(inner_tag)
             #<<<<<<<<<<<<
 
-Do przetestowania tej funkcjonalności, będziemy potrzebować pliku zawierającego xml z naszym tagiem, przykładowy napis z xml oraz przykładowy lxml (ET):
+Do przetestowania tej funkcjonalności, potrzebny jest pliku zawierający xml z tagiem, przykładowy napis z xml oraz przykładowy lxml (ET):
 	
 .. code-block:: xml
 
@@ -830,7 +831,7 @@ Do przetestowania tej funkcjonalności, będziemy potrzebować pliku zawierając
             self.get_roster()
     
             #>>>>>>>>>>>>
-            self.disconnect_counter = 3 # Ta zmienna jest tylko do rozłączenia klienta po otrzymaniu odpowiedniej ilości odpowiedzi z Iq. 
+            self.disconnect_counter = 3 # Ta zmienna służy tylko do rozłączenia klienta po otrzymaniu odpowiedniej ilości odpowiedzi z Iq. 
             
             self.send_example_iq_tag_from_file(self.to, self.path)
             # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
@@ -868,13 +869,13 @@ Do przetestowania tej funkcjonalności, będziemy potrzebować pliku zawierając
             iq.send()
             #<<<<<<<<<<<<
 
-Jeśli Responder zwróci nasze wysłane Iq, a Sender wyłączy się po trzech odpowiedziach, wtedy wszystko działa jak powinno.
+Jeśli Responder zwróci wysłane Iq, a Sender wyłączy się po trzech odpowiedziach, wtedy wszystko działa tak, jak powinno.
 
 Łatwość użycia pluginu dla programistów 
 +++++++++++++++++++++++++++++++++++++++
 
-Każdy plugin powinien posiadać pewne obiektowe metody, wczytanie danych jak w przypadku metod `setup` z poprzedniego rozdziału, gettery, settery, czy wywoływanie odpowiednich eventów.
-Potencjalne błędy powinny być przechwytywane z poziomu pluginu i zwracane z odpowiednim opisem błędu w postaci odpowiedzi Iq o tym samym id do wysyłającego, aby uniknąć sytuacji kiedy plugin nie robi tego co powinien, a wiadomość zwrotna nigdy nie nadchodzi, zamiast tego wysyłający dostaje error z komunikatem timeout.
+Każdy plugin powinien posiadać pewne obiektowe metody: wczytanie danych, jak w przypadku metod `setup` z poprzedniego rozdziału, gettery, settery, czy wywoływanie odpowiednich eventów.
+Potencjalne błędy powinny być przechwytywane z poziomu pluginu i zwracane z odpowiednim opisem błędu w postaci odpowiedzi Iq o tym samym id do wysyłającego. Aby uniknąć sytuacji kiedy plugin nie robi tego co powinien, a wiadomość zwrotna nigdy nie nadchodzi, wysyłający dostaje error z komunikatem timeout.
 
 Poniżej przykład kodu podyktowanego tymi zasadami:
 
@@ -1216,9 +1217,9 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
 Tagi i atrybuty zagnieżdżone wewnątrz głównego elementu
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Aby stworzyć zagnieżdżony tag, wewnątrz naszego głównego tagu, rozważmy nasz atrybut `'self.xml'` jako Element z ET (ElementTree).
+Aby stworzyć zagnieżdżony tag, wewnątrz głównego tagu, rozważmy atrybut `'self.xml'` jako Element z ET (ElementTree).
 
-Można powtórzyć poprzednie działania, inicjalizować nowy element jak główny (ExampleTag). Jednak jeśli nie potrzebujemy dodatkowych metod czy walidacji, a jest to wynik dla innego procesu który i tak będzie parsował xml, wtedy możemy zagnieździć zwyczajny Element z ElementTree z pomocą metody `'append'`. Jeśli przetwarzamy typ napisowy, można to zrobić nawet dzięki parsowaniu napisu na Element i kolejne zagnieżdżenia już będą w dodanym Elemencie do głównego. By nie powtarzać metody setup, tu pokażę bardziej ręczne dodanie zagnieżdżonego taga konstruując ET.Element samodzielnie.
+Można powtórzyć poprzednie działania inicjalizując nowy element jak główny (ExampleTag). Jednak jeśli nie potrzebujemy dodatkowych metod, czy walidacji, a jest to wynik dla innego procesu który i tak będzie parsował xml, wtedy możemy zagnieździć zwyczajny Element z ElementTree za pomocą metody `'append'`. W przypadku przetwarzania typy napisowego, można to zrobić nawet dzięki parsowaniu napisu na Element - kolejne zagnieżdżenia już będą w dodanym Elemencie do głównego. By nie powtarzać metody setup, poniżej przedstawione jest ręczne dodanie zagnieżdżonego taga konstruując ET.Element samodzielnie.
     
 .. code-block:: python
 
@@ -1240,7 +1241,7 @@ Można powtórzyć poprzednie działania, inicjalizować nowy element jak głów
 Kompletny kod z tutorialu
 -------------------------
 
-Do kompletnego kodu pozostawione zostały angielskie komentarze, tworząc własny plugin za pierwszym razem, jestem przekonany że będą przydatne:
+W poniższym kodzie zostały pozostawione oryginalne komentarze w języku angielskim.
 
 .. code-block:: python
     
@@ -1782,5 +1783,3 @@ Official pdf documentation:
 * https://buildmedia.readthedocs.org/media/pdf/slixmpp/latest/slixmpp.pdf
 
 Note: Dokumentacje w formie Web i PDF mają pewne różnice, pewne szczegóły potrafią być wspomniane tylko w jednej z dwóch.
-
-
