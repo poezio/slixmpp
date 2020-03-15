@@ -1,5 +1,5 @@
 Jak stworzyć własny plugin rozszerzający obiekty Message i Iq w Slixmpp
-=======================================================================
+====================================================================
 
 Wstęp i wymagania
 -----------------
@@ -61,8 +61,7 @@ Jeśli jakaś biblioteka zwróci NameError, należy zainstalować pakiet ponowni
 
 * `Konta dla Jabber`
 
-Do testowania niezbędne będą dwa prywatne konta jabbera.
-Można je stworzyć na jednym z dostępnych darmowych serwerów: 
+Do testowania niezbędne będą dwa prywatne konta jabbera. Można je stworzyć na jednym z dostępnych darmowych serwerów: 
 
 https://www.google.com/search?q=jabber+server+list
 
@@ -293,7 +292,7 @@ Następny plik, który należy stworzyć to `'example_plugin'`. Powinien być w 
 
 
     class ExampleTag(ElementBase):
-        name = "example_tag"                                        ##~ Nazwa głównego tagu dla XML w tym rozszerzeniu.
+        name = "example_tag"                                        ##~ Nazwa głównego pliku XML w tym rozszerzeniu.
         namespace = "https://example.net/our_extension"             ##~ Namespace obiektu jest definiowana w tym miejscu, powinien się odnosić do nazwy portalu xmpp; w wiadomości wygląda tak: <example_tag xmlns={namespace} (...)</example_tag>
     
         plugin_attrib = "example_tag"                               ##~ Nazwa pod którą można odwoływać się do danych zawartych w tym pluginie. Bardziej szczegółowo: tutaj rejestrujemy nazwę obiektu by móc się do niego odwoływać z zewnątrz. Można się do niego odwoływać jak do słownika: stanza_object['example_tag'], gdzie `'example_tag'` staje się nazwą pluginu i powinno być takie samo jak name.
@@ -359,7 +358,7 @@ Przykład:
     
         def send_example_message(self, to, body):
             #~ make_message(mfrom=None, mto=None, mtype=None, mquery=None)
-            # Domyślnie mtype == "chat" if None; 
+            # Domyślnie mtype == "chat"; 
             msg = self.make_message(mto=to, mbody=body)
             msg.send()
             #<<<<<<<<<<<<
@@ -396,7 +395,7 @@ Aby otrzymać tę wiadomość, responder powinien wykorzystać odpowiedni event:
         #<<<<<<<<<<<<
 
 Rozszerzenie Message o nowy tag
-+++++++++++++++++++++++++++++++
+-------------------------
 
 Aby rozszerzyć obiekt Message o wybrany tag, plugin powinien zostać zarejestrowany jako rozszerzenie dla obiektu Message:
 
@@ -415,8 +414,8 @@ Aby rozszerzyć obiekt Message o wybrany tag, plugin powinien zostać zarejestro
             #<<<<<<<<<<<<
 
     class ExampleTag(ElementBase):
-        name = "example_tag"                                        ##~ Nazwa pliku XML dla tego rozszerzenia..
-        namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>.
+        name = "example_tag"                                        ##~ Nazwa głównego pliku XML dla tego rozszerzenia..
+        namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>. Powinna zostać zmieniona na własną.
     
         plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestronanego obieksu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
         
@@ -464,7 +463,7 @@ Teraz, po rejestracji tagu, można rozszerzyć wiadomość.
 Po uruchomieniu, logging powinien wyświetlić Message wraz z tagiem `'example_tag'` zawartym w środku <message><example_tag/></message>, oraz z napisem `'Work'` i nadanym namespace.
 
 Nadanie oddzielnego sygnału dla rozszerzonej wiadomości
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-------------------------
 
 Jeśli event nie zostanie sprecyzowany, to zarówno rozszerzona jak i podstawowa wiadomość będą przechwytywane przez sygnał `'message'`. Aby nadać im oddzielny event, należy zarejestrować odpowiedni handler dla namespace'a i tagu, aby stworzyć unikalną kombinację, która pozwoli na przechwycenie wyłącznie pożądanych wiadomości (lub Iq object).
 
@@ -480,10 +479,9 @@ Jeśli event nie zostanie sprecyzowany, to zarówno rozszerzona jak i podstawowa
             namespace = ExampleTag.namespace
 
             self.xmpp.register_handler(
-                        Callback('ExampleMessage Event:example_tag',	##~ Nazwa tego Callback
+                        Callback('ExampleMessage Event:example_tag',##~ Nazwa tego Callback
                         StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Przechwytuje wyłącznie Message z tagiem example_tag i namespace takim jaki zdefiniowaliśmy w ExampleTag
                         self.__handle_message))                     ##~ Metoda do której zostaje przypisany przechwycony odpowiedni obiekt, powinna wywołać odpowiedni event dla klienta.
-
             register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowany rozszerzony tag dla obiektu Message. Jeśli to nie zostanie zrobione, message['example_tag'] będzie polem tekstowym, a nie rozszerzeniem i nie będzie mogło zawierać atrybutów i podelementów.
 
         def __handle_message(self, msg):
@@ -560,8 +558,8 @@ Natomiast obiekt komunikacji (Iq) już będzie wymagał odpowiedzi, więc obydwa
 Użyteczne metody i inne
 -----------------------
 
-Modyfikacja przykładowego obiektu `Message` na obiekt `Iq`.
-++++++++++++++++++++++++++++++++++++++++++++++++++++
+Modyfikacja przykładowego obiektu `Message` na obiekt `Iq`
+-------------------------
 
 Aby przerobić przykładowy obiekt Message na obiekt Iq, należy zarejestrować nowy handler dla Iq, podobnie jak zostało to przedstawione w rozdziale `"Rozszerzenie Message o tag"`. Tym razem, przykład będzie zawierał kilka rodzajów Iq o oddzielnych typami. Poprawia to czytelność kodu oraz usprawnia weryfikację poprawności działania. Wszystkie Iq powinny odesłać odpowiedź z tym samym Id i odpowiedzią do wysyłającego. W przeciwnym wypadku, wysyłający dostanie Iq zwrotne typu error, zawierające informacje o przekroczonym czasie oczekiwania (timeout).
 
@@ -661,6 +659,7 @@ Domyślnie parametr `'clear'` dla `'Iq.reply'` jest ustawiony na True. Wtedy to,
             #<<<<<<<<<<<<
             
         def start(self, event):
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
             self.send_presence()
             self.get_roster()
 
@@ -688,7 +687,7 @@ Domyślnie parametr `'clear'` dla `'Iq.reply'` jest ustawiony na True. Wtedy to,
             #<<<<<<<<<<<<
 
 Dostęp do elementów
-+++++++++++++++++++
+-------------------------
 
 Jest kilka możliwości dostania się do pól wewnątrz Message lub Iq. Po pierwsze, z poziomu klienta, można dostać zawartość jak ze słownika:
 
@@ -715,12 +714,12 @@ Z rozszerzenia ExampleTag, dostęp do elementów jest podobny, tyle że, nie wym
     #File: $WORKDIR/example/example plugin.py
 
     class ExampleTag(ElementBase):
-        name = "example_tag"
-        namespace = "https://example.net/our_extension"
+        name = "example_tag"                                        ##~ Nazwa głównego pliku XML tego rozszerzenia.
+        namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>. Powinna zostać zmieniona na własną.
     
-        plugin_attrib = "example_tag"
+        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestronanego obieksu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
         
-        interfaces = {"boolean", "some_string"}
+        interfaces = {"boolean", "some_string"}                     ##~ Lista kluczy słownika, które mogą być użyte z obiektem. Na przykład: `stanza_object['example_tag']` zwraca {"another": "some", "data": "some"}, gdzie `'example_tag'` jest nazwą rozszerzenia ElementBase.
         
             #>>>>>>>>>>>>
         def get_some_string(self):
@@ -756,6 +755,7 @@ Kiedy odpowiednie gettery i settery są tworzone, można sprawdzić, czy na pewn
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
                
         def send_example_iq(self, to):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get")
             iq['example_tag']['boolean'] = "True"  #Przypisanie wprost
             #>>>>>>>>>>>>
@@ -765,7 +765,7 @@ Kiedy odpowiednie gettery i settery są tworzone, można sprawdzić, czy na pewn
             iq.send()
 
 Wczytanie ExampleTag ElementBase z pliku XML, łańcucha znaków i innych obiektów
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-------------------------
 
 Jest wiele możliwości na wczytanie wcześniej zdefiniowanego napisu z pliku albo lxml (ElementTree). Poniższy przykład wykorzystuje parsowanie typu napisowego do lxml (ElementTree) i przekazanie atrybutów.
 
@@ -778,12 +778,12 @@ Jest wiele możliwości na wczytanie wcześniej zdefiniowanego napisu z pliku al
     #...
 
     class ExampleTag(ElementBase):
-        name = "example_tag"
-        namespace = "https://example.net/our_extension"
+        name = "example_tag"                                        ##~ Nazwa głównego pliku XML tego rozszerzenia.
+        namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>. Powinna zostać zmieniona na własną.
     
-        plugin_attrib = "example_tag"
+        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestronanego obieksu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
         
-        interfaces = {"boolean", "some_string"}
+        interfaces = {"boolean", "some_string"}                     ##~ Lista kluczy słownika, które mogą być użyte z obiektem. Na przykład: `stanza_object['example_tag']` zwraca {"another": "some", "data": "some"}, gdzie `'example_tag'` jest nazwą rozszerzenia ElementBase.
         
             #>>>>>>>>>>>>
         def setup_from_string(self, string):
@@ -833,6 +833,7 @@ Do przetestowania tej funkcjonalności, potrzebny jest pliku zawierający xml z 
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
     
         def start(self, event):
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
             self.send_presence()
             self.get_roster()
     
@@ -857,18 +858,21 @@ Do przetestowania tej funkcjonalności, potrzebny jest pliku zawierający xml z 
                 self.disconnect() # Przykład rozłączania się aplikacji po uzyskaniu odpowiedniej ilości odpowiedzi.
     
         def send_example_iq_tag_from_file(self, to, path):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=2)
             iq['example_tag'].setup_from_file(path)
     
             iq.send()
             
         def send_example_iq_tag_from_element_tree(self, to, et):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=3)
             iq['example_tag'].setup_from_lxml(et)
     
             iq.send()
     
         def send_example_iq_tag_from_string(self, to, string):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=5)
             iq['example_tag'].setup_from_string(string)
     
@@ -877,8 +881,8 @@ Do przetestowania tej funkcjonalności, potrzebny jest pliku zawierający xml z 
 
 Jeśli Responder zwróci wysłane Iq, a Sender wyłączy się po trzech odpowiedziach, wtedy wszystko działa tak, jak powinno.
 
-Łatwość użycia pluginu dla programistów 
-+++++++++++++++++++++++++++++++++++++++
+Łatwość użycia pluginu dla programistów
+--------------------------------------
 
 Każdy plugin powinien posiadać pewne obiektowe metody: wczytanie danych, jak w przypadku metod `setup` z poprzedniego rozdziału, gettery, settery, czy wywoływanie odpowiednich eventów.
 Potencjalne błędy powinny być przechwytywane z poziomu pluginu i zwracane z odpowiednim opisem błędu w postaci odpowiedzi Iq o tym samym id do wysyłającego. Aby uniknąć sytuacji kiedy plugin nie robi tego co powinien, a wiadomość zwrotna nigdy nie nadchodzi, wysyłający dostaje error z komunikatem timeout.
@@ -905,33 +909,34 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
     
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"
-            self.xep = "ope"
+            self.description = "OurPluginExtension"                ##~ Tekst czytelny dla człowieka oraz do znalezienia pluginu przez inny plugin.
+            self.xep = "ope"                 ##~ Tekst czytelny dla człowieka oraz do znalezienia pluginu przez inny plugin poprzez dodanie go do `slixmpp/plugins/__init__.py` do funkcji `__all__` z 'xep_OPE'.
     
             namespace = ExampleTag.namespace
             self.xmpp.register_handler(
-                        Callback('ExampleGet Event:example_tag',
-                        StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),
-                        self.__handle_get_iq))
+                        Callback('ExampleGet Event:example_tag',    ##~ Nazwa tego Callbacku
+                        StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Obsługuje tylko Iq o typie 'get' oraz example_tag
+                        self.__handle_get_iq))                      ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
     
             self.xmpp.register_handler(
-                        Callback('ExampleResult Event:example_tag',
-                        StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),
-                        self.__handle_result_iq))
+                        Callback('ExampleGet Event:example_tag',  ##~ Nazwa tego Callbacku
+                        StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),   ##~ Obsługuje tylko Iq o typie 'result' oraz example_tag
+                     self.__handle_get_iq))                    ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
     
             self.xmpp.register_handler(
-                        Callback('ExampleError Event:example_tag',
-                        StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),
-                        self.__handle_error_iq))
+                        Callback('ExampleGet Event:example_tag',   ##~ Nazwa tego Callbacku
+                        StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),   ##~ Obsługuje tylko Iq o typie 'error' oraz example_tag
+                        self.__handle_get_iq))                     ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
     
             self.xmpp.register_handler(
-                        Callback('ExampleMessage Event:example_tag',
-                        StanzaPath(f'message/{{{namespace}}}example_tag'),
-                        self.__handle_message))
+                        Callback('ExampleMessage Event:example_tag',##~ Nazwa tego Callbacku
+                        StanzaPath(f'message/{{{namespace}}}example_tag'),         ##~ Obsługije tylko Message z example_tag
+                        self.__handle_message))                     ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
     
-            register_stanza_plugin(Iq, ExampleTag)
-            register_stanza_plugin(Message, ExampleTag)
-    
+            register_stanza_plugin(Iq, ExampleTag)                  ##~ Zarejestrowane rozszerzenia tagu dla Iq. Bez tego, iq['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć podelementów.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowane rozszerzenia tagu dla Message. Bez tego, message['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć podelementów.
+   
+        # Wszystkie możliwe typy iq: get, set, error, result
         def __handle_get_iq(self, iq):
             if iq.get_some_string is None:
                 error = iq.reply(clear=False)
@@ -939,25 +944,28 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
                 error["error"]["condition"] = "missing-data"
                 error["error"]["text"] = "Without some_string value returns error."
                 error.send()
-            self.xmpp.event('example_tag_get_iq', iq)
+            # Zrób coś z otrzymanym Iq
+            self.xmpp.event('example_tag_get_iq', iq)           ##~ Wywołanie eventu, który może być przesłany do klienta lub zmieniony po drodze.
             
         def __handle_result_iq(self, iq):
-            self.xmpp.event('example_tag_result_iq', iq)
+            # Zrób coś z otrzymanym Iq
+            self.xmpp.event('example_tag_result_iq', iq)           ##~ Wywołanie eventu, który może być przesłany do klienta lub zmieniony po drodze.
     
         def __handle_error_iq(self, iq):
-            # Do something with received iq
-            self.xmpp.event('example_tag_error_iq', iq)
+            # Zrób coś z otrzymanym Iq
+            self.xmpp.event('example_tag_error_iq', iq)           ##~ Wywołanie eventu, który może być przesłany do klienta lub zmieniony po drodze.
     
         def __handle_message(self, msg):
-            self.xmpp.event('example_tag_message', msg)
+            # Zrób coś z otrzymanym Message
+            self.xmpp.event('example_tag_message', msg)           ##~ Wywołanie eventu, który może być przesłany do klienta lub zmieniony po drodze.
     
     class ExampleTag(ElementBase):
-        name = "example_tag"
-        namespace = "https://example.net/our_extension"
+        name = "example_tag"                                        ##~ Nazwa głównego pliku XML tego rozszerzenia.
+        namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>. Powinna zostać zmieniona na własną.
     
-        plugin_attrib = "example_tag"
+        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestronanego obieksu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
         
-        interfaces = {"boolean", "some_string"}
+        interfaces = {"boolean", "some_string"}                     ##~ Lista kluczy słownika, które mogą być użyte z obiektem. Na przykład: `stanza_object['example_tag']` zwraca {"another": "some", "data": "some"}, gdzie `'example_tag'` jest nazwą rozszerzenia ElementBase.
     
         def setup_from_string(self, string):
             """Initialize tag element from string"""
@@ -978,6 +986,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
                 self.xml.append(inner_tag)
 
         def setup_from_dict(self, data):
+            #Poprawnośc kluczy słownika powinna być sprawdzona
             self.xml.attrib.update(data)
     
         def get_boolean(self):
@@ -999,6 +1008,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             self.xml.text = text
     
         def fill_interfaces(self, boolean, some_string):
+            #Jakaś walidacja, jeśli jest potrzebna
             self.set_boolean(boolean)
             self.set_some_string(some_string)
 
@@ -1022,17 +1032,18 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             self.add_event_handler("example_tag_message", self.example_tag_message)
     
         def start(self, event):
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
             self.send_presence()
             self.get_roster()
             
-        def example_tag_get_iq(self, iq):
+        def example_tag_get_iq(self, iq): # Iq zawsze powinien odpowiedzieć. Jeżeli użytkownik jest offline, zostanie zrwócony error.
             logging.info(iq)
             reply = iq.reply()
             reply["example_tag"].fill_interfaces(True, "Reply_string")
             reply.send()
     
         def example_tag_message(self, msg):
-            logging.info(msg)
+            logging.info(msg) # Na Message można odpowiedzieć, ale nie trzeba.
     
     
     if __name__ == '__main__':
@@ -1063,7 +1074,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             args.password = getpass("Password: ")
     
         xmpp = Responder(args.jid, args.password)
-        xmpp.register_plugin('OurPlugin', module=example_plugin)
+        xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPluggin jest nazwa klasy example_plugin
     
         xmpp.connect()
         try:
@@ -1073,7 +1084,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
                 xmpp.disconnect()
             except:
                 pass
-    
+
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
@@ -1100,10 +1111,11 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
     
         def start(self, event):
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
             self.send_presence()
             self.get_roster()
     
-            self.disconnect_counter = 5
+            self.disconnect_counter = 5 # Aplikacja rozłączy się po odebraniu takiej ilości odpowiedzi.
             
             self.send_example_iq(self.to)
             # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
@@ -1132,15 +1144,16 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
-                self.disconnect()
-                
+                self.disconnect() # Przykład rozłączania się aplikacji po uzyskaniu odpowiedniej ilości odpowiedzi.
+    
         def example_tag_error_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
-                self.disconnect()
-                
+                self.disconnect() # Przykład rozłączania się aplikacji po uzyskaniu odpowiedniej ilości odpowiedzi.
+    
         def send_example_iq(self, to):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get")
             iq['example_tag'].set_boolean(True)
             iq['example_tag'].set_some_string("Another_string")
@@ -1148,6 +1161,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             iq.send()
     
         def send_example_message(self, to):
+            #~ make_message(mfrom=None, mto=None, mtype=None, mquery=None)
             msg = self.make_message(mto=to)
             msg['example_tag'].set_boolean(True)
             msg['example_tag'].set_some_string("Message string")
@@ -1155,23 +1169,27 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             msg.send()
     
         def send_example_iq_tag_from_file(self, to, path):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=2)
             iq['example_tag'].setup_from_file(path)
     
             iq.send()
     
         def send_example_iq_tag_from_element_tree(self, to, et):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=3)
             iq['example_tag'].setup_from_lxml(et)
     
             iq.send()
     
         def send_example_iq_to_get_error(self, to):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=4)
-            iq['example_tag'].set_boolean(True)
+            iq['example_tag'].set_boolean(True) # Kiedy, aby otrzymać odpowiedż z błędem, potrzebny jest example_tag bez wartości bool.
             iq.send()
     
         def send_example_iq_tag_from_string(self, to, string):
+            #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=5)
             iq['example_tag'].setup_from_string(string)
     
@@ -1207,7 +1225,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             args.password = getpass("Password: ")
     
         xmpp = Sender(args.jid, args.password, args.to, args.path)
-        xmpp.register_plugin('OurPlugin', module=example_plugin)
+        xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin jest nazwą klasy z example_plugin.
     
         xmpp.connect()
         try:
@@ -1217,16 +1235,15 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
                 xmpp.disconnect()
             except:
                 pass
-    
 
 
 Tagi i atrybuty zagnieżdżone wewnątrz głównego elementu
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--------------------------------------
 
-Aby stworzyć zagnieżdżony tag, wewnątrz głównego tagu, rozważmy atrybut `'self.xml'` jako Element z ET (ElementTree).
+Aby stworzyć zagnieżdżony tag, wewnątrz głównego tagu, rozważmy atrybut `'self.xml'` jako Element z ET (ElementTree). W takim wypadku, aby stworzyć zagnieżdżony element można użyć funkcji 'append'.
 
 Można powtórzyć poprzednie działania inicjalizując nowy element jak główny (ExampleTag). Jednak jeśli nie potrzebujemy dodatkowych metod, czy walidacji, a jest to wynik dla innego procesu który i tak będzie parsował xml, wtedy możemy zagnieździć zwyczajny Element z ElementTree za pomocą metody `'append'`. W przypadku przetwarzania typy napisowego, można to zrobić nawet dzięki parsowaniu napisu na Element - kolejne zagnieżdżenia już będą w dodanym Elemencie do głównego. By nie powtarzać metody setup, poniżej przedstawione jest ręczne dodanie zagnieżdżonego taga konstruując ET.Element samodzielnie.
-    
+
 .. code-block:: python
 
     #File: $WORKDIR/example/example_plugin.py
@@ -1238,13 +1255,15 @@ Można powtórzyć poprzednie działania inicjalizując nowy element jak główn
     #(...)
     
         def add_inside_tag(self, tag, attributes, text=""):
-            #Gdy chcemy dodać tagi wewnętrzne do naszego taga, to jest prosty przykład jak to zrobić:
+            #Można rozszerzyć tag o tagi wewnętrzne do tagu, na przykład tak:
             itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Inicjalizujemy Element z naszym wewnętrznym tagiem, na przykład: <example_tag (...)> <inside_tag namespace="https://example.net/our_extension"/></example_tag>
             itemXML.attrib.update(attributes) #~ Przypisujemy zdefiniowane atrybuty, na przykład: <inside_tag namespace=(...) inner_data="some"/>
             itemXML.text = text #~ Dodajemy text wewnątrz tego tagu: <inside_tag (...)>our_text</inside_tag>
             self.xml.append(itemXML) #~ I tak skonstruowany Element po prostu dodajemy do elementu z naszym tagiem `example_tag`.
 
-Kompletny kod z tutorialu
+Można też zrobić to samo używając słownika i nazw jako kluczy zagnieżdżonych elementów. W takim przypadku, pola funkcji powinny zostać przeniesione do ET.
+
+Kompletny kod tutorialu
 -------------------------
 
 W poniższym kodzie zostały pozostawione oryginalne komentarze w języku angielskim.
@@ -1424,7 +1443,7 @@ W poniższym kodzie zostały pozostawione oryginalne komentarze w języku angiel
             itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Initialize ET with our tag, for example: <example_tag (...)> <inside_tag namespace="https://example.net/our_extension"/></example_tag>
             itemXML.attrib.update(attributes) #~ There we add some fields inside tag, for example: <inside_tag namespace=(...) inner_data="some"/>
             itemXML.text = text #~ Fill field inside tag, for example: <inside_tag (...)>our_text</inside_tag>
-            self.xml.append(itemXML) #~ Add that all what we set, as inner tag inside `example_tag` tag. 
+            self.xml.append(itemXML) #~ Add that all what we set, as inner tag inside `example_tag` tag.
 
 ~
 
@@ -1765,6 +1784,7 @@ W poniższym kodzie zostały pozostawione oryginalne komentarze w języku angiel
 .. code-block:: python
 
     #File: $WORKDIR/test_example_tag.xml
+
 .. code-block:: xml
 
     <example_tag xmlns="https://example.net/our_extension" some_string="StringFromFile">Info_inside_tag<inside_tag first_field="3" secound_field="4" /></example_tag>
