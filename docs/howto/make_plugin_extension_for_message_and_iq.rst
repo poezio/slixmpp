@@ -393,11 +393,11 @@ To receive this message, the responder should have a proper handler to the signa
             #Show only body attribute
             logging.info(msg['body'])
         #<<<<<<<<<<<<
-//TODO from here
-Expanding the message with new tag
+
+Expanding the Message with a new tag
 ++++++++++++++++++++++++++++
 
-To expand the Message object with our tag, the plugin should be registered as the extension for the Message object:
+To expand the Message object with a tag, the plugin should be registered as the extension for the Message object:
 
 .. code-block:: python
 
@@ -405,22 +405,22 @@ To expand the Message object with our tag, the plugin should be registered as th
     
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"                 ##~ String data readable by humans and to find plugin by another plugin.
-            self.xep = "ope"                 ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
+            self.description = "OurPluginExtension"                 ##~ String data to read by humans and to find the plugin by another plugin.
+            self.xep = "ope"                 ##~ String data to read by humans and to find the plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'.
     
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>
-            register_stanza_plugin(Message, ExampleTag)             ##~ Register tags extension for Message object, otherwise message['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Register the tags extension for Message object, otherwise message['example_tag'] will be string field instead container and whould not be able to manage fields and create sub elements.
             #<<<<<<<<<<<<
-    
+
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
-        namespace = "<https://example.net/our_extension>"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace
+        namespace = "https://example.net/our_extension"             ##~ The namespace for stanza object, like <example_tag xmlns={namespace} (...)</example_tag>.
     
-        plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ours ElementBase extension. And this should be that same as name.
+        plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ElementBase extension. And this should be that same as 'name' above.
         
         interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
-    
+
         #>>>>>>>>>>>>
         def set_boolean(self, boolean):
             self.xml.attrib['boolean'] = str(boolean)
@@ -429,7 +429,7 @@ To expand the Message object with our tag, the plugin should be registered as th
             self.xml.attrib['some_string'] = some_string
         #<<<<<<<<<<<<
 
-Now with the registered object, the message can be extended.
+Now, with the registered object, the message can be extended.
 
 .. code-block:: python
 
@@ -443,7 +443,7 @@ Now with the registered object, the message can be extended.
             self.path = path
             
             self.add_event_handler("session_start", self.start)
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
@@ -460,12 +460,12 @@ Now with the registered object, the message can be extended.
             #<<<<<<<<<<<<
             msg.send()
 
-After running, the following message from the logging should show the `'example_tag'` stored inside <message><example_tag/></message> with string and namespace defined previously by us.
+After running, the logging should print the Message with tag `'example_tag'` stored inside <message><example_tag/></message>, string `'Work'` and given namespace.
 
-Catching the extended message with different event handler
+Giving the extended message the separate signal
 +++++++++++++++++++++++++++++++++++++++++++++++++++
 
-To get the difference between the extended messages and basic messages (or Iq), we can register the handler for the new namespace and tag. Then, make a unique name combination and handle only these required messages.
+If the separate event is not defined, then both normal and extended message will be cached by signal `'message'`. In order to have the special event, the handler for the namespace ang tag should be created. Then, make a unique name combination, which allows the handler can catch only the wanted messages (or Iq object).
 
 .. code-block:: python
 
@@ -473,30 +473,30 @@ To get the difference between the extended messages and basic messages (or Iq), 
     
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"                 ##~ String data for Human readable and find plugin by another plugin with method.
-            self.xep = "ope"                                        ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
+            self.description = "OurPluginExtension"                 ##~ String data to read by humans and to find the plugin by another plugin.
+            self.xep = "ope"                 ##~ String data to read by humans and to find the plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'.
     
             namespace = ExampleTag.namespace
-            
+
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Name of this Callback
-                        StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Handle only Message with example_tag
-                        self.__handle_message))                     ##~ Method which catch proper Message, should raise proper event for client.
-            register_stanza_plugin(Message, ExampleTag)             ##~ Register tags extension for Message object, otherwise message['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
-    
+                        StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Handles only the Message with good example_tag and namespace.
+                        self.__handle_message))                     ##~ Method which catches the proper Message, should raise event for the client.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Register the tags extension for Message object, otherwise message['example_tag'] will be string field instead container and whould not be able to manage fields and create sub elements.
+
         def __handle_message(self, msg):
-            # Do something with received message
-            self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by clients to send or something other what you want.
+            # Here something can be done with received message before it reaches the client.
+            self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by the client with desired objest as an argument.
 
 StanzaPath objects should be initialized in a specific way, such as:
 `'OBJECT_NAME[@type=TYPE_OF_OBJECT][/{NAMESPACE}[TAG]]'`
 
-- For OBJECT_NAME we can use `'message'` or `'iq'`.
-- For TYPE_OF_OBJECT, if we specify iq, we can use`'get, set, error or result'`
-- NAMESPACE should always be a namespace from our tag extension class.
-- TAG should contain our tag, in this case:`'example_tag'`.
+* For OBJECT_NAME we can use `'message'` or `'iq'`.
+* For TYPE_OF_OBJECT, when iq is specified, `'get, set, error or result'` can be used. When objest is a message, then the message type can be used, like `'chat'`.
+* NAMESPACE should always be a namespace from tag extension class.
+* TAG should contain the tag, in this case:`'example_tag'`.
 
-Now we are catching every message containing our namespace inside the `'example_tag'`field. We can check the content of it and then send it to the client with `'example_tag_message'` event.
+Now every message containing the defined namespace inside `'example_tag'` is catched. It is possible to check the content of it. Then, the message is send to the client with the `'example_tag_message'` event.
 
 .. code-block:: python
 
@@ -510,7 +510,7 @@ Now we are catching every message containing our namespace inside the `'example_
             self.path = path
             
             self.add_event_handler("session_start", self.start)
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
@@ -527,9 +527,7 @@ Now we are catching every message containing our namespace inside the `'example_
             msg.send()
             #<<<<<<<<<<<<
 
-Next, remember line: `'self.xmpp.event('example_tag_message', msg)'`.
-
-There is a responder event handler that uses the`'example_tag_message'`.
+Now, remember the line: `'self.xmpp.event('example_tag_message', msg)'`. The name of an event to catch inside the "responder.py" file was defined here. Here it is: `'example_tag_message'`.
 
 .. code-block:: python
 
@@ -541,7 +539,7 @@ There is a responder event handler that uses the`'example_tag_message'`.
             
             self.add_event_handler("session_start", self.start)
             #>>>>>>>>>>>>
-            self.add_event_handler("example_tag_message", self.example_tag_message)
+            self.add_event_handler("example_tag_message", self.example_tag_message) #Registration of the handler
             #<<<<<<<<<<<<
     
         def start(self, event):
@@ -551,17 +549,19 @@ There is a responder event handler that uses the`'example_tag_message'`.
     
         #>>>>>>>>>>>>
         def example_tag_message(self, msg):
-            logging.info(msg) # Message is standalone object, it can be replied, but no error arrives if not.
+            logging.info(msg) # Message is standalone object, it can be replied, but no error rises if not.
         #<<<<<<<<<<<<
 
-We can reply to the messages, but nothing will happen if we don't. However, when we receive the Iq object, we should always reply. Otherwise, the error reply occurs on the client side due to the target timeout.
+The messages can be replied, but nothing will happen if we don't.
+However, when we receive the Iq object, we should always reply. Otherwise, the error occurs on the client side due to the target timeout if the cell Iq won't reply with Iq with the same Id.
 
-## Useful methods and others
+Useful methods and misc.
+-----------------------
 
-Modifying the `Message` object example to `Iq` object.
+Modifying the example `Message` object to the `Iq` object.
 ++++++++++++++++++++++++++++++++++++++++
 
-To convert the Message to the Iq object, we need to register a new handler for the Iq. We can do it in the same maner as in the `,,Extend message with our tags''`part. The following example contains several types of Iq [TODO with separate types to catch]. We can use it to check the difference between the Iq request and Iq response or to verify the correctness of the objects. All of the Iq messages should be pass on to the sender with the same ID parameter, otherwise the sender receives the Iq with the timeout error.
+To convert the Message into the Iq object, a new handler for the Iq should be registered, in the same maner as in the `,,Extend message with tags''`part. The following example contains several types of Iq different types to catch. It can be used to check the difference between the Iq request and Iq response or to verify the correctness of the objects. All of the Iq messages should be passed to the sender with the same ID parameter, otherwise the sender receives the Iq with the timeout error.
 
 .. code-block:: python
 
@@ -569,24 +569,24 @@ To convert the Message to the Iq object, we need to register a new handler for t
     
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"                 ##~ String data for Human readable and find plugin by another plugin with method.
-            self.xep = "ope"                                        ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
+            self.description = "OurPluginExtension"                 ##~ String data to read by humans and to find the plugin by another plugin.
+            self.xep = "ope"                 ##~ String data to read by humans and to find the plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'.
     
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>
             self.xmpp.register_handler(
                         Callback('ExampleGet Event:example_tag',    ##~ Name of this Callback
-                        StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Handle only Iq with type get and example_tag
+                        StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Handle only Iq with type 'get' and example_tag
                         self.__handle_get_iq))                      ##~ Method which catch proper Iq, should raise proper event for client.
     
             self.xmpp.register_handler(
                         Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
-                        StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type result and example_tag
+                        StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type 'result' and example_tag
                         self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
     
             self.xmpp.register_handler(
                         Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
-                        StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Handle only Iq with type error and example_tag
+                        StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Handle only Iq with type 'error' and example_tag
                         self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
     
             self.xmpp.register_handler(
@@ -602,22 +602,21 @@ To convert the Message to the Iq object, we need to register a new handler for t
         # All iq types are: get, set, error, result
         def __handle_get_iq(self, iq):
             # Do something with received iq
-            self.xmpp.event('example_tag_get_iq', iq)           ##~ Call event which can be handled by clients to send or something other what you want.
+            self.xmpp.event('example_tag_get_iq', iq)           ##~ Call the event which can be handled by clients to send or something other.
             
         def __handle_result_iq(self, iq):
             # Do something with received iq
-            self.xmpp.event('example_tag_result_iq', iq)        ##~ Call event which can be handled by clients to send or something other what you want.
+            self.xmpp.event('example_tag_result_iq', iq)        ##~ Call the event which can be handled by clients to send or something other.
     
         def __handle_error_iq(self, iq):
             # Do something with received iq
-            self.xmpp.event('example_tag_error_iq', iq)         ##~ Call event which can be handled by clients to send or something other what you want.
+            self.xmpp.event('example_tag_error_iq', iq)         ##~ Call event which can be handled by clients to send or something other.
     
         def __handle_message(self, msg):
             # Do something with received message
-            self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by clients to send or something other what you want.
-            #<<<<<<<<<<<<
+            self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by clients to send or something other.
 
-The events called from the handlers, can be caught like in the`'example_tag_message'` example.
+The events called by the example handlers can be caught like in the`'example_tag_message'` example.
 
 .. code-block:: python
 
@@ -634,13 +633,13 @@ The events called from the handlers, can be caught like in the`'example_tag_mess
             #<<<<<<<<<<<<
     
             #>>>>>>>>>>>>
-        def example_tag_get_iq(self, iq): # Iq stanza always should have a respond. If user is offline, it call an error.
+        def example_tag_get_iq(self, iq): # Iq stanza always should have a respond. If user is offline, it calls an error.
             logging.info(str(iq))
             reply = iq.reply(clear=False)
             reply.send()
             #<<<<<<<<<<<<
 
-By default, the parameter `'clear'` in the `'Iq.reply'` is set to True. In that case, the content of the Iq should be set again. After using the reply method, only the Id and the Jid parameters will stillbe set. 
+By default, the parameter `'clear'` in the `'Iq.reply'` is set to True. In that case, the content of the Iq should be set again. After using the reply method, only the Id and the Jid parameters will still be set. 
 
 .. code-block:: python
 
@@ -663,10 +662,10 @@ By default, the parameter `'clear'` in the `'Iq.reply'` is set to True. In that 
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
-    
+
             #>>>>>>>>>>>>        
             self.send_example_iq(self.to)
-            # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
+            # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
             #<<<<<<<<<<<<
             
             #>>>>>>>>>>>>        
@@ -690,7 +689,7 @@ By default, the parameter `'clear'` in the `'Iq.reply'` is set to True. In that 
 Different ways to access the elements
 +++++++++++++++++++++++
 
-There are several ways to access the elements inside the Message or Iq stanza. The first one, from the client's side, is simply accessing the dictionary:
+There are several ways to access the elements inside the Message or Iq stanza. The first one: the client can access them like a dictionary:
 
 .. code-block:: python
 
@@ -708,17 +707,17 @@ There are several ways to access the elements inside the Message or Iq stanza. T
             logging.info(iq.get('example_tag').get('boolean'))
             #<<<<<<<<<<<<
 
-For the ExampleTag extension, there is a getter and setter method for specific fields:
+The access to the elements from extendet ExampleTag is simmilar. However, defining the types is not required and the access can be diversified (like for the `'text'` field below). For the ExampleTag extension, there is a 'getter' and 'setter' method for specific fields:
 
 .. code-block:: python
 
     #File: $WORKDIR/example/example plugin.py
-    
+
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
-        namespace = "<https://example.net/our_extension>"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace
+        namespace = "https://example.net/our_extension"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. Should be changed for own namespace.
     
-        plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ours ElementBase extension. And this should be that same as name.
+        plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'], the `'example_tag'` is the name of ElementBase extension. And this should be that same as name.
         
         interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
         
@@ -738,7 +737,7 @@ For the ExampleTag extension, there is a getter and setter method for specific f
 
 The attribute `'self.xml'` is inherited from the ElementBase and is exactly the same as the `'Iq['example_tag']'` from the client namespace.
 
-When the proper setters and getters are used, then the code can be cleaner and more object-oriented, like  in the example below:
+When the proper setters and getters are used, it is easy to check whether some argument is proper for the plugin or is conversable to another type. The code itself can be cleaner and more object-oriented, like in the example below:
 
 .. code-block:: python
 
@@ -758,9 +757,9 @@ When the proper setters and getters are used, then the code can be cleaner and m
         def send_example_iq(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get")
-            iq['example_tag']['boolean'] = "True"
+            iq['example_tag']['boolean'] = "True"  #Direct assignment
             #>>>>>>>>>>>>
-            iq['example_tag'].set_some_string("Another_string")
+            iq['example_tag'].set_some_string("Another_string") #Assignment by setter
             iq['example_tag'].set_text("Info_inside_tag")
             #<<<<<<<<<<<<
             iq.send()
@@ -768,19 +767,19 @@ When the proper setters and getters are used, then the code can be cleaner and m
 Message setup from the XML files, strings and other objects
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-There are many ways set up a xml from a string, xml-containing file or lxml (ElementTree) file. One of them is parsing the strings to lxml object, passing the attributes and other information, which may look like this:
+There are many ways to set up a xml from a string, xml-containing file or lxml (ElementTree) file. One of them is parsing the strings to lxml object, passing the attributes and other information, which may look like this:
 
 .. code-block:: python
 
     #File: $WORKDIR/example/example plugin.py
-    
+
     #...
     from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin
     #...
-    
+
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
-        namespace = "<https://example.net/our_extension>"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace
+        namespace = "https://example.net/our_extension"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace
     
         plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ours ElementBase extension. And this should be that same as name.
         
@@ -806,22 +805,22 @@ There are many ways set up a xml from a string, xml-containing file or lxml (Ele
                 self.xml.append(inner_tag)
             #<<<<<<<<<<<<
 
-To test this, we need an example file with xml, example xml string and example ET object:
+To test this, we need an example file with xml, example xml string and example lxml (ET) object:
 
 .. code-block:: xml
 
     #File: $WORKDIR/test_example_tag.xml
-    
-    <example_tag xmlns="<https://example.net/our_extension>" some_string="StringFromFile">Info_inside_tag<inside_tag first_field="3" secound_field="4" /></example_tag>
+
+    <example_tag xmlns="https://example.net/our_extension" some_string="StringFromFile">Info_inside_tag<inside_tag first_field="3" secound_field="4" /></example_tag>
 
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
-    
+
     #...
     from slixmpp.xmlstream import ET
     #...
-    
+ 
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
@@ -839,24 +838,24 @@ To test this, we need an example file with xml, example xml string and example E
             self.get_roster()
     
             #>>>>>>>>>>>>
-            self.disconnect_counter = 3 # This is only for disconnect when we receive all replies for sended Iq
+            self.disconnect_counter = 3 # Disconnects when all replies from Iq are received.
             
             self.send_example_iq_tag_from_file(self.to, self.path)
-            # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
+            # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
     
-            string = '<example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>'
+            string = '<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>'
             et = ET.fromstring(string)
             self.send_example_iq_tag_from_element_tree(self.to, et)
-            # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="<https://example.net/our_extension>" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
+            # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
             
             self.send_example_iq_tag_from_string(self.to, string)
-            # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="<https://example.net/our_extension>" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>   
-    
+            # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>   
+
         def example_tag_result_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
-                self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
+                self.disconnect() # Example disconnect after receiving the maximum number of recponses.
     
         def send_example_iq_tag_from_file(self, to, path):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
@@ -880,22 +879,22 @@ To test this, we need an example file with xml, example xml string and example E
             iq.send()
             #<<<<<<<<<<<<
 
-If the Responder returns the proper `'Iq'` in the reply, then everything went okay and the Sender can be disconnected.
+If the Responder returns the proper `'Iq'` and the Sender disconnects after three answers, then everything works okay.
 
 Dev friendly methods for plugin usage
 +++++++++++++++++++++++++++++++++++++
 
-Any plugin should have some sort of object-like methods, setup for our elements: getters, setters and signals to make it easy to use.
-During handling, the correctness of the data should be checked and the eventual errors returned to the sender.
+Any plugin should have some sort of object-like methods, that was setup for elements: reading the data, getters, setters and signals, to make them easy to use.
+During handling, the correctness of the data should be checked and the eventual errors returned back to the sender. In order to avoid the situation where the answer message is never send, the sender gets the timeout error.
 
 The following code presents exactly this:
 
 .. code-block:: python
 
     #File: $WORKDIR/example/example plugin.py
-    
+
     import logging
-    
+
     from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin
     
     from slixmpp import Iq
@@ -910,8 +909,8 @@ The following code presents exactly this:
     
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"   ##~ String data for Human readable and find plugin by another plugin with method.
-            self.xep = "ope"                          ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
+            self.description = "OurPluginExtension"                 ##~ String data to read by humans and to find the plugin by another plugin.
+            self.xep = "ope"                 ##~ String data to read by humans and to find the plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'.
     
             namespace = ExampleTag.namespace
             self.xmpp.register_handler(
@@ -922,20 +921,20 @@ The following code presents exactly this:
             self.xmpp.register_handler(
                         Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
                         StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type result and example_tag
-                        self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
+                     self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
     
             self.xmpp.register_handler(
                         Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
-                        StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Handle only Iq with type error and example_tag
+                        StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type error and example_tag
                         self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
     
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Name of this Callback
-                        StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Handle only Message with example_tag
+                        StanzaPath(f'message/{{{namespace}}}example_tag'),         ##~ Handle only Message with example_tag
                         self.__handle_message))                     ##~ Method which catch proper Message, should raise proper event for client.
     
-            register_stanza_plugin(Iq, ExampleTag)                  ##~ Register tags extension for Iq object, otherwise iq['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
-            register_stanza_plugin(Message, ExampleTag)             ##~ Register tags extension for Message object, otherwise message['example_tag'] will be string field instead container where we can manage our fields and create sub elements.
+            register_stanza_plugin(Iq, ExampleTag)                  ##~ Register tags extension for Iq object, otherwise iq['example_tag'] will be string field instead of container, where we can manage our fields and create sub elements.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Register tags extension for Message object, otherwise message['example_tag'] will be string field instead of container, where we can manage our fields and create sub elements.
     
         # All iq types are: get, set, error, result
         def __handle_get_iq(self, iq):
@@ -946,23 +945,23 @@ The following code presents exactly this:
                 error["error"]["text"] = "Without some_string value returns error."
                 error.send()
             # Do something with received iq
-            self.xmpp.event('example_tag_get_iq', iq)           ##~ Call event which can be handled by clients to send or something other what you want.
+            self.xmpp.event('example_tag_get_iq', iq)           ##~ Call event which can be handled by clients to send or something other.
             
         def __handle_result_iq(self, iq):
             # Do something with received iq
-            self.xmpp.event('example_tag_result_iq', iq)        ##~ Call event which can be handled by clients to send or something other what you want.
+            self.xmpp.event('example_tag_result_iq', iq)        ##~ Call event which can be handled by clients to send or something other.
     
         def __handle_error_iq(self, iq):
             # Do something with received iq
-            self.xmpp.event('example_tag_error_iq', iq)         ##~ Call event which can be handled by clients to send or something other what you want.
+            self.xmpp.event('example_tag_error_iq', iq)         ##~ Call event which can be handled by clients to send or something other.
     
         def __handle_message(self, msg):
             # Do something with received message
-            self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by clients to send or something other what you want.
+            self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by clients to send or something other.
     
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
-        namespace = "<https://example.net/our_extension>"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace
+        namespace = "https://example.net/our_extension"             ##~ The namespace stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace.
     
         plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ours ElementBase extension. And this should be that same as name.
         
@@ -1261,7 +1260,8 @@ To make the nested element inside our IQ tag, we need to consider `self.xml` fie
 
 There is a way to do this with a dictionary and name for the nested element tag. In that case, the insides of the function fields should be transferred to the ET element.
 
-## Complete code from tutorial
+Complete code from tutorial
+-------------------------
 
 .. code-block:: python
 
@@ -1294,10 +1294,10 @@ There is a way to do this with a dictionary and name for the nested element tag.
         responder_password = "RESPONDER_PASSWORD"
     
         # Remember about rights to run your python files. (`chmod +x ./file.py`)
-        SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \\
+        SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
                        " -t {responder_jid} --path {example_file} {postfix}"
     
-        RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \\
+        RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
                        " -p {responder_password} {postfix}"
     
         try:
@@ -1313,7 +1313,7 @@ There is a way to do this with a dictionary and name for the nested element tag.
 .. code-block:: python
 
     #File: $WORKDIR/example/example_plugin.py
-    
+
     import logging
     
     from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin
@@ -1382,7 +1382,7 @@ There is a way to do this with a dictionary and name for the nested element tag.
     
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
-        namespace = "<https://example.net/our_extension>"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace
+        namespace = "https://example.net/our_extension"             ##~ The namespace our stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace
     
         plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ours ElementBase extension. And this should be that same as name.
         
@@ -1435,7 +1435,7 @@ There is a way to do this with a dictionary and name for the nested element tag.
         
         def add_inside_tag(self, tag, attributes, text=""):
             #If we want to fill with additionaly tags our element, then we can do it that way for example:
-            itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Initialize ET with our tag, for example: <example_tag (...)> <inside_tag namespace="<https://example.net/our_extension>"/></example_tag>
+            itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Initialize ET with our tag, for example: <example_tag (...)> <inside_tag namespace="https://example.net/our_extension"/></example_tag>
             itemXML.attrib.update(attributes) #~ There we add some fields inside tag, for example: <inside_tag namespace=(...) inner_data="some"/>
             itemXML.text = text #~ Fill field inside tag, for example: <inside_tag (...)>our_text</inside_tag>
             self.xml.append(itemXML) #~ Add that all what we set, as inner tag inside `example_tag` tag.
@@ -1475,29 +1475,29 @@ There is a way to do this with a dictionary and name for the nested element tag.
             self.disconnect_counter = 6 # This is only for disconnect when we receive all replies for sended Iq
             
             self.send_example_iq(self.to)
-            # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
+            # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
             
             self.send_example_iq_with_inner_tag(self.to)
-            # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="1" xml:lang="en" type="get"><example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
+            # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="1" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
             
             self.send_example_message(self.to)
-            # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
+            # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
             
             self.send_example_iq_tag_from_file(self.to, self.path)
-            # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
+            # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
     
-            string = '<example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>'
+            string = '<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>'
             et = ET.fromstring(string)
             self.send_example_iq_tag_from_element_tree(self.to, et)
-            # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="<https://example.net/our_extension>" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
+            # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
     
             self.send_example_iq_to_get_error(self.to)
-            # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" boolean="True" /></iq>
-            # OUR ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="<https://example.net/our_extension>" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
-            # OFFLINE ERROR <iq id="4" from="RESPONDER/RESOURCE" xml:lang="en" to="SENDER/RESOURCE" type="error"><example_tag xmlns="<https://example.net/our_extension>" boolean="True" /><error type="cancel" code="503"><service-unavailable xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" xml:lang="en">User session not found</text></error></iq>
+            # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" /></iq>
+            # OUR ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
+            # OFFLINE ERROR <iq id="4" from="RESPONDER/RESOURCE" xml:lang="en" to="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel" code="503"><service-unavailable xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" xml:lang="en">User session not found</text></error></iq>
             
             self.send_example_iq_tag_from_string(self.to, string)
-            # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="<https://example.net/our_extension>" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
+            # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
     
     
         def example_tag_result_iq(self, iq):
@@ -1612,7 +1612,7 @@ There is a way to do this with a dictionary and name for the nested element tag.
 .. code-block:: python
 
     #File: $WORKDIR/example/responder.py
-    
+
     import logging
     from argparse import ArgumentParser
     from getpass import getpass
@@ -1642,29 +1642,29 @@ There is a way to do this with a dictionary and name for the nested element tag.
             self.disconnect_counter = 6 # This is only for disconnect when we receive all replies for sended Iq
             
             self.send_example_iq(self.to)
-            # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
+            # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
             
             self.send_example_iq_with_inner_tag(self.to)
-            # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="1" xml:lang="en" type="get"><example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
+            # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="1" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
             
             self.send_example_message(self.to)
-            # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
+            # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
             
             self.send_example_iq_tag_from_file(self.to, self.path)
-            # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
+            # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag></iq>
     
-            string = '<example_tag xmlns="<https://example.net/our_extension>" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>'
+            string = '<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" secound_field="2" /></example_tag>'
             et = ET.fromstring(string)
             self.send_example_iq_tag_from_element_tree(self.to, et)
-            # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="<https://example.net/our_extension>" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
+            # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
     
             self.send_example_iq_to_get_error(self.to)
-            # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="<https://example.net/our_extension>" boolean="True" /></iq>
-            # OUR ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="<https://example.net/our_extension>" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
-            # OFFLINE ERROR <iq id="4" from="RESPONDER/RESOURCE" xml:lang="en" to="SENDER/RESOURCE" type="error"><example_tag xmlns="<https://example.net/our_extension>" boolean="True" /><error type="cancel" code="503"><service-unavailable xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" xml:lang="en">User session not found</text></error></iq>
+            # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" /></iq>
+            # OUR ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
+            # OFFLINE ERROR <iq id="4" from="RESPONDER/RESOURCE" xml:lang="en" to="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel" code="503"><service-unavailable xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" xml:lang="en">User session not found</text></error></iq>
             
             self.send_example_iq_tag_from_string(self.to, string)
-            # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="<https://example.net/our_extension>" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
+            # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag secound_field="2" first_field="1" /></example_tag></iq>
     
     
         def example_tag_result_iq(self, iq):
@@ -1782,20 +1782,21 @@ There is a way to do this with a dictionary and name for the nested element tag.
 
 .. code-block:: xml
 
-    <example_tag xmlns="<https://example.net/our_extension>" some_string="StringFromFile">Info_inside_tag<inside_tag first_field="3" secound_field="4" /></example_tag>
+    <example_tag xmlns="https://example.net/our_extension" some_string="StringFromFile">Info_inside_tag<inside_tag first_field="3" secound_field="4" /></example_tag>
 
-## Sources and references
+Sources and references
+---------------------
 
 The Slixmpp project description:
 
-- [https://pypi.org/project/slixmpp/](https://pypi.org/project/slixmpp/)
+* https://pypi.org/project/slixmpp/
 
 Official web documentation:
 
-- [https://slixmpp.readthedocs.io/](https://slixmpp.readthedocs.io/)
+* https://slixmpp.readthedocs.io/
 
-Official pdf documentation:
+Official PDF documentation:
 
-- [https://buildmedia.readthedocs.org/media/pdf/slixmpp/latest/slixmpp.pdf](https://buildmedia.readthedocs.org/media/pdf/slixmpp/latest/slixmpp.pdf)
+* https://buildmedia.readthedocs.org/media/pdf/slixmpp/latest/slixmpp.pdf
 
 Note: Web and PDF Documentations have differences and some things are mentioned in only one of them.
