@@ -21,7 +21,7 @@ Instalacja dla Ubuntu linux:
 * `'subprocess'`
 * `'threading'`
 
-Wszystkie biblioteki wymienione powyżej, za wyjątkiem slixmpp, należą do standardowej biblioteki pythona. Zdaża się, że kompilując źródła samodzielnie, część z nich może nie zostać zainstalowana.
+Wszystkie biblioteki wymienione powyżej, za wyjątkiem slixmpp, należą do standardowej biblioteki pythona. Zdarza się, że kompilując źródła samodzielnie, część z nich może nie zostać zainstalowana.
 
 .. code-block:: python
 
@@ -70,7 +70,7 @@ Skrypt uruchamiający klientów
 
 Skrypt pozwalający testować klientów powinien zostać stworzony poza lokalizacją projektu. Pozwoli to szybko sprawdzać wyniki skryptów oraz uniemożliwi przypadkowe wysłanie swoich danych na gita.
 
-Przykładowo, można stworzyć plik o nazwie `'test_slixmpp'` w lokalizacji `'/usr/bin'` i nadać mu uprawnienia wykonywawcze:
+Przykładowo, można stworzyć plik o nazwie `'test_slixmpp'` w lokalizacji `'/usr/bin'` i nadać mu uprawnienia wykonawcze:
 
 .. code-block:: bash
 
@@ -127,14 +127,14 @@ Taki plik powinien wymagać uprawnień superuser do odczytu i edycji. Plik zawie
 
 Funkcja `'subprocess.run()'` jest kompatybilna z Pythonem 3.5+. Dla uzyskania wcześniejszej kompatybilności można podmienić ją metodą `'subprocess.call()'` i dostosować argumenty.
 
-Skrypt uruchomieniowy powinien być dostosowany do naszych potrzeb: można w nim pobierać ścieżki do projektu z linii komend (przez `'sys.argv[...]'` lub `'os.getcwd()'`), wybierać z jaką flagą mają zostać uruchomione programy oraz wiele innych. Jego należyte przygotowanie pozwoli zaoszczędzić czas i nerwy podczas późniejszych prac.
+Skrypt uruchamiający powinien być dostosowany do naszych potrzeb: można w nim pobierać ścieżki do projektu z linii komend (przez `'sys.argv[...]'` lub `'os.getcwd()'`), wybierać z jaką flagą mają zostać uruchomione programy oraz wiele innych. Jego należyte przygotowanie pozwoli zaoszczędzić czas i nerwy podczas późniejszych prac.
 
-W przypadku testowania większych aplikacji, w tworzeniu pluginu szczególnie użyteczne jest nadanie unikalnych nazwy dla każdego klienta (w konsekwencji: różne linie poleceń). Pozwala to szybko okreslić, który klient co zwraca, bądź który powoduje błąd.
+W przypadku testowania większych aplikacji, w tworzeniu pluginu szczególnie użyteczne jest nadanie unikalnych nazwy dla każdego klienta (w konsekwencji: różne linie poleceń). Pozwala to szybko określić, który klient co zwraca, bądź który powoduje błąd.
 
 Stworzenie klienta i pluginu
 ----------------------------
 
-W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp (w przykładach: `'sender'` i `'responder'`), aby sprawdzić czy nasz skrypt uruchomieniowy działa poprawnie. Poniżej przedstawiona została minimalna niezbędna implementacja, która może testować plugin w trakcie jego projektowania:
+W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp (w przykładach: `'sender'` i `'responder'`), aby sprawdzić czy nasz skrypt uruchamiający działa poprawnie. Poniżej przedstawiona została minimalna niezbędna implementacja, która może testować plugin w trakcie jego projektowania:
 
 .. code-block:: python
 
@@ -159,7 +159,7 @@ W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp (w prz
             self.add_event_handler("session_start", self.start)
 
     def start(self, event):
-		# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostepność online.
+		# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępność online.
         self.send_presence()
         self.get_roster()
 
@@ -221,7 +221,7 @@ W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp (w prz
             self.add_event_handler("session_start", self.start)
             
         def start(self, event):
-			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępność online
             self.send_presence()
             self.get_roster()
 
@@ -264,7 +264,7 @@ W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp (w prz
             except:
                 pass
 
-Następny plik, który należy stworzyć to `'example_plugin'`. Powinien być w lokalizacji dostepnej dla klientów (domyślnie w tej samej, co skrypty klientów).
+Następny plik, który należy stworzyć to `'example_plugin'`. Powinien być w lokalizacji dostępnej dla klientów (domyślnie w tej samej, co skrypty klientów).
 
 .. code-block:: python
 
@@ -312,14 +312,14 @@ Pierwsze uruchomienie i przechwytywanie eventów
 
 Aby sprawdzić czy wszystko działa prawidłowo, można użyć metody `'start'`. Jest jej przypisany event `'session_start'`. Sygnał ten zostanie wysłany w momencie, w którym klient będzie gotów do działania. Stworzenie własnej metoda pozwoli na zdefiniowanie działania tego sygnału.
 
-W metodzie `'__init__'` zostało stworzone przekierowanie eventu `'session_start'`. Kiedy zostanie on wywołany, metoda `'def start(self, event):'` zostanie wykonana. Jako pierwszy krok procesie tworzenia, można dodać linię `'logging.info("I'm running")'` w obu klientach (sender i responder), a nastepnie użyć komendy `'test_slixmpp'`.
+W metodzie `'__init__'` zostało stworzone przekierowanie eventu `'session_start'`. Kiedy zostanie on wywołany, metoda `'def start(self, event):'` zostanie wykonana. Jako pierwszy krok procesie tworzenia, można dodać linię `'logging.info("I'm running")'` w obu klientach (sender i responder), a następnie użyć komendy `'test_slixmpp'`.
 
 Metoda `'def start(self, event):'` powinna wyglądać tak:
 
 .. code-block:: python
 
     def start(self, event):
-        # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
+        # Metody niewymagane, ale pozwalające na zobaczenie dostępności online.
         self.send_presence()
         self.get_roster()
 
@@ -332,7 +332,7 @@ Jeżeli oba klienty uruchomiły się poprawnie, można zakomentować tą linię.
 Budowanie obiektu Message
 -------------------------
 
-Wysyłający powinien posiadać informację o tym, do kogo należy wysłać wiadomość. Nazwę i scieżkę odbiorcy można przekazać, na przykład, przez argumenty wywołania skryptu w lini komend. W poniższym przykładzie, są one trzymane w atrybucie `'self.to'`.
+Wysyłający powinien posiadać informację o tym, do kogo należy wysłać wiadomość. Nazwę i ścieżkę odbiorcy można przekazać, na przykład, przez argumenty wywołania skryptu w linii komend. W poniższym przykładzie, są one trzymane w atrybucie `'self.to'`.
 
 Przykład:
 
@@ -350,7 +350,7 @@ Przykład:
             self.add_event_handler("session_start", self.start)
 
         def start(self, event):
-        # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
+        # Metody niewymagane, ale pozwalające na zobaczenie dostępności online.
             self.send_presence()
             self.get_roster()
             #>>>>>>>>>>>>
@@ -382,7 +382,7 @@ Aby otrzymać tę wiadomość, responder powinien wykorzystać odpowiedni event:
             #<<<<<<<<<<<<
 
         def start(self, event):
-        # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
+        # Metody niewymagane, ale pozwalające na zobaczenie dostępności online.
             self.send_presence()
             self.get_roster()
     
@@ -410,14 +410,14 @@ Aby rozszerzyć obiekt Message o wybrany tag, plugin powinien zostać zarejestro
     
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>
-            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowany rozszerzony tag dla obiektu Message. Jeśli to nie zostanie zrobione, message['example_tag'] będzie polem tekstowym, a nie rozszerzeniem i nie będzie mogło zawierać atrybutów i podelementów.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowany rozszerzony tag dla obiektu Message. Jeśli to nie zostanie zrobione, message['example_tag'] będzie polem tekstowym, a nie rozszerzeniem i nie będzie mogło zawierać atrybutów i pod-elementów.
             #<<<<<<<<<<<<
 
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ Nazwa głównego pliku XML dla tego rozszerzenia..
         namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>. Powinna zostać zmieniona na własną.
     
-        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestronanego obieksu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
+        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestrowanego obiektu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
         
         interfaces = {"boolean", "some_string"}                     ##~ Lista kluczy słownika, które mogą być użyte z obiektem. Na przykład: `stanza_object['example_tag']` zwraca {"another": "some", "data": "some"}, gdzie `'example_tag'` jest nazwą rozszerzenia ElementBase.
 
@@ -445,7 +445,7 @@ Teraz, po rejestracji tagu, można rozszerzyć wiadomość.
             self.add_event_handler("session_start", self.start)
 
         def start(self, event):
-            # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
+            # Metody niewymagane, ale pozwalające na zobaczenie dostępności online.
             self.send_presence()
             self.get_roster()
             self.send_example_message(self.to, "example_message")
@@ -482,7 +482,7 @@ Jeśli event nie zostanie sprecyzowany, to zarówno rozszerzona jak i podstawowa
                         Callback('ExampleMessage Event:example_tag',##~ Nazwa tego Callback
                         StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Przechwytuje wyłącznie Message z tagiem example_tag i namespace takim jaki zdefiniowaliśmy w ExampleTag
                         self.__handle_message))                     ##~ Metoda do której zostaje przypisany przechwycony odpowiedni obiekt, powinna wywołać odpowiedni event dla klienta.
-            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowany rozszerzony tag dla obiektu Message. Jeśli to nie zostanie zrobione, message['example_tag'] będzie polem tekstowym, a nie rozszerzeniem i nie będzie mogło zawierać atrybutów i podelementów.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowany rozszerzony tag dla obiektu Message. Jeśli to nie zostanie zrobione, message['example_tag'] będzie polem tekstowym, a nie rozszerzeniem i nie będzie mogło zawierać atrybutów i pod-elementów.
 
         def __handle_message(self, msg):
             # Tu można coś zrobić z przechwyconą wiadomością zanim trafi do klienta.
@@ -512,7 +512,7 @@ Teraz, program przechwyci wszystkie message, które zawierają sprecyzowany name
             self.add_event_handler("session_start", self.start)
 
         def start(self, event):
-            # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
+            # Metody niewymagane, ale pozwalające na zobaczenie dostępności online.
             self.send_presence()
             self.get_roster()
             #>>>>>>>>>>>>
@@ -543,7 +543,7 @@ Należy zapamiętać linię: `'self.xmpp.event('example_tag_message', msg)'`. W 
             #<<<<<<<<<<<<
 
         def start(self, event):
-            # Metody niewymagane, ale pozwalające na zobaczenie dostepności online.
+            # Metody niewymagane, ale pozwalające na zobaczenie dostępności online.
             self.send_presence()
             self.get_roster()
     
@@ -553,7 +553,7 @@ Należy zapamiętać linię: `'self.xmpp.event('example_tag_message', msg)'`. W 
         #<<<<<<<<<<<<
 
 Można odesłać wiadomość, ale nic się nie stanie jeśli to nie zostanie zrobione. 
-Natomiast obiekt komunikacji (Iq) już będzie wymagał odpowiedzi, więc obydwaj klienci powinni pozostawać online. W innym wypadku, klient otrzyma automatyczny error z powodu timeout, jeśli cell Iq nie odpowie za pomocą Iq o tym samym Id.
+Natomiast obiekt komunikacji (Iq) już będzie wymagał odpowiedzi, więc obydwaj klienci powinni pozostawać online. W innym wypadku, klient otrzyma automatyczny error z powodu timeoutu, jeśli cell Iq nie odpowie za pomocą Iq o tym samym Id.
 
 Użyteczne metody i inne
 -----------------------
@@ -602,19 +602,19 @@ Aby przerobić przykładowy obiekt Message na obiekt Iq, należy zarejestrować 
         # Wszystkie możliwe typy Iq to: get, set, error, result
         def __handle_get_iq(self, iq):
             # Zrób coś z otrzymanym iq
-            self.xmpp.event('example_tag_get_iq', iq)           ##~ Wywołuje event, który może być obsłuzony przez klienta lub inaczej.
+            self.xmpp.event('example_tag_get_iq', iq)           ##~ Wywołuje event, który może być obsłużony przez klienta lub inaczej.
             
         def __handle_result_iq(self, iq):
             # Zrób coś z otrzymanym Iq
-            self.xmpp.event('example_tag_result_iq', iq)           ##~ Wywołuje event, który może być obsłuzony przez klienta lub inaczej.
+            self.xmpp.event('example_tag_result_iq', iq)           ##~ Wywołuje event, który może być obsłużony przez klienta lub inaczej.
     
         def __handle_error_iq(self, iq):
             # Zrób coś z otrzymanym Iq
-            self.xmpp.event('example_tag_error_iq', iq)           ##~ Wywołuje event, który może być obsłuzony przez klienta lub inaczej.
+            self.xmpp.event('example_tag_error_iq', iq)           ##~ Wywołuje event, który może być obsłużony przez klienta lub inaczej.
     
         def __handle_message(self, msg):
             # Zrób coś z otrzymanym message
-            self.xmpp.event('example_tag_message', msg)           ##~ Wywołuje event, który może być obsłuzony przez klienta lub inaczej.
+            self.xmpp.event('example_tag_message', msg)           ##~ Wywołuje event, który może być obsłużony przez klienta lub inaczej.
 
 Eventy wywołane przez powyższe handlery mogą zostać przechwycone tak, jak w przypadku eventu `'example_tag_message'`.
     
@@ -659,7 +659,7 @@ Domyślnie parametr `'clear'` dla `'Iq.reply'` jest ustawiony na True. Wtedy to,
             #<<<<<<<<<<<<
             
         def start(self, event):
-			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępność online
             self.send_presence()
             self.get_roster()
 
@@ -717,7 +717,7 @@ Z rozszerzenia ExampleTag, dostęp do elementów jest podobny, tyle że, nie wym
         name = "example_tag"                                        ##~ Nazwa głównego pliku XML tego rozszerzenia.
         namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>. Powinna zostać zmieniona na własną.
     
-        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestronanego obieksu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
+        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestrowanego obiektu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
         
         interfaces = {"boolean", "some_string"}                     ##~ Lista kluczy słownika, które mogą być użyte z obiektem. Na przykład: `stanza_object['example_tag']` zwraca {"another": "some", "data": "some"}, gdzie `'example_tag'` jest nazwą rozszerzenia ElementBase.
         
@@ -767,7 +767,7 @@ Kiedy odpowiednie gettery i settery są tworzone, można sprawdzić, czy na pewn
 Wczytanie ExampleTag ElementBase z pliku XML, łańcucha znaków i innych obiektów
 -------------------------
 
-Jest wiele możliwości na wczytanie wcześniej zdefiniowanego napisu z pliku albo lxml (ElementTree). Poniższy przykład wykorzystuje parsowanie typu napisowego do lxml (ElementTree) i przekazanie atrybutów.
+Jest wiele możliwości na wczytanie wcześniej zdefiniowanego napisu z pliku albo lxml (ElementTree). Poniższy przykład wykorzystuje parsowanie typu tekstowego do lxml (ElementTree) i przekazanie atrybutów.
 
 .. code-block:: python
 
@@ -781,7 +781,7 @@ Jest wiele możliwości na wczytanie wcześniej zdefiniowanego napisu z pliku al
         name = "example_tag"                                        ##~ Nazwa głównego pliku XML tego rozszerzenia.
         namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>. Powinna zostać zmieniona na własną.
     
-        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestronanego obieksu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
+        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestrowanego obiektu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
         
         interfaces = {"boolean", "some_string"}                     ##~ Lista kluczy słownika, które mogą być użyte z obiektem. Na przykład: `stanza_object['example_tag']` zwraca {"another": "some", "data": "some"}, gdzie `'example_tag'` jest nazwą rozszerzenia ElementBase.
         
@@ -833,7 +833,7 @@ Do przetestowania tej funkcjonalności, potrzebny jest pliku zawierający xml z 
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
     
         def start(self, event):
-			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępność online
             self.send_presence()
             self.get_roster()
     
@@ -930,11 +930,11 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
     
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Nazwa tego Callbacku
-                        StanzaPath(f'message/{{{namespace}}}example_tag'),         ##~ Obsługije tylko Message z example_tag
+                        StanzaPath(f'message/{{{namespace}}}example_tag'),         ##~ Obsługuje tylko Message z example_tag
                         self.__handle_message))                     ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
     
-            register_stanza_plugin(Iq, ExampleTag)                  ##~ Zarejestrowane rozszerzenia tagu dla Iq. Bez tego, iq['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć podelementów.
-            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowane rozszerzenia tagu dla Message. Bez tego, message['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć podelementów.
+            register_stanza_plugin(Iq, ExampleTag)                  ##~ Zarejestrowane rozszerzenia tagu dla Iq. Bez tego, iq['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć pod-elementów.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowane rozszerzenia tagu dla Message. Bez tego, message['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć pod-elementów.
    
         # Wszystkie możliwe typy iq: get, set, error, result
         def __handle_get_iq(self, iq):
@@ -963,7 +963,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
         name = "example_tag"                                        ##~ Nazwa głównego pliku XML tego rozszerzenia.
         namespace = "https://example.net/our_extension"             ##~ Nazwa obiektu, np. <example_tag xmlns={namespace} (...)</example_tag>. Powinna zostać zmieniona na własną.
     
-        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestronanego obieksu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
+        plugin_attrib = "example_tag"                               ##~ Nazwa, którą można odwołać się do obiektu. W szczególności, do zarejestrowanego obiektu można odwołać się przez: nazwa_obiektu['tag']. gdzie `'tag'` jest nazwą ElementBase extension. Nazwa powinna być taka sama jak "name" wyżej.
         
         interfaces = {"boolean", "some_string"}                     ##~ Lista kluczy słownika, które mogą być użyte z obiektem. Na przykład: `stanza_object['example_tag']` zwraca {"another": "some", "data": "some"}, gdzie `'example_tag'` jest nazwą rozszerzenia ElementBase.
     
@@ -1032,11 +1032,11 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             self.add_event_handler("example_tag_message", self.example_tag_message)
     
         def start(self, event):
-			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępność online
             self.send_presence()
             self.get_roster()
             
-        def example_tag_get_iq(self, iq): # Iq zawsze powinien odpowiedzieć. Jeżeli użytkownik jest offline, zostanie zrwócony error.
+        def example_tag_get_iq(self, iq): # Iq zawsze powinien odpowiedzieć. Jeżeli użytkownik jest offline, zostanie zwrócony error.
             logging.info(iq)
             reply = iq.reply()
             reply["example_tag"].fill_interfaces(True, "Reply_string")
@@ -1111,7 +1111,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
     
         def start(self, event):
-			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępnośc online
+			# Dwie niewymagane metody pozwalające innym użytkownikom zobaczyć dostępność online
             self.send_presence()
             self.get_roster()
     
@@ -1242,7 +1242,7 @@ Tagi i atrybuty zagnieżdżone wewnątrz głównego elementu
 
 Aby stworzyć zagnieżdżony tag, wewnątrz głównego tagu, rozważmy atrybut `'self.xml'` jako Element z ET (ElementTree). W takim wypadku, aby stworzyć zagnieżdżony element można użyć funkcji 'append'.
 
-Można powtórzyć poprzednie działania inicjalizując nowy element jak główny (ExampleTag). Jednak jeśli nie potrzebujemy dodatkowych metod, czy walidacji, a jest to wynik dla innego procesu który i tak będzie parsował xml, wtedy możemy zagnieździć zwyczajny Element z ElementTree za pomocą metody `'append'`. W przypadku przetwarzania typy napisowego, można to zrobić nawet dzięki parsowaniu napisu na Element - kolejne zagnieżdżenia już będą w dodanym Elemencie do głównego. By nie powtarzać metody setup, poniżej przedstawione jest ręczne dodanie zagnieżdżonego taga konstruując ET.Element samodzielnie.
+Można powtórzyć poprzednie działania inicjalizując nowy element jak główny (ExampleTag). Jednak jeśli nie potrzebujemy dodatkowych metod, czy walidacji, a jest to wynik dla innego procesu który i tak będzie parsował xml, wtedy możemy zagnieździć zwyczajny Element z ElementTree za pomocą metody `'append'`. W przypadku przetwarzania typu tekstowego, można to zrobić nawet dzięki parsowaniu napisu na Element - kolejne zagnieżdżenia już będą w dodanym Elemencie do głównego. By nie powtarzać metody setup, poniżej przedstawione jest ręczne dodanie zagnieżdżonego taga konstruując ET.Element samodzielnie.
 
 .. code-block:: python
 
