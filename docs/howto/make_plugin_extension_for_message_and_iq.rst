@@ -127,7 +127,7 @@ This file should be readable and writable only with superuser permission. This f
 
 The `'subprocess.run()'`function is compatible with Python 3.5+. If the backward compatibility is needed, replace it with `'subprocess.call'` method and adjust accordingly. 
 
-The launch script should be convenient in use and easy to reconfigure again. The proper preparation of it now, can help saving time in the future. We can define there the logging credentials, the project paths (from `'sys.argv[...]'` or `'os.getcwd()'`), set the parameters for the debugging purposes, mock the testing xml file and many more. Whichever parameters are used, the script testing itself should be fast and effortless. The proper preparation of it now, can help saving time in the future.
+The launch script should be convenient in use and easy to reconfigure again. The proper preparation of it now, can help saving time in the future. Logging credentials, the project paths (from `'sys.argv[...]'` or `'os.getcwd()'`), set the parameters for the debugging purposes, mock the testing xml file and many more things can be defined inside. Whichever parameters are used, the script testing itself should be fast and effortless. The proper preparation of it now, can help saving time in the future.
 
 In case of manually testing the larger applications, it would be a good practise to introduce the unique names (consequently, different commands) for each client. In case of any errors, it will be easier to find the client that caused it.
 
@@ -310,7 +310,7 @@ The other solution is to relative import it (with dots '.') to get the proper pa
 First run and the event handlers
 -----------------------------------------------
 
-To check if everything is okay, we can use the `'start'` method (which triggers the `'session_start'` event). Right after the client is ready, the signal will be sent.
+To check if everything is okay, the `'start'` method can be used(which triggers the `'session_start'` event). Right after the client is ready, the signal will be sent.
 
 In the `'__init__'` method, the handler for event call `'session_start'` is created. When it is called,  the `'def start(self, event):'` method will be executed. During the first run, add the line: `'logging.info("I'm running")'` to both the sender and the responder, and use `'test_slixmpp'` command.
 
@@ -327,7 +327,7 @@ The `'def start(self, event):'` method should look like this:
         logging.info("I'm running")
         #<<<<<<<<<<<<
 
-If everything works fine, we can comment this line out.
+If everything works fine, this line can be commented out.
 
 Building the message object
 -------------------------
@@ -363,7 +363,7 @@ Code example:
             msg.send()
             #<<<<<<<<<<<<
 
-In the example below, we are using the build-in method `'make_message'`. It creates a string "example_message" and sends it at the end of `'start'` method. The message will be sent once, after the script launch.
+In the example below, the build-in method `'make_message'` is used. It creates a string "example_message" and sends it at the end of `'start'` method. The message will be sent once, after the script launch.
 
 To receive this message, the responder should have a proper handler to the signal with the message object and the method to decide what to do with this message. As it is shown in the example below:
 
@@ -491,7 +491,7 @@ If the separate event is not defined, then both normal and extended message will
 StanzaPath objects should be initialised in a specific way, such as:
 `'OBJECT_NAME[@type=TYPE_OF_OBJECT][/{NAMESPACE}[TAG]]'`
 
-* For OBJECT_NAME we can use `'message'` or `'iq'`.
+* OBJECT_NAME can be `'message'` or `'iq'`.
 * For TYPE_OF_OBJECT, when iq is specified, `'get, set, error or result'` can be used. When object is a message, then the message type can be used, like `'chat'`.
 * NAMESPACE should always be a namespace from tag extension class.
 * TAG should contain the tag, in this case:`'example_tag'`.
@@ -552,8 +552,8 @@ Now, remember the line: `'self.xmpp.event('example_tag_message', msg)'`. The nam
             logging.info(msg) # Message is standalone object, it can be replied, but no error is returned if not.
         #<<<<<<<<<<<<
 
-The messages can be replied, but nothing will happen if we don't.
-However, when we receive the Iq object, we should always reply. Otherwise, the error occurs on the client side due to the target timeout if the cell Iq won't reply with Iq with the same Id.
+The messages can be replied, but nothing will happen otherwise.
+The Iq object, on the other hand, should always be replied. Otherwise, the error occurs on the client side due to the target timeout if the cell Iq won't reply with Iq with the same Id.
 
 Useful methods and misc.
 -----------------------
@@ -805,7 +805,7 @@ There are many ways to set up a xml from a string, xml-containing file or lxml (
                 self.xml.append(inner_tag)
             #<<<<<<<<<<<<
 
-To test this, we need an example file with xml, example xml string and example lxml (ET) object:
+To test this, an example file with xml, example xml string and example lxml (ET) object is needed:
 
 .. code-block:: xml
 
@@ -1185,7 +1185,7 @@ The following code presents exactly this:
         def send_example_iq_to_get_error(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=4)
-            iq['example_tag'].set_boolean(True) # For example, the condition to receive the error respond is the example_tag the without boolean value.
+            iq['example_tag'].set_boolean(True) # For example, the condition to receive the error respond is the example_tag without the boolean value.
             iq.send()
     
         def send_example_iq_tag_from_string(self, to, string):
@@ -1256,9 +1256,9 @@ As shown in the previous examples, it is possible to create a new element as mai
         def add_inside_tag(self, tag, attributes, text=""):
             #If more tags is needed inside the element, they can be added like that:
             itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Initialise ET with tag, for example: <example_tag (...)> <inside_tag namespace="<https://example.net/our_extension>"/></example_tag>
-            itemXML.attrib.update(attributes) #~ There we add some fields inside tag, for example: <inside_tag namespace=(...) inner_data="some"/>
+            itemXML.attrib.update(attributes) #~ Here we add some fields inside tag, for example: <inside_tag namespace=(...) inner_data="some"/>
             itemXML.text = text #~ Fill field inside tag, for example: <inside_tag (...)>our_text</inside_tag>
-            self.xml.append(itemXML) #~ Add that all what we set, as inner tag inside `example_tag` tag.
+            self.xml.append(itemXML) #~ Add that is all, what needs to be set as an inner tag inside the `example_tag` tag.
 
 There is a way to do this with a dictionary and name for the nested element tag. In that case, the insides of the function fields should be transferred to the ET element.
 

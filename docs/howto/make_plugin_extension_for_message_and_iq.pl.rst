@@ -127,14 +127,14 @@ Taki plik powinien wymagać uprawnień superuser do odczytu i edycji. Plik zawie
 
 Funkcja `'subprocess.run()'` jest kompatybilna z Pythonem 3.5+. Dla uzyskania wcześniejszej kompatybilności można podmienić ją metodą `'subprocess.call()'` i dostosować argumenty.
 
-Skrypt uruchamiający powinien być dostosowany do naszych potrzeb: można w nim pobierać ścieżki do projektu z linii komend (przez `'sys.argv[...]'` lub `'os.getcwd()'`), wybierać z jaką flagą mają zostać uruchomione programy oraz wiele innych. Jego należyte przygotowanie pozwoli zaoszczędzić czas i nerwy podczas późniejszych prac.
+Skrypt uruchamiający powinien być dostosowany do potrzeb urzytkownika: można w nim pobierać ścieżki do projektu z linii komend (przez `'sys.argv[...]'` lub `'os.getcwd()'`), wybierać z jaką flagą mają zostać uruchomione programy oraz wiele innych. Jego należyte przygotowanie pozwoli zaoszczędzić czas i nerwy podczas późniejszych prac.
 
 W przypadku testowania większych aplikacji, w tworzeniu pluginu szczególnie użyteczne jest nadanie unikalnych nazwy dla każdego klienta (w konsekwencji: różne linie poleceń). Pozwala to szybko określić, który klient co zwraca, bądź który powoduje błąd.
 
 Stworzenie klienta i pluginu
 ----------------------------
 
-W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp (w przykładach: `'sender'` i `'responder'`), aby sprawdzić czy nasz skrypt uruchamiający działa poprawnie. Poniżej przedstawiona została minimalna niezbędna implementacja, która może testować plugin w trakcie jego projektowania:
+W stosownej dla nas lokalizacji powinniśmy stworzyć dwa klienty slixmpp (w przykładach: `'sender'` i `'responder'`), aby sprawdzić czy skrypt uruchamiający działa poprawnie. Poniżej przedstawiona została minimalna niezbędna implementacja, która może testować plugin w trakcie jego projektowania:
 
 .. code-block:: python
 
@@ -295,7 +295,7 @@ Następny plik, który należy stworzyć to `'example_plugin'`. Powinien być w 
         name = "example_tag"                                        ##~ Nazwa głównego pliku XML w tym rozszerzeniu.
         namespace = "https://example.net/our_extension"             ##~ Namespace obiektu jest definiowana w tym miejscu, powinien się odnosić do nazwy portalu xmpp; w wiadomości wygląda tak: <example_tag xmlns={namespace} (...)</example_tag>
     
-        plugin_attrib = "example_tag"                               ##~ Nazwa pod którą można odwoływać się do danych zawartych w tym pluginie. Bardziej szczegółowo: tutaj rejestrujemy nazwę obiektu by móc się do niego odwoływać z zewnątrz. Można się do niego odwoływać jak do słownika: stanza_object['example_tag'], gdzie `'example_tag'` staje się nazwą pluginu i powinno być takie samo jak name.
+        plugin_attrib = "example_tag"                               ##~ Nazwa pod którą można odwoływać się do danych zawartych w tym pluginie. Bardziej szczegółowo: tutaj rejestrujemy nazwę obiektu by móc się do niego odwoływać z zewnątrz. Można się do niego odwoływać jak do słownika: stanza_object['example_tag'], gdzie `'example_tag'` jest nazwą pluginu i powinno być takie samo jak name.
         
         interfaces = {"boolean", "some_string"}                     ##~ Zbiór kluczy dla słownika atrybutów elementu które mogą być użyte w elemencie. Na przykład `stanza_object['example_tag']` poda informacje o: {"boolean": "some", "some_string": "some"}, tam gdzie `'example_tag'` jest elementu.
 
@@ -1256,10 +1256,10 @@ Można powtórzyć poprzednie działania inicjalizując nowy element jak główn
     
         def add_inside_tag(self, tag, attributes, text=""):
             #Można rozszerzyć tag o tagi wewnętrzne do tagu, na przykład tak:
-            itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Inicjalizujemy Element z naszym wewnętrznym tagiem, na przykład: <example_tag (...)> <inside_tag namespace="https://example.net/our_extension"/></example_tag>
+            itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Inicjalizujemy Element z wewnętrznym tagiem, na przykład: <example_tag (...)> <inside_tag namespace="https://example.net/our_extension"/></example_tag>
             itemXML.attrib.update(attributes) #~ Przypisujemy zdefiniowane atrybuty, na przykład: <inside_tag namespace=(...) inner_data="some"/>
             itemXML.text = text #~ Dodajemy text wewnątrz tego tagu: <inside_tag (...)>our_text</inside_tag>
-            self.xml.append(itemXML) #~ I tak skonstruowany Element po prostu dodajemy do elementu z naszym tagiem `example_tag`.
+            self.xml.append(itemXML) #~ I tak skonstruowany Element po prostu dodajemy do elementu z tagiem `example_tag`.
 
 Można też zrobić to samo używając słownika i nazw jako kluczy zagnieżdżonych elementów. W takim przypadku, pola funkcji powinny zostać przeniesione do ET.
 
