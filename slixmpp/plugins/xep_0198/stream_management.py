@@ -131,6 +131,7 @@ class XEP_0198(BasePlugin):
         self.xmpp.add_filter('in', self._handle_incoming)
         self.xmpp.add_filter('out_sync', self._handle_outgoing)
 
+        self.xmpp.add_event_handler('disconnected', self.disconnected)
         self.xmpp.add_event_handler('session_end', self.session_end)
 
     def plugin_end(self):
@@ -139,6 +140,7 @@ class XEP_0198(BasePlugin):
 
         self.xmpp.unregister_feature('sm', self.order)
         self.xmpp.unregister_feature('sm', self.resume_order)
+        self.xmpp.del_event_handler('disconnected', self.disconnected)
         self.xmpp.del_event_handler('session_end', self.session_end)
         self.xmpp.del_filter('in', self._handle_incoming)
         self.xmpp.del_filter('out_sync', self._handle_outgoing)
@@ -153,6 +155,10 @@ class XEP_0198(BasePlugin):
         self.xmpp.remove_stanza(stanza.Resumed)
         self.xmpp.remove_stanza(stanza.Ack)
         self.xmpp.remove_stanza(stanza.RequestAck)
+
+    def disconnected(self, event):
+        """Reset enabled state until we can resume/reenable."""
+        self.enabled = False
 
     def session_end(self, event):
         """Reset stream management state."""
