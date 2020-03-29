@@ -83,10 +83,6 @@ class XEP_0198(BasePlugin):
         self.xmpp.register_stanza(stanza.Ack)
         self.xmpp.register_stanza(stanza.RequestAck)
 
-        # Only end the session when a </stream> element is sent,
-        # not just because the connection has died.
-        self.xmpp.end_session_on_disconnect = False
-
         # Register the feature twice because it may be ordered two
         # different ways: enabling after binding and resumption
         # before binding.
@@ -246,6 +242,7 @@ class XEP_0198(BasePlugin):
         self.enabled_in = True
         self.handled = 0
         self.xmpp.event('sm_enabled', stanza)
+        self.xmpp.end_session_on_disconnect = False
 
     def _handle_resumed(self, stanza):
         """Finish resuming a stream by resending unacked stanzas.
@@ -258,6 +255,7 @@ class XEP_0198(BasePlugin):
         for id, stanza in self.unacked_queue:
             self.xmpp.send(stanza, use_filters=False)
         self.xmpp.event('session_resumed', stanza)
+        self.xmpp.end_session_on_disconnect = False
 
     def _handle_failed(self, stanza):
         """
