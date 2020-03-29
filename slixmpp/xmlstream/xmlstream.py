@@ -277,6 +277,7 @@ class XMLStream(asyncio.BaseProtocol):
         )
         self.disconnect_reason = None
         self.cancel_connection_attempt()
+        self.connect_loop_wait = 0
         if host and port:
             self.address = (host, int(port))
         try:
@@ -301,6 +302,10 @@ class XMLStream(asyncio.BaseProtocol):
     async def _connect_routine(self):
         self.event_when_connected = "connected"
 
+        if self.connect_loop_wait > 0:
+            self.event('reconnect_delay', self.connect_loop_wait)
+            await asyncio.sleep(self.connect_loop_wait, loop=self.loop)
+
         record = await self.pick_dns_answer(self.default_domain)
         if record is not None:
             host, address, dns_port = record
@@ -317,7 +322,6 @@ class XMLStream(asyncio.BaseProtocol):
         else:
             ssl_context = None
 
-        await asyncio.sleep(self.connect_loop_wait, loop=self.loop)
         if self._current_connection_attempt is None:
             return
         try:
