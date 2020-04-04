@@ -160,7 +160,7 @@ except:
         return _fixed_offset_tzs[offsetmins]
 
 
-    _iso8601_parser = re.compile("""
+    _iso8601_parser = re.compile(r"""
         ^
         (?P<year> [0-9]{4})?(?P<ymdsep>-?)?
         (?P<month>[0-9]{2})?(?P=ymdsep)?
