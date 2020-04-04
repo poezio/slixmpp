@@ -1031,14 +1031,19 @@ class ElementBase(object):
         if not lang:
             lang = default_lang
 
+        parent = self.xml
         for level, _ in enumerate(path):
             # Generate the paths to the target elements and their parent.
             element_path = "/".join(path[:len(path) - level])
             parent_path = "/".join(path[:len(path) - level - 1])
 
             elements = self.xml.findall(element_path)
-            parent = self.xml.find(parent_path)
-
+            
+            if parent_path == '':
+                parent_path = None             
+            if parent_path is not None:     
+                parent = self.xml.find(parent_path)
+                        
             if elements:
                 if parent is None:
                     parent = self.xml
