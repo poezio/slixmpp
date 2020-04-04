@@ -17,7 +17,7 @@ from __future__ import with_statement, unicode_literals
 import copy
 import logging
 import weakref
-from xml.etree import cElementTree as ET
+from xml.etree import ElementTree as ET
 
 from slixmpp.xmlstream import JID
 from slixmpp.xmlstream.tostring import tostring
@@ -203,7 +203,7 @@ class ElementBase(object):
 
     """
     The core of Slixmpp's stanza XML manipulation and handling is provided
-    by ElementBase. ElementBase wraps XML cElementTree objects and enables
+    by ElementBase. ElementBase wraps XML ElementTree objects and enables
     access to the XML contents through dictionary syntax, similar in style
     to the Ruby XMPP library Blather's stanza implementation.
 
@@ -387,7 +387,7 @@ class ElementBase(object):
         self._index = 0
 
         #: The underlying XML object for the stanza. It is a standard
-        #: :class:`xml.etree.cElementTree` object.
+        #: :class:`xml.etree.ElementTree` object.
         self.xml = xml
 
         #: An ordered dictionary of plugin stanzas, mapped by their
