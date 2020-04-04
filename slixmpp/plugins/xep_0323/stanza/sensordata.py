@@ -516,7 +516,7 @@ class Field(ElementBase):
         :param value: string
         """
 
-        pattern = re.compile("^\d+([|]\w+([.]\w+)*([|][^,]*)?)?(,\d+([|]\w+([.]\w+)*([|][^,]*)?)?)*$")
+        pattern = re.compile(r"^\d+([|]\w+([.]\w+)*([|][^,]*)?)?(,\d+([|]\w+([.]\w+)*([|][^,]*)?)?)*$")
         if pattern.match(value) is not None:
             self.xml.stringIds = value
         else:
