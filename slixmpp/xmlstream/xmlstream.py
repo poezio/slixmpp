@@ -380,6 +380,7 @@ class XMLStream(asyncio.BaseProtocol):
             "ssl_object",
             default=self.transport.get_extra_info("socket")
         )
+        self._current_connection_attempt = None
         self.init_parser()
         self.send_raw(self.stream_header)
         self.dns_answers = None
@@ -437,6 +438,9 @@ class XMLStream(asyncio.BaseProtocol):
             error['text'] = 'Server sent: %r' % data
             self.send(error)
             self.disconnect()
+
+    def is_connecting(self):
+        return self._current_connection_attempt is not None
 
     def is_connected(self):
         return self.transport is not None
