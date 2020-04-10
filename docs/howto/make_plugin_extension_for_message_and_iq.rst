@@ -2,7 +2,7 @@ How to make a slixmpp plugins for Messages and IQ extensions
 ====================================================================
 
 Introduction and requirements
------------------
+------------------------------
 
 * `'python3'`
 
@@ -21,7 +21,7 @@ Ubuntu linux installation steps:
 * `'subprocess'`
 * `'threading'`
 
-Check if these libraries and the proper python version are available at your environment. Every one of these, except the slixmpp, is a standard python library. However, it may happened that some of them may not be installed.
+Check if these libraries and the proper python version are available at your environment. Every one of these, except the slixmpp, is a standard python library. However, it may happen that some of them may not be installed.
 
 .. code-block:: python
 
@@ -43,7 +43,7 @@ Example output:
     ~ $ python3 -c "import argparse; print(argparse.__version__)"
     1.1
     ~ $ python3 -c "import logging; print(logging.__version__)"
-    0.5.1.2    
+    0.5.1.2
     ~ $ python3 -m subprocess #Should return nothing
     ~ $ python3 -m threading #Should return nothing
 
@@ -62,8 +62,7 @@ If some of the libraries throws NameError, reinstall the whole package once agai
 * `Jabber accounts`
 
 For the testing purposes, two private jabber accounts are required. They can be created on one of many available sites:
-
-[https://www.google.com/search?q=jabber+server+list](https://www.google.com/search?q=jabber+server+list)
+https://www.google.com/search?q=jabber+server+list
 
 Client launch script
 -----------------------------
@@ -86,10 +85,10 @@ This file should be readable and writable only with superuser permission. This f
     import subprocess
     import threading
     import time
-    
+
     def start_shell(shell_string):
         subprocess.run(shell_string, shell=True, universal_newlines=True)
-    
+
     if __name__ == "__main__":
         #~ prefix = "x-terminal-emulator -e" # Separate terminal for every client; can be replaced with other terminal
         #~ prefix = "xterm -e"
@@ -97,24 +96,24 @@ This file should be readable and writable only with superuser permission. This f
         #~ postfix = " -d" # Debug
         #~ postfix = " -q" # Quiet
         postfix = ""
-    
+
         sender_path = "./example/sender.py"
         sender_jid = "SENDER_JID"
         sender_password = "SENDER_PASSWORD"
-    
+
         example_file = "./test_example_tag.xml"
-    
+
         responder_path = "./example/responder.py"
         responder_jid = "RESPONDER_JID"
         responder_password = "RESPONDER_PASSWORD"
-    
+
         # Remember about the executable permission. (`chmod +x ./file.py`)
         SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
                        " -t {responder_jid} --path {example_file} {postfix}"
-    
+
         RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
                        " -p {responder_password} {postfix}"
-        
+
         try:
             responder = threading.Thread(target=start_shell, args=(RESPON_TEST, ))
             sender = threading.Thread(target=start_shell, args=(SENDER_TEST, ))
@@ -125,16 +124,16 @@ This file should be readable and writable only with superuser permission. This f
         except:
            print ("Error: unable to start thread")
 
-The `'subprocess.run()'`function is compatible with Python 3.5+. If the backward compatibility is needed, replace it with `'subprocess.call'` method and adjust accordingly. 
+The `'subprocess.run()'`function is compatible with Python 3.5+. If the backward compatibility is needed, replace it with `'subprocess.call'` method and adjust accordingly.
 
 The launch script should be convenient in use and easy to reconfigure again. The proper preparation of it now, can help saving time in the future. Logging credentials, the project paths (from `'sys.argv[...]'` or `'os.getcwd()'`), set the parameters for the debugging purposes, mock the testing xml file and many more things can be defined inside. Whichever parameters are used, the script testing itself should be fast and effortless. The proper preparation of it now, can help saving time in the future.
 
-In case of manually testing the larger applications, it would be a good practise to introduce the unique names (consequently, different commands) for each client. In case of any errors, it will be easier to find the client that caused it.
+In case of manually testing the larger applications, it would be a good practice to introduce the unique names (consequently, different commands) for each client. In case of any errors, it will be easier to find the client that caused it.
 
 Creating the client and the plugin
-----------------------------
+-----------------------------------
 
-Two slimxmpp clients should be created in order to check if everything works correctly (here: the `'sender'` and the `'responder'`). The minimal amount of code needed for effective building and testing of the plugin is the following:
+Two slixmpp clients should be created in order to check if everything works correctly (here: the `'sender'` and the `'responder'`). The minimal amount of code needed for effective building and testing of the plugin is the following:
 
 .. code-block:: python
 
@@ -143,36 +142,36 @@ Two slimxmpp clients should be created in order to check if everything works cor
     from argparse import ArgumentParser
     from getpass import getpass
     import time
-    
+
     import slixmpp
     from slixmpp.xmlstream import ET
-    
+
     import example_plugin
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-            
+
             self.add_event_handler("session_start", self.start)
 
-    def start(self, event):
-        # Two, not required methods, but allows another users to see if the client is online.
-        self.send_presence()
-        self.get_roster()
+        def start(self, event):
+            # Two, not required methods, but allows another users to see if the client is online.
+            self.send_presence()
+            self.get_roster()
 
     if __name__ == '__main__':
         parser = ArgumentParser(description=Sender.__doc__)
-    
+
         parser.add_argument("-q", "--quiet", help="set logging to ERROR",
                             action="store_const", dest="loglevel",
                             const=logging.ERROR, default=logging.INFO)
         parser.add_argument("-d", "--debug", help="set logging to DEBUG",
                             action="store_const", dest="loglevel",
                             const=logging.DEBUG, default=logging.INFO)
-    
+
         parser.add_argument("-j", "--jid", dest="jid",
                             help="JID to use")
         parser.add_argument("-p", "--password", dest="password",
@@ -181,17 +180,17 @@ Two slimxmpp clients should be created in order to check if everything works cor
                             help="JID to send the message/iq to")
         parser.add_argument("--path", dest="path",
                             help="path to load example_tag content")
-    
+
         args = parser.parse_args()
-    
+
         logging.basicConfig(level=args.loglevel,
                             format=' %(name)s - %(levelname)-8s %(message)s')
-    
+
         if args.jid is None:
             args.jid = input("Username: ")
         if args.password is None:
             args.password = getpass("Password: ")
-    
+
         xmpp = Sender(args.jid, args.password, args.to, args.path)
         #xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is the example_plugin class name.
 
@@ -210,16 +209,16 @@ Two slimxmpp clients should be created in order to check if everything works cor
     import logging
     from argparse import ArgumentParser
     from getpass import getpass
-    
+
     import slixmpp
     import example_plugin
-    
+
     class Responder(slixmpp.ClientXMPP):
         def __init__(self, jid, password):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-            
+
             self.add_event_handler("session_start", self.start)
-            
+
         def start(self, event):
         # Two, not required methods, but allows another users to see if the client is online.
             self.send_presence()
@@ -227,34 +226,34 @@ Two slimxmpp clients should be created in order to check if everything works cor
 
     if __name__ == '__main__':
         parser = ArgumentParser(description=Responder.__doc__)
-    
+
         parser.add_argument("-q", "--quiet", help="set logging to ERROR",
                             action="store_const", dest="loglevel",
                             const=logging.ERROR, default=logging.INFO)
         parser.add_argument("-d", "--debug", help="set logging to DEBUG",
                             action="store_const", dest="loglevel",
                             const=logging.DEBUG, default=logging.INFO)
-    
+
         parser.add_argument("-j", "--jid", dest="jid",
                             help="JID to use")
         parser.add_argument("-p", "--password", dest="password",
                             help="password to use")
         parser.add_argument("-t", "--to", dest="to",
                             help="JID to send the message to")
-    
+
         args = parser.parse_args()
-    
+
         logging.basicConfig(level=args.loglevel,
                             format=' %(name)s - %(levelname)-8s %(message)s')
-    
+
         if args.jid is None:
             args.jid = input("Username: ")
         if args.password is None:
             args.password = getpass("Password: ")
-    
+
         xmpp = Responder(args.jid, args.password)
         #xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is the example_plugin class name.
-    
+
         xmpp.connect()
         try:
             xmpp.process()
@@ -264,39 +263,39 @@ Two slimxmpp clients should be created in order to check if everything works cor
             except:
                 pass
 
-Next file to create is `'example_plugin.py'`. It can be placed in the same catalogue as the clients, so the problems with unknown paths can be avoided.
+Next file to create is `'example_plugin.py'`. It can be placed in the same folder as the clients, so the problems with unknown paths can be avoided.
 
 .. code-block:: python
 
-    #File: $WORKDIR/example/example plugin.py
+    #File: $WORKDIR/example/example_plugin.py
     import logging
-    
+
     from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin
-    
+
     from slixmpp import Iq
     from slixmpp import Message
-    
+
     from slixmpp.plugins.base import BasePlugin
-    
+
     from slixmpp.xmlstream.handler import Callback
     from slixmpp.xmlstream.matcher import StanzaPath
-    
+
     log = logging.getLogger(__name__)
-    
+
     class OurPlugin(BasePlugin):
         def plugin_init(self):
             self.description = "OurPluginExtension"                 ##~ String data readable by humans and to find plugin by another plugin.
             self.xep = "ope"                                        ##~ String data readable by humans and to find plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` field, with 'xep_OPE' prefix.
-    
+
             namespace = ExampleTag.namespace
 
 
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element for that extension.
         namespace = "<https://example.net/our_extension>"             ##~ The namespace of the object, like <example_tag xmlns={namespace} (...)</example_tag>. Should be changed to your namespace.
-    
+
         plugin_attrib = "example_tag"                               ##~ The name under which the data in plugin can be accessed. In particular, this object is reachable from the outside with: stanza_object['example_tag']. The `'example_tag'` is name of ElementBase extension and should be that same as the name.
-        
+
         interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ElementBase extension.
 
 If the plugin is not in the same directory as the clients, then the symbolic link to the localisation reachable by the clients should be established:
@@ -330,23 +329,23 @@ The `'def start(self, event):'` method should look like this:
 If everything works fine, this line can be commented out.
 
 Building the message object
--------------------------
+------------------------------
 
-The example sender class should get a recipient name and address (jid of responder) from command line arguments, stored in test_slixmpp. An access to this argument is stored in the `'self.to'`attribute.
+The example sender class should get a recipient name and address (jid of responder) from command line arguments, stored in test_slixmpp. An access to this argument is stored in the `'self.to'` attribute.
 
 Code example:
 
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-            
+
             self.add_event_handler("session_start", self.start)
 
         def start(self, event):
@@ -355,10 +354,10 @@ Code example:
             self.get_roster()
             #>>>>>>>>>>>>
             self.send_example_message(self.to, "example_message")
-    
+
         def send_example_message(self, to, body):
             #~ make_message(mfrom=None, mto=None, mtype=None, mquery=None)
-            # Default mtype == "chat"; 
+            # Default mtype == "chat";
             msg = self.make_message(mto=to, mbody=body)
             msg.send()
             #<<<<<<<<<<<<
@@ -370,13 +369,13 @@ To receive this message, the responder should have a proper handler to the signa
 .. code-block:: python
 
     #File: $WORKDIR/example/responder.py
-    
+
     class Responder(slixmpp.ClientXMPP):
         def __init__(self, jid, password):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-            
+
             self.add_event_handler("session_start", self.start)
-            
+
             #>>>>>>>>>>>>
             self.add_event_handler("message", self.message)
             #<<<<<<<<<<<<
@@ -385,7 +384,7 @@ To receive this message, the responder should have a proper handler to the signa
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
-    
+
         #>>>>>>>>>>>>
         def message(self, msg):
             #Show all inside msg
@@ -395,19 +394,19 @@ To receive this message, the responder should have a proper handler to the signa
         #<<<<<<<<<<<<
 
 Expanding the Message with a new tag
--------------------------
+-------------------------------------
 
 To expand the Message object with a tag, the plugin should be registered as the extension for the Message object:
 
 .. code-block:: python
 
     #File: $WORKDIR/example/example plugin.py
-    
+
     class OurPlugin(BasePlugin):
         def plugin_init(self):
             self.description = "OurPluginExtension"                 ##~ String data readable by humans and to find plugin by another plugin.
             self.xep = "ope"                 ##~ String data readable by humans and to find plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'.
-    
+
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>
             register_stanza_plugin(Message, ExampleTag)             ##~ Register the tag extension for Message object, otherwise message['example_tag'] will be string field instead container and managing fields and create sub elements would be impossible.
@@ -416,15 +415,15 @@ To expand the Message object with a tag, the plugin should be registered as the 
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
         namespace = "https://example.net/our_extension"             ##~ The namespace for stanza object, like <example_tag xmlns={namespace} (...)</example_tag>.
-    
+
         plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ElementBase extension. And this should be that same as 'name' above.
-        
+
         interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
 
         #>>>>>>>>>>>>
         def set_boolean(self, boolean):
             self.xml.attrib['boolean'] = str(boolean)
-    
+
         def set_some_string(self, some_string):
             self.xml.attrib['some_string'] = some_string
         #<<<<<<<<<<<<
@@ -434,14 +433,14 @@ Now, with the registered object, the message can be extended.
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-            
+
             self.add_event_handler("session_start", self.start)
 
         def start(self, event):
@@ -449,13 +448,13 @@ Now, with the registered object, the message can be extended.
             self.send_presence()
             self.get_roster()
             self.send_example_message(self.to, "example_message")
-    
+
         def send_example_message(self, to, body):
             #~ make_message(mfrom=None, mto=None, mtype=None, mquery=None)
-            # Default mtype == "chat"; 
+            # Default mtype == "chat";
             msg = self.make_message(mto=to, mbody=body)
             #>>>>>>>>>>>>
-            msg['example_tag'].set_some_string("Work!")
+            msg['example_tag']['some_string'] = "Work!"
             logging.info(msg)
             #<<<<<<<<<<<<
             msg.send()
@@ -463,19 +462,19 @@ Now, with the registered object, the message can be extended.
 After running, the logging should print the Message with tag `'example_tag'` stored inside <message><example_tag/></message>, string `'Work'` and given namespace.
 
 Giving the extended message the separate signal
--------------------------
+------------------------------------------------
 
 If the separate event is not defined, then both normal and extended message will be cached by signal `'message'`. In order to have the special event, the handler for the namespace and tag should be created. Then, make a unique name combination, which allows the handler can catch only the wanted messages (or Iq object).
 
 .. code-block:: python
 
     #File: $WORKDIR/example/example plugin.py
-    
+
     class OurPlugin(BasePlugin):
         def plugin_init(self):
             self.description = "OurPluginExtension"                 ##~ String data readable by humans and to find the plugin by another plugin.
             self.xep = "ope"                 ##~ String data readable by humans and to find the plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'.
-    
+
             namespace = ExampleTag.namespace
 
             self.xmpp.register_handler(
@@ -501,14 +500,14 @@ Now every message containing the defined namespace inside `'example_tag'` is cac
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-            
+
             self.add_event_handler("session_start", self.start)
 
         def start(self, event):
@@ -517,10 +516,10 @@ Now every message containing the defined namespace inside `'example_tag'` is cac
             self.get_roster()
             #>>>>>>>>>>>>
             self.send_example_message(self.to, "example_message", "example_string")
-    
+
         def send_example_message(self, to, body, some_string=""):
             #~ make_message(mfrom=None, mto=None, mtype=None, mquery=None)
-            # Default mtype == "chat"; 
+            # Default mtype == "chat";
             msg = self.make_message(mto=to, mbody=body)
             if some_string:
                 msg['example_tag'].set_some_string(some_string)
@@ -532,11 +531,11 @@ Now, remember the line: `'self.xmpp.event('example_tag_message', msg)'`. The nam
 .. code-block:: python
 
     #File: $WORKDIR/example/responder.py
-    
+
     class Responder(slixmpp.ClientXMPP):
         def __init__(self, jid, password):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-            
+
             self.add_event_handler("session_start", self.start)
             #>>>>>>>>>>>>
             self.add_event_handler("example_tag_message", self.example_tag_message) #Registration of the handler
@@ -546,7 +545,7 @@ Now, remember the line: `'self.xmpp.event('example_tag_message', msg)'`. The nam
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
-    
+
         #>>>>>>>>>>>>
         def example_tag_message(self, msg):
             logging.info(msg) # Message is standalone object, it can be replied, but no error is returned if not.
@@ -556,62 +555,62 @@ The messages can be replied, but nothing will happen otherwise.
 The Iq object, on the other hand, should always be replied. Otherwise, the error occurs on the client side due to the target timeout if the cell Iq won't reply with Iq with the same Id.
 
 Useful methods and misc.
------------------------
-
-Modifying the example `Message` object to the `Iq` object
 -------------------------
 
-To convert the Message into the Iq object, a new handler for the Iq should be registered, in the same manner as in the `,,Extend message with tags''`part. The following example contains several types of Iq different types to catch. It can be used to check the difference between the Iq request and Iq response or to verify the correctness of the objects. All of the Iq messages should be passed to the sender with the same ID parameter, otherwise the sender receives the Iq with the timeout error.
+Modifying the example `Message` object to the `Iq` object
+----------------------------------------------------------
+
+To allow our custom element into Iq payloads, a new handler for Iq can be registered, in the same manner as in the `,,Extend message with tags''` part. The following example contains several types of Iq different types to catch. It can be used to check the difference between the Iq request and Iq response or to verify the correctness of the objects. All of the Iq messages should be passed to the sender with the same ID parameter, otherwise the sender will receive an error message.
 
 .. code-block:: python
 
     #File: $WORKDIR/example/example plugin.py
-    
+
     class OurPlugin(BasePlugin):
         def plugin_init(self):
             self.description = "OurPluginExtension"                 ##~ String data readable by humans and to find the plugin by another plugin.
             self.xep = "ope"                 ##~ String data readable by humans and to find the plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'.
-    
+
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>
             self.xmpp.register_handler(
                         Callback('ExampleGet Event:example_tag',    ##~ Name of this Callback
                         StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Handle only Iq with type 'get' and example_tag
                         self.__handle_get_iq))                      ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
                         StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type 'result' and example_tag
                         self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
                         StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Handle only Iq with type 'error' and example_tag
                         self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Name of this Callback
                         StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Handle only Message with example_tag
                         self.__handle_message))                     ##~ Method which catch proper Message, should raise proper event for client.
-    
+
             register_stanza_plugin(Iq, ExampleTag)                  ##~ Register tags extension for Iq object. Otherwise the iq['example_tag'] will be string field instead of container and it would not be possible to manage the fields and sub elements.
             #<<<<<<<<<<<<
             register_stanza_plugin(Message, ExampleTag)             ##~ Register tags extension for Message object, otherwise message['example_tag'] will be string field instead container, where it is impossible to manage fields and create sub elements.
-            
+
             #>>>>>>>>>>>>
         # All iq types are: get, set, error, result
         def __handle_get_iq(self, iq):
             # Do something with received iq
             self.xmpp.event('example_tag_get_iq', iq)           ##~ Calls the event which can be handled by clients.
-            
+
         def __handle_result_iq(self, iq):
             # Do something with received iq
             self.xmpp.event('example_tag_result_iq', iq)        ##~ Calls the event which can be handled by clients.
-    
+
         def __handle_error_iq(self, iq):
             # Do something with received iq
             self.xmpp.event('example_tag_error_iq', iq)         ##~ Calls the event which can be handled by clients.
-    
+
         def __handle_message(self, msg):
             # Do something with received message
             self.xmpp.event('example_tag_message', msg)          ##~ Calls the event which can be handled by clients.
@@ -621,17 +620,17 @@ The events called by the example handlers can be caught like in the`'example_tag
 .. code-block:: python
 
     #File: $WORKDIR/example/responder.py
-    
+
     class Responder(slixmpp.ClientXMPP):
         def __init__(self, jid, password):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-            
+
             self.add_event_handler("session_start", self.start)
             self.add_event_handler("example_tag_message", self.example_tag_message)
             #>>>>>>>>>>>>
             self.add_event_handler("example_tag_get_iq", self.example_tag_get_iq)
             #<<<<<<<<<<<<
-    
+
             #>>>>>>>>>>>>
         def example_tag_get_iq(self, iq): # Iq stanza always should have a respond. If user is offline, it calls an error.
             logging.info(str(iq))
@@ -639,36 +638,36 @@ The events called by the example handlers can be caught like in the`'example_tag
             reply.send()
             #<<<<<<<<<<<<
 
-By default, the parameter `'clear'` in the `'Iq.reply'` is set to True. In that case, the content of the Iq should be set again. After using the reply method, only the Id and the Jid parameters will still be set. 
+By default, the parameter `'clear'` in the `'Iq.reply'` is set to True. In that case, the content of the Iq should be set again. After using the reply method, only the Id and the Jid parameters will still be set.
 
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-    
+
             self.add_event_handler("session_start", self.start)
             #>>>>>>>>>>>>
             self.add_event_handler("example_tag_result_iq", self.example_tag_result_iq)
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
             #<<<<<<<<<<<<
-            
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
 
-            #>>>>>>>>>>>>        
+            #>>>>>>>>>>>>
             self.send_example_iq(self.to)
             # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
             #<<<<<<<<<<<<
-            
-            #>>>>>>>>>>>>        
+
+            #>>>>>>>>>>>>
         def send_example_iq(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get")
@@ -677,24 +676,24 @@ By default, the parameter `'clear'` in the `'Iq.reply'` is set to True. In that 
             iq['example_tag'].text = "Info_inside_tag"
             iq.send()
             #<<<<<<<<<<<<
-            
+
             #>>>>>>>>>>>>
         def example_tag_result_iq(self, iq):
             logging.info(str(iq))
-    
+
         def example_tag_error_iq(self, iq):
             logging.info(str(iq))
             #<<<<<<<<<<<<
 
 Different ways to access the elements
--------------------------
+--------------------------------------
 
 There are several ways to access the elements inside the Message or Iq stanza. The first one: the client can access them like a dictionary:
 
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
-    
+
     class Sender(slixmpp.ClientXMPP):
         #...
         def example_tag_result_iq(self, iq):
@@ -716,21 +715,21 @@ The access to the elements from extended ExampleTag is similar. However, definin
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
         namespace = "https://example.net/our_extension"             ##~ The namespace for stanza object, like <example_tag xmlns={namespace} (...)</example_tag>. Should be changed to own namespace.
-    
+
         plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'], the `'example_tag'` is the name of ElementBase extension. And this should be the same as name.
-        
+
         interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ElementBase extension.
-        
+
             #>>>>>>>>>>>>
         def get_some_string(self):
             return self.xml.attrib.get("some_string", None)
-            
+
         def get_text(self, text):
             return self.xml.text
-            
+
         def set_some_string(self, some_string):
             self.xml.attrib['some_string'] = some_string
-    
+
         def set_text(self, text):
             self.xml.text = text
             #<<<<<<<<<<<<
@@ -742,18 +741,18 @@ When the proper setters and getters are used, it is easy to check whether some a
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-    
+
             self.add_event_handler("session_start", self.start)
             self.add_event_handler("example_tag_result_iq", self.example_tag_result_iq)
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
-               
+
         def send_example_iq(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get")
@@ -765,7 +764,7 @@ When the proper setters and getters are used, it is easy to check whether some a
             iq.send()
 
 Message setup from the XML files, strings and other objects
--------------------------
+------------------------------------------------------------
 
 There are many ways to set up a xml from a string, xml-containing file or lxml (ElementTree) file. One of them is parsing the strings to lxml object, passing the attributes and other information, which may look like this:
 
@@ -780,22 +779,22 @@ There are many ways to set up a xml from a string, xml-containing file or lxml (
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
         namespace = "https://example.net/our_extension"             ##~ The stanza object namespace, like <example_tag xmlns={namespace} (...)</example_tag>. Should be changed to your own namespace
-    
+
         plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ElementBase extension. And this should be that same as name.
-        
+
         interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ElementBase extension.
-        
+
             #>>>>>>>>>>>>
         def setup_from_string(self, string):
             """Initialize tag element from string"""
             et_extension_tag_xml = ET.fromstring(string)
             self.setup_from_lxml(et_extension_tag_xml)
-    
+
         def setup_from_file(self, path):
             """Initialize tag element from file containing adjusted data"""
             et_extension_tag_xml = ET.parse(path).getroot()
             self.setup_from_lxml(et_extension_tag_xml)
-    
+
         def setup_from_lxml(self, lxml):
             """Add ET data to self xml structure."""
             self.xml.attrib.update(lxml.attrib)
@@ -820,62 +819,62 @@ To test this, an example file with xml, example xml string and example lxml (ET)
     #...
     from slixmpp.xmlstream import ET
     #...
- 
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-    
+
             self.add_event_handler("session_start", self.start)
             self.add_event_handler("example_tag_result_iq", self.example_tag_result_iq)
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
-    
+
             #>>>>>>>>>>>>
             self.disconnect_counter = 3 # Disconnects when all replies from Iq are received.
-            
+
             self.send_example_iq_tag_from_file(self.to, self.path)
             # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag></iq>
-    
+
             string = '<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag>'
             et = ET.fromstring(string)
             self.send_example_iq_tag_from_element_tree(self.to, et)
             # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>
-            
+
             self.send_example_iq_tag_from_string(self.to, string)
-            # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>   
+            # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>
 
         def example_tag_result_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
                 self.disconnect() # Example disconnect after receiving the maximum number of responses.
-    
+
         def send_example_iq_tag_from_file(self, to, path):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=2)
             iq['example_tag'].setup_from_file(path)
-    
+
             iq.send()
-            
+
         def send_example_iq_tag_from_element_tree(self, to, et):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=3)
             iq['example_tag'].setup_from_lxml(et)
-    
+
             iq.send()
-    
+
         def send_example_iq_tag_from_string(self, to, string):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=5)
             iq['example_tag'].setup_from_string(string)
-    
+
             iq.send()
             #<<<<<<<<<<<<
 
@@ -896,46 +895,46 @@ The following code presents exactly this:
     import logging
 
     from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin
-    
+
     from slixmpp import Iq
     from slixmpp import Message
-    
+
     from slixmpp.plugins.base import BasePlugin
-    
+
     from slixmpp.xmlstream.handler import Callback
     from slixmpp.xmlstream.matcher import StanzaPath
-    
+
     log = logging.getLogger(__name__)
-    
+
     class OurPlugin(BasePlugin):
         def plugin_init(self):
             self.description = "OurPluginExtension"                 ##~ String data to read by humans and to find the plugin by another plugin.
             self.xep = "ope"                 ##~ String data to read by humans and to find the plugin by another plugin by adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'.
-    
+
             namespace = ExampleTag.namespace
             self.xmpp.register_handler(
                         Callback('ExampleGet Event:example_tag',    ##~ Name of this Callback
                         StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Handle only Iq with type 'get' and example_tag
                         self.__handle_get_iq))                      ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
                         StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type 'result' and example_tag
                      self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
                         StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type 'error' and example_tag
                         self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Name of this Callback
                         StanzaPath(f'message/{{{namespace}}}example_tag'),         ##~ Handle only Message with example_tag
                         self.__handle_message))                     ##~ Method which catch proper Message, should raise proper event for client.
-    
+
             register_stanza_plugin(Iq, ExampleTag)                  ##~ Register tags extension for Iq object. Otherwise the iq['example_tag'] will be string field instead of container and it would not be possible to manage the fields and sub elements.
             register_stanza_plugin(Message, ExampleTag)                  ##~ Register tags extension for Iq object. Otherwise the iq['example_tag'] will be string field instead of container and it would not be possible to manage the fields and sub elements.
-   
+
         # All iq types are: get, set, error, result
         def __handle_get_iq(self, iq):
             if iq.get_some_string is None:
@@ -946,37 +945,37 @@ The following code presents exactly this:
                 error.send()
             # Do something with received iq
             self.xmpp.event('example_tag_get_iq', iq)           ##~ Call event which can be handled by clients to send or something else.
-            
+
         def __handle_result_iq(self, iq):
             # Do something with received iq
             self.xmpp.event('example_tag_result_iq', iq)        ##~ Call event which can be handled by clients to send or something else.
-    
+
         def __handle_error_iq(self, iq):
             # Do something with received iq
             self.xmpp.event('example_tag_error_iq', iq)         ##~ Call event which can be handled by clients to send or something else.
-    
+
         def __handle_message(self, msg):
             # Do something with received message
             self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by clients to send or something else.
-    
+
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
         namespace = "https://example.net/our_extension"             ##~ The namespace stanza object lives in, like <example_tag xmlns={namespace} (...)</example_tag>. You should change it for your own namespace.
-    
+
         plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ElementBase extension. And this should be that same as name.
-        
+
         interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ElementBase extension.
-    
+
         def setup_from_string(self, string):
             """Initialize tag element from string"""
             et_extension_tag_xml = ET.fromstring(string)
             self.setup_from_lxml(et_extension_tag_xml)
-    
+
         def setup_from_file(self, path):
             """Initialize tag element from file containing adjusted data"""
             et_extension_tag_xml = ET.parse(path).getroot()
             self.setup_from_lxml(et_extension_tag_xml)
-    
+
         def setup_from_lxml(self, lxml):
             """Add ET data to self xml structure."""
             self.xml.attrib.update(lxml.attrib)
@@ -988,25 +987,25 @@ The following code presents exactly this:
         def setup_from_dict(self, data):
             #There keys from dict should be also validated
             self.xml.attrib.update(data)
-    
+
         def get_boolean(self):
             return self.xml.attrib.get("boolean", None)
-    
+
         def get_some_string(self):
             return self.xml.attrib.get("some_string", None)
-            
+
         def get_text(self, text):
             return self.xml.text
-    
+
         def set_boolean(self, boolean):
             self.xml.attrib['boolean'] = str(boolean)
-    
+
         def set_some_string(self, some_string):
             self.xml.attrib['some_string'] = some_string
-    
+
         def set_text(self, text):
             self.xml.text = text
-    
+
         def fill_interfaces(self, boolean, some_string):
             #Some validation, if necessary
             self.set_boolean(boolean)
@@ -1019,63 +1018,63 @@ The following code presents exactly this:
     import logging
     from argparse import ArgumentParser
     from getpass import getpass
-    
+
     import slixmpp
     import example_plugin
-    
+
     class Responder(slixmpp.ClientXMPP):
         def __init__(self, jid, password):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-            
+
             self.add_event_handler("session_start", self.start)
             self.add_event_handler("example_tag_get_iq", self.example_tag_get_iq)
             self.add_event_handler("example_tag_message", self.example_tag_message)
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
-            
+
         def example_tag_get_iq(self, iq): # Iq stanza always should have a respond. If user is offline, it call an error.
             logging.info(iq)
             reply = iq.reply()
             reply["example_tag"].fill_interfaces(True, "Reply_string")
             reply.send()
-    
+
         def example_tag_message(self, msg):
             logging.info(msg) # Message is standalone object, it can be replied, but no error arrives if not.
-    
-    
+
+
     if __name__ == '__main__':
         parser = ArgumentParser(description=Responder.__doc__)
-    
+
         parser.add_argument("-q", "--quiet", help="set logging to ERROR",
                             action="store_const", dest="loglevel",
                             const=logging.ERROR, default=logging.INFO)
         parser.add_argument("-d", "--debug", help="set logging to DEBUG",
                             action="store_const", dest="loglevel",
                             const=logging.DEBUG, default=logging.INFO)
-    
+
         parser.add_argument("-j", "--jid", dest="jid",
                             help="JID to use")
         parser.add_argument("-p", "--password", dest="password",
                             help="password to use")
         parser.add_argument("-t", "--to", dest="to",
                             help="JID to send the message to")
-    
+
         args = parser.parse_args()
-    
+
         logging.basicConfig(level=args.loglevel,
                             format=' %(name)s - %(levelname)-8s %(message)s')
-    
+
         if args.jid is None:
             args.jid = input("Username: ")
         if args.password is None:
             args.password = getpass("Password: ")
-    
+
         xmpp = Responder(args.jid, args.password)
         xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
-    
+
         xmpp.connect()
         try:
             xmpp.process()
@@ -1093,65 +1092,65 @@ The following code presents exactly this:
     from argparse import ArgumentParser
     from getpass import getpass
     import time
-    
+
     import slixmpp
     from slixmpp.xmlstream import ET
-    
+
     import example_plugin
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-    
+
             self.add_event_handler("session_start", self.start)
             self.add_event_handler("example_tag_result_iq", self.example_tag_result_iq)
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
-    
+
             self.disconnect_counter = 5 #  # Disconnect after receiving the maximum number of responses.
-            
+
             self.send_example_iq(self.to)
             # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
-            
+
             self.send_example_message(self.to)
             # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
-            
+
             self.send_example_iq_tag_from_file(self.to, self.path)
             # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag></iq>
-    
+
             string = '<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag>'
             et = ET.fromstring(string)
             self.send_example_iq_tag_from_element_tree(self.to, et)
             # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>
-    
+
             self.send_example_iq_to_get_error(self.to)
             # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" /></iq>
             # OUR ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
             # OFFLINE ERROR <iq id="4" from="RESPONDER/RESOURCE" xml:lang="en" to="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel" code="503"><service-unavailable xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" xml:lang="en">User session not found</text></error></iq>
-            
+
             self.send_example_iq_tag_from_string(self.to, string)
             # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>
-    
-    
+
+
         def example_tag_result_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
                 self.disconnect() # Example disconnect after receiving the maximum number of responses.
-    
+
         def example_tag_error_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
                 self.disconnect() # Example disconnect after receiving the maximum number of responses.
-    
+
         def send_example_iq(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get")
@@ -1159,7 +1158,7 @@ The following code presents exactly this:
             iq['example_tag'].set_some_string("Another_string")
             iq['example_tag'].set_text("Info_inside_tag")
             iq.send()
-    
+
         def send_example_message(self, to):
             #~ make_message(mfrom=None, mto=None, mtype=None, mquery=None)
             msg = self.make_message(mto=to)
@@ -1167,44 +1166,44 @@ The following code presents exactly this:
             msg['example_tag'].set_some_string("Message string")
             msg['example_tag'].set_text("Info_inside_tag_message")
             msg.send()
-    
+
         def send_example_iq_tag_from_file(self, to, path):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=2)
             iq['example_tag'].setup_from_file(path)
-    
+
             iq.send()
-    
+
         def send_example_iq_tag_from_element_tree(self, to, et):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=3)
             iq['example_tag'].setup_from_lxml(et)
-    
+
             iq.send()
-    
+
         def send_example_iq_to_get_error(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=4)
             iq['example_tag'].set_boolean(True) # For example, the condition to receive the error respond is the example_tag without the boolean value.
             iq.send()
-    
+
         def send_example_iq_tag_from_string(self, to, string):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=5)
             iq['example_tag'].setup_from_string(string)
-    
+
             iq.send()
-        
+
     if __name__ == '__main__':
         parser = ArgumentParser(description=Sender.__doc__)
-    
+
         parser.add_argument("-q", "--quiet", help="set logging to ERROR",
                             action="store_const", dest="loglevel",
                             const=logging.ERROR, default=logging.INFO)
         parser.add_argument("-d", "--debug", help="set logging to DEBUG",
                             action="store_const", dest="loglevel",
                             const=logging.DEBUG, default=logging.INFO)
-    
+
         parser.add_argument("-j", "--jid", dest="jid",
                             help="JID to use")
         parser.add_argument("-p", "--password", dest="password",
@@ -1213,20 +1212,20 @@ The following code presents exactly this:
                             help="JID to send the message/iq to")
         parser.add_argument("--path", dest="path",
                             help="path to load example_tag content")
-    
+
         args = parser.parse_args()
-    
+
         logging.basicConfig(level=args.loglevel,
                             format=' %(name)s - %(levelname)-8s %(message)s')
-    
+
         if args.jid is None:
             args.jid = input("Username: ")
         if args.password is None:
             args.password = getpass("Password: ")
-    
+
         xmpp = Sender(args.jid, args.password, args.to, args.path)
         xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin.
-    
+
         xmpp.connect()
         try:
             xmpp.process()
@@ -1248,11 +1247,11 @@ As shown in the previous examples, it is possible to create a new element as mai
     #File: $WORKDIR/example/example_plugin.py
 
     #(...)
-    
+
     class ExampleTag(ElementBase):
-        
+
     #(...)
-    
+
         def add_inside_tag(self, tag, attributes, text=""):
             #If more tags is needed inside the element, they can be added like that:
             itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Initialise ET with tag, for example: <example_tag (...)> <inside_tag namespace="<https://example.net/our_extension>"/></example_tag>
@@ -1263,20 +1262,20 @@ As shown in the previous examples, it is possible to create a new element as mai
 There is a way to do this with a dictionary and name for the nested element tag. In that case, the insides of the function fields should be transferred to the ET element.
 
 Complete code from tutorial
--------------------------
+----------------------------
 
 .. code-block:: python
 
     #!/usr/bin/python3
     #File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
-    
+
     import subprocess
     import threading
     import time
-    
+
     def start_shell(shell_string):
         subprocess.run(shell_string, shell=True, universal_newlines=True)
-    
+
     if __name__ == "__main__":
         #~ prefix = "x-terminal-emulator -e" # Separate terminal for every client, you can replace xterm with your terminal
         #~ prefix = "xterm -e" # Separate terminal for every client, you can replace xterm with your terminal
@@ -1284,24 +1283,24 @@ Complete code from tutorial
         #~ postfix = " -d" # Debug
         #~ postfix = " -q" # Quiet
         postfix = ""
-    
+
         sender_path = "./example/sender.py"
         sender_jid = "SENDER_JID"
         sender_password = "SENDER_PASSWORD"
-    
+
         example_file = "./test_example_tag.xml"
-    
+
         responder_path = "./example/responder.py"
         responder_jid = "RESPONDER_JID"
         responder_password = "RESPONDER_PASSWORD"
-    
+
         # Remember about rights to run your python files. (`chmod +x ./file.py`)
         SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
                        " -t {responder_jid} --path {example_file} {postfix}"
-    
+
         RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
                        " -p {responder_password} {postfix}"
-    
+
         try:
             responder = threading.Thread(target=start_shell, args=(RESPON_TEST, ))
             sender = threading.Thread(target=start_shell, args=(SENDER_TEST, ))
@@ -1317,48 +1316,48 @@ Complete code from tutorial
     #File: $WORKDIR/example/example_plugin.py
 
     import logging
-    
+
     from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin
-    
+
     from slixmpp import Iq
     from slixmpp import Message
-    
+
     from slixmpp.plugins.base import BasePlugin
-    
+
     from slixmpp.xmlstream.handler import Callback
     from slixmpp.xmlstream.matcher import StanzaPath
-    
+
     log = logging.getLogger(__name__)
-    
+
     class OurPlugin(BasePlugin):
         def plugin_init(self):
             self.description = "OurPluginExtension"   ##~ String data for Human readable and find plugin by another plugin with method.
             self.xep = "ope"                          ##~ String data for Human readable and find plugin by another plugin with adding it into `slixmpp/plugins/__init__.py` to the `__all__` declaration with 'xep_OPE'. Otherwise it's just human readable annotation.
-    
+
             namespace = ExampleTag.namespace
             self.xmpp.register_handler(
                         Callback('ExampleGet Event:example_tag',    ##~ Name of this Callback
                         StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Handle only Iq with type get and example_tag
                         self.__handle_get_iq))                      ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleResult Event:example_tag', ##~ Name of this Callback
                         StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Handle only Iq with type result and example_tag
                         self.__handle_result_iq))                   ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleError Event:example_tag',  ##~ Name of this Callback
                         StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Handle only Iq with type error and example_tag
                         self.__handle_error_iq))                    ##~ Method which catch proper Iq, should raise proper event for client.
-    
+
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Name of this Callback
                         StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Handle only Message with example_tag
                         self.__handle_message))                     ##~ Method which catch proper Message, should raise proper event for client.
-    
+
             register_stanza_plugin(Iq, ExampleTag)                  ##~ Register tags extension for Iq object. Otherwise the iq['example_tag'] will be string field instead of container and it would not be possible to manage the fields and sub elements.
             register_stanza_plugin(Message, ExampleTag)                  ##~ Register tags extension for Iq object. Otherwise the iq['example_tag'] will be string field instead of container and it would not be possible to manage the fields and sub elements.
-    
+
         # All iq types are: get, set, error, result
         def __handle_get_iq(self, iq):
             if iq.get_some_string is None:
@@ -1369,37 +1368,37 @@ Complete code from tutorial
                 error.send()
             # Do something with received iq
             self.xmpp.event('example_tag_get_iq', iq)           ##~ Call event which can be handled by clients to send or something other what you want.
-            
+
         def __handle_result_iq(self, iq):
             # Do something with received iq
             self.xmpp.event('example_tag_result_iq', iq)        ##~ Call event which can be handled by clients to send or something other what you want.
-    
+
         def __handle_error_iq(self, iq):
             # Do something with received iq
             self.xmpp.event('example_tag_error_iq', iq)         ##~ Call event which can be handled by clients to send or something other what you want.
-    
+
         def __handle_message(self, msg):
             # Do something with received message
             self.xmpp.event('example_tag_message', msg)          ##~ Call event which can be handled by clients to send or something other what you want.
-    
+
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ The name of the root XML element of that extension.
         namespace = "https://example.net/our_extension"             ##~ The stanza object namespace, like <example_tag xmlns={namespace} (...)</example_tag>. Should be changed for your namespace.
-    
+
         plugin_attrib = "example_tag"                               ##~ The name to access this type of stanza. In particular, given  a  registration  stanza,  the Registration object can be found using: stanza_object['example_tag'] now `'example_tag'` is name of ours ElementBase extension. And this should be that same as name.
-        
+
         interfaces = {"boolean", "some_string"}                     ##~ A list of dictionary-like keys that can be used with the stanza object. For example `stanza_object['example_tag']` gives us {"another": "some", "data": "some"}, whenever `'example_tag'` is name of ours ElementBase extension.
-    
+
         def setup_from_string(self, string):
             """Initialize tag element from string"""
             et_extension_tag_xml = ET.fromstring(string)
             self.setup_from_lxml(et_extension_tag_xml)
-    
+
         def setup_from_file(self, path):
             """Initialize tag element from file containing adjusted data"""
             et_extension_tag_xml = ET.parse(path).getroot()
             self.setup_from_lxml(et_extension_tag_xml)
-    
+
         def setup_from_lxml(self, lxml):
             """Add ET data to self xml structure."""
             self.xml.attrib.update(lxml.attrib)
@@ -1407,34 +1406,34 @@ Complete code from tutorial
             self.xml.tail = lxml.tail
             for inner_tag in lxml:
                 self.xml.append(inner_tag)
-    
+
         def setup_from_dict(self, data):
             #There should keys should be also validated
             self.xml.attrib.update(data)
-    
+
         def get_boolean(self):
             return self.xml.attrib.get("boolean", None)
-    
+
         def get_some_string(self):
             return self.xml.attrib.get("some_string", None)
-            
+
         def get_text(self, text):
             return self.xml.text
-    
+
         def set_boolean(self, boolean):
             self.xml.attrib['boolean'] = str(boolean)
-    
+
         def set_some_string(self, some_string):
             self.xml.attrib['some_string'] = some_string
-    
+
         def set_text(self, text):
             self.xml.text = text
-    
+
         def fill_interfaces(self, boolean, some_string):
             #Some validation if it is necessary
             self.set_boolean(boolean)
             self.set_some_string(some_string)
-        
+
         def add_inside_tag(self, tag, attributes, text=""):
             #If more tags is needed inside the element, they can be added like that:
             itemXML = ET.Element("{{{0:s}}}{1:s}".format(self.namespace, tag)) #~ Initialise ET with tag, for example: <example_tag (...)> <inside_tag namespace="https://example.net/our_extension"/></example_tag>
@@ -1447,73 +1446,73 @@ Complete code from tutorial
 .. code-block:: python
 
     #File: $WORKDIR/example/sender.py
-    
+
     import logging
     from argparse import ArgumentParser
     from getpass import getpass
     import time
-    
+
     import slixmpp
     from slixmpp.xmlstream import ET
-    
+
     import example_plugin
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-    
+
             self.add_event_handler("session_start", self.start)
             self.add_event_handler("example_tag_result_iq", self.example_tag_result_iq)
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
-    
+
             self.disconnect_counter = 6 # This is only for disconnect when we receive all replies for sent Iq
-            
+
             self.send_example_iq(self.to)
             # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
-            
+
             self.send_example_iq_with_inner_tag(self.to)
             # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="1" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag></iq>
-            
+
             self.send_example_message(self.to)
             # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
-            
+
             self.send_example_iq_tag_from_file(self.to, self.path)
             # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag></iq>
-    
+
             string = '<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag>'
             et = ET.fromstring(string)
             self.send_example_iq_tag_from_element_tree(self.to, et)
             # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>
-    
+
             self.send_example_iq_to_get_error(self.to)
             # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" /></iq>
             # OUR ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
             # OFFLINE ERROR <iq id="4" from="RESPONDER/RESOURCE" xml:lang="en" to="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel" code="503"><service-unavailable xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" xml:lang="en">User session not found</text></error></iq>
-            
+
             self.send_example_iq_tag_from_string(self.to, string)
             # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>
-    
-    
+
+
         def example_tag_result_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
                 self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
-    
+
         def example_tag_error_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
                 self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
-    
+
         def send_example_iq(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get")
@@ -1521,18 +1520,18 @@ Complete code from tutorial
             iq['example_tag'].set_some_string("Another_string")
             iq['example_tag'].set_text("Info_inside_tag")
             iq.send()
-    
+
         def send_example_iq_with_inner_tag(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=1)
             iq['example_tag'].set_some_string("Another_string")
             iq['example_tag'].set_text("Info_inside_tag")
-            
+
             inner_attributes = {"first_field": "1", "second_field": "2"}
             iq['example_tag'].add_inside_tag(tag="inside_tag", attributes=inner_attributes)
-    
+
             iq.send()
-    
+
         def send_example_message(self, to):
             #~ make_message(mfrom=None, mto=None, mtype=None, mquery=None)
             msg = self.make_message(mto=to)
@@ -1540,44 +1539,44 @@ Complete code from tutorial
             msg['example_tag'].set_some_string("Message string")
             msg['example_tag'].set_text("Info_inside_tag_message")
             msg.send()
-    
+
         def send_example_iq_tag_from_file(self, to, path):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=2)
             iq['example_tag'].setup_from_file(path)
-    
+
             iq.send()
-    
+
         def send_example_iq_tag_from_element_tree(self, to, et):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=3)
             iq['example_tag'].setup_from_lxml(et)
-    
+
             iq.send()
-    
+
         def send_example_iq_to_get_error(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=4)
             iq['example_tag'].set_boolean(True) # For example, the condition to receive error respond is the example_tag without boolean value.
             iq.send()
-    
+
         def send_example_iq_tag_from_string(self, to, string):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=5)
             iq['example_tag'].setup_from_string(string)
-    
+
             iq.send()
-        
+
     if __name__ == '__main__':
         parser = ArgumentParser(description=Sender.__doc__)
-    
+
         parser.add_argument("-q", "--quiet", help="set logging to ERROR",
                             action="store_const", dest="loglevel",
                             const=logging.ERROR, default=logging.INFO)
         parser.add_argument("-d", "--debug", help="set logging to DEBUG",
                             action="store_const", dest="loglevel",
                             const=logging.DEBUG, default=logging.INFO)
-    
+
         parser.add_argument("-j", "--jid", dest="jid",
                             help="JID to use")
         parser.add_argument("-p", "--password", dest="password",
@@ -1586,20 +1585,20 @@ Complete code from tutorial
                             help="JID to send the message/iq to")
         parser.add_argument("--path", dest="path",
                             help="path to load example_tag content")
-    
+
         args = parser.parse_args()
-    
+
         logging.basicConfig(level=args.loglevel,
                             format=' %(name)s - %(levelname)-8s %(message)s')
-    
+
         if args.jid is None:
             args.jid = input("Username: ")
         if args.password is None:
             args.password = getpass("Password: ")
-    
+
         xmpp = Sender(args.jid, args.password, args.to, args.path)
         xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
-    
+
         xmpp.connect()
         try:
             xmpp.process()
@@ -1619,68 +1618,68 @@ Complete code from tutorial
     from argparse import ArgumentParser
     from getpass import getpass
     import time
-    
+
     import slixmpp
     from slixmpp.xmlstream import ET
-    
+
     import example_plugin
-    
+
     class Sender(slixmpp.ClientXMPP):
         def __init__(self, jid, password, to, path):
             slixmpp.ClientXMPP.__init__(self, jid, password)
-    
+
             self.to = to
             self.path = path
-    
+
             self.add_event_handler("session_start", self.start)
             self.add_event_handler("example_tag_result_iq", self.example_tag_result_iq)
             self.add_event_handler("example_tag_error_iq", self.example_tag_error_iq)
-    
+
         def start(self, event):
             # Two, not required methods, but allows another users to see us available, and receive that information.
             self.send_presence()
             self.get_roster()
-    
+
             self.disconnect_counter = 6 # This is only for disconnect when we receive all replies for sended Iq
-            
+
             self.send_example_iq(self.to)
             # <iq to=RESPONDER/RESOURCE xml:lang="en" type="get" id="0" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string" boolean="True">Info_inside_tag</example_tag></iq>
-            
+
             self.send_example_iq_with_inner_tag(self.to)
             # <iq from="SENDER/RESOURCE" to="RESPONDER/RESOURCE" id="1" xml:lang="en" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag></iq>
-            
+
             self.send_example_message(self.to)
             # <message to="RESPONDER" xml:lang="en" from="SENDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" some_string="Message string">Info_inside_tag_message</example_tag></message>
-            
+
             self.send_example_iq_tag_from_file(self.to, self.path)
             # <iq from="SENDER/RESOURCE" xml:lang="en" id="2" type="get" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag></iq>
-    
+
             string = '<example_tag xmlns="https://example.net/our_extension" some_string="Another_string">Info_inside_tag<inside_tag first_field="1" second_field="2" /></example_tag>'
             et = ET.fromstring(string)
             self.send_example_iq_tag_from_element_tree(self.to, et)
             # <iq to="RESPONDER/RESOURCE" id="3" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>
-    
+
             self.send_example_iq_to_get_error(self.to)
             # <iq type="get" id="4" from="SENDER/RESOURCE" xml:lang="en" to="RESPONDER/RESOURCE"><example_tag xmlns="https://example.net/our_extension" boolean="True" /></iq>
             # OUR ERROR <iq to="RESPONDER/RESOURCE" id="4" xml:lang="en" from="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel"><feature-not-implemented xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas">Without boolean value returns error.</text></error></iq>
             # OFFLINE ERROR <iq id="4" from="RESPONDER/RESOURCE" xml:lang="en" to="SENDER/RESOURCE" type="error"><example_tag xmlns="https://example.net/our_extension" boolean="True" /><error type="cancel" code="503"><service-unavailable xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" /><text xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" xml:lang="en">User session not found</text></error></iq>
-            
+
             self.send_example_iq_tag_from_string(self.to, string)
             # <iq to="RESPONDER/RESOURCE" id="5" xml:lang="en" from="SENDER/RESOURCE" type="get"><example_tag xmlns="https://example.net/our_extension" some_string="Reply_string" boolean="True">Info_inside_tag<inside_tag second_field="2" first_field="1" /></example_tag></iq>
-    
-    
+
+
         def example_tag_result_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
                 self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
-    
+
         def example_tag_error_iq(self, iq):
             self.disconnect_counter -= 1
             logging.info(str(iq))
             if not self.disconnect_counter:
                 self.disconnect() # Example disconnect after first received iq stanza extended by example_tag with result type.
-    
+
         def send_example_iq(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get")
@@ -1688,18 +1687,18 @@ Complete code from tutorial
             iq['example_tag'].set_some_string("Another_string")
             iq['example_tag'].set_text("Info_inside_tag")
             iq.send()
-    
+
         def send_example_iq_with_inner_tag(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=1)
             iq['example_tag'].set_some_string("Another_string")
             iq['example_tag'].set_text("Info_inside_tag")
-            
+
             inner_attributes = {"first_field": "1", "second_field": "2"}
             iq['example_tag'].add_inside_tag(tag="inside_tag", attributes=inner_attributes)
-    
+
             iq.send()
-    
+
         def send_example_message(self, to):
             #~ make_message(mfrom=None, mto=None, mtype=None, mquery=None)
             msg = self.make_message(mto=to)
@@ -1707,44 +1706,44 @@ Complete code from tutorial
             msg['example_tag'].set_some_string("Message string")
             msg['example_tag'].set_text("Info_inside_tag_message")
             msg.send()
-    
+
         def send_example_iq_tag_from_file(self, to, path):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=2)
             iq['example_tag'].setup_from_file(path)
-    
+
             iq.send()
-    
+
         def send_example_iq_tag_from_element_tree(self, to, et):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=3)
             iq['example_tag'].setup_from_lxml(et)
-    
+
             iq.send()
-    
+
         def send_example_iq_to_get_error(self, to):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=4)
             iq['example_tag'].set_boolean(True) # For example, the condition for receivingg error respond is example_tag without boolean value.
             iq.send()
-    
+
         def send_example_iq_tag_from_string(self, to, string):
             #~ make_iq(id=0, ifrom=None, ito=None, itype=None, iquery=None)
             iq = self.make_iq(ito=to, itype="get", id=5)
             iq['example_tag'].setup_from_string(string)
-    
+
             iq.send()
-        
+
     if __name__ == '__main__':
         parser = ArgumentParser(description=Sender.__doc__)
-    
+
         parser.add_argument("-q", "--quiet", help="set logging to ERROR",
                             action="store_const", dest="loglevel",
                             const=logging.ERROR, default=logging.INFO)
         parser.add_argument("-d", "--debug", help="set logging to DEBUG",
                             action="store_const", dest="loglevel",
                             const=logging.DEBUG, default=logging.INFO)
-    
+
         parser.add_argument("-j", "--jid", dest="jid",
                             help="JID to use")
         parser.add_argument("-p", "--password", dest="password",
@@ -1753,20 +1752,20 @@ Complete code from tutorial
                             help="JID to send the message/iq to")
         parser.add_argument("--path", dest="path",
                             help="path to load example_tag content")
-    
+
         args = parser.parse_args()
-    
+
         logging.basicConfig(level=args.loglevel,
                             format=' %(name)s - %(levelname)-8s %(message)s')
-    
+
         if args.jid is None:
             args.jid = input("Username: ")
         if args.password is None:
             args.password = getpass("Password: ")
-    
+
         xmpp = Sender(args.jid, args.password, args.to, args.path)
         xmpp.register_plugin('OurPlugin', module=example_plugin) # OurPlugin is a class name from example_plugin
-    
+
         xmpp.connect()
         try:
             xmpp.process()
@@ -1787,7 +1786,7 @@ Complete code from tutorial
     <example_tag xmlns="https://example.net/our_extension" some_string="StringFromFile">Info_inside_tag<inside_tag first_field="3" second_field="4" /></example_tag>
 
 Sources and references
----------------------
+-----------------------
 
 The Slixmpp project description:
 
