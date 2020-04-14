@@ -19,7 +19,6 @@ Ubuntu linux installation steps:
 * `'argparse'`
 * `'logging'`
 * `'subprocess'`
-* `'threading'`
 
 Check if these libraries and the proper python version are available at your environment. Every one of these, except the slixmpp, is a standard python library. However, it may happen that some of them may not be installed.
 
@@ -30,7 +29,6 @@ Check if these libraries and the proper python version are available at your env
     python3 -c "import argparse; print(argparse.__version__)"
     python3 -c "import logging; print(logging.__version__)"
     python3 -m subprocess
-    python3 -m threading
 
 Example output:
 
@@ -45,7 +43,6 @@ Example output:
     ~ $ python3 -c "import logging; print(logging.__version__)"
     0.5.1.2
     ~ $ python3 -m subprocess #Should return nothing
-    ~ $ python3 -m threading #Should return nothing
 
 If some of the libraries throw `'ImportError'` or `'no module named ...'` error, install them with:
 
@@ -75,56 +72,53 @@ As the example, a file `'test_slixmpp'` can be created in `'/usr/bin'` directory
 
     /usr/bin $ chmod 711 test_slixmpp
 
-This file should be readable and writable only with superuser permission. This file contains a simple structure for logging credentials:
+This file contains a simple structure for logging credentials:
 
 .. code-block:: python
 
-    #!/usr/bin/python3
-    #File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
+#!/usr/bin/python3
+#File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
 
-    import subprocess
-    import threading
-    import time
+import subprocess
+import time
 
-    def start_shell(shell_string):
-        subprocess.run(shell_string, shell=True, universal_newlines=True)
+if __name__ == "__main__":
+	#~ prefix = ["x-terminal-emulator", "-e"] # Separate terminal for every client; can be replaced with other terminal
+	#~ prefix = ["xterm", "-e"]
+	prefix = []
+	#~ suffix = ["-d"] # Debug
+	#~ suffix = ["-q"] # Quiet
+	suffix = []
 
-    if __name__ == "__main__":
-        #~ prefix = "x-terminal-emulator -e" # Separate terminal for every client; can be replaced with other terminal
-        #~ prefix = "xterm -e"
-        prefix = ""
-        #~ postfix = " -d" # Debug
-        #~ postfix = " -q" # Quiet
-        postfix = ""
+	sender_path = "./example/sender.py"
+	sender_jid = "SENDER_JID"
+	sender_password = "SENDER_PASSWORD"
 
-        sender_path = "./example/sender.py"
-        sender_jid = "SENDER_JID"
-        sender_password = "SENDER_PASSWORD"
+	example_file = "./test_example_tag.xml"
 
-        example_file = "./test_example_tag.xml"
+	responder_path = "./example/responder.py"
+	responder_jid = "RESPONDER_JID"
+	responder_password = "RESPONDER_PASSWORD"
 
-        responder_path = "./example/responder.py"
-        responder_jid = "RESPONDER_JID"
-        responder_password = "RESPONDER_PASSWORD"
-
-        # Remember about the executable permission. (`chmod +x ./file.py`)
-        SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
-                       " -t {responder_jid} --path {example_file} {postfix}"
-
-        RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
-                       " -p {responder_password} {postfix}"
-
-        try:
-            responder = threading.Thread(target=start_shell, args=(RESPON_TEST, ))
-            sender = threading.Thread(target=start_shell, args=(SENDER_TEST, ))
-            responder.start()
-            sender.start()
-            while True:
-                time.sleep(0.5)
-        except:
-           print ("Error: unable to start thread")
-
-The `'subprocess.run()'`function is compatible with Python 3.5+. If the backward compatibility is needed, replace it with `'subprocess.call'` method and adjust accordingly.
+	# Remember about the executable permission. (`chmod +x ./file.py`)
+	SENDER_TEST = prefix + [sender_path, "-j", sender_jid, "-p", sender_password, "-t", responder_jid, "--path", example_file] + suffix
+	RESPON_TEST = prefix + [responder_path, "-j", responder_jid, "-p", responder_password] + suffix
+	
+	try:
+		responder = subprocess.Popen(RESPON_TEST)
+		sender = subprocess.Popen(SENDER_TEST)
+		responder.wait()
+		sender.wait()
+	except:
+		try:
+			responder.terminate()
+		except NameError:
+			pass
+		try:
+			sender.terminate()
+		except NameError:
+			pass
+		raise
 
 The launch script should be convenient in use and easy to reconfigure again. The proper preparation of it now, can help saving time in the future. Logging credentials, the project paths (from `'sys.argv[...]'` or `'os.getcwd()'`), set the parameters for the debugging purposes, mock the testing xml file and many more things can be defined inside. Whichever parameters are used, the script testing itself should be fast and effortless. The proper preparation of it now, can help saving time in the future.
 
@@ -307,7 +301,7 @@ If the plugin is not in the same directory as the clients, then the symbolic lin
 The other solution is to relative import it (with dots '.') to get the proper path.
 
 First run and the event handlers
------------------------------------------------
+-------------------------------------------------
 
 To check if everything is okay, the `'start'` method can be used(which triggers the `'session_start'` event). Right after the client is ready, the signal will be sent.
 
@@ -1236,7 +1230,7 @@ The following code presents exactly this:
                 pass
 
 Tags and strings nested inside the tag
---------------------------------------
+---------------------------------------------------------
 
 To create the nested element inside IQ tag, `self.xml` field  can be considered as an Element from ET (ElementTree). Therefore adding the nested Elements is appending the Element.
 
@@ -1266,50 +1260,49 @@ Complete code from tutorial
 
 .. code-block:: python
 
-    #!/usr/bin/python3
-    #File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
+#!/usr/bin/python3
+#File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
 
-    import subprocess
-    import threading
-    import time
+import subprocess
+import time
 
-    def start_shell(shell_string):
-        subprocess.run(shell_string, shell=True, universal_newlines=True)
+if __name__ == "__main__":
+	#~ prefix = ["x-terminal-emulator", "-e"] # Separate terminal for every client; can be replaced with other terminal
+	#~ prefix = ["xterm", "-e"]
+	prefix = []
+	#~ suffix = ["-d"] # Debug
+	#~ suffix = ["-q"] # Quiet
+	suffix = []
 
-    if __name__ == "__main__":
-        #~ prefix = "x-terminal-emulator -e" # Separate terminal for every client, you can replace xterm with your terminal
-        #~ prefix = "xterm -e" # Separate terminal for every client, you can replace xterm with your terminal
-        prefix = ""
-        #~ postfix = " -d" # Debug
-        #~ postfix = " -q" # Quiet
-        postfix = ""
+	sender_path = "./example/sender.py"
+	sender_jid = "SENDER_JID"
+	sender_password = "SENDER_PASSWORD"
 
-        sender_path = "./example/sender.py"
-        sender_jid = "SENDER_JID"
-        sender_password = "SENDER_PASSWORD"
+	example_file = "./test_example_tag.xml"
 
-        example_file = "./test_example_tag.xml"
+	responder_path = "./example/responder.py"
+	responder_jid = "RESPONDER_JID"
+	responder_password = "RESPONDER_PASSWORD"
 
-        responder_path = "./example/responder.py"
-        responder_jid = "RESPONDER_JID"
-        responder_password = "RESPONDER_PASSWORD"
-
-        # Remember about rights to run your python files. (`chmod +x ./file.py`)
-        SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
-                       " -t {responder_jid} --path {example_file} {postfix}"
-
-        RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
-                       " -p {responder_password} {postfix}"
-
-        try:
-            responder = threading.Thread(target=start_shell, args=(RESPON_TEST, ))
-            sender = threading.Thread(target=start_shell, args=(SENDER_TEST, ))
-            responder.start()
-            sender.start()
-            while True:
-                time.sleep(0.5)
-        except:
-           print ("Error: unable to start thread")
+	# Remember about the executable permission. (`chmod +x ./file.py`)
+	SENDER_TEST = prefix + [sender_path, "-j", sender_jid, "-p", sender_password, "-t", responder_jid, "--path", example_file] + suffix
+	RESPON_TEST = prefix + [responder_path, "-j", responder_jid, "-p", responder_password] + suffix
+	
+	try:
+		responder = subprocess.Popen(RESPON_TEST)
+		sender = subprocess.Popen(SENDER_TEST)
+		responder.wait()
+		sender.wait()
+	except:
+		try:
+			responder.terminate()
+		except NameError:
+			pass
+		try:
+			sender.terminate()
+		except NameError:
+			pass
+		raise
 
 .. code-block:: python
 

@@ -19,7 +19,6 @@ Instalacja dla Ubuntu linux:
 * `'argparse'`
 * `'logging'`
 * `'subprocess'`
-* `'threading'`
 
 Wszystkie biblioteki wymienione powyżej, za wyjątkiem slixmpp, należą do standardowej biblioteki pythona. Zdarza się, że kompilując źródła samodzielnie, część z nich może nie zostać zainstalowana.
 
@@ -30,7 +29,6 @@ Wszystkie biblioteki wymienione powyżej, za wyjątkiem slixmpp, należą do sta
     python3 -c "import argparse; print(argparse.__version__)"
     python3 -c "import logging; print(logging.__version__)"
     python3 -m subprocess
-    python3 -m threading
 
 Wynik w terminalu:
 
@@ -45,7 +43,6 @@ Wynik w terminalu:
     ~ $ python3 -c "import logging; print(logging.__version__)"
     0.5.1.2
     ~ $ python3 -m subprocess # Nie powinno nic zwrócić
-    ~ $ python3 -m threading # Nie powinno nic zwrócić
 
 Jeśli któraś z bibliotek zwróci `'ImportError'` lub `'no module named ...'`, należy je zainstalować zgodnie z przykładem poniżej:
 
@@ -75,56 +72,53 @@ Przykładowo, można stworzyć plik o nazwie `'test_slixmpp'` w lokalizacji `'/u
 
     /usr/bin $ chmod 711 test_slixmpp
 
-Taki plik powinien wymagać uprawnień superuser do odczytu i edycji. Plik zawiera prostą strukturę, która pozwoli nam zapisać dane logowania.
+Plik zawiera prostą strukturę, która pozwoli nam zapisać dane logowania.
 
 .. code-block:: python
 
-    #!/usr/bin/python3
-    #File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
+#!/usr/bin/python3
+#File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
 
-    import subprocess
-    import threading
-    import time
+import subprocess
+import time
 
-    def start_shell(shell_string):
-        subprocess.run(shell_string, shell=True, universal_newlines=True)
+if __name__ == "__main__":
+	#~ prefix = ["x-terminal-emulator", "-e"] # Osobny terminal dla kazdego klienta, może być zastąpiony inną konsolą.
+	#~ prefix = ["xterm", "-e"]
+	prefix = []
+	#~ suffix = ["-d"] # Debug
+	#~ suffix = ["-q"] # Quiet
+	suffix = []
 
-    if __name__ == "__main__":
-        #~ prefix = "x-terminal-emulator -e" # Oddzielny terminal dla każdego klienta, można zastąpić własnym emulatorem terminala
-        #~ prefix = "xterm -e"
-        prefix = ""
-        #~ postfix = " -d" # Debug
-        #~ postfix = " -q" # Quiet
-        postfix = ""
+	sender_path = "./example/sender.py"
+	sender_jid = "SENDER_JID"
+	sender_password = "SENDER_PASSWORD"
 
-        sender_path = "./example/sender.py"
-        sender_jid = "SENDER_JID"
-        sender_password = "SENDER_PASSWORD"
+	example_file = "./test_example_tag.xml"
 
-        example_file = "./test_example_tag.xml"
+	responder_path = "./example/responder.py"
+	responder_jid = "RESPONDER_JID"
+	responder_password = "RESPONDER_PASSWORD"
 
-        responder_path = "./example/responder.py"
-        responder_jid = "RESPONDER_JID"
-        responder_password = "RESPONDER_PASSWORD"
-
-        # Pamiętaj o nadaniu praw do wykonywania (`chmod +x ./file.py`)
-        SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
-                       " -t {responder_jid} --path {example_file} {postfix}"
-
-        RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
-                       " -p {responder_password} {postfix}"
-
-        try:
-            responder = threading.Thread(target=start_shell, args=(RESPON_TEST, ))
-            sender = threading.Thread(target=start_shell, args=(SENDER_TEST, ))
-            responder.start()
-            sender.start()
-            while True:
-                time.sleep(0.5)
-        except:
-           print ("Error: unable to start thread")
-
-Funkcja `'subprocess.run()'` jest kompatybilna z Pythonem 3.5+. Dla uzyskania wcześniejszej kompatybilności można podmienić ją metodą `'subprocess.call()'` i dostosować argumenty.
+	# Remember about the executable permission. (`chmod +x ./file.py`)
+	SENDER_TEST = prefix + [sender_path, "-j", sender_jid, "-p", sender_password, "-t", responder_jid, "--path", example_file] + suffix
+	RESPON_TEST = prefix + [responder_path, "-j", responder_jid, "-p", responder_password] + suffix
+	
+	try:
+		responder = subprocess.Popen(RESPON_TEST)
+		sender = subprocess.Popen(SENDER_TEST)
+		responder.wait()
+		sender.wait()
+	except:
+		try:
+			responder.terminate()
+		except NameError:
+			pass
+		try:
+			sender.terminate()
+		except NameError:
+			pass
+		raise
 
 Skrypt uruchamiający powinien być dostosowany do potrzeb urzytkownika: można w nim pobierać ścieżki do projektu z linii komend (przez `'sys.argv[...]'` lub `'os.getcwd()'`), wybierać z jaką flagą mają zostać uruchomione programy oraz wiele innych. Jego należyte przygotowanie pozwoli zaoszczędzić czas i nerwy podczas późniejszych prac.
 
@@ -306,12 +300,12 @@ Jeżeli powyższy plugin nie jest w domyślnej lokalizacji, a klienci powinni po
 
 Jeszcze innym wyjściem jest import relatywny z użyciem kropek '.' aby dostać się do właściwej ścieżki.
 
-Pierwsze uruchomienie i przechwytywanie eventów
------------------------------------------------
+Pierwsze uruchomienie i przechwytywanie zdarzeń
+-------------------------------------------------
 
-Aby sprawdzić czy wszystko działa prawidłowo, można użyć metody `'start'`. Jest jej przypisany event `'session_start'`. Sygnał ten zostanie wysłany w momencie, w którym klient będzie gotów do działania. Stworzenie własnej metoda pozwoli na zdefiniowanie działania tego sygnału.
+Aby sprawdzić czy wszystko działa prawidłowo, można użyć metody `'start'`. Jest jej przypisane zdarzenie `'session_start'`. Sygnał ten zostanie wysłany w momencie, w którym klient będzie gotów do działania. Stworzenie własnej metoda pozwoli na zdefiniowanie działania tego sygnału.
 
-W metodzie `'__init__'` zostało stworzone przekierowanie eventu `'session_start'`. Kiedy zostanie on wywołany, metoda `'def start(self, event):'` zostanie wykonana. Jako pierwszy krok procesie tworzenia, można dodać linię `'logging.info("I'm running")'` w obu klientach (sender i responder), a następnie użyć komendy `'test_slixmpp'`.
+W metodzie `'__init__'` zostało stworzone przekierowanie zdarzenia `'session_start'`. Kiedy zostanie on wywołany, metoda `'def start(self, event):'` zostanie wykonana. Jako pierwszy krok procesie tworzenia, można dodać linię `'logging.info("I'm running")'` w obu klientach (sender i responder), a następnie użyć komendy `'test_slixmpp'`.
 
 Metoda `'def start(self, event):'` powinna wyglądać tak:
 
@@ -364,7 +358,7 @@ Przykład:
 
 W przykładzie powyżej, używana jest wbudowana metoda `'make_message'`, która tworzy wiadomość o treści `'example_message'` i wysyła ją pod koniec działania metody start. Czyli: wiadomość ta zostanie wysłana raz, zaraz po uruchomieniu skryptu.
 
-Aby otrzymać tę wiadomość, responder powinien wykorzystać odpowiedni event: metodę, która określa co zrobić, gdy zostanie odebrana wiadomość której nie został przypisany żaden inny event. Przykład takiego kodu:
+Aby otrzymać tę wiadomość, responder powinien wykorzystać odpowiednie zdarzenie: metodę, która określa co zrobić, gdy zostanie odebrana wiadomość której nie zostało przypisane żadne inne zdarzenie. Przykład takiego kodu:
 
 .. code-block:: python
 
@@ -404,8 +398,8 @@ Aby rozszerzyć obiekt Message o wybrany tag, plugin powinien zostać zarejestro
 
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"                 ##~ String zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin.
-            self.xep = "ope"                 ##~ String zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin przez dodanie go do `slixmpp/plugins/__init__.py` w metodzie  `__all__` z 'xep_OPE'.
+            self.description = "OurPluginExtension"                 ##~ Napis zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin.
+            self.xep = "ope"                 ##~ Napis zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin przez dodanie go do `slixmpp/plugins/__init__.py` w metodzie  `__all__` z 'xep_OPE'.
 
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>
@@ -459,12 +453,12 @@ Teraz, po rejestracji tagu, można rozszerzyć wiadomość.
             #<<<<<<<<<<<<
             msg.send()
 
-Po uruchomieniu, logging powinien wyświetlić Message wraz z tagiem `'example_tag'` zawartym w środku <message><example_tag/></message>, oraz z napisem `'Work'` i nadanym namespace.
+Po uruchomieniu, obiekt logging powinien wyświetlić Message wraz z tagiem `'example_tag'` zawartym w środku <message><example_tag/></message>, oraz z napisem `'Work'` i nadaną przestrzenią nazw.
 
 Nadanie oddzielnego sygnału dla rozszerzonej wiadomości
 --------------------------------------------------------
 
-Jeśli event nie zostanie sprecyzowany, to zarówno rozszerzona jak i podstawowa wiadomość będą przechwytywane przez sygnał `'message'`. Aby nadać im oddzielny event, należy zarejestrować odpowiedni handler dla namespace'a i tagu, aby stworzyć unikalną kombinację, która pozwoli na przechwycenie wyłącznie pożądanych wiadomości (lub Iq object).
+Jeśli zdarzenie nie zostanie sprecyzowane, to zarówno rozszerzona jak i podstawowa wiadomość będą przechwytywane przez sygnał `'message'`. Aby nadać im oddzielne zdarzenie, należy zarejestrować odpowiedni uchwyt dla przestrzeni nazw i tagu, aby stworzyć unikalną kombinację, która pozwoli na przechwycenie wyłącznie pożądanych wiadomości (lub Iq object).
 
 .. code-block:: python
 
@@ -472,30 +466,30 @@ Jeśli event nie zostanie sprecyzowany, to zarówno rozszerzona jak i podstawowa
 
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"                 ##~ String zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin.
-            self.xep = "ope"                 ##~ String zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin przez dodanie go do `slixmpp/plugins/__init__.py` w metodzie  `__all__` z 'xep_OPE'.
+            self.description = "OurPluginExtension"                 ##~ Napis zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin.
+            self.xep = "ope"                 ##~ Napis zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin przez dodanie go do `slixmpp/plugins/__init__.py` w metodzie  `__all__` z 'xep_OPE'.
 
             namespace = ExampleTag.namespace
 
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Nazwa tego Callback
-                        StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Przechwytuje wyłącznie Message z tagiem example_tag i namespace takim jaki zdefiniowaliśmy w ExampleTag
-                        self.__handle_message))                     ##~ Metoda do której zostaje przypisany przechwycony odpowiedni obiekt, powinna wywołać odpowiedni event dla klienta.
+                        StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Przechwytuje wyłącznie Message z tagiem example_tag i przestrzenią nazw taką, jaką zdefiniowaliśmy w ExampleTag
+                        self.__handle_message))                     ##~ Metoda do której zostaje przypisany przechwycony odpowiedni obiekt, powinna wywołać odpowiedni dla klienta wydarzenie.
             register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowany rozszerzony tag dla obiektu Message. Jeśli to nie zostanie zrobione, message['example_tag'] będzie polem tekstowym, a nie rozszerzeniem i nie będzie mogło zawierać atrybutów i pod-elementów.
 
         def __handle_message(self, msg):
             # Tu można coś zrobić z przechwyconą wiadomością zanim trafi do klienta.
-            self.xmpp.event('example_tag_message', msg)          ##~ Wywołuje event, który może zostać przechwycony i obsłużony przez klienta, jako argument przekazujemy obiekt który chcemy dopiąć do eventu.
+            self.xmpp.event('example_tag_message', msg)          ##~ Wywołuje zdarzenie, które może zostać przechwycone i obsłużone przez klienta, jako argument przekazujemy obiekt który chcemy dopiąć do wydarzenia.
 
 Obiekt StanzaPath powinien być poprawnie zainicjalizowany, według schematu:
 `'NAZWA_OBIEKTU[@type=TYP_OBIEKTU][/{NAMESPACE}[TAG]]'`
 
 * Dla NAZWA_OBIEKTU można użyć `'message'` lub `'iq'`.
-* Dla TYP_OBIEKTU, jeśli obiektem jest iq, można użyć typu spośród: `'get, set, error or result'`. Jeśli obiektem jest message, można sprecyzować typ dla message, np. `'chat'`..
-* Dla NAMESPACE powinien to być namespace zgodny z rozszerzeniem tagu.
+* Dla TYP_OBIEKTU, jeśli obiektem jest iq, można użyć typu spośród: `'get, set, error or result'`. Jeśli obiektem jest Message, można sprecyzować typ np. `'chat'`..
+* Dla NAMESPACE powinna to byc przestrzeń nazw zgodna z rozszerzeniem tagu.
 * TAG powinien zawierać tag, tutaj: `'example_tag'`.
 
-Teraz, program przechwyci wszystkie message, które zawierają sprecyzowany namespace wewnątrz `'example_tag'`. Można też sprawdzić co message zawiera, czy na pewno posiada wymagane pola itd. Następnie wiadomość jest wysyłana do klienta za pośrednictwem eventu `'example_tag_message'`.
+Teraz program przechwyci wszystkie wiadomości typu message, które zawierają sprecyzowaną przestrzeń nazw wewnątrz `'example_tag'`. Można też sprawdzić co Message zawiera, czy na pewno posiada wymagane pola itd. Następnie wiadomość jest wysyłana do klienta za pośrednictwem wydarzenia `'example_tag_message'`.
 
 .. code-block:: python
 
@@ -526,7 +520,7 @@ Teraz, program przechwyci wszystkie message, które zawierają sprecyzowany name
             msg.send()
             #<<<<<<<<<<<<
 
-Należy zapamiętać linię: `'self.xmpp.event('example_tag_message', msg)'`. W tej linii została zdefiniowana nazwa eventu do przechwycenia wewnątrz pliku "responder.py". Tutaj to: `'example_tag_message'`.
+Należy zapamiętać linię: `'self.xmpp.event('example_tag_message', msg)'`. W tej linii została zdefiniowana nazwa zdarzenia do przechwycenia wewnątrz pliku "responder.py". Tutaj to: `'example_tag_message'`.
 
 .. code-block:: python
 
@@ -538,7 +532,7 @@ Należy zapamiętać linię: `'self.xmpp.event('example_tag_message', msg)'`. W 
 
             self.add_event_handler("session_start", self.start)
             #>>>>>>>>>>>>
-            self.add_event_handler("example_tag_message", self.example_tag_message) # Rejestracja handlera
+            self.add_event_handler("example_tag_message", self.example_tag_message) # Rejestracja uchwytu
             #<<<<<<<<<<<<
 
         def start(self, event):
@@ -560,7 +554,7 @@ Użyteczne metody i inne
 Modyfikacja przykładowego obiektu `Message` na obiekt `Iq`
 ----------------------------------------------------------
 
-Aby przerobić przykładowy obiekt Message na obiekt Iq, należy zarejestrować nowy handler dla Iq, podobnie jak zostało to przedstawione w rozdziale `,,Rozszerzenie Message o tag''`. Tym razem, przykład będzie zawierał kilka rodzajów Iq o oddzielnych typami. Poprawia to czytelność kodu oraz usprawnia weryfikację poprawności działania. Wszystkie Iq powinny odesłać odpowiedź z tym samym Id i odpowiedzią do wysyłającego. W przeciwnym wypadku, wysyłający dostanie Iq zwrotne typu error.
+Aby przerobić przykładowy obiekt Message na obiekt Iq, należy zarejestrować nowy uchwyt (handler) dla Iq, podobnie jak zostało to przedstawione w rozdziale `,,Rozszerzenie Message o tag''`. Tym razem, przykład będzie zawierał kilka rodzajów Iq o oddzielnych typami. Poprawia to czytelność kodu oraz usprawnia weryfikację poprawności działania. Wszystkie Iq powinny odesłać odpowiedź z tym samym Id i odpowiedzią do wysyłającego. W przeciwnym wypadku, wysyłający dostanie Iq zwrotne typu error.
 
 .. code-block:: python
 
@@ -568,30 +562,30 @@ Aby przerobić przykładowy obiekt Message na obiekt Iq, należy zarejestrować 
 
     class OurPlugin(BasePlugin):
         def plugin_init(self):
-            self.description = "OurPluginExtension"                 ##~ String zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin.
-            self.xep = "ope"                 ##~ String zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin przez dodanie go do `slixmpp/plugins/__init__.py` w metodzie  `__all__` z 'xep_OPE'.
+            self.description = "OurPluginExtension"                 ##~ Napis zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin.
+            self.xep = "ope"                 ##~ Napis zrozumiały dla ludzi oraz do znalezienia pluginu przez inny plugin przez dodanie go do `slixmpp/plugins/__init__.py` w metodzie  `__all__` z 'xep_OPE'.
 
             namespace = ExampleTag.namespace
             #>>>>>>>>>>>>
             self.xmpp.register_handler(
                         Callback('ExampleGet Event:example_tag',    ##~ Nazwa tego Callbacka
                         StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Obsługuje tylko Iq o typie 'get' oraz example_tag
-                        self.__handle_get_iq))                      ##~ Metoda obsługująca odpowiednie Iq, powinna wywołać event dla klienta.
+                        self.__handle_get_iq))                      ##~ Metoda obsługująca odpowiednie Iq, powinna wywołać zdarzenie dla klienta.
 
             self.xmpp.register_handler(
                         Callback('ExampleResult Event:example_tag', ##~ Nazwa tego Callbacka
                         StanzaPath(f"iq@type=result/{{{namespace}}}example_tag"),   ##~ Obsługuje tylko Iq o typie 'result' oraz example_tag
-                        self.__handle_result_iq))                   ##~ Metoda obsługująca odpowiednie Iq, powinna wywołać event dla klienta.
+                        self.__handle_result_iq))                   ##~ Metoda obsługująca odpowiednie Iq, powinna wywołać zdarzenie dla klienta.
 
             self.xmpp.register_handler(
                         Callback('ExampleError Event:example_tag',  ##~ Nazwa tego Callbacka
                         StanzaPath(f"iq@type=error/{{{namespace}}}example_tag"),    ##~ Obsługuje tylko Iq o typie 'error' oraz example_tag
-                        self.__handle_error_iq))                    ##~ Metoda obsługująca odpowiednie Iq, powinna wywołać event dla klienta.
+                        self.__handle_error_iq))                    ##~ Metoda obsługująca odpowiednie Iq, powinna wywołać zdarzenie dla klienta.
 
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Nazwa tego Callbacka
                         StanzaPath(f'message/{{{namespace}}}example_tag'),          ##~ Obsługuje tylko Iq z example_tag
-                        self.__handle_message))                     ##~ Metoda obsługująca odpowiednie Iq, powinna wywołać event dla klienta.
+                        self.__handle_message))                     ##~ Metoda obsługująca odpowiednie Iq, powinna wywołać zdarzenie dla klienta.
 
             register_stanza_plugin(Iq, ExampleTag)                  ##~ Rejestruje rozszerzenie taga dla obiektu Iq. W przeciwnym wypadku, Iq['example_tag'] będzie polem string zamiast kontenerem.
             #<<<<<<<<<<<<
@@ -601,21 +595,21 @@ Aby przerobić przykładowy obiekt Message na obiekt Iq, należy zarejestrować 
         # Wszystkie możliwe typy Iq to: get, set, error, result
         def __handle_get_iq(self, iq):
             # Zrób coś z otrzymanym iq
-            self.xmpp.event('example_tag_get_iq', iq)           ##~ Wywołuje event, który może być obsłużony przez klienta lub inaczej.
+            self.xmpp.event('example_tag_get_iq', iq)           ##~ Wywołuje zdarzenie, który może być obsłużony przez klienta lub inaczej.
 
         def __handle_result_iq(self, iq):
             # Zrób coś z otrzymanym Iq
-            self.xmpp.event('example_tag_result_iq', iq)           ##~ Wywołuje event, który może być obsłużony przez klienta lub inaczej.
+            self.xmpp.event('example_tag_result_iq', iq)           ##~ Wywołuje zdarzenie, który może być obsłużony przez klienta lub inaczej.
 
         def __handle_error_iq(self, iq):
             # Zrób coś z otrzymanym Iq
-            self.xmpp.event('example_tag_error_iq', iq)           ##~ Wywołuje event, który może być obsłużony przez klienta lub inaczej.
+            self.xmpp.event('example_tag_error_iq', iq)           ##~ Wywołuje zdarzenie, który może być obsłużony przez klienta lub inaczej.
 
         def __handle_message(self, msg):
-            # Zrób coś z otrzymanym message
-            self.xmpp.event('example_tag_message', msg)           ##~ Wywołuje event, który może być obsłużony przez klienta lub inaczej.
+            # Zrób coś z otrzymaną wiadomością
+            self.xmpp.event('example_tag_message', msg)           ##~ Wywołuje zdarzenie, który może być obsłużony przez klienta lub inaczej.
 
-Eventy wywołane przez powyższe handlery mogą zostać przechwycone tak, jak w przypadku eventu `'example_tag_message'`.
+Wydarzenia wywołane przez powyższe uchwyty mogą zostać przechwycone tak, jak w przypadku wydarzenia `'example_tag_message'`.
 
 .. code-block:: python
 
@@ -883,7 +877,7 @@ Jeśli Responder zwróci wysłane Iq, a Sender wyłączy się po trzech odpowied
 Łatwość użycia pluginu dla programistów
 ----------------------------------------
 
-Każdy plugin powinien posiadać pewne obiektowe metody: wczytanie danych, jak w przypadku metod `setup` z poprzedniego rozdziału, gettery, settery, czy wywoływanie odpowiednich eventów.
+Każdy plugin powinien posiadać pewne obiektowe metody: wczytanie danych, jak w przypadku metod `setup` z poprzedniego rozdziału, gettery, settery, czy wywoływanie odpowiednich wydarzeń.
 Potencjalne błędy powinny być przechwytywane z poziomu pluginu i zwracane z odpowiednim opisem błędu w postaci odpowiedzi Iq o tym samym id do wysyłającego. Aby uniknąć sytuacji kiedy plugin nie robi tego co powinien, a wiadomość zwrotna nigdy nie nadchodzi, wysyłający dostaje error z komunikatem timeout.
 
 Poniżej przykład kodu podyktowanego tymi zasadami:
@@ -915,25 +909,25 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             self.xmpp.register_handler(
                         Callback('ExampleGet Event:example_tag',    ##~ Nazwa tego Callbacku
                         StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),      ##~ Obsługuje tylko Iq o typie 'get' oraz example_tag
-                        self.__handle_get_iq))                      ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
+                        self.__handle_get_iq))                      ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać zdarzenie u klienta.
 
             self.xmpp.register_handler(
                         Callback('ExampleGet Event:example_tag',  ##~ Nazwa tego Callbacku
                         StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),   ##~ Obsługuje tylko Iq o typie 'result' oraz example_tag
-                     self.__handle_get_iq))                    ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
+                     self.__handle_get_iq))                    ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać zdarzenie u klienta.
 
             self.xmpp.register_handler(
                         Callback('ExampleGet Event:example_tag',   ##~ Nazwa tego Callbacku
                         StanzaPath(f"iq@type=get/{{{namespace}}}example_tag"),   ##~ Obsługuje tylko Iq o typie 'error' oraz example_tag
-                        self.__handle_get_iq))                     ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
+                        self.__handle_get_iq))                     ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać zdarzenie u klienta.
 
             self.xmpp.register_handler(
                         Callback('ExampleMessage Event:example_tag',##~ Nazwa tego Callbacku
                         StanzaPath(f'message/{{{namespace}}}example_tag'),         ##~ Obsługuje tylko Message z example_tag
-                        self.__handle_message))                     ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać event u klienta.
+                        self.__handle_message))                     ##~ Metoda przechwytuje odpowiednie Iq, powinna wywołać zdarzenie u klienta.
 
             register_stanza_plugin(Iq, ExampleTag)                  ##~ Zarejestrowane rozszerzenia tagu dla Iq. Bez tego, iq['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć pod-elementów.
-            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowane rozszerzenia tagu dla Message. Bez tego, message['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć pod-elementów.
+            register_stanza_plugin(Message, ExampleTag)             ##~ Zarejestrowane rozszerzenia tagu dla wiadomości Message. Bez tego, message['example_tag'] będzie polem tekstowym, a nie kontenerem i nie będzie można zmieniać w nim pól i tworzyć pod-elementów.
 
         # Wszystkie możliwe typy iq: get, set, error, result
         def __handle_get_iq(self, iq):
@@ -944,19 +938,19 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
                 error["error"]["text"] = "Without some_string value returns error."
                 error.send()
             # Zrób coś z otrzymanym Iq
-            self.xmpp.event('example_tag_get_iq', iq)           ##~ Wywołanie eventu, który może być przesłany do klienta lub zmieniony po drodze.
+            self.xmpp.event('example_tag_get_iq', iq)           ##~ Wywołanie zdarzenia, które może być przesłane do klienta lub zmienione po drodze.
 
         def __handle_result_iq(self, iq):
             # Zrób coś z otrzymanym Iq
-            self.xmpp.event('example_tag_result_iq', iq)           ##~ Wywołanie eventu, który może być przesłany do klienta lub zmieniony po drodze.
+            self.xmpp.event('example_tag_result_iq', iq)           ##~ Wywołanie zdarzenia, które może być przesłany do klienta lub zmienione po drodze.
 
         def __handle_error_iq(self, iq):
             # Zrób coś z otrzymanym Iq
-            self.xmpp.event('example_tag_error_iq', iq)           ##~ Wywołanie eventu, który może być przesłany do klienta lub zmieniony po drodze.
+            self.xmpp.event('example_tag_error_iq', iq)           ##~ Wywołanie zdarzenia, które może być przesłane do klienta lub zmienione po drodze.
 
         def __handle_message(self, msg):
-            # Zrób coś z otrzymanym Message
-            self.xmpp.event('example_tag_message', msg)           ##~ Wywołanie eventu, który może być przesłany do klienta lub zmieniony po drodze.
+            # Zrób coś z otrzymaną wiadomością
+            self.xmpp.event('example_tag_message', msg)           ##~ Wywołanie zdarzenia, które może być przesłane do klienta lub zmienione po drodze.
 
     class ExampleTag(ElementBase):
         name = "example_tag"                                        ##~ Nazwa głównego pliku XML tego rozszerzenia.
@@ -1042,7 +1036,7 @@ Poniżej przykład kodu podyktowanego tymi zasadami:
             reply.send()
 
         def example_tag_message(self, msg):
-            logging.info(msg) # Na Message można odpowiedzieć, ale nie trzeba.
+            logging.info(msg) # Na wiadomość Message można odpowiedzieć, ale nie trzeba.
 
 
     if __name__ == '__main__':
@@ -1269,50 +1263,49 @@ W poniższym kodzie zostały pozostawione oryginalne komentarze w języku angiel
 
 .. code-block:: python
 
-    #!/usr/bin/python3
-    #File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
+#!/usr/bin/python3
+#File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
 
-    import subprocess
-    import threading
-    import time
+import subprocess
+import time
 
-    def start_shell(shell_string):
-        subprocess.run(shell_string, shell=True, universal_newlines=True)
+if __name__ == "__main__":
+	#~ prefix = ["x-terminal-emulator", "-e"] # Separate terminal for every client; can be replaced with other terminal
+	#~ prefix = ["xterm", "-e"]
+	prefix = []
+	#~ suffix = ["-d"] # Debug
+	#~ suffix = ["-q"] # Quiet
+	suffix = []
 
-    if __name__ == "__main__":
-        #~ prefix = "x-terminal-emulator -e" # Separate terminal for every client, you can replace xterm with your terminal
-        #~ prefix = "xterm -e" # Separate terminal for every client, you can replace xterm with your terminal
-        prefix = ""
-        #~ postfix = " -d" # Debug
-        #~ postfix = " -q" # Quiet
-        postfix = ""
+	sender_path = "./example/sender.py"
+	sender_jid = "SENDER_JID"
+	sender_password = "SENDER_PASSWORD"
 
-        sender_path = "./example/sender.py"
-        sender_jid = "SENDER_JID"
-        sender_password = "SENDER_PASSWORD"
+	example_file = "./test_example_tag.xml"
 
-        example_file = "./test_example_tag.xml"
+	responder_path = "./example/responder.py"
+	responder_jid = "RESPONDER_JID"
+	responder_password = "RESPONDER_PASSWORD"
 
-        responder_path = "./example/responder.py"
-        responder_jid = "RESPONDER_JID"
-        responder_password = "RESPONDER_PASSWORD"
-
-        # Remember about rights to run your python files. (`chmod +x ./file.py`)
-        SENDER_TEST = f"{prefix} {sender_path} -j {sender_jid} -p {sender_password}" + \
-                       " -t {responder_jid} --path {example_file} {postfix}"
-
-        RESPON_TEST = f"{prefix} {responder_path} -j {responder_jid}" + \
-                       " -p {responder_password} {postfix}"
-
-        try:
-            responder = threading.Thread(target=start_shell, args=(RESPON_TEST, ))
-            sender = threading.Thread(target=start_shell, args=(SENDER_TEST, ))
-            responder.start()
-            sender.start()
-            while True:
-                time.sleep(0.5)
-        except:
-           print ("Error: unable to start thread")
+	# Remember about the executable permission. (`chmod +x ./file.py`)
+	SENDER_TEST = prefix + [sender_path, "-j", sender_jid, "-p", sender_password, "-t", responder_jid, "--path", example_file] + suffix
+	RESPON_TEST = prefix + [responder_path, "-j", responder_jid, "-p", responder_password] + suffix
+	
+	try:
+		responder = subprocess.Popen(RESPON_TEST)
+		sender = subprocess.Popen(SENDER_TEST)
+		responder.wait()
+		sender.wait()
+	except:
+		try:
+			responder.terminate()
+		except NameError:
+			pass
+		try:
+			sender.terminate()
+		except NameError:
+			pass
+		raise
 
 .. code-block:: python
 
