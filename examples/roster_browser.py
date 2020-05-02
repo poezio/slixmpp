@@ -134,4 +134,4 @@ if __name__ == '__main__':
 
     # Connect to the XMPP server and start processing XMPP stanzas.
     xmpp.connect()
-    xmpp.process()
+    xmpp.process(forever=False)
