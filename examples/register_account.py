@@ -47,7 +47,7 @@ class RegisterBot(slixmpp.ClientXMPP):
         # for data forms and OOB links that will make that easier.
         self.add_event_handler("register", self.register)
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -61,7 +61,7 @@ class RegisterBot(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
         # We're only concerned about registering, so nothing more to do here.
         self.disconnect()

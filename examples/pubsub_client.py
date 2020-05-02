@@ -32,7 +32,7 @@ class PubsubClient(slixmpp.ClientXMPP):
         self.add_event_handler('session_start', self.start)
 
     async def start(self, event):
-        self.get_roster()
+        await self.get_roster()
         self.send_presence()
 
         try:

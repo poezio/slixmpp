@@ -38,8 +38,8 @@ class PubsubEvents(slixmpp.ClientXMPP):
         # self.add_event_handler('event_prefix_purge', handler)
         # self.add_event_handler('event_prefix_delete', handler)
 
-    def start(self, event):
-        self.get_roster()
+    async def start(self, event):
+        await self.get_roster()
         self.send_presence()
 
     def _publish(self, msg):

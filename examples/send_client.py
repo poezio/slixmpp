@@ -38,7 +38,7 @@ class SendMsgBot(slixmpp.ClientXMPP):
         # our roster.
         self.add_event_handler("session_start", self.start)
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -52,7 +52,7 @@ class SendMsgBot(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
         self.send_message(mto=self.recipient,
                           mbody=self.msg,
