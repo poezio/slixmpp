@@ -38,9 +38,9 @@ class LocationBot(ClientXMPP):
 
         self.current_tune = None
 
-    def start(self, event):
+    async def start(self, event):
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
         self['xep_0115'].update_caps()
 
         print("Using freegeoip.net to get geolocation.")

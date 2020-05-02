@@ -37,7 +37,7 @@ class CommandUserBot(slixmpp.ClientXMPP):
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("message", self.message)
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -51,7 +51,7 @@ class CommandUserBot(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
         # We first create a session dictionary containing:
         #   'next'  -- the handler to execute on a successful response

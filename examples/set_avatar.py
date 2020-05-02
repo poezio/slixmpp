@@ -46,7 +46,7 @@ class AvatarSetter(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
         avatar_file = None
         try:

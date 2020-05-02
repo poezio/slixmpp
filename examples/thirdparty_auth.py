@@ -60,7 +60,7 @@ class ThirdPartyAuthBot(slixmpp.ClientXMPP):
         # MUC messages and error messages.
         self.add_event_handler("message", self.message)
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -74,7 +74,7 @@ class ThirdPartyAuthBot(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
     def message(self, msg):
         """

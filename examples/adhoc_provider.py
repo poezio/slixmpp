@@ -33,7 +33,7 @@ class CommandBot(slixmpp.ClientXMPP):
         # our roster.
         self.add_event_handler("session_start", self.start)
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -47,7 +47,7 @@ class CommandBot(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
         # We add the command after session_start has fired
         # to ensure that the correct full JID is used.

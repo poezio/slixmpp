@@ -58,7 +58,7 @@ class GTalkBot(slixmpp.ClientXMPP):
             logging.error(err.message)
             self.disconnect()
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -72,7 +72,7 @@ class GTalkBot(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
     def message(self, msg):
         """

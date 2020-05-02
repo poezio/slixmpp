@@ -51,12 +51,8 @@ class RosterBrowser(slixmpp.ClientXMPP):
                      event does not provide any additional
                      data.
         """
-        future = asyncio.Future()
-        def callback(result):
-            future.set_result(None)
         try:
-            self.get_roster(callback=callback)
-            await future
+            await self.get_roster()
         except IqError as err:
             print('Error: %s' % err.iq['error']['condition'])
         except IqTimeout:
