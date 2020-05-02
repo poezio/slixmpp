@@ -69,7 +69,7 @@ class Disco(slixmpp.ClientXMPP):
                      event does not provide any additional
                      data.
         """
-        self.get_roster()
+        await self.get_roster()
         self.send_presence()
 
         try:

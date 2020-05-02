@@ -51,7 +51,7 @@ class PingTest(slixmpp.ClientXMPP):
                      data.
         """
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
         try:
             rtt = await self['xep_0199'].ping(self.pingjid,

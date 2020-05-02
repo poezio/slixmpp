@@ -52,7 +52,7 @@ class MUCBot(slixmpp.ClientXMPP):
                                self.muc_online)
 
 
-    def start(self, event):
+    async def start(self, event):
         """
         Process the session_start event.
 
@@ -65,7 +65,7 @@ class MUCBot(slixmpp.ClientXMPP):
                      event does not provide any additional
                      data.
         """
-        self.get_roster()
+        await self.get_roster()
         self.send_presence()
         self.plugin['xep_0045'].join_muc(self.room,
                                          self.nick,
