@@ -116,7 +116,7 @@ class XEP_0363(BasePlugin):
                     except (TypeError, ValueError):
                         log.error('Invalid max size received from HTTP File Upload service')
                         self.max_file_size = float('+inf')
-                break
+                    break
 
         if input_file is None:
             input_file = open(filename, 'rb')
