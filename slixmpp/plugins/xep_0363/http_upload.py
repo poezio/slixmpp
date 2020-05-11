@@ -28,7 +28,9 @@ class UploadServiceNotFound(FileUploadError):
     pass
 
 class FileTooBig(FileUploadError):
-    pass
+    def __str__(self):
+        return 'File size too large: {} (max: {} bytes)' \
+            .format(self.args[0], self.args[1])
 
 class HTTPError(FileUploadError):
     def __str__(self):
@@ -126,7 +128,7 @@ class XEP_0363(BasePlugin):
             input_file.seek(0)
 
         if size > self.max_file_size:
-            raise FileTooBig()
+            raise FileTooBig(size, self.max_file_size)
 
         if content_type is None:
             content_type = guess_type(filename)[0]
