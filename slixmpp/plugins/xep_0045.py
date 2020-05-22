@@ -29,61 +29,61 @@ class MUCPresence(ElementBase):
     affiliations = {'', }
     roles = {'', }
 
-    def get_xml_item(self):
+    def get_item_attr(self, attr, default):
+        item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
+        if item is None:
+            return default
+        return item.get(attr)
+
+    def set_item_attr(self, attr, value):
         item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
         if item is None:
             item = ET.Element('{http://jabber.org/protocol/muc#user}item')
             self.xml.append(item)
+        item.attrib[attr] = value
         return item
 
+    def del_item_attr(self, attr):
+        item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
+        if item is not None and attr in item.attrib:
+            del item.attrib[attr]
+
     def get_affiliation(self):
-        #TODO if no affilation, set it to the default and return default
-        item = self.get_xml_item()
-        return item.get('affiliation', '')
+        return self.get_item_attr('affiliation', '')
 
     def set_affiliation(self, value):
-        item = self.get_xml_item()
-        #TODO check for valid affiliation
-        item.attrib['affiliation'] = value
+        self.set_item_attr('affiliation', value)
         return self
 
     def del_affiliation(self):
-        item = self.get_xml_item()
-        #TODO set default affiliation
-        if 'affiliation' in item.attrib: del item.attrib['affiliation']
+        # TODO: set default affiliation
+        self.del_item_attr('affiliation')
         return self
 
     def get_jid(self):
-        item = self.get_xml_item()
-        return JID(item.get('jid', ''))
+        return JID(self.get_item_attr('jid', ''))
 
     def set_jid(self, value):
-        item = self.get_xml_item()
         if not isinstance(value, str):
             value = str(value)
-        item.attrib['jid'] = value
+        self.set_item_attr('jid', value)
         return self
 
     def del_jid(self):
-        item = self.get_xml_item()
-        if 'jid' in item.attrib: del item.attrib['jid']
+        self.del_item_attr('jid')
         return self
 
     def get_role(self):
-        item = self.get_xml_item()
-        #TODO get default role, set default role if none
-        return item.get('role', '')
+        return self.get_item_attr('role', '')
 
     def set_role(self, value):
-        item = self.get_xml_item()
-        #TODO check for valid role
-        item.attrib['role'] = value
+        # TODO: check for valid role
+        self.set_item_attr('role', value)
         return self
 
     def del_role(self):
-        item = self.get_xml_item()
-        #TODO set default role
-        if 'role' in item.attrib: del item.attrib['role']
+        # TODO: set default role
+        self.del_item_attr('role')
         return self
 
     def get_nick(self):
