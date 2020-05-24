@@ -8,7 +8,7 @@
 
 from slixmpp.plugins.base import register_plugin
 
-from slixmpp.plugins.xep_0377.stanza import Report
+from slixmpp.plugins.xep_0377.stanza import Report, Text
 from slixmpp.plugins.xep_0377.spam_reporting import XEP_0377
 
 
