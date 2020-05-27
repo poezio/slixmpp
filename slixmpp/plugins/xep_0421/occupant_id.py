@@ -20,6 +20,7 @@ class XEP_0421(BasePlugin):
     description = 'Anonymous unique occupant identifiers for MUCs'
     dependencies = {'xep_0030', 'xep_0045'}
     stanza = stanza
+    namespace = stanza.NS
 
     def plugin_init(self) -> None:
         # XXX: This should be MucMessage. Someday..
@@ -27,4 +28,4 @@ class XEP_0421(BasePlugin):
 
     async def has_feature(self, jid: JID) -> bool:
         info = await self.xmpp['xep_0030'].get_info(jid)
-        return self.stanza.NS in info.get_features()
+        return self.namespace in info.get_features()
