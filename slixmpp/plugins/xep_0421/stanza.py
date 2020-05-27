@@ -9,6 +9,9 @@
 from slixmpp.xmlstream import ElementBase
 
 
+NS = 'urn:xmpp:occupant-id:0'
+
+
 class OccupantId(ElementBase):
     '''
     An Occupant-id tag.
@@ -33,5 +36,5 @@ class OccupantId(ElementBase):
     '''
 
     name = 'occupant-id'
-    namespace = 'urn:xmpp:occupant-id:0'
+    namespace = NS
     interface = {'id'}

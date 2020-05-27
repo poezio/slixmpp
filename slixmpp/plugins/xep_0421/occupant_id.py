@@ -6,7 +6,7 @@
     See the file LICENSE for copying permission.
 """
 
-from slixmpp import Message
+from slixmpp import JID, Message
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.xep_0421 import stanza
@@ -18,9 +18,13 @@ class XEP_0421(BasePlugin):
 
     name = 'xep_0421'
     description = 'Anonymous unique occupant identifiers for MUCs'
-    dependencies = {'xep_0045'}
+    dependencies = {'xep_0030', 'xep_0045'}
     stanza = stanza
 
     def plugin_init(self) -> None:
         # XXX: This should be MucMessage. Someday..
         register_stanza_plugin(Message, OccupantId)
+
+    async def has_feature(self, jid: JID) -> bool:
+        info = await self.xmpp['xep_0030'].get_info(jid)
+        return self.stanza.NS in info.get_features()
