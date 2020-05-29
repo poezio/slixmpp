@@ -19,7 +19,7 @@ NS_ADMIN = 'http://jabber.org/protocol/muc#admin'
 NS_OWNER = 'http://jabber.org/protocol/muc#owner'
 
 
-class MUCPresence(ElementBase):
+class MUCBase(ElementBase):
     name = 'x'
     namespace = NS_USER
     plugin_attrib = 'muc'
@@ -89,17 +89,61 @@ class MUCPresence(ElementBase):
         return self.parent()['from'].bare
 
     def set_nick(self, value):
-        log.warning("Cannot set nick through mucpresence plugin.")
+        log.warning(
+            "Cannot set nick through the %s plugin.",
+            self.__class__.__name__,
+        )
         return self
 
     def set_room(self, value):
-        log.warning("Cannot set room through mucpresence plugin.")
+        log.warning(
+            "Cannot set room through the %s plugin.",
+            self.__class__.__name__,
+        )
         return self
 
     def del_nick(self):
-        log.warning("Cannot delete nick through mucpresence plugin.")
+        log.warning(
+            "Cannot delete nick through the %s plugin.",
+            self.__class__.__name__,
+        )
         return self
 
     def del_room(self):
-        log.warning("Cannot delete room through mucpresence plugin.")
+        log.warning(
+            "Cannot delete room through the %s plugin.",
+            self.__class__.__name__,
+        )
         return self
+
+
+class MUCPresence(MUCBase):
+    '''
+    A MUC Presence
+
+    <presence from='foo@muc/user1' type='unavailable'>
+        <x xmlns='http://jabber.org/protocol/muc#user'>
+            <item affiliation='none'
+                  role='none'
+                  nick='newnick2'
+                  jid='some@jid'/>
+            <status code='303'/>
+        </x>
+    </presence>
+    '''
+
+
+class MUCMessage(MUCBase):
+    '''
+    A MUC Message
+
+    <message from='foo@muc/user1' type='groupchat' id='someid'>
+        <body>Foo</body>
+        <x xmlns='http://jabber.org/protocol/muc#user'>
+            <item affiliation='none'
+                  role='none'
+                  nick='newnick2'
+                  jid='some@jid'/>
+        </x>
+    </message>
+    '''
