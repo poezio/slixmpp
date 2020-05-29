@@ -27,13 +27,13 @@ class MUCPresence(ElementBase):
     affiliations = {'', }
     roles = {'', }
 
-    def get_item_attr(self, attr, default):
+    def get_item_attr(self, attr, default: str):
         item = self.xml.find('{{{NS_USER}}}item')
         if item is None:
             return default
         return item.get(attr)
 
-    def set_item_attr(self, attr, value):
+    def set_item_attr(self, attr, value: str):
         item = self.xml.find(f'{{{NS_USER}}}item')
         if item is None:
             item = ET.Element(f'{{{NS_USER}}}item')
