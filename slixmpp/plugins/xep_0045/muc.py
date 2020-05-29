@@ -19,7 +19,7 @@ from slixmpp.xmlstream.matcher.xmlmask import MatchXMLMask
 from slixmpp.exceptions import IqError, IqTimeout
 
 from slixmpp.plugins.xep_0045 import stanza
-from slixmpp.plugins.xep_0045.stanza import MUCPresence
+from slixmpp.plugins.xep_0045.stanza import MUCPresence, MUCMessage
 
 
 log = logging.getLogger(__name__)
@@ -42,6 +42,7 @@ class XEP_0045(BasePlugin):
         self.xep = '0045'
         # load MUC support in presence stanzas
         register_stanza_plugin(Presence, MUCPresence)
+        register_stanza_plugin(Message, MUCMessage)
         self.xmpp.register_handler(Callback('MUCPresence', MatchXMLMask("<presence xmlns='%s' />" % self.xmpp.default_ns), self.handle_groupchat_presence))
         self.xmpp.register_handler(Callback('MUCError', MatchXMLMask("<message xmlns='%s' type='error'><error/></message>" % self.xmpp.default_ns), self.handle_groupchat_error_message))
         self.xmpp.register_handler(Callback('MUCMessage', MatchXMLMask("<message xmlns='%s' type='groupchat'><body/></message>" % self.xmpp.default_ns), self.handle_groupchat_message))
