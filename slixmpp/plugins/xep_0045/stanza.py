@@ -24,8 +24,6 @@ class MUCPresence(ElementBase):
     namespace = NS_USER
     plugin_attrib = 'muc'
     interfaces = {'affiliation', 'role', 'jid', 'nick', 'room'}
-    affiliations = {'', }
-    roles = {'', }
 
     def get_item_attr(self, attr, default: str):
         item = self.xml.find('{{{NS_USER}}}item')
