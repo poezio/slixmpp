@@ -13,31 +13,36 @@ from slixmpp.xmlstream import ElementBase, ET, JID
 
 log = logging.getLogger(__name__)
 
+NS = 'http://jabber.org/protocol/muc'
+NS_USER = 'http://jabber.org/protocol/muc#user'
+NS_ADMIN = 'http://jabber.org/protocol/muc#admin'
+NS_OWNER = 'http://jabber.org/protocol/muc#owner'
+
 
 class MUCPresence(ElementBase):
     name = 'x'
-    namespace = 'http://jabber.org/protocol/muc#user'
+    namespace = NS_USER
     plugin_attrib = 'muc'
     interfaces = {'affiliation', 'role', 'jid', 'nick', 'room'}
     affiliations = {'', }
     roles = {'', }
 
     def get_item_attr(self, attr, default):
-        item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
+        item = self.xml.find('{{{NS_USER}}}item')
         if item is None:
             return default
         return item.get(attr)
 
     def set_item_attr(self, attr, value):
-        item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
+        item = self.xml.find(f'{{{NS_USER}}}item')
         if item is None:
-            item = ET.Element('{http://jabber.org/protocol/muc#user}item')
+            item = ET.Element(f'{{{NS_USER}}}item')
             self.xml.append(item)
         item.attrib[attr] = value
         return item
 
     def del_item_attr(self, attr):
-        item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
+        item = self.xml.find('{{{NS_USER}}}item')
         if item is not None and attr in item.attrib:
             del item.attrib[attr]
 
