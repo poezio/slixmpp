@@ -1,7 +1,6 @@
 """
     Slixmpp: The Slick XMPP Library
     Copyright (C) 2010 Nathanael C. Fritz
-    Copyright (C) 2020 "Maxime “pep” Buquet <pep@bouah.net>"
     This file is part of Slixmpp.
 
     See the file LICENSE for copying permission.
@@ -11,18 +10,103 @@ from __future__ import with_statement
 import logging
 
 from slixmpp import Presence, Message
-from slixmpp.plugins import BasePlugin
-from slixmpp.xmlstream import register_stanza_plugin, ET
+from slixmpp.plugins import BasePlugin, register_plugin
+from slixmpp.xmlstream import register_stanza_plugin, ElementBase, JID, ET
 from slixmpp.xmlstream.handler.callback import Callback
 from slixmpp.xmlstream.matcher.xpath import MatchXPath
 from slixmpp.xmlstream.matcher.xmlmask import MatchXMLMask
 from slixmpp.exceptions import IqError, IqTimeout
 
-from slixmpp.plugins.xep_0045 import stanza
-from slixmpp.plugins.xep_0045.stanza import MUCPresence, MUCMessage
-
 
 log = logging.getLogger(__name__)
+
+
+class MUCPresence(ElementBase):
+    name = 'x'
+    namespace = 'http://jabber.org/protocol/muc#user'
+    plugin_attrib = 'muc'
+    interfaces = {'affiliation', 'role', 'jid', 'nick', 'room'}
+    affiliations = {'', }
+    roles = {'', }
+
+    def get_item_attr(self, attr, default):
+        item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
+        if item is None:
+            return default
+        return item.get(attr)
+
+    def set_item_attr(self, attr, value):
+        item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
+        if item is None:
+            item = ET.Element('{http://jabber.org/protocol/muc#user}item')
+            self.xml.append(item)
+        item.attrib[attr] = value
+        return item
+
+    def del_item_attr(self, attr):
+        item = self.xml.find('{http://jabber.org/protocol/muc#user}item')
+        if item is not None and attr in item.attrib:
+            del item.attrib[attr]
+
+    def get_affiliation(self):
+        return self.get_item_attr('affiliation', '')
+
+    def set_affiliation(self, value):
+        self.set_item_attr('affiliation', value)
+        return self
+
+    def del_affiliation(self):
+        # TODO: set default affiliation
+        self.del_item_attr('affiliation')
+        return self
+
+    def get_jid(self):
+        return JID(self.get_item_attr('jid', ''))
+
+    def set_jid(self, value):
+        if not isinstance(value, str):
+            value = str(value)
+        self.set_item_attr('jid', value)
+        return self
+
+    def del_jid(self):
+        self.del_item_attr('jid')
+        return self
+
+    def get_role(self):
+        return self.get_item_attr('role', '')
+
+    def set_role(self, value):
+        # TODO: check for valid role
+        self.set_item_attr('role', value)
+        return self
+
+    def del_role(self):
+        # TODO: set default role
+        self.del_item_attr('role')
+        return self
+
+    def get_nick(self):
+        return self.parent()['from'].resource
+
+    def get_room(self):
+        return self.parent()['from'].bare
+
+    def set_nick(self, value):
+        log.warning("Cannot set nick through mucpresence plugin.")
+        return self
+
+    def set_room(self, value):
+        log.warning("Cannot set room through mucpresence plugin.")
+        return self
+
+    def del_nick(self):
+        log.warning("Cannot delete nick through mucpresence plugin.")
+        return self
+
+    def del_room(self):
+        log.warning("Cannot delete room through mucpresence plugin.")
+        return self
 
 
 class XEP_0045(BasePlugin):
@@ -34,7 +118,6 @@ class XEP_0045(BasePlugin):
     name = 'xep_0045'
     description = 'XEP-0045: Multi-User Chat'
     dependencies = {'xep_0030', 'xep_0004'}
-    stanza = stanza
 
     def plugin_init(self):
         self.rooms = {}
@@ -42,7 +125,6 @@ class XEP_0045(BasePlugin):
         self.xep = '0045'
         # load MUC support in presence stanzas
         register_stanza_plugin(Presence, MUCPresence)
-        register_stanza_plugin(Message, MUCMessage)
         self.xmpp.register_handler(Callback('MUCPresence', MatchXMLMask("<presence xmlns='%s' />" % self.xmpp.default_ns), self.handle_groupchat_presence))
         self.xmpp.register_handler(Callback('MUCError', MatchXMLMask("<message xmlns='%s' type='error'><error/></message>" % self.xmpp.default_ns), self.handle_groupchat_error_message))
         self.xmpp.register_handler(Callback('MUCMessage', MatchXMLMask("<message xmlns='%s' type='groupchat'><body/></message>" % self.xmpp.default_ns), self.handle_groupchat_message))
@@ -50,14 +132,14 @@ class XEP_0045(BasePlugin):
         self.xmpp.register_handler(Callback('MUCConfig', MatchXMLMask("<message xmlns='%s' type='groupchat'><x xmlns='http://jabber.org/protocol/muc#user'><status/></x></message>" % self.xmpp.default_ns), self.handle_config_change))
         self.xmpp.register_handler(Callback('MUCInvite', MatchXPath("{%s}message/{%s}x/{%s}invite" % (
             self.xmpp.default_ns,
-            stanza.NS_USER,
-            stanza.NS_USER)), self.handle_groupchat_invite))
+            'http://jabber.org/protocol/muc#user',
+            'http://jabber.org/protocol/muc#user')), self.handle_groupchat_invite))
 
     def plugin_end(self):
-        self.xmpp.plugin['xep_0030'].del_feature(feature=stanza.NS)
+        self.xmpp.plugin['xep_0030'].del_feature(feature='http://jabber.org/protocol/muc')
 
     def session_bind(self, jid):
-        self.xmpp.plugin['xep_0030'].add_feature(stanza.NS)
+        self.xmpp.plugin['xep_0030'].add_feature('http://jabber.org/protocol/muc')
 
     def handle_groupchat_invite(self, inv):
         """ Handle an invite into a muc.
@@ -335,3 +417,6 @@ class XEP_0045(BasePlugin):
         iq = cls.xmpp.Iq(sto=room, sfrom=ifrom, stype='get')
         iq.append(query)
         return iq.send()
+
+
+register_plugin(XEP_0045)
