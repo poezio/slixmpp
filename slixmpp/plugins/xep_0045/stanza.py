@@ -29,7 +29,7 @@ class MUCBase(ElementBase):
         item = self.xml.find(f'{{{NS_USER}}}item')
         if item is None:
             return default
-        return item.get(attr)
+        return item.get(attr, default)
 
     def set_item_attr(self, attr, value: str):
         item = self.xml.find(f'{{{NS_USER}}}item')
