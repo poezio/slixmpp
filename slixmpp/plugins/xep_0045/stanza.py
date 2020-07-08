@@ -26,7 +26,7 @@ class MUCBase(ElementBase):
     interfaces = {'affiliation', 'role', 'jid', 'nick', 'room'}
 
     def get_item_attr(self, attr, default: str):
-        item = self.xml.find('{{{NS_USER}}}item')
+        item = self.xml.find(f'{{{NS_USER}}}item')
         if item is None:
             return default
         return item.get(attr)
@@ -40,7 +40,7 @@ class MUCBase(ElementBase):
         return item
 
     def del_item_attr(self, attr):
-        item = self.xml.find('{{{NS_USER}}}item')
+        item = self.xml.find('f{{{NS_USER}}}item')
         if item is not None and attr in item.attrib:
             del item.attrib[attr]
 
