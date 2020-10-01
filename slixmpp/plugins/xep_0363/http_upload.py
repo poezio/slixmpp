@@ -138,6 +138,7 @@ class XEP_0363(BasePlugin):
         basename = os.path.basename(filename)
         slot_iq = await self.request_slot(self.upload_service, basename, size,
                                           content_type, ifrom, timeout,
+                                          callback=callback,
                                           timeout_callback=timeout_callback)
         slot = slot_iq['http_upload_slot']
 
