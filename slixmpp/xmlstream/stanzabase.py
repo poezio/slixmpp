@@ -1497,12 +1497,7 @@ class StanzaBase(ElementBase):
                                                       self.name)
 
     def send(self):
-        """Queue the stanza to be sent on the XML stream.
-
-        :param bool now: Indicates if the queue should be skipped and the
-                         stanza sent immediately. Useful for stream
-                         initialization. Defaults to ``False``.
-        """
+        """Queue the stanza to be sent on the XML stream."""
         self.stream.send(self)
 
     def __copy__(self):
