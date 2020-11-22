@@ -10,7 +10,12 @@ from __future__ import with_statement
 
 import logging
 
-from slixmpp import Presence, Message
+from slixmpp import (
+    Presence,
+    Message,
+    Iq,
+    JID,
+)
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin, ET
 from slixmpp.xmlstream.handler.callback import Callback
@@ -19,7 +24,16 @@ from slixmpp.xmlstream.matcher.xmlmask import MatchXMLMask
 from slixmpp.exceptions import IqError, IqTimeout
 
 from slixmpp.plugins.xep_0045 import stanza
-from slixmpp.plugins.xep_0045.stanza import MUCPresence, MUCMessage
+from slixmpp.plugins.xep_0045.stanza import (
+    MUCPresence,
+    MUCJoin,
+    MUCMessage,
+    MUCAdminQuery,
+    MUCAdminItem,
+    MUCHistory,
+    MUCOwnerQuery,
+    MUCOwnerDestroy,
+)
 
 
 log = logging.getLogger(__name__)
@@ -39,19 +53,61 @@ class XEP_0045(BasePlugin):
     def plugin_init(self):
         self.rooms = {}
         self.our_nicks = {}
-        self.xep = '0045'
         # load MUC support in presence stanzas
         register_stanza_plugin(Presence, MUCPresence)
+        register_stanza_plugin(Presence, MUCJoin)
+        register_stanza_plugin(MUCJoin, MUCHistory)
         register_stanza_plugin(Message, MUCMessage)
-        self.xmpp.register_handler(Callback('MUCPresence', MatchXMLMask("<presence xmlns='%s' />" % self.xmpp.default_ns), self.handle_groupchat_presence))
-        self.xmpp.register_handler(Callback('MUCError', MatchXMLMask("<message xmlns='%s' type='error'><error/></message>" % self.xmpp.default_ns), self.handle_groupchat_error_message))
-        self.xmpp.register_handler(Callback('MUCMessage', MatchXMLMask("<message xmlns='%s' type='groupchat'><body/></message>" % self.xmpp.default_ns), self.handle_groupchat_message))
-        self.xmpp.register_handler(Callback('MUCSubject', MatchXMLMask("<message xmlns='%s' type='groupchat'><subject/></message>" % self.xmpp.default_ns), self.handle_groupchat_subject))
-        self.xmpp.register_handler(Callback('MUCConfig', MatchXMLMask("<message xmlns='%s' type='groupchat'><x xmlns='http://jabber.org/protocol/muc#user'><status/></x></message>" % self.xmpp.default_ns), self.handle_config_change))
-        self.xmpp.register_handler(Callback('MUCInvite', MatchXPath("{%s}message/{%s}x/{%s}invite" % (
-            self.xmpp.default_ns,
-            stanza.NS_USER,
-            stanza.NS_USER)), self.handle_groupchat_invite))
+        register_stanza_plugin(Iq, MUCAdminQuery)
+        register_stanza_plugin(Iq, MUCOwnerQuery)
+        register_stanza_plugin(MUCOwnerQuery, MUCOwnerDestroy)
+        register_stanza_plugin(MUCAdminQuery, MUCAdminItem, iterable=True)
+
+        # Register handlers
+        self.xmpp.register_handler(
+            Callback(
+                'MUCPresence',
+                MatchXMLMask("<presence xmlns='%s' />" % self.xmpp.default_ns),
+                self.handle_groupchat_presence,
+        ))
+        self.xmpp.register_handler(
+            Callback(
+                'MUCError',
+                MatchXMLMask("<message xmlns='%s' type='error'><error/></message>" % self.xmpp.default_ns),
+                self.handle_groupchat_error_message
+        ))
+        self.xmpp.register_handler(
+            Callback(
+                'MUCMessage',
+                MatchXMLMask("<message xmlns='%s' type='groupchat'><body/></message>" % self.xmpp.default_ns),
+                self.handle_groupchat_message
+        ))
+        self.xmpp.register_handler(
+            Callback(
+                'MUCSubject',
+                MatchXMLMask("<message xmlns='%s' type='groupchat'><subject/></message>" % self.xmpp.default_ns),
+                self.handle_groupchat_subject
+        ))
+        self.xmpp.register_handler(
+            Callback(
+                'MUCConfig',
+                MatchXMLMask(
+                    "<message xmlns='%s' type='groupchat'>"
+                    "<x xmlns='http://jabber.org/protocol/muc#user'><status/></x>"
+                    "</message>" % self.xmpp.default_ns
+                ),
+                self.handle_config_change
+        ))
+        self.xmpp.register_handler(
+            Callback(
+                'MUCInvite',
+                MatchXPath("{%s}message/{%s}x/{%s}invite" % (
+                    self.xmpp.default_ns,
+                    stanza.NS_USER,
+                    stanza.NS_USER
+                )),
+                self.handle_groupchat_invite
+        ))
 
     def plugin_end(self):
         self.xmpp.plugin['xep_0030'].del_feature(feature=stanza.NS)
