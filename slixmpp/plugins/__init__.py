@@ -85,6 +85,7 @@ __all__ = [
     'xep_0323',  # IoT Systems Sensor Data
     'xep_0325',  # IoT Systems Control
     'xep_0332',  # HTTP Over XMPP Transport
+    'xep_0369',  # MIX-CORE
     'xep_0377',  # Spam reporting
     'xep_0421',  # Anonymous unique occupant identifiers for MUCs
     'xep_0444',  # Message Reactions
