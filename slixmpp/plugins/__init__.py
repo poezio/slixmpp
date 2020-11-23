@@ -87,6 +87,7 @@ __all__ = [
     'xep_0332',  # HTTP Over XMPP Transport
     'xep_0369',  # MIX-CORE
     'xep_0377',  # Spam reporting
+    'xep_0405',  # MIX-PAM
     'protoxep_reactions',  # https://dino.im/xeps/reactions.html
     'protoxep_occupantid',  # https://dino.im/xeps/occupant-id.html
 ]
