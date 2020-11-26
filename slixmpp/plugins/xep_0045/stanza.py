@@ -147,3 +147,52 @@ class MUCMessage(MUCBase):
         </x>
     </message>
     '''
+
+class MUCJoin(ElementBase):
+    name = 'x'
+    namespace = NS
+    plugin_attrib = 'muc_join'
+    interfaces = {'password'}
+    sub_interfaces = {'password'}
+
+
+class MUCInvite(ElementBase):
+    name = 'invite'
+    plugin_attrib = 'invite'
+    namespace = NS_USER
+    interfaces = {'to', 'reason'}
+    sub_interfaces = {'reason'}
+
+
+class MUCHistory(ElementBase):
+    name = 'history'
+    plugin_attrib = 'history'
+    namespace = NS
+    interfaces = {'maxchars', 'maxstanzas', 'since', 'seconds'}
+
+
+class MUCOwnerQuery(ElementBase):
+    name = 'query'
+    plugin_attrib = 'mucowner_query'
+    namespace = NS_OWNER
+
+
+class MUCOwnerDestroy(ElementBase):
+    name = 'destroy'
+    plugin_attrib = 'destroy'
+    interfaces = {'reason', 'jid'}
+    sub_interfaces = {'reason'}
+
+
+class MUCAdminQuery(ElementBase):
+    name = 'query'
+    plugin_attrib = 'mucadmin_query'
+    namespace = NS_ADMIN
+
+
+class MUCAdminItem(ElementBase):
+    namespace = NS_ADMIN
+    name = 'item'
+    plugin_attrib = 'item'
+    interfaces = {'role', 'affiliation', 'nick', 'jid'}
+
