@@ -36,5 +36,6 @@ class OccupantId(ElementBase):
     '''
 
     name = 'occupant-id'
+    plugin_attrib = 'occupant-id'
     namespace = NS
     interface = {'id'}
