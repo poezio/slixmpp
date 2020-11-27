@@ -86,6 +86,6 @@ __all__ = [
     'xep_0325',  # IoT Systems Control
     'xep_0332',  # HTTP Over XMPP Transport
     'xep_0377',  # Spam reporting
-    'protoxep_reactions',  # https://dino.im/xeps/reactions.html
+    'xep_0444',  # Message Reactions
     'protoxep_occupantid',  # https://dino.im/xeps/occupant-id.html
 ]
