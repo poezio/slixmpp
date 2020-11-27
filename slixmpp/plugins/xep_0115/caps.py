@@ -157,10 +157,12 @@ class XEP_0115(BasePlugin):
             self.assign_verstring(pres['from'], ver)
             return
 
+        ifrom = pres['to'] if self.xmpp.is_component else None
+
         if pres['caps']['hash'] not in self.hashes:
             try:
                 log.debug("Unknown caps hash: %s", pres['caps']['hash'])
-                self.xmpp['xep_0030'].get_info(jid=pres['from'])
+                self.xmpp['xep_0030'].get_info(jid=pres['from'], ifrom=ifrom)
                 return
             except XMPPError:
                 return
@@ -169,7 +171,8 @@ class XEP_0115(BasePlugin):
         try:
             node = '%s#%s' % (pres['caps']['node'], ver)
             caps = await self.xmpp['xep_0030'].get_info(pres['from'], node,
-                                                             coroutine=True)
+                                                             coroutine=True,
+                                                             ifrom=ifrom)
 
             if isinstance(caps, Iq):
                 caps = caps['disco_info']
