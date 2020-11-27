@@ -9,7 +9,8 @@ test:
   image: ubuntu:latest
   script:
     - apt update
-    - apt install -y python3 cython3 gpg
+    - apt install -y python3 pytcython3 gpg
+    - pip3 install emoji
     - ./run_tests.py
 
 trigger_poezio:
