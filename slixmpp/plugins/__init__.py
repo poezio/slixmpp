@@ -87,6 +87,7 @@ __all__ = [
     'xep_0332',  # HTTP Over XMPP Transport
     'xep_0369',  # MIX-CORE
     'xep_0377',  # Spam reporting
+    'xep_0403',  # MIX-Presence
     'xep_0404',  # MIX-Anon
     'xep_0405',  # MIX-PAM
     'xep_0421',  # Anonymous unique occupant identifiers for MUCs
