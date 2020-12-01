@@ -745,6 +745,8 @@ class ElementBase(object):
                     getattr(self, set_method)(value, **kwargs)
                 else:
                     if attrib in self.sub_interfaces:
+                        if isinstance(value, JID):
+                            value = str(value)
                         if lang == '*':
                             return self._set_all_sub_text(attrib,
                                                           value,
@@ -863,6 +865,8 @@ class ElementBase(object):
         if value is None or value == '':
             self.__delitem__(name)
         else:
+            if isinstance(value, JID):
+                value = str(value)
             self.xml.attrib[name] = value
 
     def _del_attr(self, name):
