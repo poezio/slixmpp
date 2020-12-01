@@ -71,7 +71,7 @@ class MUCBot(slixmpp.ClientXMPP):
                                          self.nick,
                                          # If a room password is needed, use:
                                          # password=the_room_password,
-                                         wait=True)
+                                         )
 
     def muc_message(self, msg):
         """
