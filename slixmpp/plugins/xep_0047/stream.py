@@ -36,7 +36,7 @@ class IBBytestream(object):
             raise socket.error
         if len(data) > self.block_size:
             data = data[:self.block_size]
-        self.send_seq = (self.send_seq + 1) % 65535
+        self.send_seq = (self.send_seq + 1) % 65536
         seq = self.send_seq
         if self.use_messages:
             msg = self.xmpp.Message()
@@ -72,7 +72,7 @@ class IBBytestream(object):
 
     def _recv_data(self, stanza):
         new_seq = stanza['ibb_data']['seq']
-        if new_seq != (self.recv_seq + 1) % 65535:
+        if new_seq != (self.recv_seq + 1) % 65536:
             self.close()
             raise XMPPError('unexpected-request')
         self.recv_seq = new_seq
