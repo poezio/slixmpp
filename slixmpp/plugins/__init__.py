@@ -94,6 +94,7 @@ __all__ = [
     'xep_0421',  # Anonymous unique occupant identifiers for MUCs
     'xep_0422',  # Message Fastening
     'xep_0424',  # Message Retraction
+    'xep_0425',  # Message Moderation
     'xep_0428',  # Message Fallback
     'xep_0444',  # Message Reactions
 ]
