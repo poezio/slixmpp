@@ -60,12 +60,11 @@ has been established:
 
 .. code-block:: python
 
-    def start(self, event):
-        self.get_roster()
+    async def start(self, event):
+        await self.get_roster()
         self.send_presence()
         self.plugin['xep_0045'].join_muc(self.room,
-                                         self.nick,
-                                         wait=True)
+                                         self.nick)
 
 Note that as in :ref:`echobot`, we need to include send an initial presence and request
 the roster. Next, we want to join the group chat, so we call the
