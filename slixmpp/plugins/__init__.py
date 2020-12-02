@@ -95,5 +95,6 @@ __all__ = [
     'xep_0405',  # MIX-PAM
     'xep_0421',  # Anonymous unique occupant identifiers for MUCs
     'xep_0422',  # Message Fastening
+    'xep_0428',  # Message Fallback
     'xep_0444',  # Message Reactions
 ]
