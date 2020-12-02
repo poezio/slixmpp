@@ -508,6 +508,12 @@
     </implements>
     <implements>
         <xmpp:SupportedXep>
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0359.html"/>
+            <xmpp:status>unknown</xmpp:status>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0332.html"/>
             <xmpp:status>unknown</xmpp:status>
         </xmpp:SupportedXep>
@@ -545,6 +551,36 @@
     <implements>
         <xmpp:SupportedXep>
             <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0421.html"/>
+            <xmpp:status>unknown</xmpp:status>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0422.html"/>
+            <xmpp:status>unknown</xmpp:status>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0424.html"/>
+            <xmpp:status>unknown</xmpp:status>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0425.html"/>
+            <xmpp:status>unknown</xmpp:status>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0428.html"/>
+            <xmpp:status>unknown</xmpp:status>
+        </xmpp:SupportedXep>
+    </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0439.html"/>
             <xmpp:status>unknown</xmpp:status>
         </xmpp:SupportedXep>
     </implements>
