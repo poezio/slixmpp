@@ -174,7 +174,15 @@ class MUCInvite(ElementBase):
     name = 'invite'
     plugin_attrib = 'invite'
     namespace = NS_USER
-    interfaces = {'to', 'reason'}
+    interfaces = {'to', 'from', 'reason'}
+    sub_interfaces = {'reason'}
+
+
+class MUCDecline(ElementBase):
+    name = 'decline'
+    plugin_attrib = 'decline'
+    namespace = NS_USER
+    interfaces = {'to', 'from', 'reason'}
     sub_interfaces = {'reason'}
 
 
