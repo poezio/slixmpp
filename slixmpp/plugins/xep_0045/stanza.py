@@ -7,6 +7,7 @@
     See the file LICENSE for copying permission.
 """
 
+from typing import Iterable, Set
 import logging
 from slixmpp.xmlstream import ElementBase, ET, JID
 
@@ -23,7 +24,26 @@ class MUCBase(ElementBase):
     name = 'x'
     namespace = NS_USER
     plugin_attrib = 'muc'
-    interfaces = {'affiliation', 'role', 'jid', 'nick', 'room'}
+    interfaces = {'affiliation', 'role', 'jid', 'nick', 'room', 'status_codes'}
+
+    def get_status_codes(self) -> Set[str]:
+        status = self.xml.findall(f'{{{NS_USER}}}status')
+        return {int(status.attrib['code']) for status in status}
+
+    def set_status_codes(self, codes: Iterable[int]):
+        self.del_status_codes()
+        for code in set(codes):
+            self._add_status_code(code)
+
+    def del_status_codes(self):
+        status = self.xml.findall(f'{{{NS_USER}}}status')
+        for elem in status:
+            self.xml.remove(elem)
+
+    def _add_status_code(self, code: int):
+        status = MUCStatus()
+        status['code'] = code
+        self.append(status)
 
     def get_item_attr(self, attr, default: str):
         item = self.xml.find(f'{{{NS_USER}}}item')
@@ -196,3 +216,12 @@ class MUCAdminItem(ElementBase):
     plugin_attrib = 'item'
     interfaces = {'role', 'affiliation', 'nick', 'jid'}
 
+
+class MUCStatus(ElementBase):
+    namespace = NS_USER
+    name = 'status'
+    plugin_attrib = 'status'
+    interfaces = {'code'}
+
+    def set_code(self, code: int):
+        self.xml.attrib['code'] = str(code)
