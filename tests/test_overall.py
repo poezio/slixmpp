@@ -2,8 +2,8 @@ import os
 import re
 import sys
 import unittest
-import tabnanny
 import compileall
+
 
 class TestOverall(unittest.TestCase):
 
@@ -17,10 +17,6 @@ class TestOverall(unittest.TestCase):
         src = '.%sslixmpp' % os.sep
         rx = re.compile('/[.]svn|.*26.*')
         self.assertTrue(compileall.compile_dir(src, rx=rx, quiet=True))
-
-    def testTabNanny(self):
-        """Testing that indentation is consistent"""
-        self.assertFalse(tabnanny.check('..%sslixmpp' % os.sep))
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestOverall)
