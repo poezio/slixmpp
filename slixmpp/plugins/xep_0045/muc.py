@@ -25,6 +25,7 @@ from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin, ET
 from slixmpp.xmlstream.handler.callback import Callback
 from slixmpp.xmlstream.matcher.xpath import MatchXPath
+from slixmpp.xmlstream.matcher.stanzapath import StanzaPath
 from slixmpp.xmlstream.matcher.xmlmask import MatchXMLMask
 from slixmpp.exceptions import IqError, IqTimeout
 
@@ -38,6 +39,7 @@ from slixmpp.plugins.xep_0045.stanza import (
     MUCHistory,
     MUCOwnerQuery,
     MUCOwnerDestroy,
+    MUCStatus,
 )
 
 
@@ -62,6 +64,8 @@ class XEP_0045(BasePlugin):
         self.rooms = {}
         self.our_nicks = {}
         # load MUC support in presence stanzas
+        register_stanza_plugin(MUCMessage, MUCStatus)
+        register_stanza_plugin(MUCPresence, MUCStatus)
         register_stanza_plugin(Presence, MUCPresence)
         register_stanza_plugin(Presence, MUCJoin)
         register_stanza_plugin(MUCJoin, MUCHistory)
@@ -99,11 +103,7 @@ class XEP_0045(BasePlugin):
         self.xmpp.register_handler(
             Callback(
                 'MUCConfig',
-                MatchXMLMask(
-                    "<message xmlns='%s' type='groupchat'>"
-                    "<x xmlns='http://jabber.org/protocol/muc#user'><status/></x>"
-                    "</message>" % self.xmpp.default_ns
-                ),
+                StanzaPath('message/muc/status'),
                 self.handle_config_change
         ))
         self.xmpp.register_handler(
