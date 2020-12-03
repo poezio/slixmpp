@@ -109,12 +109,14 @@ class XEP_0045(BasePlugin):
         self.xmpp.register_handler(
             Callback(
                 'MUCInvite',
-                MatchXPath("{%s}message/{%s}x/{%s}invite" % (
-                    self.xmpp.default_ns,
-                    stanza.NS_USER,
-                    stanza.NS_USER
-                )),
+                StanzaPath('message/muc/invite'),
                 self.handle_groupchat_invite
+        ))
+        self.xmpp.register_handler(
+            Callback(
+                'MUCDecline',
+                StanzaPath('message/muc/decline'),
+                self.handle_groupchat_decline
         ))
 
     def plugin_end(self):
@@ -124,11 +126,14 @@ class XEP_0045(BasePlugin):
         self.xmpp.plugin['xep_0030'].add_feature(stanza.NS)
 
     def handle_groupchat_invite(self, inv):
-        """ Handle an invite into a muc.
-        """
-        logging.debug("MUC invite to %s from %s: %s", inv['to'], inv["from"], inv)
+        """ Handle an invite into a muc. """
         if inv['from'] not in self.rooms.keys():
             self.xmpp.event("groupchat_invite", inv)
+
+    def handle_groupchat_decline(self, decl):
+        """Handle an invitation decline."""
+        if decl['from'] in self.room.keys():
+            self.xmpp.event('groupchat_decline', decl)
 
     def handle_config_change(self, msg):
         """Handle a MUC configuration change (with status code)."""
@@ -265,14 +270,22 @@ class XEP_0045(BasePlugin):
         iq['mucadmin_query'].append(item)
         await iq.send(**iqkwargs)
 
-    def invite(self, room: JID, jid: JID, reason='', *,
+    def invite(self, room: JID, jid: JID, reason: str = '', *,
                mfrom: Optional[JID] = None):
         """ Invite a jid to a room."""
         msg = self.xmpp.make_message(room, mfrom=mfrom)
-        msg.enable('muc')
-        msg['muc']['invite'] = jid
+        msg['muc']['invite']['to'] = jid
         if reason:
             msg['muc']['invite']['reason'] = reason
+        self.xmpp.send(msg)
+
+    def decline(self, room: JID, jid: JID, reason: str = '', *,
+                mfrom: Optional[JID] = None):
+        """Decline a mediated invitation."""
+        msg = self.xmpp.make_message(room, mfrom=mfrom)
+        msg['muc']['decline']['to'] = jid
+        if reason:
+            msg['muc']['decline']['reason'] = reason
         self.xmpp.send(msg)
 
     def leave_muc(self, room: JID, nick: str, msg='', pfrom=None):
