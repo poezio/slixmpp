@@ -226,6 +226,7 @@ class XEP_0045(BasePlugin):
 
     async def destroy(self, room: JID, reason='', altroom='', *,
                       ifrom: Optional[JID] = None, **iqkwargs) -> Iq:
+        """Destroy a room."""
         iq = self.xmpp.make_iq_set(ifrom=ifrom, ito=room)
         iq.enable('mucowner_query')
         iq['mucowner_query'].enable('destroy')
@@ -297,7 +298,6 @@ class XEP_0045(BasePlugin):
             self.xmpp.send_presence(pshow='unavailable', pto="%s/%s" % (room, nick), pfrom=pfrom)
         del self.rooms[room]
 
-
     async def get_room_config(self, room: JID, ifrom=''):
         """Get the room config form in 0004 plugin format """
         iq = self.xmpp.make_iq_get(stanza.NS_OWNER, ito=room, ifrom=ifrom)
@@ -354,7 +354,7 @@ class XEP_0045(BasePlugin):
         return await iq.send(**iqkwargs)
 
     async def send_role_list(self, room: JID, roles: List[Tuple[str, str]], *,
-                            ifrom: Optional[JID], **iqkwargs) -> Iq:
+                            ifrom: Optional[JID] = None, **iqkwargs) -> Iq:
         """Send a role delta list"""
         iq = self.xmpp.make_iq_set(ito=room, ifrom=ifrom)
         for nick, affiliation in roles:
