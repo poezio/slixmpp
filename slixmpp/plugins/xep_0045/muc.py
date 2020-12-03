@@ -31,6 +31,8 @@ from slixmpp.exceptions import IqError, IqTimeout
 
 from slixmpp.plugins.xep_0045 import stanza
 from slixmpp.plugins.xep_0045.stanza import (
+    MUCInvite,
+    MUCDecline,
     MUCPresence,
     MUCJoin,
     MUCMessage,
@@ -64,6 +66,8 @@ class XEP_0045(BasePlugin):
         self.rooms = {}
         self.our_nicks = {}
         # load MUC support in presence stanzas
+        register_stanza_plugin(MUCMessage, MUCInvite)
+        register_stanza_plugin(MUCMessage, MUCDecline)
         register_stanza_plugin(MUCMessage, MUCStatus)
         register_stanza_plugin(MUCPresence, MUCStatus)
         register_stanza_plugin(Presence, MUCPresence)
