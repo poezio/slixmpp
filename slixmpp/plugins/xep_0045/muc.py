@@ -25,6 +25,7 @@ from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin, ET
 from slixmpp.xmlstream.handler.callback import Callback
 from slixmpp.xmlstream.matcher.xpath import MatchXPath
+from slixmpp.xmlstream.matcher.stanzapath import StanzaPath
 from slixmpp.xmlstream.matcher.xmlmask import MatchXMLMask
 from slixmpp.exceptions import IqError, IqTimeout
 
@@ -38,6 +39,7 @@ from slixmpp.plugins.xep_0045.stanza import (
     MUCHistory,
     MUCOwnerQuery,
     MUCOwnerDestroy,
+    MUCStatus,
 )
 
 
@@ -62,6 +64,8 @@ class XEP_0045(BasePlugin):
         self.rooms = {}
         self.our_nicks = {}
         # load MUC support in presence stanzas
+        register_stanza_plugin(MUCMessage, MUCStatus)
+        register_stanza_plugin(MUCPresence, MUCStatus)
         register_stanza_plugin(Presence, MUCPresence)
         register_stanza_plugin(Presence, MUCJoin)
         register_stanza_plugin(MUCJoin, MUCHistory)
@@ -99,22 +103,20 @@ class XEP_0045(BasePlugin):
         self.xmpp.register_handler(
             Callback(
                 'MUCConfig',
-                MatchXMLMask(
-                    "<message xmlns='%s' type='groupchat'>"
-                    "<x xmlns='http://jabber.org/protocol/muc#user'><status/></x>"
-                    "</message>" % self.xmpp.default_ns
-                ),
+                StanzaPath('message/muc/status'),
                 self.handle_config_change
         ))
         self.xmpp.register_handler(
             Callback(
                 'MUCInvite',
-                MatchXPath("{%s}message/{%s}x/{%s}invite" % (
-                    self.xmpp.default_ns,
-                    stanza.NS_USER,
-                    stanza.NS_USER
-                )),
+                StanzaPath('message/muc/invite'),
                 self.handle_groupchat_invite
+        ))
+        self.xmpp.register_handler(
+            Callback(
+                'MUCDecline',
+                StanzaPath('message/muc/decline'),
+                self.handle_groupchat_decline
         ))
 
     def plugin_end(self):
@@ -124,11 +126,14 @@ class XEP_0045(BasePlugin):
         self.xmpp.plugin['xep_0030'].add_feature(stanza.NS)
 
     def handle_groupchat_invite(self, inv):
-        """ Handle an invite into a muc.
-        """
-        logging.debug("MUC invite to %s from %s: %s", inv['to'], inv["from"], inv)
+        """ Handle an invite into a muc. """
         if inv['from'] not in self.rooms.keys():
             self.xmpp.event("groupchat_invite", inv)
+
+    def handle_groupchat_decline(self, decl):
+        """Handle an invitation decline."""
+        if decl['from'] in self.room.keys():
+            self.xmpp.event('groupchat_decline', decl)
 
     def handle_config_change(self, msg):
         """Handle a MUC configuration change (with status code)."""
@@ -221,6 +226,7 @@ class XEP_0045(BasePlugin):
 
     async def destroy(self, room: JID, reason='', altroom='', *,
                       ifrom: Optional[JID] = None, **iqkwargs) -> Iq:
+        """Destroy a room."""
         iq = self.xmpp.make_iq_set(ifrom=ifrom, ito=room)
         iq.enable('mucowner_query')
         iq['mucowner_query'].enable('destroy')
@@ -265,14 +271,22 @@ class XEP_0045(BasePlugin):
         iq['mucadmin_query'].append(item)
         await iq.send(**iqkwargs)
 
-    def invite(self, room: JID, jid: JID, reason='', *,
+    def invite(self, room: JID, jid: JID, reason: str = '', *,
                mfrom: Optional[JID] = None):
         """ Invite a jid to a room."""
         msg = self.xmpp.make_message(room, mfrom=mfrom)
-        msg.enable('muc')
-        msg['muc']['invite'] = jid
+        msg['muc']['invite']['to'] = jid
         if reason:
             msg['muc']['invite']['reason'] = reason
+        self.xmpp.send(msg)
+
+    def decline(self, room: JID, jid: JID, reason: str = '', *,
+                mfrom: Optional[JID] = None):
+        """Decline a mediated invitation."""
+        msg = self.xmpp.make_message(room, mfrom=mfrom)
+        msg['muc']['decline']['to'] = jid
+        if reason:
+            msg['muc']['decline']['reason'] = reason
         self.xmpp.send(msg)
 
     def leave_muc(self, room: JID, nick: str, msg='', pfrom=None):
@@ -283,7 +297,6 @@ class XEP_0045(BasePlugin):
         else:
             self.xmpp.send_presence(pshow='unavailable', pto="%s/%s" % (room, nick), pfrom=pfrom)
         del self.rooms[room]
-
 
     async def get_room_config(self, room: JID, ifrom=''):
         """Get the room config form in 0004 plugin format """
@@ -341,7 +354,7 @@ class XEP_0045(BasePlugin):
         return await iq.send(**iqkwargs)
 
     async def send_role_list(self, room: JID, roles: List[Tuple[str, str]], *,
-                            ifrom: Optional[JID], **iqkwargs) -> Iq:
+                            ifrom: Optional[JID] = None, **iqkwargs) -> Iq:
         """Send a role delta list"""
         iq = self.xmpp.make_iq_set(ito=room, ifrom=ifrom)
         for nick, affiliation in roles:
