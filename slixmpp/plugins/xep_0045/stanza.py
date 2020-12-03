@@ -69,12 +69,10 @@ class MUCBase(ElementBase):
 
     def set_affiliation(self, value):
         self.set_item_attr('affiliation', value)
-        return self
 
     def del_affiliation(self):
         # TODO: set default affiliation
         self.del_item_attr('affiliation')
-        return self
 
     def get_jid(self):
         return JID(self.get_item_attr('jid', ''))
@@ -83,11 +81,9 @@ class MUCBase(ElementBase):
         if not isinstance(value, str):
             value = str(value)
         self.set_item_attr('jid', value)
-        return self
 
     def del_jid(self):
         self.del_item_attr('jid')
-        return self
 
     def get_role(self):
         return self.get_item_attr('role', '')
@@ -95,12 +91,10 @@ class MUCBase(ElementBase):
     def set_role(self, value):
         # TODO: check for valid role
         self.set_item_attr('role', value)
-        return self
 
     def del_role(self):
         # TODO: set default role
         self.del_item_attr('role')
-        return self
 
     def get_nick(self):
         return self.parent()['from'].resource
