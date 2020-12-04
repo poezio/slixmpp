@@ -11,7 +11,7 @@ from slixmpp import JID
 from slixmpp.plugins import BasePlugin
 from slixmpp.stanza import Message
 from slixmpp.xmlstream import register_stanza_plugin
-from slixmpp.xmlstream.matcher import MatchXMLMask
+from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.xmlstream.handler import Callback
 
 from slixmpp.plugins.xep_0444 import stanza
@@ -25,13 +25,11 @@ class XEP_0444(BasePlugin):
     namespace = stanza.NS
 
     def plugin_init(self):
-        self.xmpp.register_handler(
-            Callback(
-                'Reaction received',
-                MatchXMLMask('<message><reactions xmlns="urn:xmpp:reactions:0"/></message>'),
-                self._handle_reactions,
-            )
-        )
+        self.xmpp.register_handler(Callback(
+            'Reaction received',
+            StanzaPath("message/reactions"),
+            self._handle_reactions,
+        ))
         register_stanza_plugin(Message, stanza.Reactions)
         register_stanza_plugin(stanza.Reactions, stanza.Reaction, iterable=True)
 
@@ -40,7 +38,7 @@ class XEP_0444(BasePlugin):
 
     def plugin_end(self):
         self.xmpp.remove_handler('Reaction received')
-        self.xmpp['xep_0030'].remove_feature(stanza.NS)
+        self.xmpp['xep_0030'].del_feature(stanza.NS)
 
     def _handle_reactions(self, message: Message):
         self.xmpp.event('reactions', message)
