@@ -86,6 +86,7 @@ __all__ = [
     'xep_0325',  # IoT Systems Control
     'xep_0332',  # HTTP Over XMPP Transport
     'xep_0353',  # Jingle Message Initiation
+    'xep_0359',  # Unique and Stable Stanza IDs
     'xep_0363',  # HTTP File Upload
     'xep_0369',  # MIX-CORE
     'xep_0377',  # Spam reporting
@@ -93,5 +94,10 @@ __all__ = [
     'xep_0404',  # MIX-Anon
     'xep_0405',  # MIX-PAM
     'xep_0421',  # Anonymous unique occupant identifiers for MUCs
+    'xep_0422',  # Message Fastening
+    'xep_0424',  # Message Retraction
+    'xep_0425',  # Message Moderation
+    'xep_0428',  # Message Fallback
+    'xep_0439',  # Quick Response
     'xep_0444',  # Message Reactions
 ]
