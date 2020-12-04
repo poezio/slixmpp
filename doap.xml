@@ -880,14 +880,103 @@
         </xmpp:SupportedXep>
     </implements>
 
-    <!-- Figure out releases.
     <release>
         <Version>
-            <revision>0.5</revision>
-            <created>2010-02-01</created>
-            <file-release rdf:resource="https://dev.louiz.org/attachments/29/poezio-0.5.tar.bz2"/>
+            <revision>1.0</revision>
+            <created>2015-07-31</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/e7/cc/d102dee9d4cf93e24ffcf6c43c3b50e2615c2ee4514e5fd160d96b9fe536/slixmpp-1.0.post5.tar.gz"/>
         </Version>
     </release>
-    -->
+    <release>
+        <Version>
+            <revision>1.1</revision>
+            <created>2015-10-02</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/2a/8a/cb032a938bf245decc88aec2f2e03401802766a1a97f9daf3bf7fee5b07f/slixmpp-1.1.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.2</revision>
+            <created>2016-10-02</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/c2/9f/1ac5304ab1801b08c20b07ee658583abdce9b7ae47ea3faf0d062e86221b/slixmpp-1.2.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.2.1</revision>
+            <created>2016-10-05</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/73/7e/072aca82a2f8e25a93ce8755553f36e82975e950f23a69dc10164a23f32f/slixmpp-1.2.1.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.2.2</revision>
+            <created>2016-11-21</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/8f/96/19c610e3b42baa140572bb3c79723902ae608bec8d3f0fa3cb187a5c12ba/slixmpp-1.2.2.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.2.3</revision>
+            <created>2016-12-07</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/91/af/4018e1fda624af97d4e8fb37ff2cf2744926c126285488c55a5ad1f755da/slixmpp-1.2.3.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.2.4</revision>
+            <created>2017-01-30</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/49/bb/092f0c07d6f7ac6922ceea57155c24561af7ee0736c15e7f833ab916c06e/slixmpp-1.2.4.post1.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.3.0</revision>
+            <created>2017-11-28</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/84/df/c0972daaca550d98b313e0029dc7158b1b10e120f510917a3d34b5b5f102/slixmpp-1.3.0.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.4.0</revision>
+            <created>2018-08-12</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/0a/50/76a06d929668252244a1cef515c48c21403a72988c20cab2f74ef0b4ecbd/slixmpp-1.4.0.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.4.1</revision>
+            <created>2018-10-28</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/c6/d3/ed986188026843e0b98de816ab8f4d91a61865db8d4a9162f10596f5431e/slixmpp-1.4.1.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.4.2</revision>
+            <created>2019-01-31</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/69/8f/1fa625d035af93bd3dd72589e33e3ff1954bdd37546bedc9246d048b0c93/slixmpp-1.4.2.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.5.0</revision>
+            <created>2020-05-01</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/35/6c/cda25435be70821def0013c3d41761ea42c11a0c4e33b8cbca0206a21381/slixmpp-1.5.0.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.5.1</revision>
+            <created>2020-05-02</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/2c/37/fbc95dd3632cbdb0d6dcc44e9df51b195fc7793e6beb2059f697dd458dd2/slixmpp-1.5.1.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.5.2</revision>
+            <created>2020-05-23</created>
+            <file-release rdf:resource="https://files.pythonhosted.org/packages/ce/f1/b7cb0ba0b2f9950d3bd8e4d256502c39ac731136e1744c926f67e2c21131/slixmpp-1.5.2.tar.gz"/>
+        </Version>
+    </release>
 </Project>
 </rdf:RDF>
