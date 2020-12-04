@@ -10,7 +10,7 @@ test:
   script:
     - apt update
     - apt install -y python3 python3-pip cython3 gpg
-    - pip3 install emoji
+    - pip3 install emoji aiohttp
     - ./run_tests.py
 
 trigger_poezio:
