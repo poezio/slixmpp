@@ -39,25 +39,22 @@ class XEP_0300(BasePlugin):
         'sha-1': hashlib.sha1,
         'sha-256': hashlib.sha256,
         'sha-512': hashlib.sha512,
-        'sha3-256': lambda: hashlib.sha3_256(),
-        'sha3-512': lambda: hashlib.sha3_512(),
+        'sha3-256': hashlib.sha3_256,
+        'sha3-512': hashlib.sha3_512,
         'BLAKE2b256': lambda: hashlib.blake2b(digest_size=32),
         'BLAKE2b512': lambda: hashlib.blake2b(digest_size=64),
     }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.enabled_hashes = []
+
     def plugin_init(self):
         namespace = 'urn:xmpp:hash-function-text-names:%s'
-        self.enabled_hashes = []
+        self.enabled_hashes.clear()
         for algo in self._hashlib_function:
             if getattr(self, 'enable_' + algo, False):
-                # XXX: this is a hack for Python 3.5 or below, which
-                # don’t support sha3 or blake2b…
-                try:
-                    self._hashlib_function[algo]()
-                except AttributeError:
-                    log.warn('Algorithm %s unavailable, disabling.', algo)
-                else:
-                    self.enabled_hashes.append(namespace % algo)
+                self.enabled_hashes.append(namespace % algo)
 
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature(Hash.namespace)
@@ -68,6 +65,7 @@ class XEP_0300(BasePlugin):
     def plugin_end(self):
         for namespace in self.enabled_hashes:
             self.xmpp['xep_0030'].del_feature(namespace)
+        self.enabled_hashes.clear()
 
         self.xmpp['xep_0030'].del_feature(feature=Hash.namespace)
 
