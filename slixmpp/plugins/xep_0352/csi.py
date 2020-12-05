@@ -8,6 +8,7 @@
 
 import logging
 
+from slixmpp import ClientXMPP
 from slixmpp.stanza import StreamFeatures
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.base import BasePlugin
@@ -40,17 +41,19 @@ class XEP_0352(BasePlugin):
         self.xmpp.register_stanza(stanza.Active)
         self.xmpp.register_stanza(stanza.Inactive)
 
-        self.xmpp.register_feature('csi',
-                self._handle_csi_feature,
-                restart=False,
-                order=self.order)
+        if isinstance(self.xmpp, ClientXMPP):
+            self.xmpp.register_feature('csi',
+                    self._handle_csi_feature,
+                    restart=False,
+                    order=self.order)
 
 
     def plugin_end(self):
         if self.xmpp.is_component:
             return
 
-        self.xmpp.unregister_feature('csi', self.order)
+        if isinstance(self.xmpp, ClientXMPP):
+            self.xmpp.unregister_feature('csi', self.order)
         self.xmpp.remove_stanza(stanza.Active)
         self.xmpp.remove_stanza(stanza.Inactive)
 
