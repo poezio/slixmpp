@@ -12,7 +12,7 @@
     :license: MIT, see LICENSE for more details
 """
 
-from typing import Optional, Set, Callable
+from typing import Optional, Set, Callable, Any
 
 import functools
 import logging
@@ -1130,3 +1130,18 @@ class XMLStream(asyncio.BaseProtocol):
         :param exception: An unhandled exception object.
         """
         pass
+
+    async def wait_until(self, event: str, timeout=30) -> Any:
+        """Utility method to wake on the next firing of an event.
+        (Registers a disposable handler on it)
+
+        :param str event: Event to wait on.
+        :param int timeout: Timeout
+        """
+        fut = asyncio.Future()
+        self.add_event_handler(
+            event,
+            fut.set_result,
+            disposable=True,
+        )
+        return await asyncio.wait_for(fut, timeout)
