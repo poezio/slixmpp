@@ -9,6 +9,6 @@
 from slixmpp.plugins.base import register_plugin
 
 from slixmpp.plugins.xep_0333.stanza import Markable, Received, Displayed, Acknowledged
-from slixmpp.plugins.xep_0333.hints import XEP_0333
+from slixmpp.plugins.xep_0333.markers import XEP_0333
 
 register_plugin(XEP_0333)
