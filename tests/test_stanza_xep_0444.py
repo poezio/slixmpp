@@ -43,7 +43,11 @@ class TestReactions(SlixTest):
 
     def testCreateReactionsUnrestricted(self):
         """Testing creating Reactions with the extra all_chars arg."""
-
+        try:
+            import emoji
+        except ImportError:
+            # No emoji package: this test does not make sense
+            return
         xmlstring = """
           <message>
               <reactions xmlns="urn:xmpp:reactions:0" id="abcd">
