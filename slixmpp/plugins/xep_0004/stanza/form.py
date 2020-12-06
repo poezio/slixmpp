@@ -9,7 +9,6 @@
 import copy
 import logging
 
-from collections import OrderedDict
 from slixmpp.thirdparty import OrderedSet
 
 from slixmpp.xmlstream import ElementBase, ET
@@ -133,7 +132,7 @@ class Form(ElementBase):
             self.xml.remove(reportedXML)
 
     def get_fields(self, use_dict=False):
-        fields = OrderedDict()
+        fields = {}
         for stanza in self['substanzas']:
             if isinstance(stanza, FormField):
                 fields[stanza['var']] = stanza
@@ -147,7 +146,7 @@ class Form(ElementBase):
         items = []
         itemsXML = self.xml.findall('{%s}item' % self.namespace)
         for itemXML in itemsXML:
-            item = OrderedDict()
+            item = {}
             fieldsXML = itemXML.findall('{%s}field' % FormField.namespace)
             for fieldXML in fieldsXML:
                 field = FormField(xml=fieldXML)
@@ -156,7 +155,7 @@ class Form(ElementBase):
         return items
 
     def get_reported(self):
-        fields = OrderedDict()
+        fields = {}
         xml = self.xml.findall('{%s}reported/{%s}field' % (self.namespace,
                                                            FormField.namespace))
         for field in xml:
@@ -165,7 +164,7 @@ class Form(ElementBase):
         return fields
 
     def get_values(self):
-        values = OrderedDict()
+        values = {}
         fields = self.get_fields()
         for var in fields:
             values[var] = fields[var]['value']
