@@ -38,7 +38,7 @@ class XEP_0444(BasePlugin):
 
     def plugin_end(self):
         self.xmpp.remove_handler('Reaction received')
-        self.xmpp['xep_0030'].del_feature(stanza.NS)
+        self.xmpp['xep_0030'].del_feature(feature=stanza.NS)
 
     def _handle_reactions(self, message: Message):
         self.xmpp.event('reactions', message)
