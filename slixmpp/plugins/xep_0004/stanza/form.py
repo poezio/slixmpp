@@ -10,7 +10,6 @@ import copy
 import logging
 
 from collections import OrderedDict
-from slixmpp.thirdparty import OrderedSet
 
 from slixmpp.xmlstream import ElementBase, ET
 from slixmpp.plugins.xep_0004.stanza import FormField
@@ -23,7 +22,7 @@ class Form(ElementBase):
     namespace = 'jabber:x:data'
     name = 'x'
     plugin_attrib = 'form'
-    interfaces = OrderedSet(('instructions', 'reported', 'title', 'type', 'items', 'values'))
+    interfaces = {'instructions', 'reported', 'title', 'type', 'items', 'values'}
     sub_interfaces = {'title'}
     form_types = {'cancel', 'form', 'result', 'submit'}
 
