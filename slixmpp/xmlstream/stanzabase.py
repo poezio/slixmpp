@@ -21,7 +21,6 @@ from xml.etree import ElementTree as ET
 
 from slixmpp.xmlstream import JID
 from slixmpp.xmlstream.tostring import tostring
-from collections import OrderedDict
 
 
 log = logging.getLogger(__name__)
@@ -392,7 +391,7 @@ class ElementBase(object):
 
         #: An ordered dictionary of plugin stanzas, mapped by their
         #: :attr:`plugin_attrib` value.
-        self.plugins = OrderedDict()
+        self.plugins = {}
         self.loaded_plugins = set()
 
         #: A list of child stanzas whose class is included in
@@ -541,7 +540,7 @@ class ElementBase(object):
 
         .. versionadded:: 1.0-Beta1
         """
-        values = OrderedDict()
+        values = {}
         values['lang'] = self['lang']
         for interface in self.interfaces:
             if isinstance(self[interface], JID):
@@ -726,8 +725,6 @@ class ElementBase(object):
         if lang and attrib in self.lang_interfaces:
             kwargs['lang'] = lang
 
-        kwargs = OrderedDict(kwargs)
-
         if attrib in self.interfaces or attrib == 'lang':
             if value is not None:
                 set_method = "set_%s" % attrib.lower()
@@ -812,8 +809,6 @@ class ElementBase(object):
         kwargs = {}
         if lang and attrib in self.lang_interfaces:
             kwargs['lang'] = lang
-
-        kwargs = OrderedDict(kwargs)
 
         if attrib in self.interfaces or attrib == 'lang':
             del_method = "del_%s" % attrib.lower()
@@ -929,7 +924,7 @@ class ElementBase(object):
         name = self._fix_ns(name)
 
         default_lang = self.get_lang()
-        results = OrderedDict()
+        results = {}
         stanzas = self.xml.findall(name)
         if stanzas:
             for stanza in stanzas:
