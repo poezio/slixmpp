@@ -31,6 +31,21 @@ To run the test suite for Slixmpp::
 
     python run_tests.py
 
+Integration tests require the following environment variables to be set:::
+
+    $CI_ACCOUNT1
+    $CI_ACCOUNT1_PASSWORD
+    $CI_ACCOUNT2
+    $CI_ACCOUNT2_PASSWORD
+    $CI_MUC_SERVER
+
+where the account variables are JIDs of valid, existing accounts, and
+the passwords are the account passwords. The MUC server must allow room
+creation from those JIDs.
+
+To run the integration test suite for Slixmpp::
+
+    python run_integration_tests.py
 
 The Slixmpp Boilerplate
 -------------------------
