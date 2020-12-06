@@ -8,7 +8,6 @@
 
 from slixmpp.stanza import Message
 from slixmpp.util import unicode
-from collections import OrderedDict
 from slixmpp.xmlstream import ElementBase, ET, register_stanza_plugin, tostring
 
 
@@ -50,7 +49,7 @@ class XHTML_IM(ElementBase):
         bodies = self.xml.findall('{%s}body' % XHTML_NS)
 
         if lang == '*':
-            result = OrderedDict()
+            result = {}
             for body in bodies:
                 body_lang = body.attrib.get('{%s}lang' % self.xml_ns, '')
                 body_result = []
