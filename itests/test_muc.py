@@ -7,7 +7,7 @@ from slixmpp.test.integration import SlixIntegration
 UNIQUE = uuid4().hex
 
 
-class TestConnect(SlixIntegration):
+class TestMUC(SlixIntegration):
 
     async def asyncSetUp(self):
         self.mucserver = self.envjid('CI_MUC_SERVER')
@@ -75,4 +75,4 @@ class TestConnect(SlixIntegration):
         )
 
 
-suite = unittest.TestLoader().loadTestsFromTestCase(TestConnect)
+suite = unittest.TestLoader().loadTestsFromTestCase(TestMUC)

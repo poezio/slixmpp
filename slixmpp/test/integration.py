@@ -53,7 +53,8 @@ class SlixIntegration(IsolatedAsyncioTestCase):
         """Connect all clients"""
         for client in self.clients:
             client.connect()
-            await client.wait_until('session_start')
+        wait = [client.wait_until('session_start') for client in self.clients]
+        await asyncio.gather(*wait)
 
     async def _destroy(self):
         """Kill all clients"""
