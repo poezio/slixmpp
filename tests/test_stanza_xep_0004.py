@@ -1,7 +1,6 @@
 import unittest
 from slixmpp import Message
 from slixmpp.test import SlixTest
-from collections import OrderedDict
 
 import slixmpp.plugins.xep_0004 as xep_0004
 from slixmpp.xmlstream import register_stanza_plugin
@@ -52,7 +51,7 @@ class TestDataForms(SlixTest):
           </message>
         """)
 
-        fields = OrderedDict()
+        fields = {}
         fields['f1'] = {'type': 'text-single',
                         'label': 'Username',
                         'required': True}
@@ -125,7 +124,7 @@ class TestDataForms(SlixTest):
         msg = self.Message()
         form = msg['form']
 
-        fields = OrderedDict()
+        fields = {}
         fields['f1'] = {'type': 'text-single',
                         'label': 'Username',
                         'required': True}
@@ -173,7 +172,7 @@ class TestDataForms(SlixTest):
         msg = self.Message()
         form = msg['form']
 
-        fields = OrderedDict()
+        fields = {}
         fields['f1'] = {'type': 'text-single',
                         'label': 'Username',
                         'required': True}

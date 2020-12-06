@@ -6,7 +6,6 @@
     See the file LICENSE for copying permission.
 """
 
-from collections import OrderedDict
 from slixmpp.xmlstream import StanzaBase
 
 
@@ -29,7 +28,7 @@ class StreamFeatures(StanzaBase):
     def get_features(self):
         """
         """
-        features = OrderedDict()
+        features = {}
         for (name, lang), plugin in self.plugins.items():
             features[name] = plugin
         return features

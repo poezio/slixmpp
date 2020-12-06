@@ -1,7 +1,6 @@
 import unittest
 from slixmpp.test import SlixTest
 from slixmpp.xmlstream.stanzabase import ElementBase, register_stanza_plugin, ET
-from collections import OrderedDict
 
 
 class TestElementBase(SlixTest):
@@ -1221,7 +1220,7 @@ class TestElementBase(SlixTest):
             sub_interfaces = interfaces
             lang_interfaces = interfaces
 
-        data = OrderedDict()
+        data = {}
         data['en'] = 'hi'
         data['fr'] = 'bonjour'
         data['no'] = 'hej'

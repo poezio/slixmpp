@@ -6,7 +6,6 @@
     See the file LICENSE for copying permission.
 """
 
-from collections import OrderedDict
 from slixmpp.xmlstream import ET, ElementBase
 
 
@@ -18,7 +17,7 @@ class Headers(ElementBase):
     is_extension = True
 
     def get_headers(self):
-        result = OrderedDict()
+        result = {}
         headers = self.xml.findall('{%s}header' % self.namespace)
         for header in headers:
             name = header.attrib.get('name', '')
