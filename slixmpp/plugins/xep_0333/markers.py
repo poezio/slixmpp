@@ -7,8 +7,9 @@
 """
 
 import logging
+from typing import Optional
 
-from slixmpp import Message
+from slixmpp import Message, JID
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
@@ -22,6 +23,7 @@ class XEP_0333(BasePlugin):
     name = 'xep_0333'
     description = 'XEP-0333: Chat Markers'
     stanza = stanza
+    dependencies = {'xep_0030'}
 
     def plugin_init(self):
         register_stanza_plugin(Message, Markable)
@@ -42,6 +44,12 @@ class XEP_0333(BasePlugin):
                 StanzaPath('message/acknowledged'),
                 self._handle_acknowledged))
 
+    def session_bind(self, jid):
+        self.xmpp.plugin['xep_0030'].add_feature(stanza.NS)
+
+    def plugin_end(self):
+        self.xmpp.plugin['xep_0030'].del_feature(feature=stanza.NS)
+
     def _handle_received(self, message):
         self.xmpp.event('marker_received', message)
         self.xmpp.event('marker', message)
@@ -53,3 +61,24 @@ class XEP_0333(BasePlugin):
     def _handle_acknowledged(self, message):
         self.xmpp.event('marker_acknowledged', message)
         self.xmpp.event('marker', message)
+
+    def send_marker(self, mto: JID, id: str, marker: str,
+                    thread: Optional[str] = None, *,
+                    mfrom: Optional[JID] = None):
+        """
+        Send a chat marker.
+
+        :param JID mto: recipient of the marker
+        :param str id: Identifier of the marked message
+        :param str marker: Marker to send (one of
+            displayed, retrieved, or acknowledged)
+        :param str thread: Message thread
+        :param str mfrom: Use a specific JID to send the message
+        """
+        if marker not in ('displayed', 'retrieved', 'acknowledged'):
+            raise ValueError('Invalid marker: %s' % marker)
+        msg = self.xmpp.make_message(mto=mto, mfrom=mfrom)
+        if thread:
+            msg['thread'] = thread
+        msg[marker]['id'] = id
+        msg.send()

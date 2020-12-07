@@ -8,25 +8,30 @@
 
 from slixmpp.xmlstream import ElementBase
 
+NS ='urn:xmpp:chat-markers:0'
+
 class Markable(ElementBase):
     name = 'markable'
     plugin_attrib = 'markable'
-    namespace = 'urn:xmpp:chat-markers:0'
+    namespace = NS
+
 
 class Received(ElementBase):
     name = 'received'
     plugin_attrib = 'received'
-    namespace = 'urn:xmpp:chat-markers:0'
+    namespace = NS
     interfaces = {'id'}
+
 
 class Displayed(ElementBase):
     name = 'displayed'
     plugin_attrib = 'displayed'
-    namespace = 'urn:xmpp:chat-markers:0'
+    namespace = NS
     interfaces = {'id'}
+
 
 class Acknowledged(ElementBase):
     name = 'acknowledged'
     plugin_attrib = 'acknowledged'
-    namespace = 'urn:xmpp:chat-markers:0'
+    namespace = NS
     interfaces = {'id'}
