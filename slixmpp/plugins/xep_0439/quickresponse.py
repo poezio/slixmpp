@@ -11,9 +11,12 @@ from typing import (
     Tuple,
 )
 
-from slixmpp import JID
+from slixmpp import JID, Message
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0439 import stanza
+from slixmpp.xmlstream.matcher import StanzaPath
+from slixmpp.xmlstream.handler import Callback
+
 
 
 class XEP_0439(BasePlugin):
@@ -27,11 +30,40 @@ class XEP_0439(BasePlugin):
 
     def plugin_init(self) -> None:
         stanza.register_plugins()
+        self.xmpp.register_handler(Callback(
+            'Action received',
+            StanzaPath('message/action'),
+            self._handle_action,
+        ))
+        self.xmpp.register_handler(Callback(
+            'Response received',
+            StanzaPath('message/response'),
+            self._handle_response,
+        ))
+        self.xmpp.register_handler(Callback(
+            'ActionSelected received',
+            StanzaPath('message/action_selected'),
+            self._handle_action_selected,
+        ))
 
-    def ask_for_responses(self, mto: JID, body: str,
-                          responses: Iterable[Tuple[str, str]],
-                          mtype: str = 'chat', lang: Optional[str] = None, *,
-                          mfrom: Optional[JID] = None):
+    def plugin_send(self):
+        self.xmpp.remove_handler('Action received')
+        self.xmpp.remove_handler('Response received')
+        self.xmpp.remove_handler('ActionSelected received')
+
+    def _handle_response(self, msg: Message):
+        self.xmpp.event('responses_received', msg)
+
+    def _handle_action(self, msg: Message):
+        self.xmpp.event('action_received', msg)
+
+    def _handle_action_selected(self, msg: Message):
+        self.xmpp.event('action_selected', msg)
+
+    def ask_for_response(self, mto: JID, body: str,
+                         responses: Iterable[Tuple[str, str]],
+                         mtype: str = 'chat', lang: Optional[str] = None, *,
+                         mfrom: Optional[JID] = None):
         """
         Send a message with a set of responses.
 
