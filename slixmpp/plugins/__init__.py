@@ -109,6 +109,7 @@ __all__ = [
     'xep_0424',  # Message Retraction
     'xep_0425',  # Message Moderation
     'xep_0428',  # Message Fallback
+    'xep_0437',  # Room Activity Indicators
     'xep_0439',  # Quick Response
     'xep_0444',  # Message Reactions
 ]
