@@ -1,0 +1,9 @@
+
+XEP 0128
+========
+
+.. module:: slixmpp.plugins.xep_0128
+
+.. autoclass:: XEP_0128
+    :members:
+    :exclude-members: session_bind, plugin_init, plugin_end

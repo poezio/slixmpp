@@ -1,0 +1,18 @@
+
+XEP 0153
+========
+
+.. module:: slixmpp.plugins.xep_0153
+
+.. autoclass:: XEP_0153
+    :members:
+    :exclude-members: session_bind, plugin_init, plugin_end
+
+
+Stanza elements
+---------------
+
+.. automodule:: slixmpp.plugins.xep_0153.stanza
+    :members:
+    :undoc-members:
+

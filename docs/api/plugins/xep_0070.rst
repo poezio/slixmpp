@@ -1,0 +1,18 @@
+
+XEP 0070
+========
+
+.. module:: slixmpp.plugins.xep_0070
+
+.. autoclass:: XEP_0070
+    :members:
+    :exclude-members: session_bind, plugin_init, plugin_end
+
+
+Stanza elements
+---------------
+
+.. automodule:: slixmpp.plugins.xep_0070.stanza
+    :members:
+    :undoc-members:
+
