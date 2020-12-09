@@ -38,24 +38,24 @@ Event Index
         subscription decisions.
 
     chatstate_active
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0085.xep_0085`
 
     chatstate_composing
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0085.xep_0085`
 
     chatstate_gone
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0085.xep_0085`
 
     chatstate_inactive
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0085.xep_0085`
 
     chatstate_paused
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0085.xep_0085`
 
     disco_info
         - **Data:** :py:class:`~slixmpp.plugins.xep_0030.stanza.DiscoInfo`
@@ -112,8 +112,8 @@ Event Index
         Signal that an unavailable presence stanza has been received from a JID.
 
     groupchat_invite
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0045.XEP_0045`
 
     groupchat_direct_invite
         - **Data:** :py:class:`~slixmpp.Message`
@@ -172,20 +172,20 @@ Event Index
         Triggered whenever a data form is received inside a message.
 
     muc::[room]::got_offline
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Presence`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0045.XEP_0045`
 
     muc::[room]::got_online
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Presence`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0045.XEP_0045`
 
     muc::[room]::message
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0045.XEP_0045`
 
     muc::[room]::presence
-        - **Data:**
-        - **Source:**
+        - **Data:** :py:class:`~slixmpp.Presence`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0045.XEP_0045`
 
     presence_available
         - **Data:** :py:class:`~slixmpp.Presence`
@@ -280,3 +280,135 @@ Event Index
     stream_error
         - **Data:** :py:class:`~slixmpp.stanza.StreamError`
         - **Source:** :py:class:`~slixmpp.BaseXMPP`
+
+    reactions
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0444.XEP_0444`
+
+    carbon_received
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0280.XEP_0280`
+
+    carbon_sent
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0280.XEP_0280`
+
+    marker
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0333.XEP_0333`
+
+    marker_received
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0333.XEP_0333`
+
+    marker_displayed
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0333.XEP_0333`
+
+    marker_acknowledged
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0333.XEP_0333`
+
+    message_correction
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0308.XEP_0308`
+
+    attention
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0224.XEP_0224`
+
+    message_correction
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0308.XEP_0308`
+
+    receipt_received
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0184.XEP_0184`
+
+    jingle_message_propose
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0353.XEP_0353`
+
+    jingle_message_retract
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0353.XEP_0353`
+
+    jingle_message_accept
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0353.XEP_0353`
+
+    jingle_message_proceed
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0353.XEP_0353`
+
+    jingle_message_reject
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0353.XEP_0353`
+
+    room_activity
+        - **Data:** :py:class:`~slixmpp.Presence`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0437.XEP_0437`
+
+    room_activity_bare
+        - **Data:** :py:class:`~slixmpp.Presence`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0437.XEP_0437`
+
+    sm_enabled
+        - **Data:** :py:class:`~slixmpp.plugins.xep_0198.stanza.Enabled`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0198.XEP_0198`
+
+    sm_disabled
+        - **Data:**
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0198.XEP_0198`
+
+    ibb_stream_start
+        - **Data:** :py:class:`~slixmpp.plugins.xep_0047.stream.IBBBytestream`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0047.XEP_0047`
+
+    ibb_stream_end
+        - **Data:** :py:class:`~slixmpp.plugins.xep_0047.stream.IBBBytestream`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0047.XEP_0047`
+
+    ibb_stream_data
+        - **Data:** :py:class:`~slixmpp.plugins.xep_0047.stream.IBBBytestream`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0047.XEP_0047`
+
+    stream:[stream id]:[peer jid]
+        - **Data:** :py:class:`~slixmpp.plugins.xep_0047.stream.IBBBytestream`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0047.XEP_0047`
+
+    command
+        - **Data:** :py:class:`~slixmpp.Iq`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0050.XEP_0050`
+
+    command_[action]
+        - **Data:** :py:class:`~slixmpp.Iq`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0050.XEP_0050`
+
+    pubsub_publish
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
+
+    pubsub_retract
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
+
+    pubsub_purge
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
+
+    pubsub_delete
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
+
+    pubsub_config
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
+
+    pubsub_subscription
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
+
+    pubsub_retract
+        - **Data:** :py:class:`~slixmpp.Message`
+        - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
