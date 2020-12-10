@@ -1,5 +1,5 @@
-Plugins
-=======
+Plugin index
+============
 
 .. toctree::
     :maxdepth: 2
