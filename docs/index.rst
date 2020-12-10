@@ -167,6 +167,7 @@ API Reference
     api/xmlstream/matcher
     api/xmlstream/xmlstream
     api/xmlstream/tostring
+    api/plugins/index
 
 Core Stanzas
 ~~~~~~~~~~~~
@@ -177,12 +178,6 @@ Core Stanzas
     api/stanza/message
     api/stanza/presence
     api/stanza/iq
-
-Plugins
-~~~~~~~
-.. toctree::
-    :maxdepth: 2
-
 
 Additional Info
 ---------------

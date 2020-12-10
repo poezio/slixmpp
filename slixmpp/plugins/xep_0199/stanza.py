@@ -19,15 +19,11 @@ class Ping(ElementBase):
     keepalive methods for detecting lost connections.
 
     Example ping stanza:
+    ::
+
         <iq type="get">
           <ping xmlns="urn:xmpp:ping" />
         </iq>
-
-    Stanza Interface:
-        None
-
-    Methods:
-        None
     """
 
     name = 'ping'

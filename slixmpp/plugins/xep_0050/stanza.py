@@ -22,30 +22,35 @@ class Command(ElementBase):
     Also see <http://xmpp.org/extensions/xep-0050.html>
 
     Example command stanzas:
-      <iq type="set">
-        <command xmlns="http://jabber.org/protocol/commands"
-                 node="run_foo"
-                 action="execute" />
-      </iq>
 
-      <iq type="result">
-        <command xmlns="http://jabber.org/protocol/commands"
-                 node="run_foo"
-                 sessionid="12345"
-                 status="executing">
-          <actions>
-            <complete />
-          </actions>
-          <note type="info">Information!</note>
-          <x xmlns="jabber:x:data">
-            <field var="greeting"
-                   type="text-single"
-                   label="Greeting" />
-          </x>
-        </command>
-      </iq>
+    ::
+
+          <iq type="set">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="run_foo"
+                     action="execute" />
+          </iq>
+
+          <iq type="result">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="run_foo"
+                     sessionid="12345"
+                     status="executing">
+              <actions>
+                <complete />
+              </actions>
+              <note type="info">Information!</note>
+              <x xmlns="jabber:x:data">
+                <field var="greeting"
+                       type="text-single"
+                       label="Greeting" />
+              </x>
+            </command>
+          </iq>
 
     Stanza Interface:
+    ::
+
         action    -- The action to perform.
         actions   -- The set of allowable next actions.
         node      -- The node associated with the command.
@@ -53,20 +58,6 @@ class Command(ElementBase):
         sessionid -- A unique identifier for a command session.
         status    -- May be one of: canceled, completed, or executing.
 
-    Attributes:
-        actions      -- A set of allowed action values.
-        statuses     -- A set of allowed status values.
-        next_actions -- A set of allowed next action names.
-
-    Methods:
-        get_action  -- Return the requested action.
-        get_actions -- Return the allowable next actions.
-        set_actions -- Set the allowable next actions.
-        del_actions -- Remove the current set of next actions.
-        get_notes   -- Return a list of informative note data.
-        set_notes   -- Set informative notes.
-        del_notes   -- Remove any note data.
-        add_note    -- Add a single note.
     """
 
     name = 'command'
@@ -93,9 +84,8 @@ class Command(ElementBase):
         """
         Assign the set of allowable next actions.
 
-        Arguments:
-            values -- A list containing any combination of:
-                        'prev', 'next', and 'complete'
+        :param values: A list containing any combination of:
+                       'prev', 'next', and 'complete'
         """
         self.del_actions()
         if values:

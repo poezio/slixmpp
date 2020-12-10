@@ -208,7 +208,7 @@ class ClientXMPP(BaseXMPP):
         :param timeout: The length of time (in seconds) to wait
                         for a response before continuing if blocking
                         is used. Defaults to
-            :attr:`~slixmpp.xmlstream.xmlstream.XMLStream.response_timeout`.
+                        :attr:`~slixmpp.xmlstream.xmlstream.XMLStream.response_timeout`.
         :param callback: Optional reference to a stream handler function.
                          Will be executed when the roster is received.
                          Implies ``block=False``.

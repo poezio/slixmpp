@@ -13,6 +13,9 @@ class DiscoItems(ElementBase):
 
     """
     Example disco#items stanzas:
+
+    ::
+
         <iq type="get">
           <query xmlns="http://jabber.org/protocol/disco#items" />
         </iq>
@@ -29,17 +32,13 @@ class DiscoItems(ElementBase):
         </iq>
 
     Stanza Interface:
+    ::
+
         node  -- The name of the node to either
                  query or return info from.
         items -- A list of 3-tuples, where each tuple contains
                  the JID, node, and name of an item.
 
-    Methods:
-        add_item  -- Add a single new item.
-        del_item  -- Remove a single item.
-        get_items -- Return all items.
-        set_items -- Set or replace all items.
-        del_items -- Remove all items.
     """
 
     name = 'query'
@@ -58,8 +57,7 @@ class DiscoItems(ElementBase):
 
         Caches item information.
 
-        Arguments:
-            xml -- Use an existing XML object for the stanza's values.
+        :param xml: Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
         self._items = {item[0:2] for item in self['items']}
@@ -70,11 +68,10 @@ class DiscoItems(ElementBase):
         JID, but may also specify a node value to reference
         non-addressable entitities.
 
-        Arguments:
-            jid  -- The JID for the item.
-            node -- Optional additional information to reference
-                    non-addressable items.
-            name -- Optional human readable name for the item.
+        :param jid: The JID for the item.
+        :param node: Optional additional information to reference
+                     non-addressable items.
+        :param name: Optional human readable name for the item.
         """
         if (jid, node) not in self._items:
             self._items.add((jid, node))
@@ -90,9 +87,8 @@ class DiscoItems(ElementBase):
         """
         Remove a single item.
 
-        Arguments:
-            jid  -- JID of the item to remove.
-            node -- Optional extra identifying information.
+        :param jid: JID of the item to remove.
+        :param node: Optional extra identifying information.
         """
         if (jid, node) in self._items:
             for item_xml in self.xml.findall('{%s}item' % self.namespace):
@@ -115,10 +111,10 @@ class DiscoItems(ElementBase):
         """
         Set or replace all items. The given items must be in a
         list or set where each item is a tuple of the form:
+
             (jid, node, name)
 
-        Arguments:
-            items -- A series of items in tuple format.
+        :param items: A series of items in tuple format.
         """
         self.del_items()
         for item in items:

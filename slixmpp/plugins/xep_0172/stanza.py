@@ -24,6 +24,9 @@ class UserNick(ElementBase):
     the same as the nickname used in a MUC.
 
     Example stanzas:
+
+    ::
+
         <message to="user@example.com">
           <nick xmlns="http://jabber.org/nick/nick">The User</nick>
           <body>...</body>
@@ -34,13 +37,11 @@ class UserNick(ElementBase):
         </presence>
 
     Stanza Interface:
+
+    ::
+
         nick -- A global, friendly or informal name chosen by a user.
 
-    Methods:
-        setup    -- Overrides ElementBase.setup.
-        get_nick -- Return the nickname in the <nick> element.
-        set_nick -- Add a <nick> element with the given nickname.
-        del_nick -- Remove the <nick> element.
     """
 
     namespace = 'http://jabber.org/protocol/nick'

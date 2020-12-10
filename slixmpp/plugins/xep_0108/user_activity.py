@@ -39,19 +39,12 @@ class XEP_0108(BasePlugin):
         """
         Publish the user's current activity.
 
-        Arguments:
-            general  -- The required general category of the activity.
-            specific -- Optional specific activity being done as part
-                        of the general category.
-            text     -- Optional natural-language description or reason
-                        for the activity.
-            options  -- Optional form of publish options.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param general: The required general category of the activity.
+        :param specific: Optional specific activity being done as part
+                         of the general category.
+        :param text: Optional natural-language description or reason
+                     for the activity.
+        :param options: Optional form of publish options.
         """
         activity = UserActivity()
         activity['value'] = (general, specific)
@@ -66,14 +59,6 @@ class XEP_0108(BasePlugin):
              timeout_callback=None):
         """
         Clear existing user activity information to stop notifications.
-
-        Arguments:
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
         """
         activity = UserActivity()
         self.xmpp['xep_0163'].publish(activity, node=UserActivity.namespace,

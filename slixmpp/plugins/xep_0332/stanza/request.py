@@ -19,32 +19,34 @@ class HTTPRequest(ElementBase):
     element to the server. Each `iq` stanza sent is of type `set`.
 
     Examples:
-    <iq type='set' from='a@b.com/browser' to='x@y.com' id='1'>
-        <req xmlns='urn:xmpp:http'
-             method='GET'
-             resource='/api/users'
-             version='1.1'>
-            <headers xmlns='http://jabber.org/protocol/shim'>
-                <header name='Host'>b.com</header>
-            </headers>
-        </req>
-    </iq>
+    ::
 
-    <iq type='set' from='a@b.com/browser' to='x@y.com' id='2'>
-        <req xmlns='urn:xmpp:http'
-             method='PUT'
-             resource='/api/users'
-             version='1.1'>
-            <headers xmlns='http://jabber.org/protocol/shim'>
-                <header name='Host'>b.com</header>
-                <header name='Content-Type'>text/html</header>
-                <header name='Content-Length'>...</header>
-            </headers>
-            <data>
-                <text>...</text>
-            </data>
-        </req>
-    </iq>
+        <iq type='set' from='a@b.com/browser' to='x@y.com' id='1'>
+            <req xmlns='urn:xmpp:http'
+                 method='GET'
+                 resource='/api/users'
+                 version='1.1'>
+                <headers xmlns='http://jabber.org/protocol/shim'>
+                    <header name='Host'>b.com</header>
+                </headers>
+            </req>
+        </iq>
+
+        <iq type='set' from='a@b.com/browser' to='x@y.com' id='2'>
+            <req xmlns='urn:xmpp:http'
+                 method='PUT'
+                 resource='/api/users'
+                 version='1.1'>
+                <headers xmlns='http://jabber.org/protocol/shim'>
+                    <header name='Host'>b.com</header>
+                    <header name='Content-Type'>text/html</header>
+                    <header name='Content-Length'>...</header>
+                </headers>
+                <data>
+                    <text>...</text>
+                </data>
+            </req>
+        </iq>
     """
 
     name = 'request'

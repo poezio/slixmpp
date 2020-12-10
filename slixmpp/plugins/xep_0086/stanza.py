@@ -22,6 +22,8 @@ class LegacyError(ElementBase):
     Also see <http://xmpp.org/extensions/xep-0086.html>.
 
     Example legacy error stanzas:
+    ::
+
         <error xmlns="jabber:client" code="501" type="cancel">
           <feature-not-implemented
                 xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
@@ -32,13 +34,8 @@ class LegacyError(ElementBase):
                 xmlns="urn:ietf:params:xml:ns:xmpp-stanzas" />
         </error>
 
-    Attributes:
-        error_map -- A map of error conditions to error types and
-                     code values.
-    Methods:
-        setup         -- Overrides ElementBase.setup
-        set_condition -- Remap the type and code interfaces when a
-                         condition is set.
+    :var error_map: A map of error conditions to error types and
+                    code values.
     """
 
     name = 'legacy'
@@ -79,8 +76,7 @@ class LegacyError(ElementBase):
         Set the error type and code based on the given error
         condition value.
 
-        Arguments:
-            value -- The new error condition.
+        :param value: The new error condition.
         """
         self.parent().set_condition(value)
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     slixmpp.xmlstream.tostring
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This module converts XML objects into Unicode strings and
     intelligently includes namespaces only when necessary to

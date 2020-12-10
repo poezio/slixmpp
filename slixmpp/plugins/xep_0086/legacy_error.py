@@ -26,6 +26,8 @@ class XEP_0086(BasePlugin):
     Also see <http://xmpp.org/extensions/xep-0086.html>.
 
     Configuration Values:
+    ::
+
         override -- Indicates if applying legacy error codes should
                     be done automatically. Defaults to True.
                     If False, then inserting legacy error codes can

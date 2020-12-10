@@ -39,48 +39,40 @@ class XEP_0080(BasePlugin):
         """
         Publish the user's current location.
 
-        Arguments:
-            accuracy    -- Horizontal GPS error in meters.
-            alt         -- Altitude in meters above or below sea level.
-            area        -- A named area such as a campus or neighborhood.
-            bearing     -- GPS bearing (direction in which the entity is
-                           heading to reach its next waypoint), measured in
-                           decimal degrees relative to true north.
-            building    -- A specific building on a street or in an area.
-            country     -- The nation where the user is located.
-            countrycode -- The ISO 3166 two-letter country code.
-            datum       -- GPS datum.
-            description -- A natural-language name for or description of
-                           the location.
-            error       -- Horizontal GPS error in arc minutes. Obsoleted by
-                           the accuracy parameter.
-            floor       -- A particular floor in a building.
-            lat         -- Latitude in decimal degrees North.
-            locality    -- A locality within the administrative region, such
-                           as a town or city.
-            lon         -- Longitude in decimal degrees East.
-            postalcode  -- A code used for postal delivery.
-            region      -- An administrative region of the nation, such
-                           as a state or province.
-            room        -- A particular room in a building.
-            speed       -- The speed at which the entity is moving,
-                           in meters per second.
-            street      -- A thoroughfare within the locality, or a crossing
-                           of two thoroughfares.
-            text        -- A catch-all element that captures any other
-                           information about the location.
-            timestamp   -- UTC timestamp specifying the moment when the
-                           reading was taken.
-            uri         -- A URI or URL pointing to information about
-                           the location.
-
-            options  -- Optional form of publish options.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param accuracy: Horizontal GPS error in meters.
+        :param alt: Altitude in meters above or below sea level.
+        :param area: A named area such as a campus or neighborhood.
+        :param bearing: GPS bearing (direction in which the entity is
+                        heading to reach its next waypoint), measured in
+                        decimal degrees relative to true north.
+        :param building: A specific building on a street or in an area.
+        :param country: The nation where the user is located.
+        :param countrycode: The ISO 3166 two-letter country code.
+        :param datum: GPS datum.
+        :param description: A natural-language name for or description of
+                            the location.
+        :param error: Horizontal GPS error in arc minutes. Obsoleted by
+                      the accuracy parameter.
+        :param floor: A particular floor in a building.
+        :param lat: Latitude in decimal degrees North.
+        :param locality: A locality within the administrative region, such
+                         as a town or city.
+        :param lon: Longitude in decimal degrees East.
+        :param postalcode: A code used for postal delivery.
+        :param region: An administrative region of the nation, such
+                       as a state or province.
+        :param room: A particular room in a building.
+        :param speed: The speed at which the entity is moving,
+                      in meters per second.
+        :param street: A thoroughfare within the locality, or a crossing
+                       of two thoroughfares.
+        :param text: A catch-all element that captures any other
+                     information about the location.
+        :param timestamp: UTC timestamp specifying the moment when the
+                          reading was taken.
+        :param uri: A URI or URL pointing to information about
+                    the location.
+        :param options: Optional form of publish options.
         """
         options = kwargs.get('options', None)
         ifrom = kwargs.get('ifrom', None)
@@ -104,14 +96,6 @@ class XEP_0080(BasePlugin):
     def stop(self, ifrom=None, callback=None, timeout=None, timeout_callback=None):
         """
         Clear existing user location information to stop notifications.
-
-        Arguments:
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
         """
         geoloc = Geoloc()
         return self.xmpp['xep_0163'].publish(geoloc,

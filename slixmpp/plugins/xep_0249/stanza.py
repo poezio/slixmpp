@@ -17,6 +17,9 @@ class Invite(ElementBase):
     done through the server).
 
     Example invite stanza:
+
+    ::
+
       <message from='crone1@shakespeare.lit/desktop'
           to='hecate@shakespeare.lit'>
         <x xmlns='jabber:x:conference'
@@ -26,6 +29,9 @@ class Invite(ElementBase):
       </message>
 
     Stanza Interface:
+
+    ::
+
         jid      -- The JID of the groupchat room
         password -- The password used to gain entry in the room
                     (optional)

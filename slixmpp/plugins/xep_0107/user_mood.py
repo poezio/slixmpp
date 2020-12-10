@@ -45,17 +45,10 @@ class XEP_0107(BasePlugin):
         """
         Publish the user's current mood.
 
-        Arguments:
-            value    -- The name of the mood to publish.
-            text     -- Optional natural-language description or reason
-                        for the mood.
-            options  -- Optional form of publish options.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param value: The name of the mood to publish.
+        :param text: Optional natural-language description or reason
+                     for the mood.
+        :param options: Optional form of publish options.
         """
         mood = UserMood()
         mood['value'] = value
@@ -69,14 +62,6 @@ class XEP_0107(BasePlugin):
              timeout_callback=None):
         """
         Clear existing user mood information to stop notifications.
-
-        Arguments:
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
         """
         mood = UserMood()
         self.xmpp['xep_0163'].publish(mood, node=UserMood.namespace,
