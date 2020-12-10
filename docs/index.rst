@@ -167,6 +167,13 @@ API Reference
     api/xmlstream/matcher
     api/xmlstream/xmlstream
     api/xmlstream/tostring
+
+Plugins
+~~~~~~~
+
+.. toctree::
+    :maxdepth: 1
+
     api/plugins/index
 
 Core Stanzas
