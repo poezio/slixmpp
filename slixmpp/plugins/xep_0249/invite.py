@@ -7,9 +7,10 @@
 """
 
 import logging
+from typing import Optional
 
 import slixmpp
-from slixmpp import Message
+from slixmpp import Message, JID
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
@@ -46,7 +47,7 @@ class XEP_0249(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature(Invite.namespace)
 
-    def _handle_invite(self, msg):
+    def _handle_invite(self, msg: Message):
         """
         Raise an event for all invitations received.
         """
@@ -55,25 +56,26 @@ class XEP_0249(BasePlugin):
 
         self.xmpp.event('groupchat_direct_invite', msg)
 
-    def send_invitation(self, jid, roomjid, password=None,
-                        reason=None, ifrom=None):
+    def send_invitation(self, jid: JID, roomjid: JID,
+                        password: Optional[str] = None,
+                        reason: Optional[str] = None, *,
+                        mfrom: Optional[JID] = None):
         """
         Send a direct MUC invitation to an XMPP entity.
 
-        Arguments:
-            jid      -- The JID of the entity that will receive
+        :param JID jid: The JID of the entity that will receive
                         the invitation
-            roomjid  -- the address of the groupchat room to be joined
-            password -- a password needed for entry into a
-                        password-protected room (OPTIONAL).
-            reason   -- a human-readable purpose for the invitation
-                        (OPTIONAL).
+        :param JID roomjid: the address of the groupchat room to be joined
+        :param str password: a password needed for entry into a
+                             password-protected room (OPTIONAL).
+        :param str reason: a human-readable purpose for the invitation
+                            (OPTIONAL).
         """
 
         msg = self.xmpp.Message()
         msg['to'] = jid
-        if ifrom is not None:
-            msg['from'] = ifrom
+        if mfrom is not None:
+            msg['from'] = mfrom
         msg['groupchat_invite']['jid'] = roomjid
         if password is not None:
             msg['groupchat_invite']['password'] = password

@@ -79,9 +79,10 @@ class XEP_0369(BasePlugin):
     async def get_channel_info(self, channel: JID) -> InfoType:
         """"
         Get the contents of the channel info node.
-        :param JID channel: The MIX channel
+
+        :param channel: The MIX channel
         :returns: a dict containing the last modified time and form contents
-            (Name, Description, Contact per the spec, YMMV)
+                  (Name, Description, Contact per the spec, YMMV)
         """
         info = await self.xmpp['xep_0060'].get_items(channel, 'urn:xmpp:mix:nodes:info')
         for item in info['pubsub']['items']:

@@ -135,15 +135,17 @@ class MUCPresence(MUCBase):
     '''
     A MUC Presence
 
-    <presence from='foo@muc/user1' type='unavailable'>
-        <x xmlns='http://jabber.org/protocol/muc#user'>
-            <item affiliation='none'
-                  role='none'
-                  nick='newnick2'
-                  jid='some@jid'/>
-            <status code='303'/>
-        </x>
-    </presence>
+    ::
+
+        <presence from='foo@muc/user1' type='unavailable'>
+            <x xmlns='http://jabber.org/protocol/muc#user'>
+                <item affiliation='none'
+                      role='none'
+                      nick='newnick2'
+                      jid='some@jid'/>
+                <status code='303'/>
+            </x>
+        </presence>
     '''
 
 
@@ -151,15 +153,17 @@ class MUCMessage(MUCBase):
     '''
     A MUC Message
 
-    <message from='foo@muc/user1' type='groupchat' id='someid'>
-        <body>Foo</body>
-        <x xmlns='http://jabber.org/protocol/muc#user'>
-            <item affiliation='none'
-                  role='none'
-                  nick='newnick2'
-                  jid='some@jid'/>
-        </x>
-    </message>
+    ::
+
+        <message from='foo@muc/user1' type='groupchat' id='someid'>
+            <body>Foo</body>
+            <x xmlns='http://jabber.org/protocol/muc#user'>
+                <item affiliation='none'
+                      role='none'
+                      nick='newnick2'
+                      jid='some@jid'/>
+            </x>
+        </message>
     '''
 
 class MUCJoin(ElementBase):

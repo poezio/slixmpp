@@ -14,6 +14,9 @@ class ChatState(ElementBase):
 
     """
     Example chat state stanzas:
+
+    ::
+
         <message>
           <active xmlns="http://jabber.org/protocol/chatstates" />
         </message>
@@ -22,16 +25,6 @@ class ChatState(ElementBase):
           <paused xmlns="http://jabber.org/protocol/chatstates" />
         </message>
 
-    Stanza Interfaces:
-        chat_state
-
-    Attributes:
-        states
-
-    Methods:
-        get_chat_state
-        set_chat_state
-        del_chat_state
     """
 
     name = ''

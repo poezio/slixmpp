@@ -8,9 +8,11 @@
 
 import logging
 
-from slixmpp import asyncio
-from slixmpp.xmlstream import register_stanza_plugin
+from typing import Optional, Callable
+from slixmpp import asyncio, JID
+from slixmpp.xmlstream import register_stanza_plugin, ElementBase
 from slixmpp.plugins.base import BasePlugin, register_plugin
+from slixmpp.plugins.xep_0004.stanza import Form
 
 
 log = logging.getLogger(__name__)
@@ -45,16 +47,15 @@ class XEP_0163(BasePlugin):
         self.xmpp['xep_0030'].add_feature(stanza.namespace)
         self.xmpp['xep_0060'].map_node_event(stanza.namespace, name)
 
-    def add_interest(self, namespace, jid=None):
+    def add_interest(self, namespace: str, jid: Optional[JID] = None):
         """
         Mark an interest in a PEP subscription by including a disco
         feature with the '+notify' extension.
 
-        Arguments:
-            namespace -- The base namespace to register as an interest, such
-                         as 'http://jabber.org/protocol/tune'. This may also
-                         be a list of such namespaces.
-            jid       -- Optionally specify the JID.
+        :param namespace: The base namespace to register as an interest, such
+                          as 'http://jabber.org/protocol/tune'. This may also
+                          be a list of such namespaces.
+        :param jid: Optionally specify the JID.
         """
         if not isinstance(namespace, set) and not isinstance(namespace, list):
             namespace = [namespace]
@@ -67,16 +68,15 @@ class XEP_0163(BasePlugin):
             loop=self.xmpp.loop,
         )
 
-    def remove_interest(self, namespace, jid=None):
+    def remove_interest(self, namespace: str, jid: Optional[JID] = None):
         """
         Mark an interest in a PEP subscription by including a disco
         feature with the '+notify' extension.
 
-        Arguments:
-            namespace -- The base namespace to remove as an interest, such
-                         as 'http://jabber.org/protocol/tune'. This may also
-                         be a list of such namespaces.
-            jid       -- Optionally specify the JID.
+        :param namespace: The base namespace to remove as an interest, such
+                          as 'http://jabber.org/protocol/tune'. This may also
+                          be a list of such namespaces.
+        :param jid: Optionally specify the JID.
         """
         if not isinstance(namespace, (set, list)):
             namespace = [namespace]
@@ -89,26 +89,24 @@ class XEP_0163(BasePlugin):
             loop=self.xmpp.loop,
         )
 
-    def publish(self, stanza, node=None, id=None, options=None, ifrom=None,
-                timeout_callback=None, callback=None, timeout=None):
+    def publish(self, stanza: ElementBase, node: Optional[str] = None,
+                id: Optional[str] = None,
+                options: Optional[Form] = None,
+                ifrom: Optional[JID] = None,
+                timeout_callback: Optional[Callable] = None,
+                callback: Optional[Callable] = None,
+                timeout: Optional[int] = None):
         """
         Publish a PEP update.
 
         This is just a (very) thin wrapper around the XEP-0060 publish()
         method to set the defaults expected by PEP.
 
-        Arguments:
-            stanza   -- The PEP update stanza to publish.
-            node     -- The node to publish the item to. If not specified,
-                        the stanza's namespace will be used.
-            id       -- Optionally specify the ID of the item.
-            options  -- A form of publish options.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param stanza: The PEP update stanza to publish.
+        :param node: The node to publish the item to. If not specified,
+                      the stanza's namespace will be used.
+        :param id: Optionally specify the ID of the item.
+        :param options:  A form of publish options.
         """
         if node is None:
             node = stanza.namespace

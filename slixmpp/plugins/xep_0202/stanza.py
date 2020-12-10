@@ -23,6 +23,8 @@ class EntityTime(ElementBase):
     included.
 
     Example <time> stanzas:
+    ::
+
         <iq type="result">
           <time xmlns="urn:xmpp:time">
             <utc>2011-07-03T11:37:12.234569</utc>
@@ -31,18 +33,11 @@ class EntityTime(ElementBase):
         </iq>
 
     Stanza Interface:
+    ::
+
         time -- The local time for the entity (updates utc and tzo).
         utc  -- The UTC equivalent to local time.
         tzo  -- The local timezone offset from UTC.
-
-    Methods:
-        get_time -- Return local time datetime object.
-        set_time -- Set UTC and TZO fields.
-        del_time -- Remove both UTC and TZO fields.
-        get_utc  -- Return datetime object of UTC time.
-        set_utc  -- Set the UTC time.
-        get_tzo  -- Return tzinfo object.
-        set_tzo  -- Set the local timezone offset.
     """
 
     name = 'time'
@@ -55,9 +50,8 @@ class EntityTime(ElementBase):
         """
         Set both the UTC and TZO fields given a time object.
 
-        Arguments:
-            value -- A datetime object or properly formatted
-                     string equivalent.
+        :param value: A datetime object or properly formatted
+                      string equivalent.
         """
         date = value
         if not isinstance(value, dt.datetime):
@@ -92,9 +86,8 @@ class EntityTime(ElementBase):
         """
         Set the timezone offset from UTC.
 
-        Arguments:
-            value -- Either a tzinfo object or the number of
-                     seconds (positive or negative) to offset.
+        :param value: Either a tzinfo object or the number of
+                      seconds (positive or negative) to offset.
         """
         time = xep_0082.time(offset=value)
         if xep_0082.parse(time).tzinfo == tzutc():
@@ -115,9 +108,8 @@ class EntityTime(ElementBase):
         """
         Set the time in UTC.
 
-        Arguments:
-            value -- A datetime object or properly formatted
-                     string equivalent.
+        :param value: A datetime object or properly formatted
+                      string equivalent.
         """
         date = value
         if not isinstance(value, dt.datetime):

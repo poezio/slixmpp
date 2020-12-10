@@ -8,6 +8,9 @@
 
 import logging
 
+from typing import Optional
+
+from slixmpp import JID
 from slixmpp.stanza.iq import Iq
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
@@ -61,7 +64,7 @@ class XEP_0202(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature('urn:xmpp:time')
 
-    def _handle_time_request(self, iq):
+    def _handle_time_request(self, iq: Iq):
         """
         Respond to a request for the local time.
 
@@ -69,26 +72,17 @@ class XEP_0202(BasePlugin):
         during plugin configuration with a function that maps JIDs to
         times.
 
-        Arguments:
-            iq -- The Iq time request stanza.
+        :param iq: The Iq time request stanza.
         """
         iq = iq.reply()
         iq['entity_time']['time'] = self.local_time(iq['to'])
         iq.send()
 
-    def get_entity_time(self, to, ifrom=None, **iqargs):
+    def get_entity_time(self, to: JID, ifrom: Optional[JID] = None, **iqargs):
         """
         Request the time from another entity.
 
-        Arguments:
-            to       -- JID of the entity to query.
-            ifrom    -- Specifiy the sender's JID.
-            block    -- If true, block and wait for the stanzas' reply.
-            timeout  -- The time in seconds to block while waiting for
-                        a reply. If None, then wait indefinitely.
-            callback -- Optional callback to execute when a reply is
-                        received instead of blocking and waiting for
-                        the reply.
+        :param to: JID of the entity to query.
         """
         iq = self.xmpp.Iq()
         iq['type'] = 'get'

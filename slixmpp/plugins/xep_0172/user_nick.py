@@ -8,6 +8,8 @@
 
 import logging
 
+from typing import Optional, Callable
+from slixmpp import JID
 from slixmpp.stanza.message import Message
 from slixmpp.stanza.presence import Presence
 from slixmpp.xmlstream import register_stanza_plugin
@@ -15,6 +17,7 @@ from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import MatchXPath
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0172 import stanza, UserNick
+from slixmpp.plugins.xep_0004.stanza import Form
 
 
 log = logging.getLogger(__name__)
@@ -42,20 +45,17 @@ class XEP_0172(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_nick', UserNick)
 
-    def publish_nick(self, nick=None, options=None, ifrom=None, timeout_callback=None,
-                     callback=None, timeout=None):
+    def publish_nick(self, nick: Optional[str] = None,
+                     options: Optional[Form] = None,
+                     ifrom: Optional[JID] = None,
+                     timeout_callback: Optional[Callable] = None,
+                     callback: Optional[Callable] = None,
+                     timeout: Optional[int] = None):
         """
         Publish the user's current nick.
 
-        Arguments:
-            nick     -- The user nickname to publish.
-            options  -- Optional form of publish options.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param nick: The user nickname to publish.
+        :param options: Optional form of publish options.
         """
         nickname = UserNick()
         nickname['nick'] = nick
@@ -64,17 +64,12 @@ class XEP_0172(BasePlugin):
                                       callback=callback, timeout=timeout,
                                       timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, timeout_callback=None, callback=None, timeout=None):
+    def stop(self, ifrom: Optional[JID] = None,
+             timeout_callback: Optional[Callable] = None,
+              callback: Optional[Callable] = None,
+              timeout: Optional[int] = None):
         """
         Clear existing user nick information to stop notifications.
-
-        Arguments:
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
         """
         nick = UserNick()
         return self.xmpp['xep_0163'].publish(nick, node=UserNick.namespace,

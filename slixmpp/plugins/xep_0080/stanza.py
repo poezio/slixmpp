@@ -17,6 +17,9 @@ class Geoloc(ElementBase):
     geographical or physical location of an entity. (XEP-0080: User Location)
 
     Example <geoloc> stanzas:
+
+    ::
+
         <geoloc xmlns='http://jabber.org/protocol/geoloc'/>
 
         <geoloc xmlns='http://jabber.org/protocol/geoloc' xml:lang='en'>
@@ -28,6 +31,8 @@ class Geoloc(ElementBase):
         </geoloc>
 
     Stanza Interface:
+    ::
+
         accuracy    -- Horizontal GPS error in meters.
         alt         -- Altitude in meters above or below sea level.
         area        -- A named area such as a campus or neighborhood.
@@ -61,6 +66,7 @@ class Geoloc(ElementBase):
                        reading was taken.
         uri         -- A URI or URL pointing to information about
                        the location.
+
     """
 
     namespace = 'http://jabber.org/protocol/geoloc'
@@ -83,8 +89,7 @@ class Geoloc(ElementBase):
         """
         Set the value of the <accuracy> element.
 
-        Arguments:
-            accuracy -- Horizontal GPS error in meters
+        :param accuracy: Horizontal GPS error in meters
         """
         self._set_sub_text('accuracy', text=str(accuracy))
         return self
@@ -106,8 +111,7 @@ class Geoloc(ElementBase):
         """
         Set the value of the <alt> element.
 
-        Arguments:
-            alt -- Altitude in meters above or below sea level
+        :param alt: Altitude in meters above or below sea level
         """
         self._set_sub_text('alt', text=str(alt))
         return self
@@ -129,8 +133,7 @@ class Geoloc(ElementBase):
         """
         Set the value of the <bearing> element.
 
-        Arguments:
-            bearing -- GPS bearing (direction in which the entity is heading
+        :param bearing: GPS bearing (direction in which the entity is heading
                        to reach its next waypoint), measured in decimal
                        degrees relative to true north
         """
@@ -154,9 +157,8 @@ class Geoloc(ElementBase):
         """
         Set the value of the <error> element.
 
-        Arguments:
-            error -- Horizontal GPS error in arc minutes; this
-                     element is deprecated in favor of <accuracy/>
+        :param error: Horizontal GPS error in arc minutes; this
+                      element is deprecated in favor of <accuracy/>
         """
         self._set_sub_text('error', text=str(error))
         return self
@@ -178,8 +180,7 @@ class Geoloc(ElementBase):
         """
         Set the value of the <lat> element.
 
-        Arguments:
-            lat -- Latitude in decimal degrees North
+        :param lat: Latitude in decimal degrees North
         """
         self._set_sub_text('lat', text=str(lat))
         return self
@@ -201,8 +202,7 @@ class Geoloc(ElementBase):
         """
         Set the value of the <lon> element.
 
-        Arguments:
-            lon -- Longitude in decimal degrees East
+        :param lon: Longitude in decimal degrees East
         """
         self._set_sub_text('lon', text=str(lon))
         return self
@@ -224,9 +224,8 @@ class Geoloc(ElementBase):
         """
         Set the value of the <speed> element.
 
-        Arguments:
-            speed -- The speed at which the entity is moving,
-                     in meters per second
+        :param speed: The speed at which the entity is moving,
+                      in meters per second
         """
         self._set_sub_text('speed', text=str(speed))
         return self
@@ -248,9 +247,8 @@ class Geoloc(ElementBase):
         """
         Set the value of the <timestamp> element.
 
-        Arguments:
-            timestamp -- UTC timestamp specifying the moment when
-                         the reading was taken
+        :param timestamp: UTC timestamp specifying the moment when
+                          the reading was taken
         """
         self._set_sub_text('timestamp', text=str(xep_0082.datetime(timestamp)))
         return self

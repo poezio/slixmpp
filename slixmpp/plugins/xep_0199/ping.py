@@ -9,6 +9,8 @@
 import time
 import logging
 
+from typing import Optional, Callable
+
 from slixmpp.jid import JID
 from slixmpp.stanza import Iq
 from slixmpp import asyncio
@@ -123,17 +125,13 @@ class XEP_0199(BasePlugin):
         log.debug("Pinged by %s", iq['from'])
         iq.reply().send()
 
-    def send_ping(self, jid, ifrom=None, timeout=None, callback=None,
-                  timeout_callback=None):
+    def send_ping(self, jid: JID, ifrom: Optional[JID] = None,
+                  timeout: Optional[int] = None,
+                  callback: Optional[Callable] = None,
+                  timeout_callback: Optional[Callable] = None):
         """Send a ping request.
 
-        Arguments:
-            jid        -- The JID that will receive the ping.
-            ifrom      -- Specifiy the sender JID.
-            timeout    -- Time in seconds to wait for a response.
-                          Defaults to self.timeout.
-            callback   -- Optional handler to execute when a pong
-                          is received.
+        :param jid: The JID that will receive the ping.
         """
         if not timeout:
             timeout = self.timeout
@@ -147,15 +145,12 @@ class XEP_0199(BasePlugin):
         return iq.send(timeout=timeout, callback=callback,
                        timeout_callback=timeout_callback)
 
-    async def ping(self, jid=None, ifrom=None, timeout=None):
+    async def ping(self, jid: Optional[JID] =None,
+            ifrom: Optional[JID] = None, timeout: Optional[int] = None) -> float:
         """Send a ping request and calculate RTT.
         This is a coroutine.
 
-        Arguments:
-            jid        -- The JID that will receive the ping.
-            ifrom      -- Specifiy the sender JID.
-            timeout    -- Time in seconds to wait for a response.
-                          Defaults to self.timeout.
+        :param jid: The JID that will receive the ping.
         """
         own_host = False
         if not jid:

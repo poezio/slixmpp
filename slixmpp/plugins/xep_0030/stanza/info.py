@@ -34,6 +34,9 @@ class DiscoInfo(ElementBase):
     be like section headings.
 
     Example disco#info stanzas:
+
+    ::
+
         <iq type="get">
           <query xmlns="http://jabber.org/protocol/disco#info" />
         </iq>
@@ -48,6 +51,8 @@ class DiscoInfo(ElementBase):
         </iq>
 
     Stanza Interface:
+    ::
+
         node       -- The name of the node to either
                       query or return info from.
         identities -- A set of 4-tuples, where each tuple contains
@@ -55,17 +60,6 @@ class DiscoInfo(ElementBase):
                       of an identity.
         features   -- A set of namespaces for features.
 
-    Methods:
-        add_identity   -- Add a new, single identity.
-        del_identity   -- Remove a single identity.
-        get_identities -- Return all identities in tuple form.
-        set_identities -- Use multiple identities, each given in tuple form.
-        del_identities -- Remove all identities.
-        add_feature    -- Add a single feature.
-        del_feature    -- Remove a single feature.
-        get_features   -- Return a list of all features.
-        set_features   -- Use a given list of features.
-        del_features   -- Remove all features.
     """
 
     name = 'query'
@@ -86,8 +80,7 @@ class DiscoInfo(ElementBase):
 
         Caches identity and feature information.
 
-        Arguments:
-            xml -- Use an existing XML object for the stanza's values.
+        :param xml: Use an existing XML object for the stanza's values.
         """
         ElementBase.setup(self, xml)
 
@@ -104,11 +97,10 @@ class DiscoInfo(ElementBase):
         category/type/xml:lang pairs are allowed so long as the names
         are different. In any case, a category and type are required.
 
-        Arguments:
-            category -- The general category to which the agent belongs.
-            itype    -- A more specific designation with the category.
-            name     -- Optional human readable name for this identity.
-            lang     -- Optional standard xml:lang value.
+        :param category: The general category to which the agent belongs.
+        :param itype: A more specific designation with the category.
+        :param name: Optional human readable name for this identity.
+        :param lang: Optional standard xml:lang value.
         """
         identity = (category, itype, lang)
         if identity not in self._identities:
@@ -128,11 +120,10 @@ class DiscoInfo(ElementBase):
         """
         Remove a given identity.
 
-        Arguments:
-            category -- The general category to which the agent belonged.
-            itype    -- A more specific designation with the category.
-            name     -- Optional human readable name for this identity.
-            lang     -- Optional, standard xml:lang value.
+        :param category: The general category to which the agent belonged.
+        :param itype: A more specific designation with the category.
+        :param name: Optional human readable name for this identity.
+        :param lang: Optional, standard xml:lang value.
         """
         identity = (category, itype, lang)
         if identity in self._identities:
@@ -149,15 +140,15 @@ class DiscoInfo(ElementBase):
     def get_identities(self, lang=None, dedupe=True):
         """
         Return a set of all identities in tuple form as so:
+
             (category, type, lang, name)
 
         If a language was specified, only return identities using
         that language.
 
-        Arguments:
-            lang   -- Optional, standard xml:lang value.
-            dedupe -- If True, de-duplicate identities, otherwise
-                      return a list of all identities.
+        :param lang: Optional, standard xml:lang value.
+        :param dedupe: If True, de-duplicate identities, otherwise
+                       return a list of all identities.
         """
         if dedupe:
             identities = set()
@@ -180,17 +171,19 @@ class DiscoInfo(ElementBase):
         """
         Add or replace all identities. The identities must be a in set
         where each identity is a tuple of the form:
+
             (category, type, lang, name)
 
         If a language is specifified, any identities using that language
         will be removed to be replaced with the given identities.
 
-        NOTE: An identity's language will not be changed regardless of
-              the value of lang.
+        .. note::
 
-        Arguments:
-            identities -- A set of identities in tuple form.
-            lang       -- Optional, standard xml:lang value.
+            An identity's language will not be changed regardless of
+            the value of lang.
+
+        :param identities: A set of identities in tuple form.
+        :param lang: Optional, standard xml:lang value.
         """
         self.del_identities(lang)
         for identity in identities:
@@ -202,8 +195,7 @@ class DiscoInfo(ElementBase):
         Remove all identities. If a language was specified, only
         remove identities using that language.
 
-        Arguments:
-            lang -- Optional, standard xml:lang value.
+        :param lang: Optional, standard xml:lang value.
         """
         for id_xml in self.xml.findall('{%s}identity' % self.namespace):
             if lang is None:
@@ -219,8 +211,7 @@ class DiscoInfo(ElementBase):
         """
         Add a single, new feature.
 
-        Arguments:
-            feature -- The namespace of the supported feature.
+        :param feature: The namespace of the supported feature.
         """
         if feature not in self._features:
             self._features.add(feature)
@@ -234,8 +225,7 @@ class DiscoInfo(ElementBase):
         """
         Remove a single feature.
 
-        Arguments:
-            feature -- The namespace of the removed feature.
+        :param feature: The namespace of the removed feature.
         """
         if feature in self._features:
             self._features.remove(feature)
@@ -262,8 +252,7 @@ class DiscoInfo(ElementBase):
         """
         Add or replace the set of supported features.
 
-        Arguments:
-            features -- The new set of supported features.
+        :param features: The new set of supported features.
         """
         self.del_features()
         for feature in features:

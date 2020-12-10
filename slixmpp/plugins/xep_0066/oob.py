@@ -36,10 +36,6 @@ class XEP_0066(BasePlugin):
     Events:
         oob_transfer -- Raised when a request to download a resource
                         has been received.
-
-    Methods:
-        send_oob -- Send a request to another entity to download a file
-                    or other addressable resource.
     """
 
     name = 'xep_0066'
@@ -76,11 +72,10 @@ class XEP_0066(BasePlugin):
         Register a handler to process download requests, either for all
         JIDs or a single JID.
 
-        Arguments:
-            jid     -- If None, then set the handler as a global default.
-            handler -- If None, then remove the existing handler for the
-                       given JID, or reset the global handler if the JID
-                       is None.
+        :param jid: If None, then set the handler as a global default.
+        :param handler: If None, then remove the existing handler for the
+                        given JID, or reset the global handler if the JID
+                        is None.
         """
         if jid is None:
             if handler is not None:
@@ -98,17 +93,9 @@ class XEP_0066(BasePlugin):
         Initiate a basic file transfer by sending the URL of
         a file or other resource.
 
-        Arguments:
-            url      -- The URL of the resource to transfer.
-            desc     -- An optional human readable description of the item
-                        that is to be transferred.
-            ifrom    -- Specifiy the sender's JID.
-            block    -- If true, block and wait for the stanzas' reply.
-            timeout  -- The time in seconds to block while waiting for
-                        a reply. If None, then wait indefinitely.
-            callback -- Optional callback to execute when a reply is
-                        received instead of blocking and waiting for
-                        the reply.
+        :param url: The URL of the resource to transfer.
+        :param desc: An optional human readable description of the item
+                     that is to be transferred.
         """
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
@@ -122,8 +109,7 @@ class XEP_0066(BasePlugin):
         """
         Execute the appropriate handler for a transfer request.
 
-        Arguments:
-            iq -- The Iq stanza containing the OOB transfer request.
+        :param iq: The Iq stanza containing the OOB transfer request.
         """
         if iq['to'] in self.url_handlers['jid']:
             return self.url_handlers['jid'][iq['to']](iq)
@@ -140,8 +126,7 @@ class XEP_0066(BasePlugin):
         Register a new handler using self.register_url_handler to
         screen requests and download files.
 
-        Arguments:
-            iq -- The Iq stanza containing the OOB transfer request.
+        :param iq: The Iq stanza containing the OOB transfer request.
         """
         raise XMPPError('service-unavailable')
 
@@ -149,8 +134,7 @@ class XEP_0066(BasePlugin):
         """
         Handle receiving an out-of-band transfer request.
 
-        Arguments:
-            iq -- An Iq stanza containing an OOB transfer request.
+        :param iq: An Iq stanza containing an OOB transfer request.
         """
         log.debug('Received out-of-band data request for %s from %s:' % (
             iq['oob_transfer']['url'], iq['from']))
