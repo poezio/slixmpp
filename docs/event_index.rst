@@ -309,10 +309,6 @@ Event Index
         - **Data:** :py:class:`~slixmpp.Message`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0333.XEP_0333`
 
-    message_correction
-        - **Data:** :py:class:`~slixmpp.Message`
-        - **Source:** :py:class:`~slixmpp.plugins.xep_0308.XEP_0308`
-
     attention
         - **Data:** :py:class:`~slixmpp.Message`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0224.XEP_0224`
@@ -406,9 +402,5 @@ Event Index
         - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
 
     pubsub_subscription
-        - **Data:** :py:class:`~slixmpp.Message`
-        - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`
-
-    pubsub_retract
         - **Data:** :py:class:`~slixmpp.Message`
         - **Source:** :py:class:`~slixmpp.plugins.xep_0060.XEP_0060`

@@ -38,8 +38,8 @@ Updated Code
     def handleIncomingMessage(self, message):
         self.xmpp.send_message(message["from"], message["body"])
 
-`View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/EchoBot/EchoBot.py>`_ |
-`View original code <http://github.com/remko/xmpp-tdg/blob/master/code/EchoBot/EchoBot.py>`_
+`View full source (1) <http://github.com/legastero/xmpp-tdg/blob/master/code/EchoBot/EchoBot.py>`_ |
+`View original code (1) <http://github.com/remko/xmpp-tdg/blob/master/code/EchoBot/EchoBot.py>`_
 
 Example 14-1. (Page 215)
 ------------------------
@@ -88,8 +88,8 @@ Updated Code
     for subscriberJID in self.backend.getSubscriberJIDs(message.user) :
       self.xmpp.send_message(subscriberJID, body, mhtml=htmlBody)
 
-`View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/Bot.py>`_ |
-`View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/Bot.py>`_
+`View full source (2) <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/Bot.py>`_ |
+`View original code (2) <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/Bot.py>`_
 
 
 Example 14-3. (Page 217)
@@ -131,8 +131,8 @@ Updated Code
       if self.backend.getShouldMonitorPresenceFromUser(user):
         self.handleIncomingXMPPEvent(event)
 
-`View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/ConfigurableBot.py>`_ |
-`View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/ConfigurableBot.py>`_
+`View full source (3) <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/ConfigurableBot.py>`_ |
+`View original code (3) <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/ConfigurableBot.py>`_
 
 
 Example 14-4. (Page 220)
@@ -176,8 +176,8 @@ Updated Code
     for subscriberJID in self.backend.getSubscriberJIDs(message.user) :
       self.xmpp.send_message(subscriberJID, body, mfrom=self.xmpp.jid)
 
-`View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/SimpleComponent.py>`_ |
-`View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/SimpleComponent.py>`_
+`View full source (4) <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/SimpleComponent.py>`_ |
+`View original code (4) <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/SimpleComponent.py>`_
 
 
 Example 14-6. (Page 223)
@@ -195,8 +195,8 @@ implementation should work correctly.
     To see how to implement in-band registration as a Slixmpp plugin,
     see the tutorial :ref:`tutorial-create-plugin`.
 
-`View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/RegistrableComponent.py>`_ |
-`View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/RegistrableComponent.py>`_
+`View full source (5) <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/RegistrableComponent.py>`_ |
+`View original code (5) <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/RegistrableComponent.py>`_
 
 Example 14-7. (Page 225)
 ------------------------
@@ -245,5 +245,5 @@ Updated Code
       if contactJID == self.componentDomain :
         self.sendAllContactSubscriptionRequestsToUser(userJID)
 
-`View full source <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/Component.py>`_ |
-`View original code <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/Component.py>`_
+`View full source (6) <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/Component.py>`_ |
+`View original code (6) <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/Component.py>`_

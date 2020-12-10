@@ -76,49 +76,49 @@ Plik zawiera prostą strukturę, która pozwoli nam zapisać dane logowania.
 
 .. code-block:: python
 
-#!/usr/bin/python3
-#File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
+    #!/usr/bin/python3
+    #File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
 
-import subprocess
-import time
+    import subprocess
+    import time
 
-if __name__ == "__main__":
-	#~ prefix = ["x-terminal-emulator", "-e"] # Osobny terminal dla kazdego klienta, może być zastąpiony inną konsolą.
-	#~ prefix = ["xterm", "-e"]
-	prefix = []
-	#~ suffix = ["-d"] # Debug
-	#~ suffix = ["-q"] # Quiet
-	suffix = []
+    if __name__ == "__main__":
+        #~ prefix = ["x-terminal-emulator", "-e"] # Osobny terminal dla kazdego klienta, może być zastąpiony inną konsolą.
+        #~ prefix = ["xterm", "-e"]
+        prefix = []
+        #~ suffix = ["-d"] # Debug
+        #~ suffix = ["-q"] # Quiet
+        suffix = []
 
-	sender_path = "./example/sender.py"
-	sender_jid = "SENDER_JID"
-	sender_password = "SENDER_PASSWORD"
+        sender_path = "./example/sender.py"
+        sender_jid = "SENDER_JID"
+        sender_password = "SENDER_PASSWORD"
 
-	example_file = "./test_example_tag.xml"
+        example_file = "./test_example_tag.xml"
 
-	responder_path = "./example/responder.py"
-	responder_jid = "RESPONDER_JID"
-	responder_password = "RESPONDER_PASSWORD"
+        responder_path = "./example/responder.py"
+        responder_jid = "RESPONDER_JID"
+        responder_password = "RESPONDER_PASSWORD"
 
-	# Remember about the executable permission. (`chmod +x ./file.py`)
-	SENDER_TEST = prefix + [sender_path, "-j", sender_jid, "-p", sender_password, "-t", responder_jid, "--path", example_file] + suffix
-	RESPON_TEST = prefix + [responder_path, "-j", responder_jid, "-p", responder_password] + suffix
-	
-	try:
-		responder = subprocess.Popen(RESPON_TEST)
-		sender = subprocess.Popen(SENDER_TEST)
-		responder.wait()
-		sender.wait()
-	except:
-		try:
-			responder.terminate()
-		except NameError:
-			pass
-		try:
-			sender.terminate()
-		except NameError:
-			pass
-		raise
+        # Remember about the executable permission. (`chmod +x ./file.py`)
+        SENDER_TEST = prefix + [sender_path, "-j", sender_jid, "-p", sender_password, "-t", responder_jid, "--path", example_file] + suffix
+        RESPON_TEST = prefix + [responder_path, "-j", responder_jid, "-p", responder_password] + suffix
+
+        try:
+            responder = subprocess.Popen(RESPON_TEST)
+            sender = subprocess.Popen(SENDER_TEST)
+            responder.wait()
+            sender.wait()
+        except:
+            try:
+                responder.terminate()
+            except NameError:
+                pass
+            try:
+                sender.terminate()
+            except NameError:
+                pass
+            raise
 
 Skrypt uruchamiający powinien być dostosowany do potrzeb urzytkownika: można w nim pobierać ścieżki do projektu z linii komend (przez `'sys.argv[...]'` lub `'os.getcwd()'`), wybierać z jaką flagą mają zostać uruchomione programy oraz wiele innych. Jego należyte przygotowanie pozwoli zaoszczędzić czas i nerwy podczas późniejszych prac.
 
@@ -1263,49 +1263,49 @@ W poniższym kodzie zostały pozostawione oryginalne komentarze w języku angiel
 
 .. code-block:: python
 
-#!/usr/bin/python3
-#File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
+    #!/usr/bin/python3
+    #File: /usr/bin/test_slixmpp & permissions rwx--x--x (711)
 
-import subprocess
-import time
+    import subprocess
+    import time
 
-if __name__ == "__main__":
-	#~ prefix = ["x-terminal-emulator", "-e"] # Separate terminal for every client; can be replaced with other terminal
-	#~ prefix = ["xterm", "-e"]
-	prefix = []
-	#~ suffix = ["-d"] # Debug
-	#~ suffix = ["-q"] # Quiet
-	suffix = []
+    if __name__ == "__main__":
+        #~ prefix = ["x-terminal-emulator", "-e"] # Separate terminal for every client; can be replaced with other terminal
+        #~ prefix = ["xterm", "-e"]
+        prefix = []
+        #~ suffix = ["-d"] # Debug
+        #~ suffix = ["-q"] # Quiet
+        suffix = []
 
-	sender_path = "./example/sender.py"
-	sender_jid = "SENDER_JID"
-	sender_password = "SENDER_PASSWORD"
+        sender_path = "./example/sender.py"
+        sender_jid = "SENDER_JID"
+        sender_password = "SENDER_PASSWORD"
 
-	example_file = "./test_example_tag.xml"
+        example_file = "./test_example_tag.xml"
 
-	responder_path = "./example/responder.py"
-	responder_jid = "RESPONDER_JID"
-	responder_password = "RESPONDER_PASSWORD"
+        responder_path = "./example/responder.py"
+        responder_jid = "RESPONDER_JID"
+        responder_password = "RESPONDER_PASSWORD"
 
-	# Remember about the executable permission. (`chmod +x ./file.py`)
-	SENDER_TEST = prefix + [sender_path, "-j", sender_jid, "-p", sender_password, "-t", responder_jid, "--path", example_file] + suffix
-	RESPON_TEST = prefix + [responder_path, "-j", responder_jid, "-p", responder_password] + suffix
-	
-	try:
-		responder = subprocess.Popen(RESPON_TEST)
-		sender = subprocess.Popen(SENDER_TEST)
-		responder.wait()
-		sender.wait()
-	except:
-		try:
-			responder.terminate()
-		except NameError:
-			pass
-		try:
-			sender.terminate()
-		except NameError:
-			pass
-		raise
+        # Remember about the executable permission. (`chmod +x ./file.py`)
+        SENDER_TEST = prefix + [sender_path, "-j", sender_jid, "-p", sender_password, "-t", responder_jid, "--path", example_file] + suffix
+        RESPON_TEST = prefix + [responder_path, "-j", responder_jid, "-p", responder_password] + suffix
+
+        try:
+            responder = subprocess.Popen(RESPON_TEST)
+            sender = subprocess.Popen(SENDER_TEST)
+            responder.wait()
+            sender.wait()
+        except:
+            try:
+                responder.terminate()
+            except NameError:
+                pass
+            try:
+                sender.terminate()
+            except NameError:
+                pass
+            raise
 
 .. code-block:: python
 
