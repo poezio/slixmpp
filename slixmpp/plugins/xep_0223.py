@@ -8,8 +8,11 @@
 
 import logging
 
-from slixmpp.xmlstream import register_stanza_plugin
+from typing import Optional, Callable, List
+from slixmpp import JID
+from slixmpp.xmlstream import register_stanza_plugin, ElementBase
 from slixmpp.plugins.base import BasePlugin, register_plugin
+from slixmpp.plugins.xep_0004.stanza import Form
 
 
 log = logging.getLogger(__name__)
@@ -44,27 +47,24 @@ class XEP_0223(BasePlugin):
                                                      callback=callback,
                                                      timeout=timeout)
 
-    def store(self, stanza, node=None, id=None, ifrom=None, options=None,
-              callback=None, timeout=None, timeout_callback=None):
+    def store(self, stanza: ElementBase, node: Optional[str] = None,
+              id: Optional[str] = None, ifrom: Optional[JID] = None,
+              options: Optional[Form] = None,
+              callback: Optional[Callable] = None,
+              timeout: Optional[int] = None,
+              timeout_callback: Optional[Callable] = None):
         """
         Store private data via PEP.
 
         This is just a (very) thin wrapper around the XEP-0060 publish()
         method to set the defaults expected by PEP.
 
-        Arguments:
-            stanza   -- The private content to store.
-            node     -- The node to publish the content to. If not specified,
-                        the stanza's namespace will be used.
-            id       -- Optionally specify the ID of the item.
-            options  -- Publish options to use, which will be modified to
+        :param stanza:  The private content to store.
+        :param node: The node to publish the content to. If not specified,
+                     the stanza's namespace will be used.
+        :param id: Optionally specify the ID of the item.
+        :param options: Publish options to use, which will be modified to
                         fit the persistent storage option profile.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
         """
         if not options:
             options = self.xmpp['xep_0004'].stanza.Form()
@@ -85,25 +85,28 @@ class XEP_0223(BasePlugin):
                                              timeout=timeout,
                                              timeout_callback=timeout_callback)
 
-    def retrieve(self, node, id=None, item_ids=None, ifrom=None,
-                 callback=None, timeout=None, timeout_callback=None):
+    def retrieve(self, node: str, id: Optional[str] = None,
+                 item_ids: Optional[List[str]] = None,
+                 ifrom: Optional[JID] = None,
+                 callback: Optional[Callable] = None,
+                 timeout: Optional[int] = None,
+                 timeout_callback: Optional[Callable] = None):
         """
         Retrieve private data via PEP.
 
         This is just a (very) thin wrapper around the XEP-0060 publish()
         method to set the defaults expected by PEP.
 
-        Arguments:
-            node     -- The node to retrieve content from.
-            id       -- Optionally specify the ID of the item.
-            item_ids -- Specify a group of IDs. If id is also specified, it
-                        will be included in item_ids.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
+        :param node: The node to retrieve content from.
+        :param id: Optionally specify the ID of the item.
+        :param item_ids: Specify a group of IDs. If id is also specified, it
+                         will be included in item_ids.
+        :param ifrom: Specify the sender's JID.
+        :param timeout: The length of time (in seconds) to wait for a response
                         before exiting the send call if blocking is used.
                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param callback: Optional reference to a stream handler function. Will
+                         be executed when a reply stanza is received.
         """
         if item_ids is None:
             item_ids = []

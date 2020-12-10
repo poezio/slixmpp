@@ -8,8 +8,11 @@
 
 import logging
 
+from slixmpp import JID
+from typing import Optional, Callable
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0196 import stanza, UserGaming
+from slixmpp.plugins.xep_0004.stanza import Form
 
 
 log = logging.getLogger(__name__)
@@ -33,30 +36,30 @@ class XEP_0196(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_gaming', UserGaming)
 
-    def publish_gaming(self, name=None, level=None, server_name=None,
-                       uri=None, character_name=None,
-                       character_profile=None, server_address=None,
-                       options=None, ifrom=None, callback=None,
-                       timeout=None, timeout_callback=None):
+    def publish_gaming(self, name: Optional[str] = None,
+                       level: Optional[str] = None,
+                       server_name: Optional[str] = None,
+                       uri: Optional[str] = None,
+                       character_name: Optional[str] = None,
+                       character_profile: Optional[str] = None,
+                       server_address: Optional[str] = None,
+                       options: Optional[Form] = None,
+                       ifrom: Optional[JID] = None,
+                       callback: Optional[Callable] = None,
+                       timeout: Optional[int] = None,
+                       timeout_callback: Optional[Callable]=None):
         """
         Publish the user's current gaming status.
 
-        Arguments:
-            name              -- The name of the game.
-            level             -- The user's level in the game.
-            uri               -- A URI for the game or relevant gaming service
-            server_name       -- The name of the server where the user is playing.
-            server_address    -- The hostname or IP address of the server where the
-                                 user is playing.
-            character_name    -- The name of the user's character in the game.
-            character_profile -- A URI for a profile of the user's character.
-            options           -- Optional form of publish options.
-            ifrom             -- Specify the sender's JID.
-            timeout           -- The length of time (in seconds) to wait for a response
-                                 before exiting the send call if blocking is used.
-                                 Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback          -- Optional reference to a stream handler function. Will
-                                 be executed when a reply stanza is received.
+        :param name: The name of the game.
+        :param level: The user's level in the game.
+        :param uri: A URI for the game or relevant gaming service
+        :param server_name: The name of the server where the user is playing.
+        :param server_address: The hostname or IP address of the server where the
+                               user is playing.
+        :param character_name: The name of the user's character in the game.
+        :param character_profile: A URI for a profile of the user's character.
+        :param options: Optional form of publish options.
         """
         gaming = UserGaming()
         gaming['name'] = name
@@ -73,17 +76,9 @@ class XEP_0196(BasePlugin):
                                              timeout_callback=timeout_callback)
 
     def stop(self, ifrom=None, callback=None, timeout=None,
-             timeout_callback=None):
+                   timeout_callback=None):
         """
         Clear existing user gaming information to stop notifications.
-
-        Arguments:
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
         """
         gaming = UserGaming()
         return self.xmpp['xep_0163'].publish(gaming,

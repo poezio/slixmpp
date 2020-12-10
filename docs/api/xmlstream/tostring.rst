@@ -1,4 +1,5 @@
 .. module:: slixmpp.xmlstream.tostring
+    :noindex:
 
 .. _tostring:
 

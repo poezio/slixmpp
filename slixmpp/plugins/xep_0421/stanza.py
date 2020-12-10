@@ -24,15 +24,17 @@ class OccupantId(ElementBase):
     Without occupant-id, getting the following messages from MUC history would
     prevent a client from asserting senders are the same entity:
 
-    <message type='groupchat' from='foo@muc/nick1' id='message1'>
-        <body>Some message</body>
-        <occupant-id xmlns='urn:xmpp:occupant-id:0' id='unique-opaque-id1'/>
-    </message>
-    <message type='groupchat' from='foo@muc/nick2' id='message2'>
-        <body>Some correction</body>
-        <occupant-id xmlns='urn:xmpp:occupant-id:0' id='unique-opaque-id1'/>
-        <replace xmlns='urn:xmpp:message-correct:0' id='message1'/>
-    </message>
+    ::
+
+        <message type='groupchat' from='foo@muc/nick1' id='message1'>
+            <body>Some message</body>
+            <occupant-id xmlns='urn:xmpp:occupant-id:0' id='unique-opaque-id1'/>
+        </message>
+        <message type='groupchat' from='foo@muc/nick2' id='message2'>
+            <body>Some correction</body>
+            <occupant-id xmlns='urn:xmpp:occupant-id:0' id='unique-opaque-id1'/>
+            <replace xmlns='urn:xmpp:message-correct:0' id='message1'/>
+        </message>
     '''
 
     name = 'occupant-id'

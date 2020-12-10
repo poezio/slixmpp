@@ -2,4 +2,5 @@
 
 License (MIT)
 =============
-.. include:: ../LICENSE
+
+.. literalinclude:: ../LICENSE

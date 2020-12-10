@@ -7,15 +7,18 @@ class FormValidation(ElementBase):
 
     Example:
 
-    <field var='evt.date' type='text-single' label='Event Date/Time'>
-      <validate xmlns='http://jabber.org/protocol/xdata-validate'
-                datatype='xs:dateTime'/>
-      <value>2003-10-06T11:22:00-07:00</value>
-    </field>
+    ::
+
+        <field var='evt.date' type='text-single' label='Event Date/Time'>
+          <validate xmlns='http://jabber.org/protocol/xdata-validate'
+                    datatype='xs:dateTime'/>
+          <value>2003-10-06T11:22:00-07:00</value>
+        </field>
 
     Questions:
-      Should this look at the datatype value and convert the range values as appropriate?
-      Should this stanza provide a pass/fail for a value from the field, or convert field value to datatype?
+
+    * Should this look at the datatype value and convert the range values as appropriate?
+    * Should this stanza provide a pass/fail for a value from the field, or convert field value to datatype?
     """
 
     namespace = 'http://jabber.org/protocol/xdata-validate'

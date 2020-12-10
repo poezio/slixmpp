@@ -1,0 +1,18 @@
+
+XEP 0319
+========
+
+.. module:: slixmpp.plugins.xep_0319
+
+.. autoclass:: XEP_0319
+    :members:
+    :exclude-members: session_bind, plugin_init, plugin_end
+
+
+Stanza elements
+---------------
+
+.. automodule:: slixmpp.plugins.xep_0319.stanza
+    :members:
+    :undoc-members:
+

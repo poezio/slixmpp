@@ -43,12 +43,13 @@ class XEP_0424(BasePlugin):
                         mfrom: Optional[JID] = None):
         """
         Send a message retraction
+
         :param JID mto: The JID to retract the message from
         :param str id: Message ID to retract
         :param str mtype: Message type
         :param bool include_fallback: Whether to include a fallback body
-        :param Optional[str] fallback_text: The contet of the fallback
-            body. None will set the default value.
+        :param Optional[str] fallback_text: The content of the fallback
+                                            body. None will set the default value.
         """
         if fallback_text is None:
             fallback_text = DEFAULT_FALLBACK

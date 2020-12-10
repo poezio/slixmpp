@@ -32,3 +32,11 @@ Glossary
 
     substanza
         See :term:`stanza plugin`
+
+    interfaces
+        A set of keys defined on a :term:`stanza plugin`.
+
+    stanza
+        An XML payload sent over the XML stream, which is the root of XMPP.
+        A stanza is either ``<iq/>``, ``<message/>`` or ``<presence/>``. Other
+        elements are called nonzas.

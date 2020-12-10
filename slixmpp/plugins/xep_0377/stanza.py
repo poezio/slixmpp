@@ -14,15 +14,18 @@ class Report(ElementBase):
     A spam/abuse report.
 
     Example sub stanza:
+    ::
 
-    <report xmlns="urn:xmpp:reporting:0">
-      <text xml:lang="en">
-        Never came trouble to my house like this.
-      </text>
-      <spam/>
-    </report>
+        <report xmlns="urn:xmpp:reporting:0">
+          <text xml:lang="en">
+            Never came trouble to my house like this.
+          </text>
+          <spam/>
+        </report>
 
     Stanza Interface:
+    ::
+
         abuse    -- Flag the report as abuse
         spam     -- Flag the report as spam
         text     -- Add a reason to the report

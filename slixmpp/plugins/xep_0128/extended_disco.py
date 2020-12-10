@@ -8,8 +8,10 @@
 
 import logging
 
+from typing import Optional
+
 import slixmpp
-from slixmpp import Iq
+from slixmpp import Iq, JID
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0004 import Form
@@ -27,16 +29,9 @@ class XEP_0128(BasePlugin):
 
     Also see <http://www.xmpp.org/extensions/xep-0128.html>.
 
-    Attributes:
-        disco  -- A reference to the XEP-0030 plugin.
-        static -- Object containing the default set of static
-                  node handlers.
-        xmpp   -- The main Slixmpp object.
-
-    Methods:
-        set_extended_info -- Set extensions to a disco#info result.
-        add_extended_info -- Add an extension to a disco#info result.
-        del_extended_info -- Remove all extensions from a disco#info result.
+    :var disco: A reference to the XEP-0030 plugin.
+    :var static: Object containing the default set of static
+                 node handlers.
     """
 
     name = 'xep_0128'
@@ -67,12 +62,11 @@ class XEP_0128(BasePlugin):
 
         Replaces any existing extended information.
 
-        Arguments:
-            jid  -- The JID to modify.
-            node -- The node to modify.
-            data -- Either a form, or a list of forms to use
-                    as extended information, replacing any
-                    existing extensions.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
+        :param data: Either a form, or a list of forms to use
+                     as extended information, replacing any
+                     existing extensions.
         """
         self.api['set_extended_info'](jid, node, None, kwargs)
 
@@ -80,20 +74,19 @@ class XEP_0128(BasePlugin):
         """
         Add additional, extended identity information to a node.
 
-        Arguments:
-            jid  -- The JID to modify.
-            node -- The node to modify.
-            data -- Either a form, or a list of forms to add
-                    as extended information.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
+        :param data: Either a form, or a list of forms to add
+                     as extended information.
         """
         self.api['add_extended_info'](jid, node, None, kwargs)
 
-    def del_extended_info(self, jid=None, node=None, **kwargs):
+    def del_extended_info(self, jid: Optional[JID] = None,
+                          node: Optional[str] = None, **kwargs):
         """
         Remove all extended identity information to a node.
 
-        Arguments:
-            jid  -- The JID to modify.
-            node -- The node to modify.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
         """
         self.api['del_extended_info'](jid, node, None, kwargs)

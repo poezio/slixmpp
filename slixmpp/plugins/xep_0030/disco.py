@@ -9,6 +9,9 @@
 import asyncio
 import logging
 
+
+from typing import Optional, Callable
+
 from slixmpp import Iq
 from slixmpp import future_wrapper
 from slixmpp.plugins import BasePlugin
@@ -41,6 +44,9 @@ class XEP_0030(BasePlugin):
     storage mechanism desired, such as SQLite or Redis.
 
     Node handler hierarchy:
+
+    ::
+
         JID   | Node  | Level
         ---------------------
         None  | None  | Global
@@ -49,41 +55,29 @@ class XEP_0030(BasePlugin):
         Given | Given | A single node
 
     Stream Handlers:
+
+    ::
+
         Disco Info  -- Any Iq stanze that includes a query with the
                        namespace http://jabber.org/protocol/disco#info.
         Disco Items -- Any Iq stanze that includes a query with the
                        namespace http://jabber.org/protocol/disco#items.
 
     Events:
+
+    ::
+
         disco_info         -- Received a disco#info Iq query result.
         disco_items        -- Received a disco#items Iq query result.
         disco_info_query   -- Received a disco#info Iq query request.
         disco_items_query  -- Received a disco#items Iq query request.
 
     Attributes:
-        stanza           -- A reference to the module containing the
-                            stanza classes provided by this plugin.
-        static           -- Object containing the default set of
-                            static node handlers.
-        default_handlers -- A dictionary mapping operations to the default
-                            global handler (by default, the static handlers).
-        xmpp             -- The main Slixmpp object.
 
-    Methods:
-        set_node_handler -- Assign a handler to a JID/node combination.
-        del_node_handler -- Remove a handler from a JID/node combination.
-        get_info         -- Retrieve disco#info data, locally or remote.
-        get_items        -- Retrieve disco#items data, locally or remote.
-        set_identities   --
-        set_features     --
-        set_items        --
-        del_items        --
-        del_identity     --
-        del_feature      --
-        del_item         --
-        add_identity     --
-        add_feature      --
-        add_item         --
+    :var static: Object containing the default set of
+                 static node handlers.
+    :var default_handlers: A dictionary mapping operations to the default
+                           global handler (by default, the static handlers).
     """
 
     name = 'xep_0030'
@@ -136,7 +130,9 @@ class XEP_0030(BasePlugin):
         self.api.register(default_handler, op)
         self.api.register_default(default_handler, op)
 
-    def set_node_handler(self, htype, jid=None, node=None, handler=None):
+    def set_node_handler(self, htype: str, jid: Optional[JID] = None,
+                         node: Optional[str] = None,
+                         handler: Optional[Callable] = None):
         """
         Add a node handler for the given hierarchy level and
         handler type.
@@ -148,6 +144,9 @@ class XEP_0030(BasePlugin):
         global behavior.
 
         Node handler hierarchy:
+
+        ::
+
             JID   | Node  | Level
             ---------------------
             None  | None  | Global
@@ -156,6 +155,9 @@ class XEP_0030(BasePlugin):
             Given | Given | A single node
 
         Handler types:
+
+        ::
+
             get_info
             get_items
             set_identities
@@ -171,14 +173,13 @@ class XEP_0030(BasePlugin):
             add_feature
             add_item
 
-        Arguments:
-            htype   -- The operation provided by the handler.
-            jid     -- The JID the handler applies to. May be narrowed
-                       further if a node is given.
-            node    -- The particular node the handler is for. If no JID
-                       is given, then the self.xmpp.boundjid.full is
-                       assumed.
-            handler -- The handler function to use.
+        :param htype: The operation provided by the handler.
+        :param jid: The JID the handler applies to. May be narrowed
+                    further if a node is given.
+        :param node: The particular node the handler is for. If no JID
+                     is given, then the self.xmpp.boundjid.full is
+                     assumed.
+        :param handler: The handler function to use.
         """
         self.api.register(handler, htype, jid, node)
 
@@ -191,6 +192,9 @@ class XEP_0030(BasePlugin):
         other handlers exist to process existing nodes.
 
         Node handler hierarchy:
+
+        ::
+
             JID   | Node  | Level
             ---------------------
             None  | None  | Global
@@ -198,10 +202,9 @@ class XEP_0030(BasePlugin):
             None  | Given | Node on self.xmpp.boundjid
             Given | Given | A single node
 
-        Arguments:
-            htype -- The type of handler to remove.
-            jid   -- The JID from which to remove the handler.
-            node  -- The node from which to remove the handler.
+        :param htype: The type of handler to remove.
+        :param jid: The JID from which to remove the handler.
+        :param node: The node from which to remove the handler.
         """
         self.api.unregister(htype, jid, node)
 
@@ -215,13 +218,12 @@ class XEP_0030(BasePlugin):
         The default is to use the built-in static handlers, but that
         may be changed by modifying self.default_handlers.
 
-        Arguments:
-            jid      -- The JID owning the node to modify.
-            node     -- The node to change to using static handlers.
-            handlers -- Optional list of handlers to change to the
-                        default version. If provided, only these
-                        handlers will be changed. Otherwise, all
-                        handlers will use the default version.
+        :param jid: The JID owning the node to modify.
+        :param node: The node to change to using static handlers.
+        :param handlers: Optional list of handlers to change to the
+                         default version. If provided, only these
+                         handlers will be changed. Otherwise, all
+                         handlers will use the default version.
         """
         if handlers is None:
             handlers = self._disco_ops
@@ -234,27 +236,25 @@ class XEP_0030(BasePlugin):
         Check if a JID supports a given feature.
 
         Return values:
-            True  -- The feature is supported
-            False -- The feature is not listed as supported
-            None  -- Nothing could be found due to a timeout
+        :param True: The feature is supported
+        :param False: The feature is not listed as supported
+        :param None: Nothing could be found due to a timeout
 
-        Arguments:
-            jid      -- Request info from this JID.
-            node     -- The particular node to query.
-            feature  -- The name of the feature to check.
-            local    -- If true, then the query is for a JID/node
-                        combination handled by this Slixmpp instance and
-                        no stanzas need to be sent.
-                        Otherwise, a disco stanza must be sent to the
-                        remove JID to retrieve the info.
-            cached   -- If true, then look for the disco info data from
-                        the local cache system. If no results are found,
-                        send the query as usual. The self.use_cache
-                        setting must be set to true for this option to
-                        be useful. If set to false, then the cache will
-                        be skipped, even if a result has already been
-                        cached. Defaults to false.
-            ifrom    -- Specifiy the sender's JID.
+        :param jid: Request info from this JID.
+        :param node: The particular node to query.
+        :param feature: The name of the feature to check.
+        :param local: If true, then the query is for a JID/node
+                      combination handled by this Slixmpp instance and
+                      no stanzas need to be sent.
+                      Otherwise, a disco stanza must be sent to the
+                      remove JID to retrieve the info.
+        :param cached: If true, then look for the disco info data from
+                       the local cache system. If no results are found,
+                       send the query as usual. The self.use_cache
+                       setting must be set to true for this option to
+                       be useful. If set to false, then the cache will
+                       be skipped, even if a result has already been
+                       cached. Defaults to false.
         """
         data = {'feature': feature,
                 'local': local,
@@ -267,29 +267,27 @@ class XEP_0030(BasePlugin):
         Check if a JID provides a given identity.
 
         Return values:
-            True  -- The identity is provided
-            False -- The identity is not listed
-            None  -- Nothing could be found due to a timeout
+        :param True: The identity is provided
+        :param False: The identity is not listed
+        :param None: Nothing could be found due to a timeout
 
-        Arguments:
-            jid      -- Request info from this JID.
-            node     -- The particular node to query.
-            category -- The category of the identity to check.
-            itype    -- The type of the identity to check.
-            lang     -- The language of the identity to check.
-            local    -- If true, then the query is for a JID/node
+        :param jid: Request info from this JID.
+        :param node: The particular node to query.
+        :param category: The category of the identity to check.
+        :param itype: The type of the identity to check.
+        :param lang: The language of the identity to check.
+        :param local: If true, then the query is for a JID/node
                         combination handled by this Slixmpp instance and
                         no stanzas need to be sent.
                         Otherwise, a disco stanza must be sent to the
                         remove JID to retrieve the info.
-            cached   -- If true, then look for the disco info data from
+        :param cached: If true, then look for the disco info data from
                         the local cache system. If no results are found,
                         send the query as usual. The self.use_cache
                         setting must be set to true for this option to
                         be useful. If set to false, then the cache will
                         be skipped, even if a result has already been
                         cached. Defaults to false.
-            ifrom    -- Specifiy the sender's JID.
         """
         data = {'category': category,
                 'itype': itype,
@@ -343,29 +341,20 @@ class XEP_0030(BasePlugin):
         If requesting items from a local JID/node, then only a DiscoInfo
         stanza will be returned. Otherwise, an Iq stanza will be returned.
 
-        Arguments:
-            jid      -- Request info from this JID.
-            node     -- The particular node to query.
-            local    -- If true, then the query is for a JID/node
-                        combination handled by this Slixmpp instance and
-                        no stanzas need to be sent.
-                        Otherwise, a disco stanza must be sent to the
-                        remote JID to retrieve the info.
-            cached   -- If true, then look for the disco info data from
-                        the local cache system. If no results are found,
-                        send the query as usual. The self.use_cache
-                        setting must be set to true for this option to
-                        be useful. If set to false, then the cache will
-                        be skipped, even if a result has already been
-                        cached. Defaults to false.
-            ifrom    -- Specifiy the sender's JID.
-            timeout  -- The time in seconds to wait for reply, before
-                        calling timeout_callback
-            callback -- Optional callback to execute when a reply is
-                        received instead of blocking and waiting for
-                        the reply.
-            timeout_callback -- Optional callback to execute when no result
-                        has been received in timeout seconds.
+        :param jid: Request info from this JID.
+        :param node: The particular node to query.
+        :param local: If true, then the query is for a JID/node
+                      combination handled by this Slixmpp instance and
+                      no stanzas need to be sent.
+                      Otherwise, a disco stanza must be sent to the
+                      remote JID to retrieve the info.
+        :param cached: If true, then look for the disco info data from
+                       the local cache system. If no results are found,
+                       send the query as usual. The self.use_cache
+                       setting must be set to true for this option to
+                       be useful. If set to false, then the cache will
+                       be skipped, even if a result has already been
+                       cached. Defaults to false.
         """
         if local is None:
             if jid is not None and not isinstance(jid, JID):
@@ -430,25 +419,16 @@ class XEP_0030(BasePlugin):
         If requesting items from a local JID/node, then only a DiscoItems
         stanza will be returned. Otherwise, an Iq stanza will be returned.
 
-        Arguments:
-            jid      -- Request info from this JID.
-            node     -- The particular node to query.
-            local    -- If true, then the query is for a JID/node
-                        combination handled by this Slixmpp instance and
-                        no stanzas need to be sent.
-                        Otherwise, a disco stanza must be sent to the
-                        remove JID to retrieve the items.
-            ifrom    -- Specifiy the sender's JID.
-            timeout  -- The time in seconds to block while waiting for
-                        a reply. If None, then wait indefinitely.
-            callback -- Optional callback to execute when a reply is
-                        received instead of blocking and waiting for
-                        the reply.
-            iterator -- If True, return a result set iterator using
-                        the XEP-0059 plugin, if the plugin is loaded.
-                        Otherwise the parameter is ignored.
-            timeout_callback -- Optional callback to execute when no result
-                        has been received in timeout seconds.
+        :param jid: Request info from this JID.
+        :param node: The particular node to query.
+        :param local: If true, then the query is for a JID/node
+                      combination handled by this Slixmpp instance and
+                      no stanzas need to be sent.
+                      Otherwise, a disco stanza must be sent to the
+                      remove JID to retrieve the items.
+        :param iterator: If True, return a result set iterator using
+                         the XEP-0059 plugin, if the plugin is loaded.
+                         Otherwise the parameter is ignored.
         """
         if local or local is None and jid is None:
             items = self.api['get_items'](jid, node,
@@ -477,10 +457,9 @@ class XEP_0030(BasePlugin):
         The given items must be in a list or set where each item is a
         tuple of the form: (jid, node, name).
 
-        Arguments:
-            jid   -- The JID to modify.
-            node  -- Optional node to modify.
-            items -- A series of items in tuple format.
+        :param jid: The JID to modify.
+        :param node: Optional node to modify.
+        :param items: A series of items in tuple format.
         """
         self.api['set_items'](jid, node, None, kwargs)
 
@@ -489,8 +468,8 @@ class XEP_0030(BasePlugin):
         Remove all items from the given JID/node combination.
 
         Arguments:
-            jid  -- The JID to modify.
-            node -- Optional node to modify.
+        :param jid: The JID to modify.
+        :param node: Optional node to modify.
         """
         self.api['del_items'](jid, node, None, kwargs)
 
@@ -501,12 +480,11 @@ class XEP_0030(BasePlugin):
         Each item is required to have a JID, but may also specify
         a node value to reference non-addressable entities.
 
-        Arguments:
-            jid  -- The JID for the item.
-            name  -- Optional name for the item.
-            node  -- The node to modify.
-            subnode -- Optional node for the item.
-            ijid   -- The JID to modify.
+        :param jid: The JID for the item.
+        :param name: Optional name for the item.
+        :param node: The node to modify.
+        :param subnode: Optional node for the item.
+        :param ijid: The JID to modify.
         """
         if not jid:
             jid = self.xmpp.boundjid.full
@@ -519,11 +497,10 @@ class XEP_0030(BasePlugin):
         """
         Remove a single item from the given JID/node combination.
 
-        Arguments:
-            jid   -- The JID to modify.
-            node  -- The node to modify.
-            ijid  -- The item's JID.
-            inode -- The item's node.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
+        :param ijid: The item's JID.
+        :param inode: The item's node.
         """
         self.api['del_item'](jid, node, None, kwargs)
 
@@ -540,13 +517,12 @@ class XEP_0030(BasePlugin):
         category/type/xml:lang pairs are allowed so long as the
         names are different. A category and type is always required.
 
-        Arguments:
-            category -- The identity's category.
-            itype    -- The identity's type.
-            name     -- Optional name for the identity.
-            lang     -- Optional two-letter language code.
-            node     -- The node to modify.
-            jid      -- The JID to modify.
+        :param category: The identity's category.
+        :param itype: The identity's type.
+        :param name: Optional name for the identity.
+        :param lang: Optional two-letter language code.
+        :param node: The node to modify.
+        :param jid: The JID to modify.
         """
         kwargs = {'category': category,
                   'itype': itype,
@@ -554,29 +530,28 @@ class XEP_0030(BasePlugin):
                   'lang': lang}
         self.api['add_identity'](jid, node, None, kwargs)
 
-    def add_feature(self, feature, node=None, jid=None):
+    def add_feature(self, feature: str, node: Optional[str] = None,
+                    jid: Optional[JID] = None):
         """
         Add a feature to a JID/node combination.
 
-        Arguments:
-            feature -- The namespace of the supported feature.
-            node    -- The node to modify.
-            jid     -- The JID to modify.
+        :param feature: The namespace of the supported feature.
+        :param node: The node to modify.
+        :param jid: The JID to modify.
         """
         kwargs = {'feature': feature}
         self.api['add_feature'](jid, node, None, kwargs)
 
-    def del_identity(self, jid=None, node=None, **kwargs):
+    def del_identity(self, jid: Optional[JID] = None, node: Optional[str] = None, **kwargs):
         """
         Remove an identity from the given JID/node combination.
 
-        Arguments:
-            jid      -- The JID to modify.
-            node     -- The node to modify.
-            category -- The identity's category.
-            itype    -- The identity's type value.
-            name     -- Optional, human readable name for the identity.
-            lang     -- Optional, the identity's xml:lang value.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
+        :param category: The identity's category.
+        :param itype: The identity's type value.
+        :param name: Optional, human readable name for the identity.
+        :param lang: Optional, the identity's xml:lang value.
         """
         self.api['del_identity'](jid, node, None, kwargs)
 
@@ -584,10 +559,9 @@ class XEP_0030(BasePlugin):
         """
         Remove a feature from a given JID/node combination.
 
-        Arguments:
-            jid     -- The JID to modify.
-            node    -- The node to modify.
-            feature -- The feature's namespace.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
+        :param feature: The feature's namespace.
         """
         self.api['del_feature'](jid, node, None, kwargs)
 
@@ -598,11 +572,10 @@ class XEP_0030(BasePlugin):
         The identities must be in a set where each identity is a tuple
         of the form: (category, type, lang, name)
 
-        Arguments:
-            jid        -- The JID to modify.
-            node       -- The node to modify.
-            identities -- A set of identities in tuple form.
-            lang       -- Optional, xml:lang value.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
+        :param identities: A set of identities in tuple form.
+        :param lang: Optional, xml:lang value.
         """
         self.api['set_identities'](jid, node, None, kwargs)
 
@@ -613,10 +586,9 @@ class XEP_0030(BasePlugin):
         If a language is specified, only identities using that
         language will be removed.
 
-        Arguments:
-            jid  -- The JID to modify.
-            node -- The node to modify.
-            lang -- Optional. If given, only remove identities
+        :param jid: The JID to modify.
+        :param node: The node to modify.
+        :param lang: Optional. If given, only remove identities
                     using this xml:lang value.
         """
         self.api['del_identities'](jid, node, None, kwargs)
@@ -626,10 +598,9 @@ class XEP_0030(BasePlugin):
         Add or replace the set of supported features
         for a JID/node combination.
 
-        Arguments:
-            jid      -- The JID to modify.
-            node     -- The node to modify.
-            features -- The new set of supported features.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
+        :param features: The new set of supported features.
         """
         self.api['set_features'](jid, node, None, kwargs)
 
@@ -637,9 +608,8 @@ class XEP_0030(BasePlugin):
         """
         Remove all features from a JID/node combination.
 
-        Arguments:
-            jid  -- The JID to modify.
-            node -- The node to modify.
+        :param jid: The JID to modify.
+        :param node: The node to modify.
         """
         self.api['del_features'](jid, node, None, kwargs)
 
@@ -648,11 +618,10 @@ class XEP_0030(BasePlugin):
         Execute the most specific node handler for the given
         JID/node combination.
 
-        Arguments:
-            htype -- The handler type to execute.
-            jid   -- The JID requested.
-            node  -- The node requested.
-            data  -- Optional, custom data to pass to the handler.
+        :param htype: The handler type to execute.
+        :param jid: The JID requested.
+        :param node: The node requested.
+        :param data: Optional, custom data to pass to the handler.
         """
         if not data:
             data = {}
@@ -666,8 +635,7 @@ class XEP_0030(BasePlugin):
         and features. If it is an info result, fire the
         disco_info event.
 
-        Arguments:
-            iq -- The incoming disco#items stanza.
+        :param iq: The incoming disco#items stanza.
         """
         if iq['type'] == 'get':
             log.debug("Received disco info query from " + \
@@ -709,8 +677,7 @@ class XEP_0030(BasePlugin):
         request, find and return the appropriate items. If it
         is an items result, fire the disco_items event.
 
-        Arguments:
-            iq -- The incoming disco#items stanza.
+        :param iq: The incoming disco#items stanza.
         """
         if iq['type'] == 'get':
             log.debug("Received disco items query from " + \
@@ -739,8 +706,7 @@ class XEP_0030(BasePlugin):
         bot client identity. A the standard disco#info feature will also be
         added if no features are provided.
 
-        Arguments:
-            info -- The disco#info quest (not the full Iq stanza) to modify.
+        :param info: The disco#info quest (not the full Iq stanza) to modify.
         """
         result = info
         if isinstance(info, Iq):
@@ -766,11 +732,10 @@ class XEP_0030(BasePlugin):
         Ensure that results are wrapped in an Iq stanza
         if self.wrap_results has been set to True.
 
-        Arguments:
-            ito     -- The JID to use as the 'to' value
-            ifrom   -- The JID to use as the 'from' value
-            payload -- The disco data to wrap
-            force   -- Force wrapping, regardless of self.wrap_results
+        :param ito: The JID to use as the 'to' value
+        :param ifrom: The JID to use as the 'from' value
+        :param payload: The disco data to wrap
+        :param force: Force wrapping, regardless of self.wrap_results
         """
         if (force or self.wrap_results) and not isinstance(payload, Iq):
             iq = self.xmpp.Iq()

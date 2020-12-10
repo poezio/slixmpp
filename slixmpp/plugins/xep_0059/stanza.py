@@ -18,26 +18,30 @@ class Set(ElementBase):
     per response or starting at certain positions.
 
     Example set stanzas:
-    <iq type="get">
-      <query xmlns="http://jabber.org/protocol/disco#items">
-        <set xmlns="http://jabber.org/protocol/rsm">
-          <max>2</max>
-        </set>
-      </query>
-    </iq>
+    ::
 
-    <iq type="result">
-      <query xmlns="http://jabber.org/protocol/disco#items">
-        <item jid="conference.example.com" />
-        <item jid="pubsub.example.com" />
-        <set xmlns="http://jabber.org/protocol/rsm">
-          <first>conference.example.com</first>
-          <last>pubsub.example.com</last>
-        </set>
-      </query>
-    </iq>
+        <iq type="get">
+          <query xmlns="http://jabber.org/protocol/disco#items">
+            <set xmlns="http://jabber.org/protocol/rsm">
+              <max>2</max>
+            </set>
+          </query>
+        </iq>
+
+        <iq type="result">
+          <query xmlns="http://jabber.org/protocol/disco#items">
+            <item jid="conference.example.com" />
+            <item jid="pubsub.example.com" />
+            <set xmlns="http://jabber.org/protocol/rsm">
+              <first>conference.example.com</first>
+              <last>pubsub.example.com</last>
+            </set>
+          </query>
+        </iq>
 
     Stanza Interface:
+    ::
+
         first_index -- The index attribute of <first>
         after       -- The id defining from which item to start
         before      -- The id defining from which item to
@@ -48,17 +52,6 @@ class Set(ElementBase):
         index       -- Used to set an index to start from
         count       -- The number of remote items available
 
-    Methods:
-        set_first_index -- Sets the index attribute for <first> and
-                           creates the element if it doesn't exist
-        get_first_index -- Returns the value of the index
-                           attribute for <first>
-        del_first_index -- Removes the index attribute for <first>
-                           but keeps the element
-        set_before      -- Sets the value of <before>, if the value is True
-                           then the element will be created without a value
-        get_before      -- Returns the value of <before>, if it is
-                           empty it will return True
 
     """
     namespace = 'http://jabber.org/protocol/rsm'
@@ -70,6 +63,10 @@ class Set(ElementBase):
                   'count', 'index', 'last', 'max'}
 
     def set_first_index(self, val):
+        """
+        Sets the index attribute for <first> and
+        creates the element if it doesn't exist
+        """
         fi = self.xml.find("{%s}first" % (self.namespace))
         if fi is not None:
             if val:
@@ -82,16 +79,26 @@ class Set(ElementBase):
             self.xml.append(fi)
 
     def get_first_index(self):
+        """
+        Returns the value of the index attribute for <first>
+        """
         fi = self.xml.find("{%s}first" % (self.namespace))
         if fi is not None:
             return fi.attrib.get('index', '')
 
     def del_first_index(self):
+        """
+        Removes the index attribute for <first> but keeps the element
+        """
         fi = self.xml.find("{%s}first" % (self.namespace))
         if fi is not None:
             del fi.attrib['index']
 
     def set_before(self, val):
+        """
+        Sets the value of <before>, if the value is True
+        then the element will be created without a value
+        """
         b = self.xml.find("{%s}before" % (self.namespace))
         if b is None and val is True:
             self._set_sub_text('{%s}before' % self.namespace, '', True)
@@ -99,6 +106,10 @@ class Set(ElementBase):
             self._set_sub_text('{%s}before' % self.namespace, val)
 
     def get_before(self):
+        """
+        Returns the value of <before>, if it is
+        empty it will return True
+        """
         b = self.xml.find("{%s}before" % (self.namespace))
         if b is not None and not b.text:
             return True

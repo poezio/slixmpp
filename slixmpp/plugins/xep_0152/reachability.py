@@ -8,8 +8,11 @@
 
 import logging
 
+from slixmpp import JID
+from typing import Dict, List, Optional, Callable
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0152 import stanza, Reachability
+from slixmpp.plugins.xep_0004 import Form
 
 
 log = logging.getLogger(__name__)
@@ -33,22 +36,18 @@ class XEP_0152(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('reachability', Reachability)
 
-    def publish_reachability(self, addresses, options=None, ifrom=None,
-                             callback=None, timeout=None,
-                             timeout_callback=None):
+    def publish_reachability(self, addresses: List[Dict[str, str]],
+                             options: Optional[Form] = None,
+                             ifrom: Optional[JID] = None,
+                             callback: Optional[Callable] = None,
+                             timeout: Optional[int] = None,
+                             timeout_callback: Optional[Callable] = None):
         """
         Publish alternative addresses where the user can be reached.
 
-        Arguments:
-            addresses -- A list of dictionaries containing the URI and
-                         optional description for each address.
-            options   -- Optional form of publish options.
-            ifrom     -- Specify the sender's JID.
-            timeout   -- The length of time (in seconds) to wait for a response
-                         before exiting the send call if blocking is used.
-                         Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback  -- Optional reference to a stream handler function. Will
-                         be executed when a reply stanza is received.
+        :param addresses: A list of dictionaries containing the URI and
+                          optional description for each address.
+        :param options: Optional form of publish options.
         """
         if not isinstance(addresses, (list, tuple)):
             addresses = [addresses]
@@ -69,17 +68,12 @@ class XEP_0152(BasePlugin):
                 timeout=timeout,
                 timeout_callback=timeout_callback)
 
-    def stop(self, ifrom=None, callback=None, timeout=None, timeout_callback=None):
+    def stop(self, ifrom: Optional[JID] = None,
+             callback: Optional[Callable] = None,
+             timeout: Optional[int] = None,
+             timeout_callback: Optional[Callable] = None):
         """
         Clear existing user activity information to stop notifications.
-
-        Arguments:
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
         """
         reach = Reachability()
         return self.xmpp['xep_0163'].publish(reach,

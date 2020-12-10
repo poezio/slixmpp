@@ -50,26 +50,6 @@ class XEP_0050(BasePlugin):
                     session IDs to dictionaries containing data
                     relevant to a command's session.
 
-    Methods:
-        plugin_init       -- Overrides BasePlugin.plugin_init
-        post_init         -- Overrides BasePlugin.post_init
-        new_session       -- Return a new session ID.
-        prep_handlers     -- Placeholder. May call with a list of handlers
-                             to prepare them for use with the session storage
-                             backend, if needed.
-        set_backend       -- Replace the default session storage with some
-                             external storage mechanism, such as a database.
-                             The provided backend wrapper must be able to
-                             act using the same syntax as a dictionary.
-        add_command       -- Add a command for use by external entitites.
-        get_commands      -- Retrieve a list of commands provided by a
-                             remote agent.
-        send_command      -- Send a command request to a remote agent.
-        start_command     -- Command user API: initiate a command session
-        continue_command  -- Command user API: proceed to the next step
-        cancel_command    -- Command user API: cancel a command
-        complete_command  -- Command user API: finish a command
-        terminate_command -- Command user API: delete a command's session
     """
 
     name = 'xep_0050'
@@ -116,8 +96,7 @@ class XEP_0050(BasePlugin):
         The replacement backend must be able to interact through
         the same syntax and interfaces as a normal dictionary.
 
-        Arguments:
-            db -- The new session storage mechanism.
+        :param db: The new session storage mechanism.
         """
         self.sessions = db
 
@@ -127,9 +106,8 @@ class XEP_0050(BasePlugin):
 
         Intended to be replaced by the backend service as needed.
 
-        Arguments:
-            handlers -- A list of function pointers
-            **kwargs -- Any additional parameters required by the backend.
+        :param handlers: A list of function pointers
+        :param kwargs: Any additional parameters required by the backend.
         """
         pass
 
@@ -148,13 +126,12 @@ class XEP_0050(BasePlugin):
         payload items of the command. All handlers will receive the command's
         session data.
 
-        Arguments:
-            jid     -- The JID that will expose the command.
-            node    -- The node associated with the command.
-            name    -- A human readable name for the command.
-            handler -- A function that will generate the response to the
-                       initial command request, as well as enforcing any
-                       access control policies.
+        :param jid: The JID that will expose the command.
+        :param node: The node associated with the command.
+        :param name: A human readable name for the command.
+        :param handler: A function that will generate the response to the
+                        initial command request, as well as enforcing any
+                        access control policies.
         """
         if jid is None:
             jid = self.xmpp.boundjid
@@ -212,8 +189,7 @@ class XEP_0050(BasePlugin):
         """
         Process an initial request to execute a command.
 
-        Arguments:
-            iq -- The command execution request.
+        :param iq: The command execution request.
         """
         sessionid = self.new_session()
         node = iq['command']['node']
@@ -258,8 +234,7 @@ class XEP_0050(BasePlugin):
         Process a request for the next step in the workflow
         for a command with multiple steps.
 
-        Arguments:
-            iq -- The command continuation request.
+        :param iq: The command continuation request.
         """
         sessionid = iq['command']['sessionid']
         session = self.sessions.get(sessionid)
@@ -285,8 +260,7 @@ class XEP_0050(BasePlugin):
         Process a request for the prev step in the workflow
         for a command with multiple steps.
 
-        Arguments:
-            iq -- The command continuation request.
+        :param iq: The command continuation request.
         """
         sessionid = iq['command']['sessionid']
         session = self.sessions.get(sessionid)
@@ -312,9 +286,8 @@ class XEP_0050(BasePlugin):
         Generate a command reply stanza based on the
         provided session data.
 
-        Arguments:
-            iq      -- The command request stanza.
-            session -- A dictionary of relevant session data.
+        :param iq: The command request stanza.
+        :param session: A dictionary of relevant session data.
         """
         sessionid = session['id']
 
@@ -368,8 +341,7 @@ class XEP_0050(BasePlugin):
         """
         Process a request to cancel a command's execution.
 
-        Arguments:
-            iq -- The command cancellation request.
+        :param iq: The command cancellation request.
         """
         node = iq['command']['node']
         sessionid = iq['command']['sessionid']
@@ -399,7 +371,7 @@ class XEP_0050(BasePlugin):
         All data related to the command session will be removed.
 
         Arguments:
-            iq -- The command completion request.
+        :param iq: The command completion request.
         """
         node = iq['command']['node']
         sessionid = iq['command']['sessionid']
@@ -451,22 +423,15 @@ class XEP_0050(BasePlugin):
         """
         Return a list of commands provided by a given JID.
 
-        Arguments:
-            jid      -- The JID to query for commands.
-            local    -- If true, then the query is for a JID/node
-                        combination handled by this Slixmpp instance and
-                        no stanzas need to be sent.
-                        Otherwise, a disco stanza must be sent to the
-                        remove JID to retrieve the items.
-            ifrom    -- Specifiy the sender's JID.
-            timeout  -- The time in seconds to block while waiting for
-                        a reply. If None, then wait indefinitely.
-            callback -- Optional callback to execute when a reply is
-                        received instead of blocking and waiting for
-                        the reply.
-            iterator -- If True, return a result set iterator using
-                        the XEP-0059 plugin, if the plugin is loaded.
-                        Otherwise the parameter is ignored.
+        :param jid: The JID to query for commands.
+        :param local: If true, then the query is for a JID/node
+                      combination handled by this Slixmpp instance and
+                      no stanzas need to be sent.
+                      Otherwise, a disco stanza must be sent to the
+                      remove JID to retrieve the items.
+        :param iterator: If True, return a result set iterator using
+                         the XEP-0059 plugin, if the plugin is loaded.
+                         Otherwise the parameter is ignored.
         """
         return self.xmpp['xep_0030'].get_items(jid=jid,
                                                node=Command.namespace,
@@ -478,26 +443,18 @@ class XEP_0050(BasePlugin):
         Create and send a command stanza, without using the provided
         workflow management APIs.
 
-        Arguments:
-            jid       -- The JID to send the command request or result.
-            node      -- The node for the command.
-            ifrom     -- Specify the sender's JID.
-            action    -- May be one of: execute, cancel, complete,
+        :param jid: The JID to send the command request or result.
+        :param node: The node for the command.
+        :param ifrom: Specify the sender's JID.
+        :param action: May be one of: execute, cancel, complete,
                          or cancel.
-            payload   -- Either a list of payload items, or a single
-                         payload item such as a data form.
-            sessionid -- The current session's ID value.
-            flow      -- If True, process the Iq result using the
-                         command workflow methods contained in the
-                         session instead of returning the response
-                         stanza itself. Defaults to False.
-            timeout   -- The length of time (in seconds) to wait for a
-                         response before exiting the send call
-                         if blocking is used. Defaults to
-                         slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback  -- Optional reference to a stream handler
-                         function. Will be executed when a reply
-                         stanza is received if flow=False.
+        :param payload: Either a list of payload items, or a single
+                        payload item such as a data form.
+        :param sessionid: The current session's ID value.
+        :param flow: If True, process the Iq result using the
+                     command workflow methods contained in the
+                     session instead of returning the response
+                     stanza itself. Defaults to False.
         """
         iq = self.xmpp.Iq()
         iq['type'] = 'set'
@@ -522,15 +479,14 @@ class XEP_0050(BasePlugin):
         Initiate executing a command provided by a remote agent.
 
         The provided session dictionary should contain:
-            next  -- A handler for processing the command result.
-            error -- A handler for processing any error stanzas
-                     generated by the request.
 
-        Arguments:
-            jid     -- The JID to send the command request.
-            node    -- The node for the desired command.
-            session -- A dictionary of relevant session data.
-            ifrom   -- Optionally specify the sender's JID.
+        :param next: A handler for processing the command result.
+        :param error: A handler for processing any error stanzas
+                      generated by the request.
+
+        :param jid: The JID to send the command request.
+        :param node: The node for the desired command.
+        :param session: A dictionary of relevant session data.
         """
         session['jid'] = jid
         session['node'] = node
@@ -560,9 +516,8 @@ class XEP_0050(BasePlugin):
         """
         Execute the next action of the command.
 
-        Arguments:
-            session -- All stored data relevant to the current
-                       command session.
+        :param session: All stored data relevant to the current
+                        command session.
         """
         sessionid = 'client:' + session['id']
         self.sessions[sessionid] = session
@@ -579,9 +534,8 @@ class XEP_0050(BasePlugin):
         """
         Cancel the execution of a command.
 
-        Arguments:
-            session -- All stored data relevant to the current
-                       command session.
+        :param session: All stored data relevant to the current
+                        command session.
         """
         sessionid = 'client:' + session['id']
         self.sessions[sessionid] = session
@@ -598,9 +552,8 @@ class XEP_0050(BasePlugin):
         """
         Finish the execution of a command workflow.
 
-        Arguments:
-            session -- All stored data relevant to the current
-                       command session.
+        :param session: All stored data relevant to the current
+                        command session.
         """
         sessionid = 'client:' + session['id']
         self.sessions[sessionid] = session
@@ -618,9 +571,8 @@ class XEP_0050(BasePlugin):
         Delete a command's session after a command has completed
         or an error has occurred.
 
-        Arguments:
-            session -- All stored data relevant to the current
-                       command session.
+        :param session: All stored data relevant to the current
+                        command session.
         """
         sessionid = 'client:' + session['id']
         try:
@@ -635,8 +587,7 @@ class XEP_0050(BasePlugin):
         Will execute the 'next' handler stored in the session
         data, or the 'error' handler depending on the Iq's type.
 
-        Arguments:
-            iq -- The command response.
+        :param iq: The command response.
         """
         sessionid = 'client:' + iq['command']['sessionid']
         pending = False

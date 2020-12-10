@@ -261,7 +261,6 @@ class XMLStream(asyncio.BaseProtocol):
                         connection will be upgraded to SSL/TLS later, using
                         STARTTLS.  Only use this value for old servers that
                         have specific port for SSL/TLS
-        TODO fix the comment
         :param force_starttls: If True, the connection will be aborted if
                                the server does not initiate a STARTTLS
                                negotiation.  If None, the connection will be
@@ -278,7 +277,7 @@ class XMLStream(asyncio.BaseProtocol):
                 self.run_filters(),
                 loop=self.loop,
             )
-            
+
         self.disconnect_reason = None
         self.cancel_connection_attempt()
         self.connect_loop_wait = 0

@@ -39,21 +39,14 @@ class XEP_0118(BasePlugin):
         """
         Publish the user's current tune.
 
-        Arguments:
-            artist   -- The artist or performer of the song.
-            length   -- The length of the song in seconds.
-            rating   -- The user's rating of the song (from 1 to 10)
-            source   -- The album name, website, or other source of the song.
-            title    -- The title of the song.
-            track    -- The song's track number, or other unique identifier.
-            uri      -- A URL to more information about the song.
-            options  -- Optional form of publish options.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param artist: The artist or performer of the song.
+        :param length: The length of the song in seconds.
+        :param rating: The user's rating of the song (from 1 to 10)
+        :param source: The album name, website, or other source of the song.
+        :param title: The title of the song.
+        :param track: The song's track number, or other unique identifier.
+        :param uri: A URL to more information about the song.
+        :param options: Optional form of publish options.
         """
         tune = UserTune()
         tune['artist'] = artist
@@ -74,14 +67,6 @@ class XEP_0118(BasePlugin):
     def stop(self, ifrom=None, callback=None, timeout=None, timeout_callback=None):
         """
         Clear existing user tune information to stop notifications.
-
-        Arguments:
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
         """
         tune = UserTune()
         return self.xmpp['xep_0163'].publish(tune,

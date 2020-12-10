@@ -144,9 +144,8 @@ class XEP_0060(BasePlugin):
         when the respective notifications are received from the node
         'http://jabber.org/protocol/tune', among other events.
 
-        Arguments:
-            node       -- The node name to map to an event.
-            event_name -- The name of the event to raise when a
+        :param node: The node name to map to an event.
+        :param event_name: The name of the event to raise when a
                           notification from the given node is received.
         """
         self.node_event_map[node] = event_name
@@ -163,22 +162,15 @@ class XEP_0060(BasePlugin):
         the server's default configuration. To get the default configuration
         use get_node_config().
 
-        Arguments:
-            jid      -- The JID of the pubsub service.
-            node     -- Optional name of the node to create. If no name is
-                        provided, the server MAY generate a node ID for you.
-                        The server can also assign a different name than the
-                        one you provide; check the result stanza to see if
-                        the server assigned a name.
-            config   -- Optional XEP-0004 data form of configuration settings.
-            ntype    -- The type of node to create. Servers typically default
-                        to using 'leaf' if no type is provided.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param jid: The JID of the pubsub service.
+        :param node: Optional name of the node to create. If no name is
+                     provided, the server MAY generate a node ID for you.
+                     The server can also assign a different name than the
+                     one you provide; check the result stanza to see if
+                     the server assigned a name.
+        :param config: Optional XEP-0004 data form of configuration settings.
+        :param ntype: The type of node to create. Servers typically default
+                      to using 'leaf' if no type is provided.
         """
         iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='set')
         iq['pubsub']['create']['node'] = node
@@ -207,24 +199,16 @@ class XEP_0060(BasePlugin):
         Subscribe to updates from a pubsub node.
 
         The rules for determining the JID that is subscribing to the node are:
-            1. If subscribee is given, use that as provided.
-            2. If ifrom was given, use the bare or full version based on bare.
-            3. Otherwise, use self.xmpp.boundjid based on bare.
+        1. If subscribee is given, use that as provided.
+        2. If ifrom was given, use the bare or full version based on bare.
+        3. Otherwise, use self.xmpp.boundjid based on bare.
 
-        Arguments:
-            jid        -- The pubsub service JID.
-            node       -- The node to subscribe to.
-            bare       -- Indicates if the subscribee is a bare or full JID.
-                          Defaults to True for a bare JID.
-            subscribee -- The JID that is subscribing to the node.
-            options    --
-            ifrom      -- Specify the sender's JID.
-            timeout    -- The length of time (in seconds) to wait for a
-                          response before exiting the send call if blocking
-                          is used.
-                          Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback   -- Optional reference to a stream handler function. Will
-                          be executed when a reply stanza is received.
+        :param jid: The pubsub service JID.
+        :param node: The node to subscribe to.
+        :param bare: Indicates if the subscribee is a bare or full JID.
+                     Defaults to True for a bare JID.
+        :param subscribee: The JID that is subscribing to the node.
+        :param options:
         """
         iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='set')
         iq['pubsub']['subscribe']['node'] = node
@@ -254,25 +238,17 @@ class XEP_0060(BasePlugin):
 
         The rules for determining the JID that is unsubscribing
         from the node are:
-            1. If subscribee is given, use that as provided.
-            2. If ifrom was given, use the bare or full version based on bare.
-            3. Otherwise, use self.xmpp.boundjid based on bare.
+        1. If subscribee is given, use that as provided.
+        2. If ifrom was given, use the bare or full version based on bare.
+        3. Otherwise, use self.xmpp.boundjid based on bare.
 
-        Arguments:
-            jid        -- The pubsub service JID.
-            node       -- The node to unsubscribe from.
-            subid      -- The specific subscription, if multiple subscriptions
-                          exist for this JID/node combination.
-            bare       -- Indicates if the subscribee is a bare or full JID.
-                          Defaults to True for a bare JID.
-            subscribee -- The JID that is unsubscribing from the node.
-            ifrom      -- Specify the sender's JID.
-            timeout    -- The length of time (in seconds) to wait for a
-                          response before exiting the send call if blocking
-                          is used.
-                          Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback   -- Optional reference to a stream handler function. Will
-                          be executed when a reply stanza is received.
+        :param jid: The pubsub service JID.
+        :param node: The node to unsubscribe from.
+        :param subid: The specific subscription, if multiple subscriptions
+                      exist for this JID/node combination.
+        :param bare: Indicates if the subscribee is a bare or full JID.
+                     Defaults to True for a bare JID.
+        :param subscribee: The JID that is unsubscribing from the node.
         """
         iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='set')
         iq['pubsub']['unsubscribe']['node'] = node
@@ -332,17 +308,10 @@ class XEP_0060(BasePlugin):
         Retrieve the configuration for a node, or the pubsub service's
         default configuration for new nodes.
 
-        Arguments:
-            jid      -- The JID of the pubsub service.
-            node     -- The node to retrieve the configuration for. If None,
-                        the default configuration for new nodes will be
-                        requested. Defaults to None.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param jid: The JID of the pubsub service.
+        :param node: The node to retrieve the configuration for. If None,
+                     the default configuration for new nodes will be
+                     requested. Defaults to None.
         """
         iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='get')
         if node is None:
@@ -357,15 +326,8 @@ class XEP_0060(BasePlugin):
         """
         Retrieve the subscriptions associated with a given node.
 
-        Arguments:
-            jid      -- The JID of the pubsub service.
-            node     -- The node to retrieve subscriptions from.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param jid: The JID of the pubsub service.
+        :param node: The node to retrieve subscriptions from.
         """
         iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='get')
         iq['pubsub_owner']['subscriptions']['node'] = node
@@ -376,15 +338,8 @@ class XEP_0060(BasePlugin):
         """
         Retrieve the affiliations associated with a given node.
 
-        Arguments:
-            jid      -- The JID of the pubsub service.
-            node     -- The node to retrieve affiliations from.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param jid: The JID of the pubsub service.
+        :param node: The node to retrieve affiliations from.
         """
         iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='get')
         iq['pubsub_owner']['affiliations']['node'] = node
@@ -395,15 +350,8 @@ class XEP_0060(BasePlugin):
         """
         Delete a a pubsub node.
 
-        Arguments:
-            jid      -- The JID of the pubsub service.
-            node     -- The node to delete.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param jid: The JID of the pubsub service.
+        :param node: The node to delete.
         """
         iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='set')
         iq['pubsub_owner']['delete']['node'] = node
@@ -433,18 +381,11 @@ class XEP_0060(BasePlugin):
         the options as preconditions that the node's settings
         must match.
 
-        Arguments:
-            jid      -- The JID of the pubsub service.
-            node     -- The node to publish the item to.
-            id       -- Optionally specify the ID of the item.
-            payload  -- The item content to publish.
-            options  -- A form of publish options.
-            ifrom    -- Specify the sender's JID.
-            timeout  -- The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-            callback -- Optional reference to a stream handler function. Will
-                        be executed when a reply stanza is received.
+        :param jid: The JID of the pubsub service.
+        :param node: The node to publish the item to.
+        :param id: Optionally specify the ID of the item.
+        :param payload: The item content to publish.
+        :param options: A form of publish options.
         """
         iq = self.xmpp.Iq(sto=jid, sfrom=ifrom, stype='set')
         iq['pubsub']['publish']['node'] = node

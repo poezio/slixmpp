@@ -21,27 +21,29 @@ class HTTPResponse(ElementBase):
     in which the original requests were made.
 
     Examples:
-    <iq type='result'
-        from='httpserver@clayster.com'
-        to='httpclient@clayster.com/browser' id='2'>
-        <resp xmlns='urn:xmpp:http'
-              version='1.1'
-              statusCode='200'
-              statusMessage='OK'>
-            <headers xmlns='http://jabber.org/protocol/shim'>
-                <header name='Date'>Fri, 03 May 2013 16:39:54GMT-4</header>
-                <header name='Server'>Clayster</header>
-                <header name='Content-Type'>text/turtle</header>
-                <header name='Content-Length'>...</header>
-                <header name='Connection'>Close</header>
-            </headers>
-            <data>
-                <text>
-                    ...
-                </text>
-            </data>
-        </resp>
-    </iq>
+    ::
+
+        <iq type='result'
+            from='httpserver@clayster.com'
+            to='httpclient@clayster.com/browser' id='2'>
+            <resp xmlns='urn:xmpp:http'
+                  version='1.1'
+                  statusCode='200'
+                  statusMessage='OK'>
+                <headers xmlns='http://jabber.org/protocol/shim'>
+                    <header name='Date'>Fri, 03 May 2013 16:39:54GMT-4</header>
+                    <header name='Server'>Clayster</header>
+                    <header name='Content-Type'>text/turtle</header>
+                    <header name='Content-Length'>...</header>
+                    <header name='Connection'>Close</header>
+                </headers>
+                <data>
+                    <text>
+                        ...
+                    </text>
+                </data>
+            </resp>
+        </iq>
     """
 
     name = 'response'
