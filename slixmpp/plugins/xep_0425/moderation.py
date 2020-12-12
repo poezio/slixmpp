@@ -9,6 +9,8 @@ from typing import Optional
 
 from slixmpp import JID, Message
 from slixmpp.exceptions import IqError, IqTimeout
+from slixmpp.xmlstream.handler import Callback
+from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0425 import stanza
 
@@ -24,9 +26,18 @@ class XEP_0425(BasePlugin):
 
     def plugin_init(self) -> None:
         stanza.register_plugins()
+        self.xmpp.register_handler(Callback(
+            'Moderated Message',
+            StanzaPath('message/apply_to/moderated/retract'),
+            self._handle_moderated,
+        ))
 
     def session_bind(self, jid):
         self.xmpp.plugin['xep_0030'].add_feature(feature=stanza.NS)
+
+    def _handle_moderated(self, message: Message):
+        if message['type'] == 'groupchat':
+            self.xmpp.event('moderated_message', message)
 
     def plugin_end(self):
         self.xmpp.plugin['xep_0030'].del_feature(feature=stanza.NS)

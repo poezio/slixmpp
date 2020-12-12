@@ -42,5 +42,6 @@ def register_plugins():
 
     register_stanza_plugin(Message, Moderated)
     register_stanza_plugin(ApplyTo, Moderated)
+    register_stanza_plugin(Moderated, Retract)
     register_stanza_plugin(Moderated, Retracted)
     register_stanza_plugin(Moderated, OccupantId)
