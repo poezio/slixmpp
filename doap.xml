@@ -986,5 +986,12 @@
             <file-release rdf:resource="https://files.pythonhosted.org/packages/ce/f1/b7cb0ba0b2f9950d3bd8e4d256502c39ac731136e1744c926f67e2c21131/slixmpp-1.5.2.tar.gz"/>
         </Version>
     </release>
+    <release>
+        <Version>
+            <revision>1.6.0</revision>
+            <created>2020-12-12</created>
+            <file-release rdf:resource="https://lab.louiz.org/poezio/slixmpp/-/archive/slix-1.6.0/slixmpp-slix-1.6.0.tar.gz"/>
+        </Version>
+    </release>
 </Project>
 </rdf:RDF>
