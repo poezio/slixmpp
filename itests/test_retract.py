@@ -22,7 +22,7 @@ class TestRetract(SlixIntegration):
             id='toto',
             fallback_text='Twas a mistake',
         )
-        msg = await self.clients[1].wait_until('message')
+        msg = await self.clients[1].wait_until('message_retract')
         self.assertEqual(msg['apply_to']['id'], 'toto')
         self.assertTrue(msg['apply_to']['retract'])
 
