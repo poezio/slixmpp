@@ -9,6 +9,8 @@ from typing import Optional
 
 from slixmpp import JID, Message
 from slixmpp.exceptions import IqError, IqTimeout
+from slixmpp.xmlstream.matcher import StanzaPath
+from slixmpp.xmlstream.handler import Callback
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0424 import stanza
 
@@ -30,12 +32,21 @@ class XEP_0424(BasePlugin):
 
     def plugin_init(self) -> None:
         stanza.register_plugins()
+        self.xmpp.register_handler(Callback(
+            "Message Retracted",
+            StanzaPath("message/apply_to/retract"),
+            self._handle_retract_message,
+        ))
 
     def session_bind(self, jid):
         self.xmpp.plugin['xep_0030'].add_feature(feature=stanza.NS)
 
     def plugin_end(self):
         self.xmpp.plugin['xep_0030'].del_feature(feature=stanza.NS)
+
+    def _handle_retract_message(self, message: Message):
+        if message['type'] != 'groupchat':
+            self.xmpp.event('message_retract', message)
 
     def send_retraction(self, mto: JID, id: str, mtype: str = 'chat',
                         include_fallback: bool = True,
