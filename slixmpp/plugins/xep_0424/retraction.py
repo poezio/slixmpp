@@ -45,8 +45,7 @@ class XEP_0424(BasePlugin):
         self.xmpp.plugin['xep_0030'].del_feature(feature=stanza.NS)
 
     def _handle_retract_message(self, message: Message):
-        if message['type'] != 'groupchat':
-            self.xmpp.event('message_retract', message)
+        self.xmpp.event('message_retract', message)
 
     def send_retraction(self, mto: JID, id: str, mtype: str = 'chat',
                         include_fallback: bool = True,
