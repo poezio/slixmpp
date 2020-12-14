@@ -56,7 +56,7 @@ class TestModerate(SlixIntegration):
         iqres, new_msg = await asyncio.gather(
             self.clients[0]['xep_0425'].moderate(
                 self.muc,
-                id=msg_recv['id'],
+                id=msg_recv['stanza_id']['id'],
                 reason='Your message is bad.',
             ),
             self.clients[1].wait_until('moderated_message')
