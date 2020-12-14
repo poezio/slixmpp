@@ -152,7 +152,8 @@ class PluginManager(object):
                 if not self.registered(name):
                     load_plugin(name)
 
-                plugin_class = PLUGIN_REGISTRY.get(name, None)
+                with REGISTRY_LOCK:
+                    plugin_class = PLUGIN_REGISTRY.get(name, None)
                 if not plugin_class:
                     raise PluginNotFound(name)
 
@@ -184,7 +185,8 @@ class PluginManager(object):
                             configuration dictionaries, as used by
                             :meth:`~PluginManager.enable`.
         """
-        names = names if names else PLUGIN_REGISTRY.keys()
+        with REGISTRY_LOCK:
+            names = names if names else list(PLUGIN_REGISTRY.keys())
         if config is None:
             config = {}
         for name in names:
@@ -204,7 +206,8 @@ class PluginManager(object):
         :param string name: The name of the plugin to check.
         :return: boolean
         """
-        return name in PLUGIN_REGISTRY
+        with REGISTRY_LOCK:
+            return name in PLUGIN_REGISTRY
 
     def disable(self, name, _disabled=None):
         """Disable a plugin, including any dependent upon it.
@@ -222,7 +225,9 @@ class PluginManager(object):
                 plugin = self._plugins.get(name, None)
                 if plugin is None:
                     raise PluginNotFound(name)
-                for dep in PLUGIN_DEPENDENTS[name]:
+                with REGISTRY_LOCK:
+                    deps = PLUGIN_DEPENDENTS[name]
+                for dep in deps:
                     self.disable(dep, _disabled)
                 plugin._end()
                 if name in self._enabled:
