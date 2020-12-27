@@ -229,6 +229,13 @@ class XEP_0045(BasePlugin):
         self.rooms[room] = {}
         self.our_nicks[room] = nick
 
+    def set_subject(self, room: JID, subject: str, *, mfrom: Optional[JID] = None):
+        """Set a room’s subject."""
+        msg = self.xmpp.make_message(room, mfrom=mfrom)
+        msg['type'] = 'groupchat'
+        msg['subject'] = subject
+        msg.send()
+
     async def destroy(self, room: JID, reason='', altroom='', *,
                       ifrom: Optional[JID] = None, **iqkwargs):
         """Destroy a room."""
