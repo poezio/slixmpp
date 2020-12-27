@@ -207,6 +207,7 @@ class XEP_0045(BasePlugin):
             entry = self.rooms[room][nick]
             if entry is not None and entry['jid'].full == jid:
                 return nick
+        return None
 
     def join_muc(self, room: JID, nick: str, maxhistory="0", password='',
                  pstatus='', pshow='', pfrom=''):
@@ -228,8 +229,15 @@ class XEP_0045(BasePlugin):
         self.rooms[room] = {}
         self.our_nicks[room] = nick
 
+    def set_subject(self, room: JID, subject: str, *, mfrom: Optional[JID] = None):
+        """Set a room’s subject."""
+        msg = self.xmpp.make_message(room, mfrom=mfrom)
+        msg['type'] = 'groupchat'
+        msg['subject'] = subject
+        msg.send()
+
     async def destroy(self, room: JID, reason='', altroom='', *,
-                      ifrom: Optional[JID] = None, **iqkwargs) -> Iq:
+                      ifrom: Optional[JID] = None, **iqkwargs):
         """Destroy a room."""
         iq = self.xmpp.make_iq_set(ifrom=ifrom, ito=room)
         iq.enable('mucowner_query')
@@ -241,7 +249,7 @@ class XEP_0045(BasePlugin):
         await iq.send(**iqkwargs)
 
     async def set_affiliation(self, room: JID, jid: Optional[JID] = None, nick: Optional[str] = None, *, affiliation: str,
-                              ifrom: Optional[JID] = None, **iqkwargs):
+                              reason: str = '', ifrom: Optional[JID] = None, **iqkwargs):
         """ Change room affiliation."""
         if affiliation not in AFFILIATIONS:
             raise ValueError('%s is not a valid affiliation' % affiliation)
@@ -255,11 +263,13 @@ class XEP_0045(BasePlugin):
             item['nick'] = nick
         if jid:
             item['jid'] = jid
+        if reason:
+            item['reason'] = reason
         iq['mucadmin_query'].append(item)
         await iq.send(**iqkwargs)
 
     async def set_role(self, room: JID, nick: str, role: str, *,
-                       ifrom: Optional[JID] = None, **iqkwargs) -> Iq:
+                       reason: str = '', ifrom: Optional[JID] = None, **iqkwargs):
         """ Change role property of a nick in a room.
             Typically, roles are temporary (they last only as long as you are in the
             room), whereas affiliations are permanent (they last across groupchat
@@ -272,6 +282,8 @@ class XEP_0045(BasePlugin):
         item = MUCAdminItem()
         item['role'] = role
         item['nick'] = nick
+        if reason:
+            item['reason'] = reason
         iq['mucadmin_query'].append(item)
         await iq.send(**iqkwargs)
 
@@ -389,11 +401,11 @@ class XEP_0045(BasePlugin):
         """ Get the list of nicks in a room.
         """
         if room not in self.rooms.keys():
-            return None
+            raise ValueError("Room %s is not joined" % room)
         return self.rooms[room].keys()
 
     def get_users_by_affiliation(self, room: JID, affiliation='member', *, ifrom: Optional[JID] = None):
         # Preserve old API
         if affiliation not in AFFILIATIONS:
-            raise TypeError
+            raise ValueError("Affiliation %s does not exist" % affiliation)
         return self.get_affiliation_list(room, affiliation, ifrom=ifrom)
