@@ -242,7 +242,7 @@ class XEP_0045(BasePlugin):
         await iq.send(**iqkwargs)
 
     async def set_affiliation(self, room: JID, jid: Optional[JID] = None, nick: Optional[str] = None, *, affiliation: str,
-                              ifrom: Optional[JID] = None, **iqkwargs):
+                              reason: str = '', ifrom: Optional[JID] = None, **iqkwargs):
         """ Change room affiliation."""
         if affiliation not in AFFILIATIONS:
             raise ValueError('%s is not a valid affiliation' % affiliation)
@@ -256,11 +256,13 @@ class XEP_0045(BasePlugin):
             item['nick'] = nick
         if jid:
             item['jid'] = jid
+        if reason:
+            item['reason'] = reason
         iq['mucadmin_query'].append(item)
         await iq.send(**iqkwargs)
 
     async def set_role(self, room: JID, nick: str, role: str, *,
-                       ifrom: Optional[JID] = None, **iqkwargs):
+                       reason: str = '', ifrom: Optional[JID] = None, **iqkwargs):
         """ Change role property of a nick in a room.
             Typically, roles are temporary (they last only as long as you are in the
             room), whereas affiliations are permanent (they last across groupchat
@@ -273,6 +275,8 @@ class XEP_0045(BasePlugin):
         item = MUCAdminItem()
         item['role'] = role
         item['nick'] = nick
+        if reason:
+            item['reason'] = reason
         iq['mucadmin_query'].append(item)
         await iq.send(**iqkwargs)
 

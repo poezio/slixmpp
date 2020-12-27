@@ -220,7 +220,8 @@ class MUCAdminItem(ElementBase):
     namespace = NS_ADMIN
     name = 'item'
     plugin_attrib = 'item'
-    interfaces = {'role', 'affiliation', 'nick', 'jid'}
+    interfaces = {'role', 'affiliation', 'nick', 'jid', 'reason'}
+    sub_interfaces = {'reason'}
 
 
 class MUCStatus(ElementBase):
