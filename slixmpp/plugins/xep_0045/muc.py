@@ -207,6 +207,7 @@ class XEP_0045(BasePlugin):
             entry = self.rooms[room][nick]
             if entry is not None and entry['jid'].full == jid:
                 return nick
+        return None
 
     def join_muc(self, room: JID, nick: str, maxhistory="0", password='',
                  pstatus='', pshow='', pfrom=''):
@@ -229,7 +230,7 @@ class XEP_0045(BasePlugin):
         self.our_nicks[room] = nick
 
     async def destroy(self, room: JID, reason='', altroom='', *,
-                      ifrom: Optional[JID] = None, **iqkwargs) -> Iq:
+                      ifrom: Optional[JID] = None, **iqkwargs):
         """Destroy a room."""
         iq = self.xmpp.make_iq_set(ifrom=ifrom, ito=room)
         iq.enable('mucowner_query')
@@ -259,7 +260,7 @@ class XEP_0045(BasePlugin):
         await iq.send(**iqkwargs)
 
     async def set_role(self, room: JID, nick: str, role: str, *,
-                       ifrom: Optional[JID] = None, **iqkwargs) -> Iq:
+                       ifrom: Optional[JID] = None, **iqkwargs):
         """ Change role property of a nick in a room.
             Typically, roles are temporary (they last only as long as you are in the
             room), whereas affiliations are permanent (they last across groupchat
@@ -389,11 +390,11 @@ class XEP_0045(BasePlugin):
         """ Get the list of nicks in a room.
         """
         if room not in self.rooms.keys():
-            return None
+            raise ValueError("Room %s is not joined" % room)
         return self.rooms[room].keys()
 
     def get_users_by_affiliation(self, room: JID, affiliation='member', *, ifrom: Optional[JID] = None):
         # Preserve old API
         if affiliation not in AFFILIATIONS:
-            raise TypeError
+            raise ValueError("Affiliation %s does not exist" % affiliation)
         return self.get_affiliation_list(room, affiliation, ifrom=ifrom)
