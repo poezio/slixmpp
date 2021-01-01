@@ -11,7 +11,7 @@
     <description xml:lang="en">Add description</description>
     <description xml:lang="fr">Ajouter une description</description>
 
-    <homepage rdf:resource="https:/lab.louiz.org/poezio/slixmpp/"/>
+    <homepage rdf:resource="https://lab.louiz.org/poezio/slixmpp/"/>
     <download-page rdf:resource="https://lab.louiz.org/poezio/slixmpp/tags"/>
     <bug-database rdf:resource="https://lab.louiz.org/poezio/slixmpp/issues"/>
     <developer-forum rdf:resource="xmpp:slixmpp@muc.poez.io?join"/>
