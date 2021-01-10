@@ -88,7 +88,7 @@ class XEP_0045(BasePlugin):
         self.xmpp.register_handler(
             Callback(
                 'MUCPresence',
-                MatchXMLMask("<presence xmlns='%s' />" % self.xmpp.default_ns),
+                StanzaPath("presence/muc"),
                 self.handle_groupchat_presence,
         ))
         self.xmpp.register_handler(
