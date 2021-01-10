@@ -13,6 +13,11 @@ from slixmpp.plugins.xep_0444 import XEP_0444
 import slixmpp.plugins.xep_0444.stanza as stanza
 from slixmpp.xmlstream import register_stanza_plugin
 
+try:
+    import emoji
+except ImportError:
+    emoji = None
+
 
 class TestReactions(SlixTest):
 
@@ -41,13 +46,9 @@ class TestReactions(SlixTest):
         self.assertEqual({'😃', '🤗'}, msg['reactions']['values'])
 
 
+    @unittest.skipIf(emoji is None, 'Emoji package not installed')
     def testCreateReactionsUnrestricted(self):
         """Testing creating Reactions with the extra all_chars arg."""
-        try:
-            import emoji
-        except ImportError:
-            # No emoji package: this test does not make sense
-            return
         xmlstring = """
           <message>
               <reactions xmlns="urn:xmpp:reactions:0" id="abcd">
