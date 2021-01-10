@@ -136,22 +136,27 @@ class XEP_0045(BasePlugin):
 
     def handle_groupchat_invite(self, inv):
         """ Handle an invite into a muc. """
-        if inv['from'] not in self.rooms.keys():
-            self.xmpp.event("groupchat_invite", inv)
+        if self.xmpp.is_component:
+            self.xmpp.event('groupchat_invite', inv)
+        else:
+            if inv['from'] not in self.rooms.keys():
+                self.xmpp.event("groupchat_invite", inv)
 
     def handle_groupchat_decline(self, decl):
         """Handle an invitation decline."""
-        if decl['from'] in self.room.keys():
-            self.xmpp.event('groupchat_decline', decl)
+        if self.xmpp.is_component:
+            self.xmpp.event('groupchat_invite', decl)
+        else:
+            if decl['from'] in self.room.keys():
+                self.xmpp.event('groupchat_decline', decl)
 
     def handle_config_change(self, msg):
         """Handle a MUC configuration change (with status code)."""
         self.xmpp.event('groupchat_config_status', msg)
         self.xmpp.event('muc::%s::config_status' % msg['from'].bare , msg)
 
-    def handle_groupchat_presence(self, pr):
-        """ Handle a presence in a muc.
-        """
+    def client_handle_presence(self, pr: Presence):
+        """As a client, handle a presence stanza"""
         got_offline = False
         got_online = False
         if pr['muc']['room'] not in self.rooms.keys():
@@ -176,6 +181,13 @@ class XEP_0045(BasePlugin):
             self.xmpp.event("muc::%s::got_offline" % entry['room'], pr)
         if got_online:
             self.xmpp.event("muc::%s::got_online" % entry['room'], pr)
+
+    def handle_groupchat_presence(self, pr: Presence):
+        """ Handle a presence in a muc."""
+        if self.xmpp.is_component:
+            self.xmpp.event('groupchat_presence', pr)
+        else:
+            self.client_handle_presence(pr)
 
     def handle_groupchat_message(self, msg: Message) -> None:
         """ Handle a message event in a muc.
