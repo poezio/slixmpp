@@ -42,6 +42,8 @@ from slixmpp.plugins.xep_0045.stanza import (
     MUCOwnerQuery,
     MUCOwnerDestroy,
     MUCStatus,
+    MUCActor,
+    MUCUserItem,
 )
 
 
@@ -66,6 +68,9 @@ class XEP_0045(BasePlugin):
         self.rooms = {}
         self.our_nicks = {}
         # load MUC support in presence stanzas
+        register_stanza_plugin(MUCMessage, MUCUserItem)
+        register_stanza_plugin(MUCPresence, MUCUserItem)
+        register_stanza_plugin(MUCUserItem, MUCActor)
         register_stanza_plugin(MUCMessage, MUCInvite)
         register_stanza_plugin(MUCMessage, MUCDecline)
         register_stanza_plugin(MUCMessage, MUCStatus)
@@ -83,7 +88,7 @@ class XEP_0045(BasePlugin):
         self.xmpp.register_handler(
             Callback(
                 'MUCPresence',
-                MatchXMLMask("<presence xmlns='%s' />" % self.xmpp.default_ns),
+                StanzaPath("presence/muc"),
                 self.handle_groupchat_presence,
         ))
         self.xmpp.register_handler(
@@ -131,22 +136,27 @@ class XEP_0045(BasePlugin):
 
     def handle_groupchat_invite(self, inv):
         """ Handle an invite into a muc. """
-        if inv['from'] not in self.rooms.keys():
-            self.xmpp.event("groupchat_invite", inv)
+        if self.xmpp.is_component:
+            self.xmpp.event('groupchat_invite', inv)
+        else:
+            if inv['from'] not in self.rooms.keys():
+                self.xmpp.event("groupchat_invite", inv)
 
     def handle_groupchat_decline(self, decl):
         """Handle an invitation decline."""
-        if decl['from'] in self.room.keys():
-            self.xmpp.event('groupchat_decline', decl)
+        if self.xmpp.is_component:
+            self.xmpp.event('groupchat_invite', decl)
+        else:
+            if decl['from'] in self.room.keys():
+                self.xmpp.event('groupchat_decline', decl)
 
     def handle_config_change(self, msg):
         """Handle a MUC configuration change (with status code)."""
         self.xmpp.event('groupchat_config_status', msg)
         self.xmpp.event('muc::%s::config_status' % msg['from'].bare , msg)
 
-    def handle_groupchat_presence(self, pr):
-        """ Handle a presence in a muc.
-        """
+    def client_handle_presence(self, pr: Presence):
+        """As a client, handle a presence stanza"""
         got_offline = False
         got_online = False
         if pr['muc']['room'] not in self.rooms.keys():
@@ -171,6 +181,13 @@ class XEP_0045(BasePlugin):
             self.xmpp.event("muc::%s::got_offline" % entry['room'], pr)
         if got_online:
             self.xmpp.event("muc::%s::got_online" % entry['room'], pr)
+
+    def handle_groupchat_presence(self, pr: Presence):
+        """ Handle a presence in a muc."""
+        if self.xmpp.is_component:
+            self.xmpp.event('groupchat_presence', pr)
+        else:
+            self.client_handle_presence(pr)
 
     def handle_groupchat_message(self, msg: Message) -> None:
         """ Handle a message event in a muc.
@@ -248,24 +265,22 @@ class XEP_0045(BasePlugin):
             iq['mucowner_query']['destroy']['reason'] = reason
         await iq.send(**iqkwargs)
 
-    async def set_affiliation(self, room: JID, jid: Optional[JID] = None, nick: Optional[str] = None, *, affiliation: str,
-                              reason: str = '', ifrom: Optional[JID] = None, **iqkwargs):
+    async def set_affiliation(self, room: JID, affiliation: str, *, jid: Optional[JID] = None,
+                              nick: Optional[str] = None, reason: str = '',
+                              ifrom: Optional[JID] = None, **iqkwargs):
         """ Change room affiliation."""
         if affiliation not in AFFILIATIONS:
             raise ValueError('%s is not a valid affiliation' % affiliation)
         if not any((jid, nick)):
             raise ValueError('One of jid or nick must be set')
         iq = self.xmpp.make_iq_set(ito=room, ifrom=ifrom)
-        iq.enable('mucadmin_query')
-        item = MUCAdminItem()
-        item['affiliation'] = affiliation
+        iq['mucadmin_query']['item']['affiliation'] = affiliation
         if nick:
-            item['nick'] = nick
+            iq['mucadmin_query']['item']['nick'] = nick
         if jid:
-            item['jid'] = jid
+            iq['mucadmin_query']['item']['jid'] = jid
         if reason:
-            item['reason'] = reason
-        iq['mucadmin_query'].append(item)
+            iq['mucadmin_query']['item']['reason'] = reason
         await iq.send(**iqkwargs)
 
     async def set_role(self, room: JID, nick: str, role: str, *,
@@ -278,13 +293,10 @@ class XEP_0045(BasePlugin):
         if role not in ROLES:
             raise ValueError("Role %s does not exist" % role)
         iq = self.xmpp.make_iq_set(ito=room, ifrom=ifrom)
-        iq.enable('mucadmin_query')
-        item = MUCAdminItem()
-        item['role'] = role
-        item['nick'] = nick
+        iq['mucadmin_query']['item']['role'] = role
+        iq['mucadmin_query']['item']['nick'] = nick
         if reason:
-            item['reason'] = reason
-        iq['mucadmin_query'].append(item)
+            iq['mucadmin_query']['item']['reason'] = reason
         await iq.send(**iqkwargs)
 
     def invite(self, room: JID, jid: JID, reason: str = '', *,
