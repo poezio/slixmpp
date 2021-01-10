@@ -7,7 +7,12 @@
     See the file LICENSE for copying permission.
 """
 
-from typing import Iterable, Set
+from typing import (
+    Iterable,
+    Set,
+    Optional,
+    Union,
+)
 import logging
 from slixmpp.xmlstream import ElementBase, ET, JID
 
@@ -45,24 +50,21 @@ class MUCBase(ElementBase):
         status['code'] = code
         self.append(status)
 
-    def get_item_attr(self, attr, default: str):
+    def get_item_attr(self, attr: str, default):
         item = self.xml.find(f'{{{NS_USER}}}item')
         if item is None:
             return default
-        return item.get(attr)
+        return self['item'][attr]
 
-    def set_item_attr(self, attr, value: str):
-        item = self.xml.find(f'{{{NS_USER}}}item')
-        if item is None:
-            item = ET.Element(f'{{{NS_USER}}}item')
-            self.xml.append(item)
-        item.attrib[attr] = value
+    def set_item_attr(self, attr: str, value: str):
+        item = self['item']
+        item[attr] = value
         return item
 
     def del_item_attr(self, attr):
         item = self.xml.find(f'{{{NS_USER}}}item')
-        if item is not None and attr in item.attrib:
-            del item.attrib[attr]
+        if item is not None:
+            del self['item'][attr]
 
     def get_affiliation(self):
         return self.get_item_attr('affiliation', '')
@@ -71,13 +73,12 @@ class MUCBase(ElementBase):
         self.set_item_attr('affiliation', value)
 
     def del_affiliation(self):
-        # TODO: set default affiliation
         self.del_item_attr('affiliation')
 
-    def get_jid(self):
+    def get_jid(self) -> JID:
         return JID(self.get_item_attr('jid', ''))
 
-    def set_jid(self, value):
+    def set_jid(self, value: Union[JID, str]):
         if not isinstance(value, str):
             value = str(value)
         self.set_item_attr('jid', value)
@@ -85,10 +86,10 @@ class MUCBase(ElementBase):
     def del_jid(self):
         self.del_item_attr('jid')
 
-    def get_role(self):
+    def get_role(self) -> str:
         return self.get_item_attr('role', '')
 
-    def set_role(self, value):
+    def set_role(self, value: str):
         # TODO: check for valid role
         self.set_item_attr('role', value)
 
@@ -96,10 +97,10 @@ class MUCBase(ElementBase):
         # TODO: set default role
         self.del_item_attr('role')
 
-    def get_nick(self):
+    def get_nick(self) -> str:
         return self.parent()['from'].resource
 
-    def get_room(self):
+    def get_room(self) -> str:
         return self.parent()['from'].bare
 
     def set_nick(self, value):
@@ -232,3 +233,30 @@ class MUCStatus(ElementBase):
 
     def set_code(self, code: int):
         self.xml.attrib['code'] = str(code)
+
+
+class MUCUserItem(ElementBase):
+    namespace = NS_USER
+    name = 'item'
+    plugin_attrib = 'item'
+    interfaces = {'role', 'affiliation', 'jid', 'reason', 'nick'}
+    sub_interfaces = {'reason'}
+
+    def get_jid(self) -> Optional[JID]:
+        jid = self.xml.attrib.get('jid', None)
+        if jid:
+            return JID(jid)
+        return jid
+
+
+class MUCActor(ElementBase):
+    namespace = NS_USER
+    name = 'actor'
+    plugin_attrib = 'actor'
+    interfaces = {'jid', 'nick'}
+
+    def get_jid(self) -> Optional[JID]:
+        jid = self.xml.attrib.get('jid', None)
+        if jid:
+            return JID(jid)
+        return jid
