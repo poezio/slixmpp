@@ -91,6 +91,14 @@ class XEP_0045(BasePlugin):
                 StanzaPath("presence/muc"),
                 self.handle_groupchat_presence,
         ))
+        if self.xmpp.is_component:
+            self.xmpp.register_handler(
+                Callback(
+                    'MUCPresenceJoin',
+                    StanzaPath("presence/muc_join"),
+                    self.handle_groupchat_join,
+            ))
+
         self.xmpp.register_handler(
             Callback(
                 'MUCError',
@@ -188,6 +196,10 @@ class XEP_0045(BasePlugin):
             self.xmpp.event('groupchat_presence', pr)
         else:
             self.client_handle_presence(pr)
+
+    def handle_groupchat_join(self, pr: Presence):
+        """Received a join presence (as a component)"""
+        self.xmpp.event('groupchat_join', pr)
 
     def handle_groupchat_message(self, msg: Message) -> None:
         """ Handle a message event in a muc.
