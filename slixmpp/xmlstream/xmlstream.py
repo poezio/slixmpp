@@ -458,9 +458,6 @@ class XMLStream(asyncio.BaseProtocol):
         closure of the TCP connection
         """
         log.info("connection_lost: %s", (exception,))
-        self.event("disconnected", self.disconnect_reason or exception and exception.strerror)
-        if self.end_session_on_disconnect:
-            self.event('session_end')
         # All these objects are associated with one TCP connection.  Since
         # we are not connected anymore, destroy them
         self.parser = None
@@ -468,6 +465,10 @@ class XMLStream(asyncio.BaseProtocol):
         self.socket = None
         if self._run_filters:
             self._run_filters.cancel()
+        # Fire the events after cleanup
+        if self.end_session_on_disconnect:
+            self.event('session_end')
+        self.event("disconnected", self.disconnect_reason or exception and exception.strerror)
 
     def cancel_connection_attempt(self):
         """
@@ -481,7 +482,6 @@ class XMLStream(asyncio.BaseProtocol):
             self._current_connection_attempt = None
             if self._run_filters:
                 self._run_filters.cancel()
-        
 
     def disconnect(self, wait: float = 2.0, reason: Optional[str] = None, ignore_send_queue: bool = False) -> None:
         """Close the XML stream and wait for an acknowldgement from the server for
