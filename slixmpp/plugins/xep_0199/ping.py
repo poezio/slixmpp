@@ -66,6 +66,7 @@ class XEP_0199(BasePlugin):
         """
 
         register_stanza_plugin(Iq, Ping)
+        self.__pending_futures = []
 
         self.xmpp.register_handler(
                 Callback('Ping',
@@ -90,6 +91,11 @@ class XEP_0199(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature(Ping.namespace)
 
+    def session_end(self, event):
+        for future in self.__pending_futures:
+            future.cancel()
+        self.__pending_futures.clear()
+
     def enable_keepalive(self, interval=None, timeout=None):
         if interval:
             self.interval = interval
@@ -97,10 +103,20 @@ class XEP_0199(BasePlugin):
             self.timeout = timeout
 
         self.keepalive = True
-        handler = lambda event=None: asyncio.ensure_future(
-            self._keepalive(event),
-            loop=self.xmpp.loop,
-        )
+        def handler(event):
+            # Cleanup futures
+            if self.__pending_futures:
+                tmp_futures = []
+                for future in self.__pending_futures[:]:
+                    if not future.done():
+                        tmp_futures.append(future)
+                self.__pending_futures = tmp_futures
+
+            future = asyncio.ensure_future(
+                self._keepalive(event),
+                loop=self.xmpp.loop,
+            )
+            self.__pending_futures.append(future)
         self.xmpp.schedule('Ping keepalive',
                            self.interval,
                            handler,
