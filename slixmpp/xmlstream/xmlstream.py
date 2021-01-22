@@ -622,6 +622,10 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.event('ssl_invalid_chain', e)
             return False
+        except OSError as exc:
+            log.debug("Connection error:", exc_info=True)
+            self.disconnect()
+            return False
         der_cert = transp.get_extra_info("ssl_object").getpeercert(True)
         pem_cert = ssl.DER_cert_to_PEM_cert(der_cert)
         self.event('ssl_cert', pem_cert)
