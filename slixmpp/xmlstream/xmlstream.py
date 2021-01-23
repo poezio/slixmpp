@@ -272,7 +272,7 @@ class XMLStream(asyncio.BaseProtocol):
                                localhost
 
         """
-        if self._run_filters is None:
+        if self._run_filters is None or self._run_filters.done():
             self._run_filters = asyncio.ensure_future(
                 self.run_filters(),
                 loop=self.loop,
@@ -463,8 +463,6 @@ class XMLStream(asyncio.BaseProtocol):
         self.parser = None
         self.transport = None
         self.socket = None
-        if self._run_filters:
-            self._run_filters.cancel()
         # Fire the events after cleanup
         if self.end_session_on_disconnect:
             self.event('session_end')
@@ -480,8 +478,6 @@ class XMLStream(asyncio.BaseProtocol):
         if self._current_connection_attempt:
             self._current_connection_attempt.cancel()
             self._current_connection_attempt = None
-            if self._run_filters:
-                self._run_filters.cancel()
 
     def disconnect(self, wait: float = 2.0, reason: Optional[str] = None, ignore_send_queue: bool = False) -> None:
         """Close the XML stream and wait for an acknowldgement from the server for
@@ -974,7 +970,6 @@ class XMLStream(asyncio.BaseProtocol):
             self.send_raw(str_data)
         else:
             self.send_raw(data)
-
 
     async def run_filters(self):
         """
