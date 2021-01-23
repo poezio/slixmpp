@@ -1142,9 +1142,15 @@ class XMLStream(asyncio.BaseProtocol):
         :param int timeout: Timeout
         """
         fut = asyncio.Future()
+        def result_handler(event_data):
+            if not fut.done():
+                fut.set_result(event_data)
+            else:
+                log.debug("Future registered on event '%s' was alredy done", event)
+
         self.add_event_handler(
             event,
-            fut.set_result,
+            result_handler,
             disposable=True,
         )
-        return await asyncio.wait_for(fut, timeout)
+        return await asyncio.wait_for(fut, timeout, loop=self.loop)
