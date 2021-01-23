@@ -9,7 +9,8 @@
 import time
 import logging
 
-from typing import Optional, Callable
+from asyncio import Future
+from typing import Optional, Callable, List
 
 from slixmpp.jid import JID
 from slixmpp.stanza import Iq
@@ -64,9 +65,9 @@ class XEP_0199(BasePlugin):
         """
         Start the XEP-0199 plugin.
         """
-
         register_stanza_plugin(Iq, Ping)
-        self.__pending_futures = []
+
+        self.__pending_futures: List[Future] = []
 
         self.xmpp.register_handler(
                 Callback('Ping',
@@ -76,7 +77,9 @@ class XEP_0199(BasePlugin):
         if self.keepalive:
             self.xmpp.add_event_handler('session_start',
                                         self.enable_keepalive)
-            self.xmpp.add_event_handler('session_end',
+            self.xmpp.add_event_handler('session_resumed',
+                                        self.enable_keepalive)
+            self.xmpp.add_event_handler('disconnected',
                                         self.disable_keepalive)
 
     def plugin_end(self):
@@ -85,16 +88,22 @@ class XEP_0199(BasePlugin):
         if self.keepalive:
             self.xmpp.del_event_handler('session_start',
                                         self.enable_keepalive)
-            self.xmpp.del_event_handler('session_end',
+            self.xmpp.del_event_handler('session_resumed',
+                                        self.enable_keepalive)
+            self.xmpp.del_event_handler('disconnected',
                                         self.disable_keepalive)
 
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature(Ping.namespace)
 
-    def session_end(self, event):
-        for future in self.__pending_futures:
-            future.cancel()
-        self.__pending_futures.clear()
+
+    def _clear_pending_futures(self):
+        """Cancel all pending ping futures"""
+        if self.__pending_futures:
+            log.debug('Clearing %s pdnding pings', len(self.__pending_futures))
+            for future in self.__pending_futures:
+                future.cancel()
+            self.__pending_futures.clear()
 
     def enable_keepalive(self, interval=None, timeout=None):
         if interval:
@@ -103,7 +112,7 @@ class XEP_0199(BasePlugin):
             self.timeout = timeout
 
         self.keepalive = True
-        def handler(event):
+        def handler(event=None):
             # Cleanup futures
             if self.__pending_futures:
                 tmp_futures = []
@@ -123,7 +132,10 @@ class XEP_0199(BasePlugin):
                            repeat=True)
 
     def disable_keepalive(self, event=None):
+        self._clear_pending_futures()
         self.xmpp.cancel_schedule('Ping keepalive')
+
+    session_end = disable_keepalive
 
     async def _keepalive(self, event=None):
         log.debug("Keepalive ping...")
