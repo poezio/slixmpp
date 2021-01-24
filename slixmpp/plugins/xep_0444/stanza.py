@@ -10,6 +10,8 @@ from typing import Set, Iterable
 from slixmpp.xmlstream import ElementBase
 try:
     from emoji import UNICODE_EMOJI
+    if UNICODE_EMOJI.get('en'):
+        UNICODE_EMOJI = UNICODE_EMOJI['en']
 except ImportError:
     UNICODE_EMOJI = None
 
