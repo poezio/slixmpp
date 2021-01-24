@@ -237,7 +237,7 @@ class XMLStream(asyncio.BaseProtocol):
         self.add_event_handler('disconnected', self._remove_schedules)
         self.add_event_handler('session_start', self._start_keepalive)
 
-        self._run_filters = None
+        self._run_out_filters: Optional[Future] = None
         self.__slow_tasks: List[Future] = []
 
     @property
@@ -281,8 +281,8 @@ class XMLStream(asyncio.BaseProtocol):
                                localhost
 
         """
-        if self._run_filters is None or self._run_filters.done():
-            self._run_filters = asyncio.ensure_future(
+        if self._run_out_filters is None or self._run_out_filters.done():
+            self._run_out_filters = asyncio.ensure_future(
                 self.run_filters(),
                 loop=self.loop,
             )
