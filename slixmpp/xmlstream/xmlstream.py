@@ -232,7 +232,7 @@ class XMLStream(asyncio.BaseProtocol):
         self.disconnect_reason = None
 
         #: An asyncio Future being done when the stream is disconnected.
-        self.disconnected = asyncio.Future()
+        self.disconnected: Future = Future()
 
         self.add_event_handler('disconnected', self._remove_schedules)
         self.add_event_handler('session_start', self._start_keepalive)
@@ -258,6 +258,12 @@ class XMLStream(asyncio.BaseProtocol):
         are unique in this stream.
         """
         return uuid.uuid4().hex
+
+    def _set_disconnected_future(self):
+        """Set the self.disconnected future on disconnect"""
+        if not self.disconnected.done():
+            self.disconnected.set_result(True)
+        self.disconnected = asyncio.Future()
 
     def connect(self, host='', port=0, use_ssl=False,
                 force_starttls=True, disable_starttls=False):
@@ -477,6 +483,7 @@ class XMLStream(asyncio.BaseProtocol):
         if self.end_session_on_disconnect:
             self._reset_sendq()
             self.event('session_end')
+        self._set_disconnected_future()
         self.event("disconnected", self.disconnect_reason or exception and exception.strerror)
 
     def cancel_connection_attempt(self):
@@ -527,6 +534,7 @@ class XMLStream(asyncio.BaseProtocol):
                     loop=self.loop,
                 )
         else:
+            self._set_disconnected_future()
             self.event("disconnected", reason)
             future = Future()
             future.set_result(None)
