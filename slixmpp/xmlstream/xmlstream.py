@@ -431,6 +431,7 @@ class XMLStream(asyncio.BaseProtocol):
                         log.debug("End of stream received")
                         self.disconnect_reason = "End of stream"
                         self.abort()
+                        return
                     elif self.xml_depth == 1:
                         # A stanza is an XML element that is a direct child of
                         # the root element, hence the check of depth == 1
