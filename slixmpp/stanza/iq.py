@@ -194,9 +194,11 @@ class Iq(RootStanza):
         def callback_success(result):
             type_ = result['type']
             if type_ == 'result':
-                future.set_result(result)
+                if not future.done():
+                    future.set_result(result)
             elif type_ == 'error':
-                future.set_exception(IqError(result))
+                if not future.done():
+                    future.set_exception(IqError(result))
             else:
                 # Most likely an iq addressed to ourself, rearm the callback.
                 handler = constr(handler_name,
@@ -212,7 +214,8 @@ class Iq(RootStanza):
                 callback(result)
 
         def callback_timeout():
-            future.set_exception(IqTimeout(self))
+            if not future.done():
+                future.set_exception(IqTimeout(self))
             self.stream.remove_handler('IqCallback_%s' % self['id'])
             if timeout_callback is not None:
                 timeout_callback(self)
