@@ -578,11 +578,7 @@ class XMLStream(asyncio.BaseProtocol):
             self.cancel_connection_attempt()
             self.transport.close()
             self.transport.abort()
-            self.transport = None
             self.event("killed")
-            self.disconnected.set_result(True)
-            self.disconnected = asyncio.Future()
-            self.event("disconnected", self.disconnect_reason)
 
     def reconnect(self, wait=2.0, reason="Reconnecting"):
         """Calls disconnect(), and once we are disconnected (after the timeout, or
