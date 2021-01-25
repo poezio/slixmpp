@@ -585,7 +585,10 @@ class XMLStream(asyncio.BaseProtocol):
         when the server acknowledgement is received), call connect()
         """
         log.debug("reconnecting...")
-        self.add_event_handler('disconnected', lambda event: self.connect(), disposable=True)
+        async def handler(event):
+            await asyncio.sleep(0, loop=self.loop)
+            self.connect()
+        self.add_event_handler('disconnected', handler, disposable=True)
         self.disconnect(wait, reason)
 
     def configure_socket(self):
