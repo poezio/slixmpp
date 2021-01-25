@@ -833,7 +833,7 @@ class XMLStream(asyncio.BaseProtocol):
         """
         log.debug("Event triggered: %s", name)
 
-        handlers = self.__event_handlers.get(name, [])
+        handlers = self.__event_handlers.get(name, [])[:]
         for handler in handlers:
             handler_callback, disposable = handler
             old_exception = getattr(data, 'exception', None)
