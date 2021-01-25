@@ -1053,7 +1053,8 @@ class XMLStream(asyncio.BaseProtocol):
                                         self._continue_slow_send(
                                             task,
                                             already_run_filters
-                                        )
+                                        ),
+                                        loop=self.loop,
                                     )
                                     raise Exception("Slow coro, rescheduling")
                                 data = task.result()
