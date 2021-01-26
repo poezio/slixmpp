@@ -31,23 +31,23 @@ for the JID that will receive our message, and the string content of the message
 
             self.add_event_handler('session_start', self.start)
 
-        def start(self, event):
+        async def start(self, event):
             self.send_presence()
-            self.get_roster()
+            await self.get_roster()
 
 Note that as in :ref:`echobot`, we need to include send an initial presence and request
 the roster. Next, we want to send our message, and to do that we will use :meth:`send_message <slixmpp.basexmpp.BaseXMPP.send_message>`.
 
 .. code-block:: python
 
-    def start(self, event):
+    async def start(self, event):
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
         self.send_message(mto=self.recipient, mbody=self.msg)
 
 Finally, we need to disconnect the client using :meth:`disconnect <slixmpp.xmlstream.XMLStream.disconnect>`.
-Now, sent stanzas are placed in a queue to pass them to the send thread.
+Now, sent stanzas are placed in a queue to pass them to the send routine.
 :meth:`disconnect <slixmpp.xmlstream.XMLStream.disconnect>` by default will wait for an
 acknowledgement from the server for at least `2.0` seconds. This time is configurable with
 the `wait` parameter. If `0.0` is passed for `wait`, :meth:`disconnect
@@ -55,9 +55,9 @@ the `wait` parameter. If `0.0` is passed for `wait`, :meth:`disconnect
 
 .. code-block:: python
 
-    def start(self, event):
+    async def start(self, event):
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
         self.send_message(mto=self.recipient, mbody=self.msg)
 

@@ -18,7 +18,7 @@ messages sent to it. We will also go through adding some basic command line conf
 for enabling or disabling debug log outputs and setting the username and password
 for the bot.
 
-For the command line options processing, we will use the built-in ``optparse``
+For the command line options processing, we will use the built-in ``argparse``
 module and the ``getpass`` module for reading in passwords.
 
 TL;DR Just Give Me the Code
@@ -39,7 +39,8 @@ To get started, here is a brief outline of the structure that the final project 
     import asyncio
     import logging
     import getpass
-    from optparse import OptionParser
+
+    from argparse import ArgumentParser
 
     import slixmpp
 
@@ -93,9 +94,9 @@ we also need to define the ``self.start`` handler.
 
 .. code-block:: python
 
-    def start(self, event):
+    async def start(self, event):
         self.send_presence()
-        self.get_roster()
+        await self.get_roster()
 
 .. warning::
 
@@ -143,6 +144,11 @@ The XMPP stanzas from the roster retrieval process could look like this:
         <item jid="friend@example.com" subscription="both" />
       </query>
     </iq>
+
+Additionally, since :meth:`get_roster <slixmpp.clientxmpp.ClientXMPP.get_roster>` is using
+``<iq/>`` stanzas, which will always receive an answer, it should be awaited on, to keep
+a synchronous flow.
+
 
 Responding to Messages
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -212,8 +218,7 @@ Command Line Arguments and Logging
 
 While this isn't part of Slixmpp itself, we do want our echo bot program to be able
 to accept a JID and password from the command line instead of hard coding them. We will
-use the ``optparse`` module for this, though there are several alternative methods, including
-the newer ``argparse`` module.
+use the ``argparse`` module for this.
 
 We want to accept three parameters: the JID for the echo bot, its password, and a flag for
 displaying the debugging logs. We also want these to be optional parameters, since passing
@@ -222,22 +227,29 @@ a password directly through the command line can be a security risk.
 .. code-block:: python
 
     if __name__ == '__main__':
-        optp = OptionParser()
+        # Setup the command line arguments.
+        parser = ArgumentParser(description=EchoBot.__doc__)
 
-        optp.add_option('-d', '--debug', help='set logging to DEBUG',
-                        action='store_const', dest='loglevel',
-                        const=logging.DEBUG, default=logging.INFO)
-        optp.add_option("-j", "--jid", dest="jid",
-                        help="JID to use")
-        optp.add_option("-p", "--password", dest="password",
-                        help="password to use")
+        # Output verbosity options.
+        parser.add_argument("-q", "--quiet", help="set logging to ERROR",
+                            action="store_const", dest="loglevel",
+                            const=logging.ERROR, default=logging.INFO)
+        parser.add_argument("-d", "--debug", help="set logging to DEBUG",
+                            action="store_const", dest="loglevel",
+                            const=logging.DEBUG, default=logging.INFO)
 
-        opts, args = optp.parse_args()
+        # JID and password options.
+        parser.add_argument("-j", "--jid", dest="jid",
+                            help="JID to use")
+        parser.add_argument("-p", "--password", dest="password",
+                            help="password to use")
 
-        if opts.jid is None:
-            opts.jid = raw_input("Username: ")
-        if opts.password is None:
-            opts.password = getpass.getpass("Password: ")
+        args = parser.parse_args()
+
+        if args.jid is None:
+            args.jid = input("Username: ")
+        if args.password is None:
+            args.password = getpass("Password: ")
 
 Since we included a flag for enabling debugging logs, we need to configure the
 ``logging`` module to behave accordingly.
@@ -248,7 +260,7 @@ Since we included a flag for enabling debugging logs, we need to configure the
 
         # .. option parsing from above ..
 
-        logging.basicConfig(level=opts.loglevel,
+        logging.basicConfig(level=args.loglevel,
                             format='%(levelname)-8s %(message)s')
 
 
@@ -276,52 +288,36 @@ at this stage. For example, let's say we want our bot to support `service discov
 If the ``EchoBot`` class had a hard dependency on a plugin, we could register that plugin in
 the ``EchoBot.__init__`` method instead.
 
-.. note::
-
-    If you are using the OpenFire server, you will need to include an additional
-    configuration step. OpenFire supports a different version of SSL than what
-    most servers and Slixmpp support.
-
-    .. code-block:: python
-
-        import ssl
-        xmpp.ssl_version = ssl.PROTOCOL_SSLv3
-
 Now we're ready to connect and begin echoing messages. If you have the package
-``aiodns`` installed, then the :meth:`slixmpp.clientxmpp.ClientXMPP` method
+``aiodns`` installed, then the :meth:`slixmpp.clientxmpp.ClientXMPP.connect` method
 will perform a DNS query to find the appropriate server to connect to for the
 given JID. If you do not have ``aiodns``, then Slixmpp will attempt to
 connect to the hostname used by the JID, unless an address tuple is supplied
-to :meth:`slixmpp.clientxmpp.ClientXMPP`.
+to :meth:`slixmpp.clientxmpp.ClientXMPP.connect`.
 
 .. code-block:: python
 
     if __name__ == '__main__':
 
         # .. option parsing & echo bot configuration
+        xmpp.connect():
+        xmpp.process(forever=True)
 
-        if xmpp.connect():
-            xmpp.process(block=True)
-        else:
-            print('Unable to connect')
 
-To begin responding to messages, you'll see we called :meth:`slixmpp.basexmpp.BaseXMPP.process`
-which will start the event handling, send queue, and XML reader threads. It will also call
-the :meth:`slixmpp.plugins.base.BasePlugin.post_init` method on all registered plugins. By
-passing ``block=True`` to :meth:`slixmpp.basexmpp.BaseXMPP.process` we are running the
-main processing loop in the main thread of execution. The :meth:`slixmpp.basexmpp.BaseXMPP.process`
-call will not return until after Slixmpp disconnects. If you need to run the client in the background
-for another program, use ``block=False`` to spawn the processing loop in its own thread.
+The :meth:`slixmpp.basexmpp.BaseXMPP.connect` will only schedule a connection
+asynchronously. To actually connect, you need to let the event loop take over.
+This is done with the :meth:`slixmpp.basexmpp.BaseXMPP.process` method,
+which can either run forever (``forever=True``, the default), run for a (maximum)
+duration of time (``timeout=n``), and/or run until it gets disconnected (``forever=False``).
+
+However, calling ``process()`` is not required if you already have an event loop
+running, so you can handle the logic around it however you like.
 
 .. note::
 
-    Before 1.0, controlling the blocking behaviour of :meth:`slixmpp.basexmpp.BaseXMPP.process` was
-    done via the ``threaded`` argument. This arrangement was a source of confusion because some users
-    interpreted that as controlling whether or not Slixmpp used threads at all, instead of how
-    the processing loop itself was spawned.
-
-    The statements ``xmpp.process(threaded=False)`` and ``xmpp.process(block=True)`` are equivalent.
-
+    Before slixmpp, :meth:slixmpp.basexmpp.BaseXMPP.process` took ``block`` and ``threaded``
+    arguments. These do not make sense anymore and have been removed. Slixmpp does not use
+    threads at all.
 
 .. _echobot_complete:
 

@@ -168,13 +168,13 @@ if __name__ == '__main__':
         xmpp.beClientOrServer(server=True)
         while not(xmpp.testForRelease()):
             xmpp.connect()
-            xmpp.process(block=True)
+            xmpp.process(forever=False)
             logging.debug("lost connection")
     if args.sensorjid:
         logging.debug("will try to call another device for data")
         xmpp.beClientOrServer(server=False,clientJID=args.sensorjid)
         xmpp.connect()
-        xmpp.process(block=True)
+        xmpp.process(forever=False)
         logging.debug("ready ending")
 
     else:
