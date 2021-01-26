@@ -100,6 +100,7 @@ __all__ = [
     'xep_0369',  # MIX-CORE
     'xep_0377',  # Spam reporting
     'xep_0380',  # Explicit Message Encryption
+    'xep_0382',  # Spoiler Messages
     'xep_0394',  # Message Markup
     'xep_0403',  # MIX-Presence
     'xep_0404',  # MIX-Anon
