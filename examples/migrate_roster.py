@@ -73,21 +73,21 @@ old_xmpp = slixmpp.ClientXMPP(args.old_jid, args.old_password)
 
 roster = []
 
-def on_session(event):
-    roster.append(old_xmpp.get_roster())
+async def on_session(event):
+    roster.append(await old_xmpp.get_roster())
     old_xmpp.disconnect()
 old_xmpp.add_event_handler('session_start', on_session)
 
 if old_xmpp.connect():
-    old_xmpp.process(block=True)
+    old_xmpp.process(forever=False)
 
 if not roster:
     print('No roster to migrate')
     sys.exit()
 
 new_xmpp = slixmpp.ClientXMPP(args.new_jid, args.new_password)
-def on_session2(event):
-    new_xmpp.get_roster()
+async def on_session2(event):
+    await new_xmpp.get_roster()
     new_xmpp.send_presence()
 
     logging.info(roster[0])
@@ -97,9 +97,11 @@ def on_session2(event):
     for jid, item in data.items():
         if item['subscription'] != 'none':
             new_xmpp.send_presence(ptype='subscribe', pto=jid)
-        new_xmpp.update_roster(jid,
-                name = item['name'],
-                groups = item['groups'])
+        await new_xmpp.update_roster(
+            jid,
+            name=item['name'],
+            groups=item['groups']
+        )
     new_xmpp.disconnect()
 new_xmpp.add_event_handler('session_start', on_session2)
 
