@@ -9,10 +9,8 @@ Glossary
     stream handler
         A callback function that accepts stanza objects pulled directly
         from the XML stream. A stream handler is encapsulated in a
-        object that includes a :class:`Matcher <.MatcherBase>` object, and
-        which provides additional semantics. For example, the
-        :class:`.Waiter` handler wrapper blocks thread execution until a
-        matching stanza is received.
+        object that includes a :class:`Matcher <.MatcherBase>` object
+        which provides additional semantics.
 
     event handler
         A callback function that responds to events raised by
