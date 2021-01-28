@@ -433,7 +433,6 @@ class XMLStream(asyncio.BaseProtocol):
                     if self.xml_depth == 0:
                         # The stream's root element has closed,
                         # terminating the stream.
-                        self.end_session_on_disconnect = True
                         log.debug("End of stream received")
                         self.disconnect_reason = "End of stream"
                         self.abort()
