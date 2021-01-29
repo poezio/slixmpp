@@ -8,9 +8,6 @@
     <shortdesc xml:lang="en">Elegant Python library for XMPP</shortdesc>
     <shortdesc xml:lang="fr">Bibliothèque pour XMPP élégante, en Python</shortdesc>
 
-    <description xml:lang="en">Add description</description>
-    <description xml:lang="fr">Ajouter une description</description>
-
     <homepage rdf:resource="https://lab.louiz.org/poezio/slixmpp/"/>
     <download-page rdf:resource="https://lab.louiz.org/poezio/slixmpp/tags"/>
     <bug-database rdf:resource="https://lab.louiz.org/poezio/slixmpp/issues"/>
@@ -999,6 +996,13 @@
             <revision>1.6.0</revision>
             <created>2020-12-12</created>
             <file-release rdf:resource="https://lab.louiz.org/poezio/slixmpp/-/archive/slix-1.6.0/slixmpp-slix-1.6.0.tar.gz"/>
+        </Version>
+    </release>
+    <release>
+        <Version>
+            <revision>1.7.0</revision>
+            <created>2021-01-29</created>
+            <file-release rdf:resource="https://lab.louiz.org/poezio/slixmpp/-/archive/slix-1.7.9/slixmpp-slix-1.7.9.tar.gz"/>
         </Version>
     </release>
 </Project>
