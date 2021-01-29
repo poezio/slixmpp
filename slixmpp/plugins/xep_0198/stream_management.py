@@ -174,6 +174,9 @@ class XEP_0198(BasePlugin):
 
     def send_ack(self):
         """Send the current ack count to the server."""
+        if not self.xmpp.transport:
+            log.debug('Disconnected: not sending ack')
+            return
         ack = stanza.Ack(self.xmpp)
         ack['h'] = self.handled
         self.xmpp.send_raw(str(ack))
