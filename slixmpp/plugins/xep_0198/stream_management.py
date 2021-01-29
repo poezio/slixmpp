@@ -174,6 +174,9 @@ class XEP_0198(BasePlugin):
 
     def send_ack(self):
         """Send the current ack count to the server."""
+        if not self.xmpp.transport:
+            log.debug('Disconnected: not sending ack')
+            return
         ack = stanza.Ack(self.xmpp)
         ack['h'] = self.handled
         self.xmpp.send_raw(str(ack))
@@ -198,20 +201,7 @@ class XEP_0198(BasePlugin):
             # We've already negotiated stream management,
             # so no need to do it again.
             return False
-        if not self.sm_id:
-            if 'bind' in self.xmpp.features:
-                enable = stanza.Enable(self.xmpp)
-                enable['resume'] = self.allow_resume
-                enable.send()
-                log.debug("enabling SM")
-
-                waiter = Waiter('enabled_or_failed',
-                        MatchMany([
-                            MatchXPath(stanza.Enabled.tag_name()),
-                            MatchXPath(stanza.Failed.tag_name())]))
-                self.xmpp.register_handler(waiter)
-                result = await waiter.wait()
-        elif self.sm_id and self.allow_resume and 'bind' not in self.xmpp.features:
+        if self.sm_id and self.allow_resume and 'bind' not in self.xmpp.features:
             resume = stanza.Resume(self.xmpp)
             resume['h'] = self.handled
             resume['previd'] = self.sm_id
@@ -229,6 +219,19 @@ class XEP_0198(BasePlugin):
             result = await waiter.wait()
             if result is not None and result.name == 'resumed':
                 return True
+            self.xmpp.event("session_end")
+        if 'bind' in self.xmpp.features:
+            enable = stanza.Enable(self.xmpp)
+            enable['resume'] = self.allow_resume
+            enable.send()
+            log.debug("enabling SM")
+
+            waiter = Waiter('enabled_or_failed',
+                    MatchMany([
+                        MatchXPath(stanza.Enabled.tag_name()),
+                        MatchXPath(stanza.Failed.tag_name())]))
+            self.xmpp.register_handler(waiter)
+            result = await waiter.wait()
         return False
 
     def _handle_enabled(self, stanza):
