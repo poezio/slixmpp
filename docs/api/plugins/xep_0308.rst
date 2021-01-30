@@ -1,6 +1,6 @@
 
-XEP 0308
-========
+XEP-0308: Last Message Correction
+=================================
 
 .. module:: slixmpp.plugins.xep_0308
 

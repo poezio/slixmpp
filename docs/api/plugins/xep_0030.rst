@@ -1,6 +1,6 @@
 
-XEP 0030
-========
+XEP-0030: Service Discovery
+===========================
 
 .. module:: slixmpp.plugins.xep_0030
 

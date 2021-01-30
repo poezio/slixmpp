@@ -1,6 +1,6 @@
 
-XEP 0122
-========
+XEP-0122: Data Forms Validation
+===============================
 
 .. module:: slixmpp.plugins.xep_0122
 

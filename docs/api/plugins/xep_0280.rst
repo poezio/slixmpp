@@ -1,6 +1,6 @@
 
-XEP 0280
-========
+XEP-0280: Message Carbons
+=========================
 
 .. module:: slixmpp.plugins.xep_0280
 

@@ -1,6 +1,6 @@
 
-XEP 0045
-========
+XEP-0045: Multi-User Chat
+=========================
 
 .. module:: slixmpp.plugins.xep_0045
 

@@ -1,6 +1,6 @@
 
-XEP 0153
-========
+XEP-0153: vCard-Based Avatars
+=============================
 
 .. module:: slixmpp.plugins.xep_0153
 

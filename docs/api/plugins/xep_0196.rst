@@ -1,6 +1,6 @@
 
-XEP 0196
-========
+XEP-0196: User Gaming
+=====================
 
 .. module:: slixmpp.plugins.xep_0196
 

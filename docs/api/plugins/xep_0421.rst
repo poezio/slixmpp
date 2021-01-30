@@ -1,6 +1,6 @@
 
-XEP 0421
-========
+XEP-0421: Anonymous unique occupant identifiers for MUCs
+========================================================
 
 .. module:: slixmpp.plugins.xep_0421
 

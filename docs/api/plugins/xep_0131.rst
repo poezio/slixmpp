@@ -1,6 +1,6 @@
 
-XEP 0131
-========
+XEP-0131: Stanza Headers and Internet Metadata
+==============================================
 
 .. module:: slixmpp.plugins.xep_0131
 

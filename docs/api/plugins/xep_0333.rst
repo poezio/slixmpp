@@ -1,6 +1,6 @@
 
-XEP 0333
-========
+XEP-0333: Chat Markers
+======================
 
 .. module:: slixmpp.plugins.xep_0333
 

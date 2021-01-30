@@ -1,6 +1,6 @@
 
-XEP 0444
-========
+XEP-0444: Message Reactions
+===========================
 
 .. module:: slixmpp.plugins.xep_0444
 

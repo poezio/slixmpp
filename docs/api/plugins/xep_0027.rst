@@ -1,6 +1,6 @@
 
-XEP 0027
-========
+XEP-0027: Current Jabber OpenPGP Usage
+======================================
 
 .. module:: slixmpp.plugins.xep_0027
 

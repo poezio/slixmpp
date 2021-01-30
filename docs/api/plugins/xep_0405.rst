@@ -1,6 +1,6 @@
 
-XEP 0405
-========
+XEP-0405: MIX-PAM
+=================
 
 .. module:: slixmpp.plugins.xep_0405
 

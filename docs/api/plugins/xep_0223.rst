@@ -1,6 +1,6 @@
 
-XEP 0223
-========
+XEP-0223: Persistent Storage of Private Data via PubSub
+=======================================================
 
 .. module:: slixmpp.plugins.xep_0223
 

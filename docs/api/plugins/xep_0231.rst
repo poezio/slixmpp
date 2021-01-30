@@ -1,6 +1,6 @@
 
-XEP 0231
-========
+XEP-0231: Bits of Binary
+========================
 
 .. module:: slixmpp.plugins.xep_0231
 

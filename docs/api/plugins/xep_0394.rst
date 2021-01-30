@@ -1,6 +1,6 @@
 
-XEP 0394
-========
+XEP-0394: Message Markup
+========================
 
 .. module:: slixmpp.plugins.xep_0394
 

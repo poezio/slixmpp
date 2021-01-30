@@ -1,6 +1,6 @@
 
-XEP 0049
-========
+XEP-0049: Private XML Storage
+=============================
 
 .. module:: slixmpp.plugins.xep_0049
 

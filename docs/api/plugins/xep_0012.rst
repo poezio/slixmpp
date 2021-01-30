@@ -1,6 +1,6 @@
 
-XEP 0012
-========
+XEP-0012: Last Activity
+=======================
 
 .. module:: slixmpp.plugins.xep_0012
 

@@ -1,6 +1,6 @@
 
-XEP 0172
-========
+XEP-0172: User Nickname
+=======================
 
 .. module:: slixmpp.plugins.xep_0172
 
