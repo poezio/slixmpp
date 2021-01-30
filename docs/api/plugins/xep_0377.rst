@@ -1,6 +1,6 @@
 
-XEP 0377
-========
+XEP-0377: Spam Reporting
+========================
 
 .. module:: slixmpp.plugins.xep_0377
 

@@ -1,6 +1,6 @@
 
-XEP 0186
-========
+XEP-0186: Invisible Command
+===========================
 
 .. module:: slixmpp.plugins.xep_0186
 

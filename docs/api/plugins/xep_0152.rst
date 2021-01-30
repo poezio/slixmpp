@@ -1,6 +1,6 @@
 
-XEP 0152
-========
+XEP-0152: Reachability Addresses
+================================
 
 .. module:: slixmpp.plugins.xep_0152
 

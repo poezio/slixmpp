@@ -1,6 +1,6 @@
 
-XEP 0222
-========
+XEP-0222: Persistent Storage of Public Data via PubSub
+======================================================
 
 .. module:: slixmpp.plugins.xep_0222
 

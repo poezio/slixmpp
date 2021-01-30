@@ -1,6 +1,6 @@
 
-XEP 0319
-========
+XEP-0319: Last User Interaction in Presence
+===========================================
 
 .. module:: slixmpp.plugins.xep_0319
 

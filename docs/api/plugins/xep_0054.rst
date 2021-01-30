@@ -1,6 +1,6 @@
 
-XEP 0054
-========
+XEP-0054: vcard-temp
+====================
 
 .. module:: slixmpp.plugins.xep_0054
 

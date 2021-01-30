@@ -1,6 +1,6 @@
 
-XEP 0163
-========
+XEP-0163: Personal Eventing Protocol (PEP)
+==========================================
 
 .. module:: slixmpp.plugins.xep_0163
 

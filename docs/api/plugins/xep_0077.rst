@@ -1,6 +1,6 @@
 
-XEP 0077
-========
+XEP-0077: In-Band Registration
+==============================
 
 .. module:: slixmpp.plugins.xep_0077
 

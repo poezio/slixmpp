@@ -1,6 +1,6 @@
 
-XEP 0184
-========
+XEP-0184: Message Delivery Receipts
+===================================
 
 .. module:: slixmpp.plugins.xep_0184
 

@@ -1,6 +1,6 @@
 
-XEP 0133
-========
+XEP-0133: Service Administration
+================================
 
 .. module:: slixmpp.plugins.xep_0133
 

@@ -1,6 +1,6 @@
 
-XEP 0070
-========
+XEP-0070: Verifying HTTP Requests via XMPP
+==========================================
 
 .. module:: slixmpp.plugins.xep_0070
 

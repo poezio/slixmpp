@@ -1,6 +1,6 @@
 
-XEP 0313
-========
+XEP-0313: Message Archive Management
+====================================
 
 .. module:: slixmpp.plugins.xep_0313
 

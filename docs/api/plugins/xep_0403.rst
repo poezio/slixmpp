@@ -1,6 +1,6 @@
 
-XEP 0403
-========
+XEP-0403: MIX-Presence
+======================
 
 .. module:: slixmpp.plugins.xep_0403
 

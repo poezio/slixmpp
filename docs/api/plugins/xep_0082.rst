@@ -1,6 +1,6 @@
 
-XEP 0082
-========
+XEP-0082: XMPP Date and Time Profiles
+=====================================
 
 .. module:: slixmpp.plugins.xep_0082
 

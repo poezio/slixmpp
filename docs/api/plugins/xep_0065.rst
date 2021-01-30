@@ -1,6 +1,6 @@
 
-XEP 0065
-========
+XEP-0065: SOCKS5 Bytestreams
+============================
 
 .. module:: slixmpp.plugins.xep_0065
 

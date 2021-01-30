@@ -1,6 +1,6 @@
 
-XEP 0380
-========
+XEP-0380: Explicit Message Encryption
+=====================================
 
 .. module:: slixmpp.plugins.xep_0380
 

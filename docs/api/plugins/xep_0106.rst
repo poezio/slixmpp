@@ -1,6 +1,6 @@
 
-XEP 0106
-========
+XEP-0106: JID Escaping
+======================
 
 .. module:: slixmpp.plugins.xep_0106
 

@@ -1,6 +1,6 @@
 
-XEP 0198
-========
+XEP-0198: Stream Management
+===========================
 
 .. module:: slixmpp.plugins.xep_0198
 

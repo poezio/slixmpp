@@ -1,6 +1,6 @@
 
-XEP 0369
-========
+XEP-0369: MIX-CORE
+==================
 
 .. module:: slixmpp.plugins.xep_0369
 

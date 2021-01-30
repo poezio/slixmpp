@@ -1,6 +1,6 @@
 
-XEP 0235
-========
+XEP-0235: OAuth Over XMPP
+=========================
 
 .. module:: slixmpp.plugins.xep_0235
 

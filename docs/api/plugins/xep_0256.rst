@@ -1,6 +1,6 @@
 
-XEP 0256
-========
+XEP-0256: Last Activity in Presence
+===================================
 
 .. module:: slixmpp.plugins.xep_0256
 
