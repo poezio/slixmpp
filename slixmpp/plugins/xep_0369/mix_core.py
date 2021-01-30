@@ -72,9 +72,22 @@ class XEP_0369(BasePlugin):
 
     def session_bind(self, jid):
         self.xmpp.plugin['xep_0030'].add_feature(stanza.NS)
+        self.xmpp.plugin['xep_0060'].map_node_event(
+            'urn:xmpp:mix:nodes:participants',
+            'mix_participant_info',
+        )
+        self.xmpp.plugin['xep_0060'].map_node_event(
+            'urn:xmpp:mix:nodes:info',
+            'mix_channel_info',
+        )
 
     def plugin_end(self):
         self.xmpp.plugin['xep_0030'].del_feature(feature=stanza.NS)
+        node_map = self.xmpp.plugin['xep_0060'].node_event_map
+        if 'urn:xmpp:mix:nodes:info' in node_map:
+            del node_map['urn:xmpp:mix:nodes:info']
+        if 'urn:xmpp:mix:nodes:participants' in node_map:
+            del node_map['urn:xmpp:mix:nodes:participants']
 
     async def get_channel_info(self, channel: JID) -> InfoType:
         """"
