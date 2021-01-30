@@ -19,7 +19,7 @@ class XEP_0425(BasePlugin):
     '''XEP-0425: Message Moderation'''
 
     name = 'xep_0425'
-    description = 'Message Moderation'
+    description = 'XEP-0425: Message Moderation'
     dependencies = {'xep_0424', 'xep_0421'}
     stanza = stanza
     namespace = stanza.NS

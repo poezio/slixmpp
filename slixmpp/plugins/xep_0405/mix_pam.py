@@ -28,7 +28,7 @@ class XEP_0405(BasePlugin):
     '''XEP-0405: MIX-PAM'''
 
     name = 'xep_0405'
-    description = 'MIX-PAM'
+    description = 'XEP-0405: MIX-PAM'
     dependencies = {'xep_0369'}
     stanza = stanza
     namespace = stanza.NS

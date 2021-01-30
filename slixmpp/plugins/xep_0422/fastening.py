@@ -13,7 +13,7 @@ class XEP_0422(BasePlugin):
     '''XEP-0422: Message Fastening'''
 
     name = 'xep_0422'
-    description = 'Message Fastening'
+    description = 'XEP-0422: Message Fastening'
     dependencies = {'xep_0030'}
     stanza = stanza
     namespace = stanza.NS

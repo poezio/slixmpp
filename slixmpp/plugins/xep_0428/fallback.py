@@ -13,7 +13,7 @@ class XEP_0428(BasePlugin):
     '''XEP-0428: Fallback Indication'''
 
     name = 'xep_0428'
-    description = 'Fallback Indication'
+    description = 'XEP-0428: Fallback Indication'
     dependencies = set()
     stanza = stanza
     namespace = stanza.NS

@@ -25,7 +25,7 @@ class XEP_0424(BasePlugin):
     '''XEP-0424: Message Retraction'''
 
     name = 'xep_0424'
-    description = 'Message Retraction'
+    description = 'XEP-0424: Message Retraction'
     dependencies = {'xep_0422', 'xep_0030', 'xep_0359', 'xep_0428', 'xep_0334'}
     stanza = stanza
     namespace = stanza.NS
