@@ -31,7 +31,7 @@ class XEP_0404(BasePlugin):
     '''XEP-0404: MIX JID Hidden Channels'''
 
     name = 'xep_0404'
-    description = 'MIX-ANON'
+    description = 'XEP-0404: MIX-ANON'
     dependencies = {'xep_0369'}
     stanza = stanza
     namespace = stanza.NS

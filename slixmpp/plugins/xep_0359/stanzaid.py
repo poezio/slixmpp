@@ -13,7 +13,7 @@ class XEP_0359(BasePlugin):
     '''XEP-0359: Unique and Stable Stanza IDs'''
 
     name = 'xep_0359'
-    description = 'Unique and Stable Stanza IDs'
+    description = 'XEP-0359: Unique and Stable Stanza IDs'
     dependencies = set()
     stanza = stanza
     namespace = stanza.NS
