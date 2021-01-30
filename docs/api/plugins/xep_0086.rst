@@ -1,6 +1,6 @@
 
-XEP 0086
-========
+XEP-0086: Error Condition Mappings
+==================================
 
 .. module:: slixmpp.plugins.xep_0086
 

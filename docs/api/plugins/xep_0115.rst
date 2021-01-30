@@ -1,6 +1,6 @@
 
-XEP 0115
-========
+XEP-0115: Entity Capabilities
+=============================
 
 .. module:: slixmpp.plugins.xep_0115
 

@@ -1,6 +1,6 @@
 
-XEP 0258
-========
+XEP-0258: Security Labels in XMPP
+=================================
 
 .. module:: slixmpp.plugins.xep_0258
 

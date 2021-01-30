@@ -1,6 +1,6 @@
 
-XEP 0066
-========
+XEP-0066: Out of Band Data
+==========================
 
 .. module:: slixmpp.plugins.xep_0066
 

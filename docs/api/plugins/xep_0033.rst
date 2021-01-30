@@ -1,6 +1,6 @@
 
-XEP 0033
-========
+XEP-0033: Extended Stanza Addressing
+====================================
 
 .. module:: slixmpp.plugins.xep_0033
 

@@ -1,6 +1,6 @@
 
-XEP 0107
-========
+XEP-0107: User Mood
+===================
 
 .. module:: slixmpp.plugins.xep_0107
 

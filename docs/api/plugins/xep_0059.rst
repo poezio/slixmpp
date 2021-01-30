@@ -1,6 +1,6 @@
 
-XEP 0059
-========
+XEP-0059: Result Set Management
+===============================
 
 .. module:: slixmpp.plugins.xep_0059
 

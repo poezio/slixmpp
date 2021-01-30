@@ -1,6 +1,6 @@
 
-XEP 0353
-========
+XEP-0353: Jingle Message Initiation
+===================================
 
 .. module:: slixmpp.plugins.xep_0353
 

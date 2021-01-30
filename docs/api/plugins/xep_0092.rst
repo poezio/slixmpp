@@ -1,6 +1,6 @@
 
-XEP 0092
-========
+XEP-0092: Software Version
+==========================
 
 .. module:: slixmpp.plugins.xep_0092
 

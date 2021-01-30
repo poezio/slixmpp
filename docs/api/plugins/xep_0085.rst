@@ -1,6 +1,6 @@
 
-XEP 0085
-========
+XEP-0085: Chat State Notifications
+==================================
 
 .. module:: slixmpp.plugins.xep_0085
 

@@ -1,6 +1,6 @@
 
-XEP 0439
-========
+XEP-0439: Quick Response
+========================
 
 .. module:: slixmpp.plugins.xep_0439
 

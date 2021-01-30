@@ -1,6 +1,6 @@
 
-XEP 0221
-========
+XEP-0221: Data Forms Media Element
+==================================
 
 .. module:: slixmpp.plugins.xep_0221
 

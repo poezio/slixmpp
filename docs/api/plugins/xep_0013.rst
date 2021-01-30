@@ -1,6 +1,6 @@
 
-XEP 0013
-========
+XEP-0013: Flexible Offline Message Retrieval
+============================================
 
 .. module:: slixmpp.plugins.xep_0013
 

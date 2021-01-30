@@ -1,6 +1,6 @@
 
-XEP 0118
-========
+XEP-0118: User Tune
+===================
 
 .. module:: slixmpp.plugins.xep_0118
 

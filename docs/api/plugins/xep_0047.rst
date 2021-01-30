@@ -1,6 +1,6 @@
 
-XEP 0047
-========
+XEP-0047: In-band Bytestreams
+=============================
 
 .. module:: slixmpp.plugins.xep_0047
 

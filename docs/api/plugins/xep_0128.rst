@@ -1,6 +1,6 @@
 
-XEP 0128
-========
+XEP-0128: Service Discovery Extensions
+======================================
 
 .. module:: slixmpp.plugins.xep_0128
 

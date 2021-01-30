@@ -1,6 +1,6 @@
 
-XEP 0191
-========
+XEP-0191: Blocking Command
+==========================
 
 .. module:: slixmpp.plugins.xep_0191
 

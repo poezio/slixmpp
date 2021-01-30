@@ -1,6 +1,6 @@
 
-XEP 0224
-========
+XEP-0224: Attention
+===================
 
 .. module:: slixmpp.plugins.xep_0224
 

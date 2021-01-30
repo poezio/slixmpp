@@ -1,6 +1,6 @@
 
-XEP 0084
-========
+XEP-0084: User Avatar
+=====================
 
 .. module:: slixmpp.plugins.xep_0084
 

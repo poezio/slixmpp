@@ -1,6 +1,6 @@
 
-XEP 0079
-========
+XEP-0079: Advanced Message Processing
+=====================================
 
 .. module:: slixmpp.plugins.xep_0079
 

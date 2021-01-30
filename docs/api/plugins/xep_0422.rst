@@ -1,6 +1,6 @@
 
-XEP 0422
-========
+XEP-0422: Message Fastening
+===========================
 
 .. module:: slixmpp.plugins.xep_0422
 

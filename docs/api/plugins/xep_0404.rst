@@ -1,6 +1,6 @@
 
-XEP 0404
-========
+XEP-0404: MIX-ANON
+==================
 
 .. module:: slixmpp.plugins.xep_0404
 

@@ -1,6 +1,6 @@
 
-XEP 0300
-========
+XEP-0300: Use of Cryptographic Hash Functions in XMPP
+=====================================================
 
 .. module:: slixmpp.plugins.xep_0300
 

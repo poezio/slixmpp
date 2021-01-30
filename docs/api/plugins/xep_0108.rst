@@ -1,6 +1,6 @@
 
-XEP 0108
-========
+XEP-0108: User Activity
+=======================
 
 .. module:: slixmpp.plugins.xep_0108
 

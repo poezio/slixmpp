@@ -1,6 +1,6 @@
 
-XEP 0363
-========
+XEP-0363: HTTP File Upload
+==========================
 
 .. module:: slixmpp.plugins.xep_0363
 
