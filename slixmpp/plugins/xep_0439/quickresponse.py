@@ -23,7 +23,7 @@ class XEP_0439(BasePlugin):
     '''XEP-0439: Quick Response'''
 
     name = 'xep_0439'
-    description = 'Quick Response'
+    description = 'XEP-0439: Quick Response'
     dependencies = set()
     stanza = stanza
     namespace = stanza.NS

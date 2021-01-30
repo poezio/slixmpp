@@ -50,7 +50,7 @@ class XEP_0369(BasePlugin):
     '''XEP-0369: MIX-CORE'''
 
     name = 'xep_0369'
-    description = 'MIX-CORE'
+    description = 'XEP-0369: MIX-CORE'
     dependencies = {'xep_0030', 'xep_0060', 'xep_0082', 'xep_0004'}
     stanza = stanza
     namespace = stanza.NS
