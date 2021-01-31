@@ -184,6 +184,8 @@ class XEP_0045(BasePlugin):
             self.rooms[entry['room']][entry['nick']] = entry
         log.debug("MUC presence from %s/%s : %s", entry['room'],entry['nick'], entry)
         self.xmpp.event("groupchat_presence", pr)
+        if 110 in pr['muc']['status_codes']:
+            self.xmpp.event("muc::%s::self-presence" % entry['room'], pr)
         self.xmpp.event("muc::%s::presence" % entry['room'], pr)
         if got_offline:
             self.xmpp.event("muc::%s::got_offline" % entry['room'], pr)
