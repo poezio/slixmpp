@@ -91,6 +91,8 @@ class XEP_0045(BasePlugin):
                 StanzaPath("presence/muc"),
                 self.handle_groupchat_presence,
         ))
+        # <x xmlns="http://jabber.org/protocol/muc"/> is only used when joining
+        # on the client side, and for errors on the server side.
         if self.xmpp.is_component:
             self.xmpp.register_handler(
                 Callback(
@@ -98,6 +100,13 @@ class XEP_0045(BasePlugin):
                     StanzaPath("presence/muc_join"),
                     self.handle_groupchat_join,
             ))
+        self.xmpp.register_handler(
+            Callback(
+                "MUCPresenceError",
+                StanzaPath("presence@type=error/muc_join"),
+                self._handle_presence_error,
+            )
+        )
 
         self.xmpp.register_handler(
             Callback(
@@ -191,6 +200,10 @@ class XEP_0045(BasePlugin):
             self.xmpp.event("muc::%s::got_offline" % entry['room'], pr)
         if got_online:
             self.xmpp.event("muc::%s::got_online" % entry['room'], pr)
+
+    def _handle_presence_error(self, pr: Presence):
+        """Generate MUC presence error events"""
+        self.xmpp.event("muc::%s::presence-error" % pr['from'].bare, pr)
 
     def handle_groupchat_presence(self, pr: Presence):
         """ Handle a presence in a muc."""
