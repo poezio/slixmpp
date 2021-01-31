@@ -30,7 +30,7 @@ import weakref
 import uuid
 
 from asyncio import iscoroutinefunction, wait, Future
-
+from contextlib import contextmanager
 import xml.etree.ElementTree as ET
 
 from slixmpp.xmlstream.asyncio import asyncio
@@ -1208,3 +1208,16 @@ class XMLStream(asyncio.BaseProtocol):
             disposable=True,
         )
         return await asyncio.wait_for(fut, timeout, loop=self.loop)
+
+    @contextmanager
+    def event_handler(self, event: str, handler: Callable):
+        """
+        Context manager that adds then removes an event handler.
+        """
+        self.add_event_handler(event, handler)
+        try:
+            yield
+        except Exception as exc:
+            raise
+        finally:
+            self.del_event_handler(event, handler)

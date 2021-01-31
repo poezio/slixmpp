@@ -8,8 +8,11 @@
 """
 from __future__ import with_statement
 
+import asyncio
 import logging
+from datetime import datetime
 from typing import (
+    Dict,
     List,
     Tuple,
     Optional,
@@ -27,7 +30,7 @@ from slixmpp.xmlstream.handler.callback import Callback
 from slixmpp.xmlstream.matcher.xpath import MatchXPath
 from slixmpp.xmlstream.matcher.stanzapath import StanzaPath
 from slixmpp.xmlstream.matcher.xmlmask import MatchXMLMask
-from slixmpp.exceptions import IqError, IqTimeout
+from slixmpp.exceptions import IqError, IqTimeout, PresenceError
 
 from slixmpp.plugins.xep_0045 import stanza
 from slixmpp.plugins.xep_0045.stanza import (
@@ -91,6 +94,9 @@ class XEP_0045(BasePlugin):
                 StanzaPath("presence/muc"),
                 self.handle_groupchat_presence,
         ))
+        # <x xmlns="http://jabber.org/protocol/muc"/> is only used in
+        # presence when joining on the client side, and for errors on
+        # the server side.
         if self.xmpp.is_component:
             self.xmpp.register_handler(
                 Callback(
@@ -98,6 +104,13 @@ class XEP_0045(BasePlugin):
                     StanzaPath("presence/muc_join"),
                     self.handle_groupchat_join,
             ))
+        self.xmpp.register_handler(
+            Callback(
+                "MUCPresenceError",
+                StanzaPath("presence@type=error/muc_join"),
+                self._handle_presence_error,
+            )
+        )
 
         self.xmpp.register_handler(
             Callback(
@@ -184,11 +197,17 @@ class XEP_0045(BasePlugin):
             self.rooms[entry['room']][entry['nick']] = entry
         log.debug("MUC presence from %s/%s : %s", entry['room'],entry['nick'], entry)
         self.xmpp.event("groupchat_presence", pr)
+        if 110 in pr['muc']['status_codes']:
+            self.xmpp.event("muc::%s::self-presence" % entry['room'], pr)
         self.xmpp.event("muc::%s::presence" % entry['room'], pr)
         if got_offline:
             self.xmpp.event("muc::%s::got_offline" % entry['room'], pr)
         if got_online:
             self.xmpp.event("muc::%s::got_online" % entry['room'], pr)
+
+    def _handle_presence_error(self, pr: Presence):
+        """Generate MUC presence error events"""
+        self.xmpp.event("muc::%s::presence-error" % pr['from'].bare, pr)
 
     def handle_groupchat_presence(self, pr: Presence):
         """ Handle a presence in a muc."""
@@ -237,6 +256,70 @@ class XEP_0045(BasePlugin):
             if entry is not None and entry['jid'].full == jid:
                 return nick
         return None
+
+    async def join_muc_wait(self, room: JID, nick: str, *,
+                            password: Optional[str] = None,
+                            maxchars: Optional[int] = None,
+                            maxstanzas: Optional[int] = None,
+                            seconds: Optional[int] = None,
+                            since: Optional[datetime] = None,
+                            presence_options: Optional[Dict[str, str]] = None,
+                            timeout: int = 30) -> Presence:
+        """
+        Try to join a MUC and block until we are joined or get an error.
+
+        Only one of {maxchars, maxstanzas, seconds, since} will be used, in
+        that order.
+
+        :param password: The optional room password.
+        :param maxchars: Max number of characters to return from history.
+        :param maxstanzas: Max number of stanzas to return from history.
+        :param seconds: Fetch history until that many seconds in the past.
+        :param since: Fetch history since that timestamp.
+        :raises: A slixmpp.exceptions.PresenceError if the MUC returns a
+                 presence error.
+        :raises: An asyncio.TimeoutError if there is neither success nor
+                presence error when the timeout is reached.
+        :return: Our own presence
+        """
+        if presence_options is None:
+            presence_options = {}
+        stanza = self.xmpp.make_presence(
+            pto="%s/%s" % (room, nick),
+            **presence_options
+        )
+        stanza.enable('muc_join')
+        if password is not None:
+            stanza['muc_join']['password'] = password
+        if maxchars is not None:
+            stanza['muc_join']['history']['maxchars'] = str(maxchars)
+        elif maxstanzas is not None:
+            stanza['muc_join']['history']['maxstanzas'] = str(maxstanzas)
+        elif seconds is not None:
+            stanza['muc_join']['history']['seconds'] = str(seconds)
+        elif since is not None:
+            fmt = self.xmpp.plugin['xep_0082'].format_datetime(since)
+            stanza['muc_join']['history']['since'] = fmt
+        self.rooms[room] = {}
+        self.our_nicks[room] = nick
+        stanza.send()
+
+        future = asyncio.Future()
+        context1 = self.xmpp.event_handler("muc::%s::self-presence" % room, future.set_result)
+        context2 = self.xmpp.event_handler("muc::%s::presence-error" % room, future.set_result)
+        with context1, context2:
+            done, pending = await asyncio.wait(
+                [future],
+                timeout=timeout,
+            )
+        if pending:
+            raise asyncio.TimeoutError()
+        pres = await future
+        if pres['type'] == 'error':
+            raise PresenceError(pres)
+        # update known nick in case it has changed
+        self.our_nicks[room] = pres['from'].resource
+        return pres
 
     def join_muc(self, room: JID, nick: str, maxhistory="0", password='',
                  pstatus='', pshow='', pfrom=''):
