@@ -264,7 +264,7 @@ class XEP_0045(BasePlugin):
                             seconds: Optional[int] = None,
                             since: Optional[datetime] = None,
                             presence_options: Optional[Dict[str, str]] = None,
-                            timeout: int = 30) -> Presence:
+                            timeout: Optional[int] = None) -> Presence:
         """
         Try to join a MUC and block until we are joined or get an error.
 
@@ -276,6 +276,8 @@ class XEP_0045(BasePlugin):
         :param maxstanzas: Max number of stanzas to return from history.
         :param seconds: Fetch history until that many seconds in the past.
         :param since: Fetch history since that timestamp.
+        :param timeout: Timeout after which a TimeoutError is raised.
+                        None means no timeout.
         :raises: A slixmpp.exceptions.PresenceError if the MUC returns a
                  presence error.
         :raises: An asyncio.TimeoutError if there is neither success nor
