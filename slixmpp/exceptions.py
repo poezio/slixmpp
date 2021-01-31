@@ -101,3 +101,17 @@ class IqError(XMPPError):
 
         #: The :class:`~slixmpp.stanza.iq.Iq` error result stanza.
         self.iq = iq
+
+
+class PresenceError(XMPPError):
+    """
+    An exception raised in specific circumstances for presences
+    of type 'error' received.
+    """
+    def __init__(self, pres):
+        super().__init__(
+            condition=pres['error']['condition'],
+            text=pres['error']['text'],
+            etype=pres['error']['type'],
+        )
+        self.presence = pres
