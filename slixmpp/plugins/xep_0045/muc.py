@@ -8,8 +8,11 @@
 """
 from __future__ import with_statement
 
+import asyncio
 import logging
+from datetime import datetime
 from typing import (
+    Dict,
     List,
     Tuple,
     Optional,
@@ -27,7 +30,7 @@ from slixmpp.xmlstream.handler.callback import Callback
 from slixmpp.xmlstream.matcher.xpath import MatchXPath
 from slixmpp.xmlstream.matcher.stanzapath import StanzaPath
 from slixmpp.xmlstream.matcher.xmlmask import MatchXMLMask
-from slixmpp.exceptions import IqError, IqTimeout
+from slixmpp.exceptions import IqError, IqTimeout, PresenceError
 
 from slixmpp.plugins.xep_0045 import stanza
 from slixmpp.plugins.xep_0045.stanza import (
@@ -252,6 +255,70 @@ class XEP_0045(BasePlugin):
             if entry is not None and entry['jid'].full == jid:
                 return nick
         return None
+
+    async def join_muc_wait(self, room: JID, nick: str, *,
+                            password: Optional[str] = None,
+                            maxchars: Optional[int] = None,
+                            maxstanzas: Optional[int] = None,
+                            seconds: Optional[int] = None,
+                            since: Optional[datetime] = None,
+                            presence_options: Optional[Dict[str, str]] = None,
+                            timeout: int = 30) -> Presence:
+        """
+        Try to join a MUC and block until we are joined or get an error.
+
+        Only one of {maxchars, maxstanzas, seconds, since} will be used, in
+        that order.
+
+        :param password: The optional room password.
+        :param maxchars: Max number of characters to return from history.
+        :param maxstanzas: Max number of stanzas to return from history.
+        :param seconds: Fetch history until that many seconds in the past.
+        :param since: Fetch history since that timestamp.
+        :raises: A slixmpp.exceptions.PresenceError if the MUC returns a
+                 presence error.
+        :raises: An asyncio.TimeoutError if there is neither success nor
+                presence error when the timeout is reached.
+        :return: Our own presence
+        """
+        if presence_options is None:
+            presence_options = {}
+        stanza = self.xmpp.make_presence(
+            pto="%s/%s" % (room, nick),
+            **presence_options
+        )
+        stanza.enable('muc_join')
+        if password is not None:
+            stanza['muc_join']['password'] = password
+        if maxchars is not None:
+            stanza['muc_join']['history']['maxchars'] = str(maxchars)
+        elif maxstanzas is not None:
+            stanza['muc_join']['history']['maxstanzas'] = str(maxstanzas)
+        elif seconds is not None:
+            stanza['muc_join']['history']['seconds'] = str(seconds)
+        elif since is not None:
+            fmt = self.xmpp.plugin['xep_0082'].format_datetime(since)
+            stanza['muc_join']['history']['since'] = fmt
+        self.rooms[room] = {}
+        self.our_nicks[room] = nick
+        stanza.send()
+
+        future = asyncio.Future()
+        context1 = self.xmpp.event_handler("muc::%s::self-presence" % room, future.set_result)
+        context2 = self.xmpp.event_handler("muc::%s::presence-error" % room, future.set_result)
+        with context1, context2:
+            done, pending = await asyncio.wait(
+                [future],
+                timeout=timeout,
+            )
+        if pending:
+            raise asyncio.TimeoutError()
+        pres = await future
+        if pres['type'] == 'error':
+            raise PresenceError(pres)
+        # update known nick in case it has changed
+        self.our_nicks[room] = pres['from'].resource
+        return pres
 
     def join_muc(self, room: JID, nick: str, maxhistory="0", password='',
                  pstatus='', pshow='', pfrom=''):
