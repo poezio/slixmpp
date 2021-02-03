@@ -11,9 +11,14 @@
     :copyright: (c) 2011 Nathanael C. Fritz
     :license: MIT, see LICENSE for more details
 """
+from __future__ import annotations
 
 import asyncio
 import logging
+
+from typing import (
+    TYPE_CHECKING,
+)
 
 from slixmpp import plugins, roster, stanza
 from slixmpp.api import APIRegistry
@@ -33,6 +38,11 @@ from slixmpp.plugins import PluginManager, load_plugin
 
 log = logging.getLogger(__name__)
 
+
+if TYPE_CHECKING:
+    from slixmpp.types import PluginsDict
+
+
 class BaseXMPP(XMLStream):
 
     """
@@ -43,6 +53,10 @@ class BaseXMPP(XMLStream):
     :param default_ns: Ensure that the correct default XML namespace
                        is used during initialization.
     """
+
+    # This is technically not correct, but much more useful to typecheck
+    # than the internal use of the PluginManager API
+    plugin: PluginsDict
 
     def __init__(self, jid='', default_ns='jabber:client', **kwargs):
         XMLStream.__init__(self, **kwargs)
