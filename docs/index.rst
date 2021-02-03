@@ -93,93 +93,26 @@ Here's your first Slixmpp Bot:
         xmpp.process()
 
 
-To read if you come from SleekXMPP
-----------------------------------
+Documentation Index
+-------------------
 
-.. toctree::
-    :maxdepth: 1
-
-    differences
-    using_asyncio
-
-
-Getting Started (with Examples)
--------------------------------
-.. toctree::
-    :maxdepth: 1
-
-    getting_started/echobot
-    getting_started/sendlogout
-    getting_started/component
-    getting_started/presence
-    getting_started/muc
-    getting_started/proxy
-    getting_started/scheduler
-    getting_started/iq
-
-
-Tutorials, FAQs, and How To Guides
-----------------------------------
-.. toctree::
-    :maxdepth: 1
-
-    xeps
-    xmpp_tdg
-    howto/stanzas
-    create_plugin
-    features
-    sasl
-    handlersmatchers
-
-Plugin Guides
-~~~~~~~~~~~~~
-.. toctree::
-    :maxdepth: 1
-
-    guide_xep_0030
-
-Slixmpp Architecture and Design
----------------------------------
-.. toctree::
-    :maxdepth: 3
-
-    architecture
-    plugin_arch
-
-API Reference
--------------
 .. toctree::
     :maxdepth: 2
 
+    getting_started/index
+    howto/index
+    api/index
+    api/stanza/index
     event_index
-    api/clientxmpp
-    api/componentxmpp
-    api/basexmpp
-    api/exceptions
-    api/xmlstream/jid
-    api/xmlstream/stanzabase
-    api/xmlstream/handler
-    api/xmlstream/matcher
-    api/xmlstream/xmlstream
-    api/xmlstream/tostring
+    sleekxmpp
+    architecture
 
 Plugins
 ~~~~~~~
-
 .. toctree::
     :maxdepth: 1
 
     api/plugins/index
-
-Core Stanzas
-~~~~~~~~~~~~
-.. toctree::
-    :maxdepth: 2
-
-    api/stanza/rootstanza
-    api/stanza/message
-    api/stanza/presence
-    api/stanza/iq
 
 Additional Info
 ---------------
