@@ -16,11 +16,6 @@ Slixmpp
     **Reporting bugs**
         You can report bugs at http://lab.louiz.org/poezio/slixmpp/issues.
 
-.. note::
-    slixmpp is a friendly fork of `SleekXMPP <https://github.com/fritzy/SleekXMPP>`_
-    which goal is to use asyncio instead of threads to handle networking. See
-    :ref:`differences`.
-
 Slixmpp is an :ref:`MIT licensed <license>` XMPP library for Python 3.7+,
 
 Slixmpp's design goals and philosphy are:
@@ -200,8 +195,29 @@ Additional Info
 * :ref:`modindex`
 * :ref:`search`
 
+
+Slixmpp Credits
+---------------
+
+**Maintainers:**
+    - Florent Le Coz (`louiz@louiz.org <xmpp:louiz@louiz.org?message>`_),
+    - Mathieu Pasquet (`mathieui@mathieui.net <xmpp:mathieui@mathieui.net?message>`_),
+    - Emmanuel Gil Peyrot (`Link mauve <xmpp:linkmauve@linkmauve.fr?message>`_)
+    - Maxime Buquet (`pep <xmpp:pep@bouah.net?message>`_)
+
+**Contributors:**
+    - Sam Whited (`Sam Whited <mailto:sam@samwhited.com>`_)
+    - Dan Sully (`Dan Sully <mailto:daniel@electricalrain.com>`_)
+    - Gasper Zejn (`Gasper Zejn <mailto:zejn@kiberpipa.org>`_)
+    - Krzysztof Kotlenga (`Krzysztof Kotlenga <mailto:pocek@users.sf.net>`_)
+    - Tsukasa Hiiragi (`Tsukasa Hiiragi <mailto:bakalolka@gmail.com>`_)
+
 SleekXMPP Credits
 -----------------
+
+Slixmpp is a friendly fork of `SleekXMPP <https://github.com/fritzy/SleekXMPP>`_
+which goal is to use asyncio instead of threads to handle networking. See
+:ref:`differences`. We are crediting SleekXMPP Authors here.
 
 .. note::
     Those people made SleekXMPP, so you should not bother them if
