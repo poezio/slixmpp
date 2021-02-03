@@ -3,7 +3,7 @@ Send/Receive IQ Stanzas
 
 Unlike :class:`~slixmpp.stanza.message.Message` and
 :class:`~slixmpp.stanza.presence.Presence` stanzas which only use
-text data for basic usage, :class:`~slixmpp.stanza.iq.Iq` stanzas
+text data for basic usage, :class:`~slixmpp.stanza.Iq` stanzas
 require using XML payloads, and generally entail creating a new
 Slixmpp plugin to provide the necessary convenience methods to
 make working with them easier.
@@ -11,7 +11,7 @@ make working with them easier.
 Basic Use
 ---------
 
-XMPP's use of :class:`~slixmpp.stanza.iq.Iq` stanzas is built around
+XMPP's use of :class:`~slixmpp.stanza.Iq` stanzas is built around
 namespaced ``<query />`` elements. For clients, just sending the
 empty ``<query />`` element will suffice for retrieving information. For
 example, a very basic implementation of service discovery would just
@@ -26,7 +26,7 @@ need to be able to send:
 Creating Iq Stanzas
 ~~~~~~~~~~~~~~~~~~~
 
-Slixmpp provides built-in support for creating basic :class:`~slixmpp.stanza.iq.Iq`
+Slixmpp provides built-in support for creating basic :class:`~slixmpp.stanza.Iq`
 stanzas this way. The relevant methods are:
 
 * :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq`
@@ -37,7 +37,7 @@ stanzas this way. The relevant methods are:
 * :meth:`~slixmpp.basexmpp.BaseXMPP.make_iq_query`
 
 These methods all follow the same pattern: create or modify an existing
-:class:`~slixmpp.stanza.iq.Iq` stanza, set the ``'type'`` value based
+:class:`~slixmpp.stanza.Iq` stanza, set the ``'type'`` value based
 on the method name, and finally add a ``<query />`` element with the given
 namespace. For example, to produce the query above, you would use:
 
@@ -50,18 +50,16 @@ namespace. For example, to produce the query above, you would use:
 Sending Iq Stanzas
 ~~~~~~~~~~~~~~~~~~
 
-Once an :class:`~slixmpp.stanza.iq.Iq` stanza is created, sending it
-over the wire is done using its :meth:`~slixmpp.stanza.iq.Iq.send()`
+Once an :class:`~slixmpp.stanza.Iq` stanza is created, sending it
+over the wire is done using its :meth:`~slixmpp.stanza.Iq.send()`
 method, like any other stanza object. However, there are a few extra
-options to control how to wait for the query's response.
+options to control how to wait for the query's response, as well as
+how to handle the result.
+
+:meth:`~slixmpp.stanza.Iq.send()` returns an :class:`~asyncio.Future`
+object, which can be awaited on until a ``result`` is received.
 
 These options are:
-
-* ``block``: The default behaviour is that :meth:`~slixmpp.stanza.iq.Iq.send()`
-  will block until a response is received and the response stanza will be the
-  return value. Setting ``block`` to ``False`` will cause the call to return
-  immediately. In which case, you will need to arrange some way to capture
-  the response stanza if you need it.
 
 * ``timeout``: When using the blocking behaviour, the call will eventually
   timeout with an error. The default timeout is 30 seconds, but this may
@@ -79,28 +77,33 @@ These options are:
 
 * ``callback``: When not using a blocking call, using the ``callback``
   argument is a simple way to register a handler that will execute
-  whenever a response is finally received. Using this method, there
-  is no timeout limit. In case you need to remove the callback, the
-  name of the newly created callback is returned.
+  whenever a response is finally received.
 
     .. code-block:: python
 
-       cb_name = iq.send(callback=self.a_callback)
+       iq.send(callback=self.a_callback)
 
-       # ... later if we need to cancel
-       self.remove_handler(cb_name)
+* ``timeout_callback``: A callback to execute when the provided
+  ``timeout`` is reached before an answer is received.
 
-Properly working with :class:`~slixmpp.stanza.iq.Iq` stanzas requires
+
+.. note::
+
+    Both ``callback`` and ``timeout_callback`` can be effectively
+    replaced using ``await``, and standard exception handling
+    (see below), which provide a more linear and readable workflow.
+
+Properly working with :class:`~slixmpp.stanza.Iq` stanzas requires
 handling the intended, normal flow, error responses, and timed out
 requests. To make this easier, two exceptions may be thrown by
-:meth:`~slixmpp.stanza.iq.Iq.send()`: :exc:`~slixmpp.exceptions.IqError`
+:meth:`~slixmpp.stanza.Iq.send()`: :exc:`~slixmpp.exceptions.IqError`
 and :exc:`~slixmpp.exceptions.IqTimeout`. These exceptions only
 apply to the default, blocking calls.
 
 .. code-block:: python
 
     try:
-        resp = iq.send()
+        resp = await iq.send()
         # ... do stuff with expected Iq result
     except IqError as e:
         err_resp = e.iq
@@ -116,7 +119,7 @@ exception:
 .. code-block:: python
 
     try:
-        resp = iq.send()
+        resp = await iq.send()
     except XMPPError:
         # ... Don't care about the response
         pass
@@ -126,7 +129,7 @@ Advanced Use
 
 Going beyond the basics provided by Slixmpp requires building at least a
 rudimentary Slixmpp plugin to create a :term:`stanza object` for
-interfacting with the :class:`~slixmpp.stanza.iq.Iq` payload.
+interfacting with the :class:`~slixmpp.stanza.Iq` payload.
 
 .. seealso::
 
@@ -135,13 +138,13 @@ interfacting with the :class:`~slixmpp.stanza.iq.Iq` payload.
     * :ref:`using-handlers-matchers`
 
 
-The typical way to respond to :class:`~slixmpp.stanza.iq.Iq` requests is
+The typical way to respond to :class:`~slixmpp.stanza.Iq` requests is
 to register stream handlers. As an example, suppose we create a stanza class
 named ``CustomXEP`` which uses the XML element ``<query xmlns="custom-xep" />``,
 and has a :attr:`~slixmpp.xmlstream.stanzabase.ElementBase.plugin_attrib` value
 of ``custom_xep``.
 
-There are two types of incoming :class:`~slixmpp.stanza.iq.Iq` requests:
+There are two types of incoming :class:`~slixmpp.stanza.Iq` requests:
 ``get`` and ``set``. You can register a handler that will accept both and then
 filter by type as needed, as so:
 
