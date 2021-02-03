@@ -1,13 +1,12 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 
 import logging
 
+from asyncio import Future
+from typing import Optional
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0118 import stanza, UserTune
 
@@ -33,9 +32,11 @@ class XEP_0118(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_tune', UserTune)
 
-    def publish_tune(self, artist=None, length=None, rating=None, source=None,
-                     title=None, track=None, uri=None, options=None,
-                     ifrom=None, callback=None, timeout=None, timeout_callback=None):
+    def publish_tune(self, *, artist: Optional[str] = None,
+                     length: Optional[int] =None, rating: Optional[int] = None,
+                     source: Optional[str] = None, title: Optional[str] = None,
+                     track: Optional[str] = None, uri: Optional[str] = None,
+                     **pubsubkwargs) -> Future:
         """
         Publish the user's current tune.
 
@@ -46,7 +47,6 @@ class XEP_0118(BasePlugin):
         :param title: The title of the song.
         :param track: The song's track number, or other unique identifier.
         :param uri: A URL to more information about the song.
-        :param options: Optional form of publish options.
         """
         tune = UserTune()
         tune['artist'] = artist
@@ -56,22 +56,19 @@ class XEP_0118(BasePlugin):
         tune['title'] = title
         tune['track'] = track
         tune['uri'] = uri
-        return self.xmpp['xep_0163'].publish(tune,
-                node=UserTune.namespace,
-                options=options,
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout,
-                timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            tune,
+            node=UserTune.namespace,
+            **pubsubkwargs
+        )
 
-    def stop(self, ifrom=None, callback=None, timeout=None, timeout_callback=None):
+    def stop(self, **pubsubkwargs) -> Future:
         """
         Clear existing user tune information to stop notifications.
         """
         tune = UserTune()
-        return self.xmpp['xep_0163'].publish(tune,
-                node=UserTune.namespace,
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout,
-                timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            tune,
+            node=UserTune.namespace,
+            **pubsubkwargs
+        )
