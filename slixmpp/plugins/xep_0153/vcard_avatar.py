@@ -152,13 +152,14 @@ class XEP_0153(BasePlugin):
         self.xmpp['xep_0054'].get_vcard(jid=jid.bare, ifrom=ifrom,
                                         callback=callback)
 
-    def _recv_presence(self, pres):
+    def _recv_presence(self, pres: Presence):
         try:
-            if pres['muc']['affiliation']:
+            if pres.get_plugin('muc', check=True):
                 # Don't process vCard avatars for MUC occupants
                 # since they all share the same bare JID.
                 return
-        except: pass
+        except:
+            pass
 
         if not pres.match('presence/vcard_temp_update'):
             self.api['set_hash'](pres['from'], args=None)
