@@ -7,8 +7,11 @@
 """
 
 import logging
+from asyncio import Future
+from typing import Optional
 
-from slixmpp import JID, Iq
+from slixmpp import JID
+from slixmpp.stanza import Iq
 from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
@@ -57,12 +60,22 @@ class XEP_0054(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature('vcard-temp')
 
-    def make_vcard(self):
+    def make_vcard(self) -> VCardTemp:
+        """Return an empty vcard element."""
         return VCardTemp()
 
     @future_wrapper
-    def get_vcard(self, jid=None, ifrom=None, local=None, cached=False,
-                  callback=None, timeout=None, timeout_callback=None):
+    def get_vcard(self, jid: Optional[JID] = None, *,
+                  local: Optional[bool] = None, cached: bool = False,
+                  ifrom: Optional[JID] = None,
+                  **iqkwargs) -> Future:
+        """Retrieve a VCard.
+
+        :param jid: JID of the entity to fetch the VCard from.
+        :param local: Only check internally for a vcard.
+        :param cached: Whether to check in the local cache before
+                       sending a query.
+        """
         if local is None:
             if jid is not None and not isinstance(jid, JID):
                 jid = JID(jid)
@@ -95,31 +108,28 @@ class XEP_0054(BasePlugin):
                     return iq
                 return vcard
 
-        iq = self.xmpp.Iq()
-        iq['to'] = jid
-        iq['from'] = ifrom
-        iq['type'] = 'get'
+        iq = self.xmpp.make_iq_get(ito=jid, ifrom=ifrom)
         iq.enable('vcard_temp')
-
-        return iq.send(callback=callback, timeout=timeout,
-                       timeout_callback=timeout_callback)
+        return iq.send(**iqkwargs)
 
     @future_wrapper
-    def publish_vcard(self, vcard=None, jid=None, ifrom=None,
-                      callback=None, timeout=None, timeout_callback=None):
+    def publish_vcard(self, vcard: Optional[VCardTemp] =None,
+                      jid: Optional[JID] = None,
+                      ifrom: Optional[JID] = None, **iqkwargs) -> Future:
+        """Publish a vcard.
+
+        :param vcard: The VCard to publish.
+        :param jid: The JID to publish the VCard to.
+        """
         self.api['set_vcard'](jid, None, ifrom, vcard)
         if self.xmpp.is_component:
             return
 
-        iq = self.xmpp.Iq()
-        iq['to'] = jid
-        iq['from'] = ifrom
-        iq['type'] = 'set'
+        iq = self.xmpp.make_iq_set(ito=jid, ifrom=ifrom)
         iq.append(vcard)
-        return iq.send(callback=callback, timeout=timeout,
-                       timeout_callback=timeout_callback)
+        return iq.send(**iqkwargs)
 
-    def _handle_get_vcard(self, iq):
+    def _handle_get_vcard(self, iq: Iq):
         if iq['type'] == 'result':
             self.api['set_vcard'](jid=iq['from'], args=iq['vcard_temp'])
             return
