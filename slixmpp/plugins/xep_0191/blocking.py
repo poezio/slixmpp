@@ -8,7 +8,15 @@
 
 import logging
 
-from slixmpp import Iq
+from asyncio import Future
+from typing import (
+    List,
+    Optional,
+    Set,
+    Union,
+)
+
+from slixmpp.stanza import Iq
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -17,6 +25,12 @@ from slixmpp.plugins.xep_0191 import stanza, Block, Unblock, BlockList
 
 
 log = logging.getLogger(__name__)
+
+BlockedJIDs = Union[
+    JID,
+    Set[JID],
+    List[JID]
+]
 
 
 class XEP_0191(BasePlugin):
@@ -45,42 +59,39 @@ class XEP_0191(BasePlugin):
         self.xmpp.remove_handler('Blocked Contact')
         self.xmpp.remove_handler('Unblocked Contact')
 
-    def get_blocked(self, ifrom=None, timeout=None, callback=None,
-                          timeout_callback=None):
-        iq = self.xmpp.Iq()
-        iq['type'] = 'get'
-        iq['from'] = ifrom
+    def get_blocked(self, ifrom: Optional[JID] = None, **iqkwargs) -> Future:
+        """Get the list of blocked JIDs."""
+        iq = self.xmpp.make_iq_get(ifrom=ifrom)
         iq.enable('blocklist')
-        return iq.send(timeout=timeout, callback=callback,
-                       timeout_callback=timeout_callback)
+        return iq.send(**iqkwargs)
 
-    def block(self, jids, ifrom=None, timeout=None, callback=None,
-                          timeout_callback=None):
-        iq = self.xmpp.Iq()
-        iq['type'] = 'set'
-        iq['from'] = ifrom
+    def block(self, jids: BlockedJIDs,
+              ifrom: Optional[JID] = None, **iqkwargs) -> Future:
+        """Block a JID or a list of JIDs.
 
+        :param jids: JID(s) to block.
+        """
+        iq = self.xmpp.make_iq_set(ifrom=ifrom)
         if not isinstance(jids, (set, list)):
             jids = [jids]
 
         iq['block']['items'] = jids
-        return iq.send(timeout=timeout, callback=callback,
-                       timeout_callback=timeout_callback)
+        return iq.send(**iqkwargs)
 
-    def unblock(self, jids=None, ifrom=None, timeout=None, callback=None,
-                      timeout_callback=None):
-        iq = self.xmpp.Iq()
-        iq['type'] = 'set'
-        iq['from'] = ifrom
+    def unblock(self, jids: BlockedJIDs, ifrom: Optional[JID] = None, **iqkwargs) -> Future:
+        """Unblock a JID or a list of JIDs.
 
+        :param jids: JID(s) to unblock.
+        """
         if jids is None:
-            jids = []
+            raise ValueError("jids cannot be empty.")
+        iq = self.xmpp.make_iq_set(ifrom=ifrom)
+
         if not isinstance(jids, (set, list)):
             jids = [jids]
 
         iq['unblock']['items'] = jids
-        return iq.send(timeout=timeout, callback=callback,
-                       timeout_callback=timeout_callback)
+        return iq.send(**iqkwargs)
 
     def _handle_blocked(self, iq):
         self.xmpp.event('blocked', iq)
