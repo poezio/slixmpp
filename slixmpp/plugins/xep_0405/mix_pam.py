@@ -106,7 +106,7 @@ class XEP_0405(BasePlugin):
         contacts = []
         mix = []
         for item in result['roster']:
-            channel = item._get_plugin('channel', check=True)
+            channel = item.get_plugin('channel', check=True)
             if channel:
                 mix.append(item)
             else:
