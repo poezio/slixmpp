@@ -157,10 +157,6 @@ class XMLStream(asyncio.BaseProtocol):
         #: non-SSL traffic and another for SSL traffic.
         self.use_ssl = False
 
-        #: If set to ``True``, attempt to connect through an HTTP
-        #: proxy based on the settings in :attr:`proxy_config`.
-        self.use_proxy = False
-
         #: If set to ``True``, attempt to use IPv6.
         self.use_ipv6 = True
 
@@ -172,13 +168,6 @@ class XMLStream(asyncio.BaseProtocol):
         #: Use CDATA for escaping instead of XML entities. Defaults
         #: to ``False``.
         self.use_cdata = False
-
-        #: An optional dictionary of proxy settings. It may provide:
-        #: :host: The host offering proxy services.
-        #: :port: The port for the proxy service.
-        #: :username: Optional username for accessing the proxy.
-        #: :password: Optional password for accessing the proxy.
-        self.proxy_config = {}
 
         #: The default namespace of the stream content, not of the
         #: stream wrapper itself.
