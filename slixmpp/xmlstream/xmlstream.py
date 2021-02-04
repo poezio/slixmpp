@@ -88,7 +88,9 @@ class XMLStream(asyncio.BaseProtocol):
         # The socket that is used internally by the transport object
         self.socket = None
 
-        self.connect_loop_wait = 0
+        # The backoff of the connect routine (increases exponentially
+        # after each failure)
+        self._connect_loop_wait = 0
 
         self.parser = None
         self.xml_depth = 0
@@ -284,7 +286,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         self.disconnect_reason = None
         self.cancel_connection_attempt()
-        self.connect_loop_wait = 0
+        self._connect_loop_wait = 0
         if host and port:
             self.address = (host, int(port))
         try:
@@ -309,9 +311,9 @@ class XMLStream(asyncio.BaseProtocol):
     async def _connect_routine(self):
         self.event_when_connected = "connected"
 
-        if self.connect_loop_wait > 0:
-            self.event('reconnect_delay', self.connect_loop_wait)
-            await asyncio.sleep(self.connect_loop_wait, loop=self.loop)
+        if self._connect_loop_wait > 0:
+            self.event('reconnect_delay', self._connect_loop_wait)
+            await asyncio.sleep(self._connect_loop_wait, loop=self.loop)
 
         record = await self.pick_dns_answer(self.default_domain)
         if record is not None:
@@ -337,7 +339,7 @@ class XMLStream(asyncio.BaseProtocol):
                                                    self.address[1],
                                                    ssl=ssl_context,
                                                    server_hostname=self.default_domain if self.use_ssl else None)
-            self.connect_loop_wait = 0
+            self._connect_loop_wait = 0
         except Socket.gaierror as e:
             self.event('connection_failed',
                        'No DNS record available for %s' % self.default_domain)
@@ -346,7 +348,7 @@ class XMLStream(asyncio.BaseProtocol):
             self.event("connection_failed", e)
             if self._current_connection_attempt is None:
                 return
-            self.connect_loop_wait = self.connect_loop_wait * 2 + 1
+            self._connect_loop_wait = self.connect_loop_wait * 2 + 1
             self._current_connection_attempt = asyncio.ensure_future(
                 self._connect_routine(),
                 loop=self.loop,
