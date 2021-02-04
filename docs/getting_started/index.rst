@@ -9,7 +9,5 @@ Getting Started (with examples)
     component
     presence
     muc
-    proxy
     scheduler
     iq
-
