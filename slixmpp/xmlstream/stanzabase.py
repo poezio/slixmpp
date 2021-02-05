@@ -1,17 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.xmlstream.stanzabase
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- module implements a wrapper layer for XML objects
-    that allows them to be treated like dictionaries.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.xmlstream.stanzabase
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# module implements a wrapper layer for XML objects
+# that allows them to be treated like dictionaries.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 from __future__ import annotations
 
 import copy

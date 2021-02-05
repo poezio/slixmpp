@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.basexmpp
-    ~~~~~~~~~~~~~~~~~~
-
-    This module provides the common XMPP functionality
-    for both clients and components.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
+# slixmpp.basexmpp
+# ~~~~~~~~~~~~~~~~~~
+# This module provides the common XMPP functionality
+# for both clients and components.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 from __future__ import annotations
 
 import asyncio

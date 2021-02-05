@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2012 Erik Reuterborg Larsson, Nathanael C. Fritz
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2012 Erik Reuterborg Larsson, Nathanael C. Fritz
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import logging
 
 from slixmpp.stanza import Message

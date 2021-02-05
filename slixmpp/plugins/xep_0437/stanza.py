@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Mathieu Pasquet
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Mathieu Pasquet
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from typing import Iterable
 from slixmpp import JID, Presence
 from slixmpp.xmlstream import (

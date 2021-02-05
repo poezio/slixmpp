@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permissio
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permissio
 from slixmpp.jid import JID
 from slixmpp.xmlstream import ElementBase, register_stanza_plugin
 
