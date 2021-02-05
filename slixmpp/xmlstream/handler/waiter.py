@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.xmlstream.handler.waiter
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.xmlstream.handler.waiter
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 import logging
 import asyncio
 from  asyncio import Queue, wait_for, TimeoutError

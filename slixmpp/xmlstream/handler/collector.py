@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.xmlstream.handler.collector
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2012 Nathanael C. Fritz, Lance J.T. Stout
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.xmlstream.handler.collector
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2012 Nathanael C. Fritz, Lance J.T. Stout
+# :license: MIT, see LICENSE for more details
 import logging
 from queue import Queue, Empty
 

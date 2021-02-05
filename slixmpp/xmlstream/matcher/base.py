@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.xmlstream.matcher.base
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.xmlstream.matcher.base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 
 class MatcherBase(object):
 

@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 "Maxime “pep” Buquet <pep@bouah.net>"
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 "Maxime “pep” Buquet <pep@bouah.net>"
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from slixmpp import JID, Message, Presence
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream import register_stanza_plugin

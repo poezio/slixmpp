@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-"""
-    Slixmpp: The Slick XMPP Library
-    Implementation of xeps for Internet of Things
-    http://wiki.xmpp.org/web/Tech_pages/IoT_systems
-    Copyright (C) 2013 Sustainable Innovation, Joachim.lindborg@sust.se
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Implementation of xeps for Internet of Things
+# http://wiki.xmpp.org/web/Tech_pages/IoT_systems
+# Copyright (C) 2013 Sustainable Innovation, Joachim.lindborg@sust.se
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 
 import logging
 
@@ -179,4 +175,3 @@ if __name__ == '__main__':
 
     else:
        print("noopp didn't happen")
-

@@ -1,11 +1,8 @@
-"""
-    slixmpp: The Slick XMPP Library
-    Copyright (C) 2016 Emmanuel Gil Peyrot
-    This file is part of slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# slixmpp: The Slick XMPP Library
+# Copyright (C) 2016 Emmanuel Gil Peyrot
+# This file is part of slixmpp.
+# See the file LICENSE for copying permission.
 from slixmpp.xmlstream import ElementBase
 
 NS ='urn:xmpp:chat-markers:0'

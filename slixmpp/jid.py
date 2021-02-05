@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.jid
-    ~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module allows for working with Jabber IDs (JIDs).
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.jid
+# ~~~~~~~~~~~~~~~~~~~~~~~
+# This module allows for working with Jabber IDs (JIDs).
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 import re
 import socket
 
