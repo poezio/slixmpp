@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2017 Emmanuel Gil Peyrot
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2017 Emmanuel Gil Peyrot
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from base64 import b64encode
 import hashlib
 import logging

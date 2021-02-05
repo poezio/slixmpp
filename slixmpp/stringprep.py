@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.stringprep
-    ~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module is a fallback using python’s stringprep instead of libidn’s.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2015 Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.stringprep
+# ~~~~~~~~~~~~~~~~~~~~~~~
+# This module is a fallback using python’s stringprep instead of libidn’s.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2015 Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+# :license: MIT, see LICENSE for more details
 import logging
 import stringprep
 from slixmpp.util import stringprep_profiles

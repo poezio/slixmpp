@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permissio
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permissio
 from slixmpp import JID
 from slixmpp.stanza import Iq
 from slixmpp.stanza.roster import Roster, RosterItem

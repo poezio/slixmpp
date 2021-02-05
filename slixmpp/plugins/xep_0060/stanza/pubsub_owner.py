@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011  Nathanael C. Fritz
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011  Nathanael C. Fritz
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from slixmpp import Iq
 from slixmpp.xmlstream import register_stanza_plugin, ElementBase, ET, JID
 from slixmpp.plugins.xep_0004 import Form
