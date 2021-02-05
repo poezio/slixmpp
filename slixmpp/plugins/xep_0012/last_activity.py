@@ -7,10 +7,16 @@
 """
 
 import logging
+from asyncio import Future
 from datetime import datetime, timedelta
+from typing import (
+    Dict,
+    Optional
+)
 
 from slixmpp.plugins import BasePlugin, register_plugin
-from slixmpp import future_wrapper, Iq
+from slixmpp import future_wrapper, JID
+from slixmpp.stanza import Iq
 from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import JID, register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
@@ -59,7 +65,11 @@ class XEP_0012(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature('jabber:iq:last')
 
-    def begin_idle(self, jid=None, status=None):
+    def begin_idle(self, jid: Optional[JID] = None, status: str = None):
+        """Reset the last activity for the given JID.
+
+        :param status: Optional status.
+        """
         self.set_last_activity(jid, 0, status)
 
     def end_idle(self, jid=None):
@@ -77,8 +87,12 @@ class XEP_0012(BasePlugin):
         self.api['del_last_activity'](jid)
 
     @future_wrapper
-    def get_last_activity(self, jid, local=False, ifrom=None, timeout=None,
-                          callback=None, timeout_callback=None):
+    def get_last_activity(self, jid: JID, local: bool = False,
+                          ifrom: Optional[JID] = None, **iqkwargs) -> Future:
+        """Get last activity for a specific JID.
+
+        :param local: Fetch the value from the local cache.
+        """
         if jid is not None and not isinstance(jid, JID):
             jid = JID(jid)
 
@@ -94,15 +108,11 @@ class XEP_0012(BasePlugin):
             log.debug("Looking up local last activity data for %s", jid)
             return self.api['get_last_activity'](jid, None, ifrom, None)
 
-        iq = self.xmpp.Iq()
-        iq['from'] = ifrom
-        iq['to'] = jid
-        iq['type'] = 'get'
+        iq = self.xmpp.make_iq_get(ito=jid, ifrom=ifrom)
         iq.enable('last_activity')
-        return iq.send(timeout=timeout, callback=callback,
-                       timeout_callback=timeout_callback)
+        return iq.send(**iqkwargs)
 
-    def _handle_get_last_activity(self, iq):
+    def _handle_get_last_activity(self, iq: Iq):
         log.debug("Received last activity query from " + \
                   "<%s> to <%s>.", iq['from'], iq['to'])
         reply = self.api['get_last_activity'](iq['to'], None, iq['from'], iq)
@@ -112,7 +122,7 @@ class XEP_0012(BasePlugin):
     # Default in-memory implementations for storing last activity data.
     # =================================================================
 
-    def _default_set_last_activity(self, jid, node, ifrom, data):
+    def _default_set_last_activity(self, jid: JID, node: str, ifrom: JID, data: Dict):
         seconds = data.get('seconds', None)
         if seconds is None:
             seconds = 0
@@ -125,11 +135,11 @@ class XEP_0012(BasePlugin):
             'seconds': datetime.now() - timedelta(seconds=seconds),
             'status': status}
 
-    def _default_del_last_activity(self, jid, node, ifrom, data):
+    def _default_del_last_activity(self, jid: JID, node: str, ifrom: JID, data: Dict):
         if jid in self._last_activities:
             del self._last_activities[jid]
 
-    def _default_get_last_activity(self, jid, node, ifrom, iq):
+    def _default_get_last_activity(self, jid: JID, node: str, ifrom: JID, iq: Iq) -> Iq:
         if not isinstance(iq, Iq):
             reply = self.xmpp.Iq()
         else:
