@@ -6,15 +6,49 @@
     See the file LICENSE for copying permission.
 """
 
+from __future__ import annotations
+
 import hashlib
 import logging
 
-from slixmpp import Iq
+from asyncio import Future
+from typing import (
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Set,
+    Union,
+    TYPE_CHECKING,
+)
+
+from slixmpp.stanza import Iq
 from slixmpp.plugins import BasePlugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.xmlstream import register_stanza_plugin, JID
-from slixmpp.plugins.xep_0084 import stanza, Data, MetaData
+from slixmpp.plugins.xep_0084.stanza import Data, MetaData, Pointer
+from slixmpp.plugins.xep_0084 import stanza
+
+try:
+    from typing import TypedDict
+except ImportError:
+    from typing_extensions import TypedDict
+
+
+class AvatarMetadataItem(TypedDict, total=False):
+    bytes: int
+    id: str
+    type: str
+    height: int
+    width: int
+    url: str
+
+MetadataItems = Union[
+    AvatarMetadataItem,
+    List[AvatarMetadataItem],
+    Set[AvatarMetadataItem]
+]
 
 
 log = logging.getLogger(__name__)
@@ -41,32 +75,43 @@ class XEP_0084(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('avatar_metadata', MetaData)
 
-    def generate_id(self, data):
+    def generate_id(self, data) -> str:
         return hashlib.sha1(data).hexdigest()
 
-    def retrieve_avatar(self, jid, id, url=None, ifrom=None,
-                              callback=None, timeout=None, timeout_callback=None):
-        return self.xmpp['xep_0060'].get_item(jid, Data.namespace, id,
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout,
-                timeout_callback=timeout_callback)
+    def retrieve_avatar(self, jid: JID, id: str, **pubsubkwargs) -> Future:
+        """Retrieve an avatar.
 
-    def publish_avatar(self, data, ifrom=None, callback=None,
-                             timeout=None, timeout_callback=None):
+        :param jid: JID of the entity to get the avatar from.
+        :param id: Identifier of the item containing the avatar.
+        """
+        return self.xmpp['xep_0060'].get_item(
+            jid,
+            Data.namespace,
+            id,
+            **pubsubkwargs
+        )
+
+    def publish_avatar(self, data: bytes, **pubsubkwargs) -> Future:
+        """Publish an avatar.
+
+        :param data: The avatar, in bytes representation.
+        """
         payload = Data()
         payload['value'] = data
-        return self.xmpp['xep_0163'].publish(payload,
-                id=self.generate_id(data),
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout,
-                timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            payload,
+            id=self.generate_id(data),
+            **pubsubkwargs
+        )
 
-    def publish_avatar_metadata(self, items=None, pointers=None,
-                                      ifrom=None,
-                                      callback=None, timeout=None,
-                                      timeout_callback=None):
+    def publish_avatar_metadata(self, items: Optional[MetadataItems] = None,
+                                pointers: Optional[Iterable[Pointer]] = None,
+                                **pubsubkwargs) -> Future:
+        """Publish avatar metadata.
+
+        :param items: Metadata items to store
+        :param pointers: Optional pointers
+        """
         metadata = MetaData()
         if items is None:
             items = []
@@ -82,21 +127,19 @@ class XEP_0084(BasePlugin):
             for pointer in pointers:
                 metadata.add_pointer(pointer)
 
-        return self.xmpp['xep_0163'].publish(metadata,
-                id=info['id'],
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout,
-                timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            metadata,
+            id=info['id'],
+            **pubsubkwargs
+        )
 
-    def stop(self, ifrom=None, callback=None, timeout=None, timeout_callback=None):
+    def stop(self, **pubsubkwargs) -> Future:
         """
         Clear existing avatar metadata information to stop notifications.
         """
         metadata = MetaData()
-        return self.xmpp['xep_0163'].publish(metadata,
-                node=MetaData.namespace,
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout,
-                timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            metadata,
+            node=MetaData.namespace,
+            **pubsubkwargs
+        )
