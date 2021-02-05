@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011  Nathanael C. Fritz
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011  Nathanael C. Fritz
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 
 import logging
 from getpass import getpass

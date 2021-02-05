@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011  Dann Martens
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011  Dann Martens
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 
 from slixmpp.plugins.xep_0009.remote import Endpoint, remote, Remote, \
     ANY_ALL
@@ -53,4 +49,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

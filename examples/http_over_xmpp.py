@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-"""
-    Slixmpp: The Slick XMPP Library
-    Implementation of HTTP over XMPP transport
-    http://xmpp.org/extensions/xep-0332.html
-    Copyright (C) 2015 Riptide IO, sangeeth@riptideio.com
-    This file is part of slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Implementation of HTTP over XMPP transport
+# http://xmpp.org/extensions/xep-0332.html
+# Copyright (C) 2015 Riptide IO, sangeeth@riptideio.com
+# This file is part of slixmpp.
+# See the file LICENSE for copying permission.
 
 from slixmpp import ClientXMPP
 
@@ -94,4 +90,3 @@ if __name__ == '__main__':
     xmpp = HTTPOverXMPPClient(args.jid, args.password)
     xmpp.connect()
     xmpp.process()
-
