@@ -99,8 +99,8 @@ of an interface defined by the parent.
 .. seealso::
 
     - :ref:`create-stanza-plugins`
-    - :ref:`create-extension-plugins`
-    - :ref:`override-parent-interfaces`
+    - :ref:`is_extension`
+    - :ref:`overrides`
 
 
 Registering Stanza Plugins
