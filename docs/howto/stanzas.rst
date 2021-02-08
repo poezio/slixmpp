@@ -327,6 +327,9 @@ Which will produces the following:
 We can see that ``bool_interfaces`` allows to quickly create sub-elements with no
 content, without the need to create a custom class or getter/setter.
 
+
+.. _overrides:
+
 overrides
 ~~~~~~~~~
 
@@ -349,6 +352,8 @@ parent ``interfaces`` with the same name.
 
     parent = Parent()
     parent['toto'] = 'test' # equivalent to parent['sub']['toto'] = "test"
+
+.. _is_extension:
 
 is_extension
 ~~~~~~~~~~~~
