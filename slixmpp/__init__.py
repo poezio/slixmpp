@@ -6,6 +6,13 @@
 import logging
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
+# Use defusedxml if available
+try:
+    import defusedxml
+    defusedxml.defuse_stdlib()
+except ImportError:
+    pass
+
 from slixmpp.stanza import Message, Presence, Iq
 from slixmpp.jid import JID, InvalidJID
 from slixmpp.xmlstream.stanzabase import ET, ElementBase, register_stanza_plugin
