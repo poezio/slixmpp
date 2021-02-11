@@ -87,6 +87,7 @@ setup(
     extras_require={
         'XEP-0363': ['aiohttp'],
         'XEP-0444 compliance': ['emoji'],
+        'Safer XML parsing': ['defusedxml'],
     },
     classifiers=CLASSIFIERS,
     cmdclass={'test': TestCommand}
