@@ -8,6 +8,10 @@ XEP-0047: In-band Bytestreams
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+.. module:: slixmpp.plugins.xep_0047
+
+.. autoclass:: IBBytestream
+    :members:
 
 Stanza elements
 ---------------
