@@ -8,6 +8,12 @@ XEP-0363: HTTP File Upload
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+.. autoclass:: UploadServiceNotFound
+
+.. autoclass:: FileTooBig
+
+.. autoclass:: HTTPError
+
 
 Stanza elements
 ---------------
