@@ -131,7 +131,7 @@ class XEP_0054(BasePlugin):
             self.api['set_vcard'](jid=iq['from'], args=iq['vcard_temp'])
             return
         elif iq['type'] == 'get' and self.xmpp.is_component:
-            vcard = self.api['get_vcard'](iq['from'].bare)
+            vcard = self.api['get_vcard'](iq['to'].bare, ifrom=iq['from'])
             if isinstance(vcard, Iq):
                 vcard.send()
             else:
