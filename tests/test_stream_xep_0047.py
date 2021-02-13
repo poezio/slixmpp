@@ -14,7 +14,7 @@ class TestInBandByteStreams(SlixTest):
     def tearDown(self):
         self.stream_close()
 
-    def testOpenStream(self):
+    async def testOpenStream(self):
         """Test requesting a stream, successfully"""
 
         events = []
@@ -25,8 +25,8 @@ class TestInBandByteStreams(SlixTest):
 
         self.xmpp.add_event_handler('ibb_stream_start', on_stream_start)
 
-        self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
-                                          sid='testing')
+        await self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
+                                                sid='testing')
 
         self.send("""
           <iq type="set" to="tester@localhost/receiver" id="1">
@@ -45,7 +45,7 @@ class TestInBandByteStreams(SlixTest):
 
         self.assertEqual(events, ['ibb_stream_start'])
 
-    def testAysncOpenStream(self):
+    async def testAysncOpenStream(self):
         """Test requesting a stream, aysnc"""
 
         events = set()
@@ -58,9 +58,9 @@ class TestInBandByteStreams(SlixTest):
 
         self.xmpp.add_event_handler('ibb_stream_start', on_stream_start)
 
-        self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
-                                          sid='testing',
-                                          callback=stream_callback)
+        await self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
+                                                sid='testing',
+                                                callback=stream_callback)
 
         self.send("""
           <iq type="set" to="tester@localhost/receiver" id="1">

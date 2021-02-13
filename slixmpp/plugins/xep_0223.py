@@ -5,6 +5,7 @@
 # See the file LICENSE for copying permission.
 import logging
 
+from asyncio import Future
 from typing import Optional, Callable, List
 from slixmpp import JID
 from slixmpp.xmlstream import register_stanza_plugin, ElementBase
@@ -28,28 +29,24 @@ class XEP_0223(BasePlugin):
     profile = {'pubsub#persist_items': True,
                'pubsub#access_model': 'whitelist'}
 
-    def configure(self, node, ifrom=None, callback=None, timeout=None):
+    def configure(self, node: str, **iqkwargs) -> Future:
         """
-        Update a node's configuration to match the public storage profile.
+        Update a node's configuration to match the private storage profile.
+
+        :param node: Node to set the configuration at.
         """
-        # TODO: that cannot possibly work, why is this here?
         config = self.xmpp['xep_0004'].Form()
         config['type'] = 'submit'
 
         for field, value in self.profile.items():
             config.add_field(var=field, value=value)
 
-        return self.xmpp['xep_0060'].set_node_config(None, node, config,
-                                                     ifrom=ifrom,
-                                                     callback=callback,
-                                                     timeout=timeout)
+        return self.xmpp['xep_0060'].set_node_config(
+            jid=None, node=node, config=config, **iqkwargs
+        )
 
     def store(self, stanza: ElementBase, node: Optional[str] = None,
-              id: Optional[str] = None, ifrom: Optional[JID] = None,
-              options: Optional[Form] = None,
-              callback: Optional[Callable] = None,
-              timeout: Optional[int] = None,
-              timeout_callback: Optional[Callable] = None):
+              id: Optional[str] = None, **pubsubkwargs) -> Future:
         """
         Store private data via PEP.
 
@@ -63,6 +60,7 @@ class XEP_0223(BasePlugin):
         :param options: Publish options to use, which will be modified to
                         fit the persistent storage option profile.
         """
+        options = pubsubkwargs.pop('options', None)
         if not options:
             options = self.xmpp['xep_0004'].stanza.Form()
             options['type'] = 'submit'
@@ -77,17 +75,11 @@ class XEP_0223(BasePlugin):
                 options.add_field(var=field)
             options.get_fields()[field]['value'] = value
 
-        return self.xmpp['xep_0163'].publish(stanza, node, options=options,
-                                             ifrom=ifrom, callback=callback,
-                                             timeout=timeout,
-                                             timeout_callback=timeout_callback)
+        pubsubkwargs['options'] = options
+        return self.xmpp['xep_0163'].publish(stanza, node, id=id, **pubsubkwargs)
 
     def retrieve(self, node: str, id: Optional[str] = None,
-                 item_ids: Optional[List[str]] = None,
-                 ifrom: Optional[JID] = None,
-                 callback: Optional[Callable] = None,
-                 timeout: Optional[int] = None,
-                 timeout_callback: Optional[Callable] = None):
+                 item_ids: Optional[List[str]] = None, **iqkwargs) -> Future:
         """
         Retrieve private data via PEP.
 
@@ -98,22 +90,17 @@ class XEP_0223(BasePlugin):
         :param id: Optionally specify the ID of the item.
         :param item_ids: Specify a group of IDs. If id is also specified, it
                          will be included in item_ids.
-        :param ifrom: Specify the sender's JID.
-        :param timeout: The length of time (in seconds) to wait for a response
-                        before exiting the send call if blocking is used.
-                        Defaults to slixmpp.xmlstream.RESPONSE_TIMEOUT
-        :param callback: Optional reference to a stream handler function. Will
-                         be executed when a reply stanza is received.
         """
         if item_ids is None:
             item_ids = []
         if id is not None:
             item_ids.append(id)
 
-        return self.xmpp['xep_0060'].get_items(None, node,
-                                               item_ids=item_ids, ifrom=ifrom,
-                                               callback=callback, timeout=timeout,
-                                               timeout_callback=timeout_callback)
+        return self.xmpp['xep_0060'].get_items(
+            jid=None, node=node,
+            item_ids=item_ids,
+            **iqkwargs
+        )
 
 
 register_plugin(XEP_0223)
