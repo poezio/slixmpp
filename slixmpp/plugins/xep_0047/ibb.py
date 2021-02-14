@@ -13,7 +13,7 @@ from typing import (
 from slixmpp import JID
 from slixmpp.stanza import Message, Iq
 from slixmpp.exceptions import XMPPError
-from slixmpp.xmlstream.handler import Callback
+from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins import BasePlugin
@@ -62,22 +62,22 @@ class XEP_0047(BasePlugin):
         register_stanza_plugin(Iq, Data)
         register_stanza_plugin(Message, Data)
 
-        self.xmpp.register_handler(Callback(
+        self.xmpp.register_handler(CoroutineCallback(
             'IBB Open',
             StanzaPath('iq@type=set/ibb_open'),
             self._handle_open_request))
 
-        self.xmpp.register_handler(Callback(
+        self.xmpp.register_handler(CoroutineCallback(
             'IBB Close',
             StanzaPath('iq@type=set/ibb_close'),
             self._handle_close))
 
-        self.xmpp.register_handler(Callback(
+        self.xmpp.register_handler(CoroutineCallback(
             'IBB Data',
             StanzaPath('iq@type=set/ibb_data'),
             self._handle_data))
 
-        self.xmpp.register_handler(Callback(
+        self.xmpp.register_handler(CoroutineCallback(
             'IBB Message Data',
             StanzaPath('message/ibb_data'),
             self._handle_data))
@@ -109,14 +109,14 @@ class XEP_0047(BasePlugin):
         if (jid, sid, peer_jid) in self._streams:
             del self._streams[(jid, sid, peer_jid)]
 
-    def _accept_stream(self, iq):
+    async def _accept_stream(self, iq):
         receiver = iq['to']
         sender = iq['from']
         sid = iq['ibb_open']['sid']
 
-        if self.api['authorized_sid'](receiver, sid, sender, iq):
+        if await self.api['authorized_sid'](receiver, sid, sender, iq):
             return True
-        return self.api['authorized'](receiver, sid, sender, iq)
+        return await self.api['authorized'](receiver, sid, sender, iq)
 
     def _authorized(self, jid, sid, ifrom, iq):
         if self.auto_accept:
@@ -169,14 +169,14 @@ class XEP_0047(BasePlugin):
         stream.self_jid = result['to']
         stream.peer_jid = result['from']
         stream.stream_started = True
-        self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
+        await self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
         if callback is not None:
             self.xmpp.add_event_handler('ibb_stream_start', callback, disposable=True)
         self.xmpp.event('ibb_stream_start', stream)
         self.xmpp.event('stream:%s:%s' % (stream.sid, stream.peer_jid), stream)
         return stream
 
-    def _handle_open_request(self, iq: Iq):
+    async def _handle_open_request(self, iq: Iq):
         sid = iq['ibb_open']['sid']
         size = iq['ibb_open']['block_size'] or self.block_size
 
@@ -185,7 +185,7 @@ class XEP_0047(BasePlugin):
         if not sid:
             raise XMPPError(etype='modify', condition='bad-request')
 
-        if not self._accept_stream(iq):
+        if not await self._accept_stream(iq):
             raise XMPPError(etype='cancel', condition='not-acceptable')
 
         if size > self.max_block_size:
@@ -194,25 +194,25 @@ class XEP_0047(BasePlugin):
         stream = IBBytestream(self.xmpp, sid, size,
                               iq['to'], iq['from'])
         stream.stream_started = True
-        self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
+        await self.api['set_stream'](stream.self_jid, stream.sid, stream.peer_jid, stream)
         iq.reply().send()
 
         self.xmpp.event('ibb_stream_start', stream)
         self.xmpp.event('stream:%s:%s' % (sid, stream.peer_jid), stream)
 
-    def _handle_data(self, stanza: Union[Iq, Message]):
+    async def _handle_data(self, stanza: Union[Iq, Message]):
         sid = stanza['ibb_data']['sid']
-        stream = self.api['get_stream'](stanza['to'], sid, stanza['from'])
+        stream = await self.api['get_stream'](stanza['to'], sid, stanza['from'])
         if stream is not None and stanza['from'] == stream.peer_jid:
             stream._recv_data(stanza)
         else:
             raise XMPPError('item-not-found')
 
-    def _handle_close(self, iq: Iq):
+    async def _handle_close(self, iq: Iq):
         sid = iq['ibb_close']['sid']
-        stream = self.api['get_stream'](iq['to'], sid, iq['from'])
+        stream = await self.api['get_stream'](iq['to'], sid, iq['from'])
         if stream is not None and iq['from'] == stream.peer_jid:
             stream._closed(iq)
-            self.api['del_stream'](stream.self_jid, stream.sid, stream.peer_jid)
+            await self.api['del_stream'](stream.self_jid, stream.sid, stream.peer_jid)
         else:
             raise XMPPError('item-not-found')
