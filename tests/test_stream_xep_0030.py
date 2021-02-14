@@ -1,5 +1,5 @@
+import asyncio
 import time
-import threading
 
 import unittest
 from slixmpp.test import SlixTest
@@ -288,7 +288,9 @@ class TestStreamDisco(SlixTest):
 
         self.xmpp.add_event_handler('disco_info', handle_disco_info)
 
-        self.xmpp['xep_0030'].get_info('user@localhost', 'foo')
+
+        self.xmpp.wrap(self.xmpp['xep_0030'].get_info('user@localhost', 'foo'))
+        self.wait_()
 
         self.send("""
           <iq type="get" to="user@localhost" id="1">
@@ -483,7 +485,8 @@ class TestStreamDisco(SlixTest):
 
         self.xmpp.add_event_handler('disco_items', handle_disco_items)
 
-        self.xmpp['xep_0030'].get_items('user@localhost', 'foo')
+        self.xmpp.wrap(self.xmpp['xep_0030'].get_items('user@localhost', 'foo'))
+        self.wait_()
 
         self.send("""
           <iq type="get" to="user@localhost" id="1">

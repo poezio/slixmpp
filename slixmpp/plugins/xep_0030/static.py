@@ -109,7 +109,7 @@ class StaticDisco(object):
     # the requester's JID, except for cached results. To do that,
     # register a custom node handler.
 
-    def supports(self, jid, node, ifrom, data):
+    async def supports(self, jid, node, ifrom, data):
         """
         Check if a JID supports a given feature.
 
@@ -137,8 +137,8 @@ class StaticDisco(object):
             return False
 
         try:
-            info = self.disco.get_info(jid=jid, node=node,
-                                       ifrom=ifrom, **data)
+            info = await self.disco.get_info(jid=jid, node=node,
+                                             ifrom=ifrom, **data)
             info = self.disco._wrap(ifrom, jid, info, True)
             features = info['disco_info']['features']
             return feature in features
@@ -147,7 +147,7 @@ class StaticDisco(object):
         except IqTimeout:
             return None
 
-    def has_identity(self, jid, node, ifrom, data):
+    async def has_identity(self, jid, node, ifrom, data):
         """
         Check if a JID has a given identity.
 
@@ -176,8 +176,8 @@ class StaticDisco(object):
                 'cached': data.get('cached', True)}
 
         try:
-            info = self.disco.get_info(jid=jid, node=node,
-                                       ifrom=ifrom, **data)
+            info = await self.disco.get_info(jid=jid, node=node,
+                                             ifrom=ifrom, **data)
             info = self.disco._wrap(ifrom, jid, info, True)
             trunc = lambda i: (i[0], i[1], i[2])
             return identity in map(trunc, info['disco_info']['identities'])
