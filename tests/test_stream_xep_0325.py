@@ -324,6 +324,7 @@ class TestStreamControl(SlixTest):
             <query xmlns='http://jabber.org/protocol/disco#info'>
                 <identity category='client' type='bot'/>
                 <feature var='urn:xmpp:iot:control'/>
+                <feature var='http://jabber.org/protocol/disco#info'/>
             </query>
         </iq>
         """)
@@ -350,6 +351,7 @@ class TestStreamControl(SlixTest):
             <query xmlns='http://jabber.org/protocol/disco#info'>
                 <identity category='component' type='generic'/>
                 <feature var='urn:xmpp:iot:control'/>
+                <feature var='http://jabber.org/protocol/disco#info'/>
             </query>
         </iq>
         """)
