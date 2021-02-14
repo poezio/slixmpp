@@ -9,6 +9,40 @@ XEP-0231: Bits of Binary
     :exclude-members: session_bind, plugin_init, plugin_end
 
 
+Internal API methods
+--------------------
+
+The default API handlers for this plugin manage an in-memory cache of
+bits of binary by content-id.
+
+.. glossary::
+
+    set_bob
+        - **jid**: :class:`~.JID` sending the bob
+        - **node**: unused
+        - **ifrom**: :class:`~JID` receiving the bob
+        - **args**: :class:`~.BitsOfBinary` element.
+
+        Set a BoB in the cache.
+
+    get_bob
+        - **jid**: :class:`~.JID` receiving the bob
+        - **node**: unused
+        - **ifrom**: :class:`~JID` sending the bob
+        - **args**: ``str`` content-id of the bob
+        - **returns**: :class:`~.BitsOfBinary` element.
+
+        Get a BoB from the cache.
+
+    del_bob
+        - **jid**: unused
+        - **node**: unused
+        - **ifrom**: :class:`~JID` sending the bob
+        - **args**: ``str`` content-id of the bob
+
+        Delete a BoB from the cache.
+
+
 Stanza elements
 ---------------
 
