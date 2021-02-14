@@ -14,7 +14,7 @@ class TestInBandByteStreams(SlixTest):
     def tearDown(self):
         self.stream_close()
 
-    async def testOpenStream(self):
+    def testOpenStream(self):
         """Test requesting a stream, successfully"""
 
         events = []
@@ -25,8 +25,9 @@ class TestInBandByteStreams(SlixTest):
 
         self.xmpp.add_event_handler('ibb_stream_start', on_stream_start)
 
-        await self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
-                                                sid='testing')
+        self.xmpp.wrap(self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
+                                                         sid='testing'))
+        self.wait_()
 
         self.send("""
           <iq type="set" to="tester@localhost/receiver" id="1">
@@ -45,7 +46,7 @@ class TestInBandByteStreams(SlixTest):
 
         self.assertEqual(events, ['ibb_stream_start'])
 
-    async def testAysncOpenStream(self):
+    def testAysncOpenStream(self):
         """Test requesting a stream, aysnc"""
 
         events = set()
@@ -58,9 +59,10 @@ class TestInBandByteStreams(SlixTest):
 
         self.xmpp.add_event_handler('ibb_stream_start', on_stream_start)
 
-        await self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
-                                                sid='testing',
-                                                callback=stream_callback)
+        self.xmpp.wrap(self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
+                                                         sid='testing',
+                                                         callback=stream_callback))
+        self.wait_()
 
         self.send("""
           <iq type="set" to="tester@localhost/receiver" id="1">
@@ -79,7 +81,7 @@ class TestInBandByteStreams(SlixTest):
 
         self.assertEqual(events, {'ibb_stream_start', 'callback'})
 
-    async def testSendData(self):
+    def testSendData(self):
         """Test sending data over an in-band bytestream."""
 
         streams = []
@@ -89,13 +91,14 @@ class TestInBandByteStreams(SlixTest):
             streams.append(stream)
 
         def on_stream_data(d):
-            data.append(d['data'])
+            data.append(d.read())
 
         self.xmpp.add_event_handler('ibb_stream_start', on_stream_start)
         self.xmpp.add_event_handler('ibb_stream_data', on_stream_data)
 
-        self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
-                                          sid='testing')
+        self.xmpp.wrap(self.xmpp['xep_0047'].open_stream('tester@localhost/receiver',
+                                                         sid='testing'))
+        self.wait_()
 
         self.send("""
           <iq type="set" to="tester@localhost/receiver" id="1">
@@ -116,7 +119,8 @@ class TestInBandByteStreams(SlixTest):
 
 
         # Test sending data out
-        await stream.send("Testing")
+        self.xmpp.wrap(stream.send("Testing"))
+        self.wait_()
 
         self.send("""
           <iq type="set" id="2"
