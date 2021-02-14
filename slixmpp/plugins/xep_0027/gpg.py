@@ -123,16 +123,27 @@ class XEP_0027(BasePlugin):
         return v
 
     def set_keyid(self, jid=None, keyid=None):
-        self.api['set_keyid'](jid, args=keyid)
+        """Set a keyid for a specific JID."""
+        return self.xmpp.wrap(self.api['set_keyid'](jid, args=keyid))
 
-    def get_keyid(self, jid=None):
-        return self.api['get_keyid'](jid)
+    async def get_keyid(self, jid=None):
+        """Get a keyid for a jid.
+
+        .. versionchanged:: 1.8.0
+            This function has become a coroutine.
+        """
+        return await self.xmpp.wrap(self.api['get_keyid'](jid))
 
     def del_keyid(self, jid=None):
-        self.api['del_keyid'](jid)
+        """Delete a keyid."""
+        return self.xmpp.wrap(self.api['del_keyid'](jid))
 
-    def get_keyids(self):
-        return self.api['get_keyids']()
+    async def get_keyids(self):
+        """Get store keyids.
+        .. versionchanged:: 1.8.0
+            This function has become a coroutine.
+        """
+        return await self.api['get_keyids']()
 
     def _handle_signed_presence(self, pres):
         self.xmpp.event('unverified_signed_presence', pres)
