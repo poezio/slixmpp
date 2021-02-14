@@ -16,7 +16,7 @@ from slixmpp import future_wrapper, JID
 from slixmpp.stanza import Iq
 from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import JID, register_stanza_plugin
-from slixmpp.xmlstream.handler import Callback
+from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins.xep_0012 import stanza, LastActivity
 
@@ -41,7 +41,7 @@ class XEP_0012(BasePlugin):
         self._last_activities = {}
 
         self.xmpp.register_handler(
-            Callback('Last Activity',
+            CoroutineCallback('Last Activity',
                  StanzaPath('iq@type=get/last_activity'),
                  self._handle_get_last_activity))
 
@@ -62,28 +62,29 @@ class XEP_0012(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature('jabber:iq:last')
 
-    def begin_idle(self, jid: Optional[JID] = None, status: str = None):
+    def begin_idle(self, jid: Optional[JID] = None, status: Optional[str] = None) -> Future:
         """Reset the last activity for the given JID.
 
         :param status: Optional status.
         """
-        self.set_last_activity(jid, 0, status)
+        return self.xmpp.wrap(self.set_last_activity(jid, 0, status))
 
-    def end_idle(self, jid=None):
-        self.del_last_activity(jid)
+    def end_idle(self, jid: Optional[JID] = None) -> Future:
+        return self.xmpp.wrap(self.del_last_activity(jid))
 
-    def start_uptime(self, status=None):
-        self.set_last_activity(None, 0, status)
+    def start_uptime(self, status: Optional[str] = None) -> Future:
+        return self.xmpp.wrap(self.set_last_activity(None, 0, status))
 
-    def set_last_activity(self, jid=None, seconds=None, status=None):
-        self.api['set_last_activity'](jid, args={
+    def set_last_activity(self, jid=None, seconds=None, status=None) -> Future:
+        return self.xmpp.wrap(
+            self.api['set_last_activity'](jid, args={
             'seconds': seconds,
-            'status': status})
+            'status': status
+        }))
 
-    def del_last_activity(self, jid):
-        self.api['del_last_activity'](jid)
+    def del_last_activity(self, jid: JID) -> Future:
+        return self.xmpp.wrap(self.api['del_last_activity'](jid))
 
-    @future_wrapper
     def get_last_activity(self, jid: JID, local: bool = False,
                           ifrom: Optional[JID] = None, **iqkwargs) -> Future:
         """Get last activity for a specific JID.
@@ -103,16 +104,16 @@ class XEP_0012(BasePlugin):
 
         if local or jid in (None, ''):
             log.debug("Looking up local last activity data for %s", jid)
-            return self.api['get_last_activity'](jid, None, ifrom, None)
+            return self.xmpp.wrap(self.api['get_last_activity'](jid, None, ifrom, None))
 
         iq = self.xmpp.make_iq_get(ito=jid, ifrom=ifrom)
         iq.enable('last_activity')
         return iq.send(**iqkwargs)
 
-    def _handle_get_last_activity(self, iq: Iq):
+    async def _handle_get_last_activity(self, iq: Iq):
         log.debug("Received last activity query from " + \
                   "<%s> to <%s>.", iq['from'], iq['to'])
-        reply = self.api['get_last_activity'](iq['to'], None, iq['from'], iq)
+        reply = await self.api['get_last_activity'](iq['to'], None, iq['from'], iq)
         reply.send()
 
     # =================================================================
