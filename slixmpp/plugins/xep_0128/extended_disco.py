@@ -5,6 +5,7 @@
 # See the file LICENSE for copying permission.
 import logging
 
+from asyncio import Future
 from typing import Optional
 
 import slixmpp
@@ -53,11 +54,14 @@ class XEP_0128(BasePlugin):
         for op in self._disco_ops:
             self.api.register(getattr(self.static, op), op, default=True)
 
-    def set_extended_info(self, jid=None, node=None, **kwargs):
+    def set_extended_info(self, jid=None, node=None, **kwargs) -> Future:
         """
         Set additional, extended identity information to a node.
 
         Replaces any existing extended information.
+
+        .. versionchanged:: 1.8.0
+            This function now returns a Future.
 
         :param jid: The JID to modify.
         :param node: The node to modify.
@@ -65,25 +69,31 @@ class XEP_0128(BasePlugin):
                      as extended information, replacing any
                      existing extensions.
         """
-        self.api['set_extended_info'](jid, node, None, kwargs)
+        return self.api['set_extended_info'](jid, node, None, kwargs)
 
-    def add_extended_info(self, jid=None, node=None, **kwargs):
+    def add_extended_info(self, jid=None, node=None, **kwargs) -> Future:
         """
         Add additional, extended identity information to a node.
+
+        .. versionchanged:: 1.8.0
+            This function now returns a Future.
 
         :param jid: The JID to modify.
         :param node: The node to modify.
         :param data: Either a form, or a list of forms to add
                      as extended information.
         """
-        self.api['add_extended_info'](jid, node, None, kwargs)
+        return self.api['add_extended_info'](jid, node, None, kwargs)
 
     def del_extended_info(self, jid: Optional[JID] = None,
-                          node: Optional[str] = None, **kwargs):
+                          node: Optional[str] = None, **kwargs) -> Future:
         """
         Remove all extended identity information to a node.
+
+        .. versionchanged:: 1.8.0
+            This function now returns a Future.
 
         :param jid: The JID to modify.
         :param node: The node to modify.
         """
-        self.api['del_extended_info'](jid, node, None, kwargs)
+        return self.api['del_extended_info'](jid, node, None, kwargs)
