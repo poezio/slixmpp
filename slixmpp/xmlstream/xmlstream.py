@@ -9,6 +9,7 @@
 # :license: MIT, see LICENSE for more details
 from typing import (
     Any,
+    Coroutine,
     Callable,
     Iterable,
     Iterator,
@@ -1209,3 +1210,13 @@ class XMLStream(asyncio.BaseProtocol):
             raise
         finally:
             self.del_event_handler(event, handler)
+
+    def wrap(self, coroutine: Coroutine[Any, Any, Any]) -> Future:
+        """Make a Future out of a coroutine with the current loop.
+
+        :param coroutine: The coroutine to wrap.
+        """
+        return asyncio.ensure_future(
+            coroutine,
+            loop=self.loop,
+        )
