@@ -46,19 +46,19 @@ class XEP_0319(BasePlugin):
         self.xmpp.del_filter('out', self._stamp_idle_presence)
         self.xmpp.remove_handler('Idle Presence')
 
-    def idle(self, jid=None, since=None):
+    async def idle(self, jid=None, since=None):
         seconds = None
         timezone = get_local_timezone()
         if since is None:
             since = datetime.now(timezone)
         else:
             seconds = datetime.now(timezone) - since
-        self.api['set_idle'](jid, None, None, since)
-        self.xmpp['xep_0012'].set_last_activity(jid=jid, seconds=seconds)
+        await self.api['set_idle'](jid, None, None, since)
+        await self.xmpp['xep_0012'].set_last_activity(jid=jid, seconds=seconds)
 
-    def active(self, jid=None):
-        self.api['set_idle'](jid, None, None, None)
-        self.xmpp['xep_0012'].del_last_activity(jid)
+    async def active(self, jid=None):
+        await self.api['set_idle'](jid, None, None, None)
+        await self.xmpp['xep_0012'].del_last_activity(jid)
 
     def _set_idle(self, jid, node, ifrom, data):
         self._idle_stamps[jid] = data
@@ -69,9 +69,9 @@ class XEP_0319(BasePlugin):
     def _idle_presence(self, pres):
         self.xmpp.event('presence_idle', pres)
 
-    def _stamp_idle_presence(self, stanza):
+    async def _stamp_idle_presence(self, stanza):
         if isinstance(stanza, Presence):
-            since = self.api['get_idle'](stanza['from'] or self.xmpp.boundjid)
+            since = await self.api['get_idle'](stanza['from'] or self.xmpp.boundjid)
             if since:
                 stanza['idle']['since'] = since
         return stanza
