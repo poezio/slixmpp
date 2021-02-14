@@ -20,7 +20,7 @@ class TestBOB(SlixIntegration):
 
     async def test_bob(self):
         """Check we can send and receive a BOB."""
-        cid = self.clients[0]['xep_0231'].set_bob(
+        cid = await self.clients[0]['xep_0231'].set_bob(
             self.data,
             'image/jpeg',
         )
