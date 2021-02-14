@@ -1,3 +1,4 @@
+from asyncio import iscoroutinefunction
 from slixmpp.xmlstream import JID
 
 
@@ -44,7 +45,7 @@ class APIRegistry(object):
         self.xmpp = xmpp
         self.settings = {}
 
-    def _setup(self, ctype, op):
+    def _setup(self, ctype: str, op: str):
         """Initialize the API callback dictionaries.
 
         :param string ctype: The name of the API to initialize.
@@ -61,17 +62,17 @@ class APIRegistry(object):
                                          'jid': {},
                                          'node': {}}
 
-    def wrap(self, ctype):
+    def wrap(self, ctype: str) -> APIWrapper:
         """Return a wrapper object that targets a specific API."""
         return APIWrapper(self, ctype)
 
-    def purge(self, ctype):
+    def purge(self, ctype: str):
         """Remove all information for a given API."""
         del self.settings[ctype]
         del self._handler_defaults[ctype]
         del self._handlers[ctype]
 
-    def run(self, ctype, op, jid=None, node=None, ifrom=None, args=None):
+    async def run(self, ctype: str, op: str, jid=None, node=None, ifrom=None, args=None):
         """Execute an API callback, based on specificity.
 
         The API callback that is executed is chosen based on the combination
@@ -89,6 +90,9 @@ class APIRegistry(object):
 
         Handlers should check that the JID ``ifrom`` is authorized to perform
         the desired action.
+
+        .. versionchanged:: 1.8.0
+            ``run()`` is now a coroutine.
 
         :param string ctype: The name of the API to use.
         :param string op: The API operation to perform.
@@ -130,7 +134,10 @@ class APIRegistry(object):
 
         if handler:
             try:
-                return handler(jid, node, ifrom, args)
+                if iscoroutinefunction(handler):
+                    return await handler(jid, node, ifrom, args)
+                else:
+                    return handler(jid, node, ifrom, args)
             except TypeError:
                 # To preserve backward compatibility, drop the ifrom
                 # parameter for existing handlers that don't understand it.
