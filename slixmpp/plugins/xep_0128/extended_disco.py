@@ -65,7 +65,9 @@ class XEP_0128(BasePlugin):
                      as extended information, replacing any
                      existing extensions.
         """
-        self.api['set_extended_info'](jid, node, None, kwargs)
+        return self.xmpp.wrap(
+            self.api['set_extended_info'](jid, node, None, kwargs)
+        )
 
     def add_extended_info(self, jid=None, node=None, **kwargs):
         """
@@ -76,7 +78,9 @@ class XEP_0128(BasePlugin):
         :param data: Either a form, or a list of forms to add
                      as extended information.
         """
-        self.api['add_extended_info'](jid, node, None, kwargs)
+        return self.xmpp.wrap(
+            self.api['add_extended_info'](jid, node, None, kwargs)
+        )
 
     def del_extended_info(self, jid: Optional[JID] = None,
                           node: Optional[str] = None, **kwargs):
@@ -86,4 +90,6 @@ class XEP_0128(BasePlugin):
         :param jid: The JID to modify.
         :param node: The node to modify.
         """
-        self.api['del_extended_info'](jid, node, None, kwargs)
+        return self.xmpp.wrap(
+            self.api['del_extended_info'](jid, node, None, kwargs)
+        )
