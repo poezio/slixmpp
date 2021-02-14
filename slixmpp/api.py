@@ -1,3 +1,5 @@
+from typing import Any, Optional
+from asyncio import iscoroutinefunction, Future
 from slixmpp.xmlstream import JID
 
 
@@ -44,7 +46,7 @@ class APIRegistry(object):
         self.xmpp = xmpp
         self.settings = {}
 
-    def _setup(self, ctype, op):
+    def _setup(self, ctype: str, op: str):
         """Initialize the API callback dictionaries.
 
         :param string ctype: The name of the API to initialize.
@@ -61,17 +63,19 @@ class APIRegistry(object):
                                          'jid': {},
                                          'node': {}}
 
-    def wrap(self, ctype):
+    def wrap(self, ctype: str) -> APIWrapper:
         """Return a wrapper object that targets a specific API."""
         return APIWrapper(self, ctype)
 
-    def purge(self, ctype):
+    def purge(self, ctype: str):
         """Remove all information for a given API."""
         del self.settings[ctype]
         del self._handler_defaults[ctype]
         del self._handlers[ctype]
 
-    def run(self, ctype, op, jid=None, node=None, ifrom=None, args=None):
+    def run(self, ctype: str, op: str, jid: Optional[JID] = None,
+            node: Optional[str] = None, ifrom: Optional[JID] = None,
+            args: Any = None) -> Future:
         """Execute an API callback, based on specificity.
 
         The API callback that is executed is chosen based on the combination
@@ -90,12 +94,16 @@ class APIRegistry(object):
         Handlers should check that the JID ``ifrom`` is authorized to perform
         the desired action.
 
-        :param string ctype: The name of the API to use.
-        :param string op: The API operation to perform.
-        :param JID jid: Optionally provide specific JID.
-        :param string node: Optionally provide specific node.
-        :param JID ifrom: Optionally provide the requesting JID.
-        :param tuple args: Optional positional arguments to the handler.
+        .. versionchanged:: 1.8.0
+            ``run()`` always returns a future, if the handler is a coroutine
+            the future should be awaited on.
+
+        :param ctype: The name of the API to use.
+        :param op: The API operation to perform.
+        :param jid: Optionally provide specific JID.
+        :param node: Optionally provide specific node.
+        :param ifrom: Optionally provide the requesting JID.
+        :param args: Optional arguments to the handler.
         """
         self._setup(ctype, op)
 
@@ -130,7 +138,13 @@ class APIRegistry(object):
 
         if handler:
             try:
-                return handler(jid, node, ifrom, args)
+                if iscoroutinefunction(handler):
+                    return self.xmpp.wrap(handler(jid, node, ifrom, args))
+                else:
+                    future = Future()
+                    result = handler(jid, node, ifrom, args)
+                    future.set_result(result)
+                    return future
             except TypeError:
                 # To preserve backward compatibility, drop the ifrom
                 # parameter for existing handlers that don't understand it.
