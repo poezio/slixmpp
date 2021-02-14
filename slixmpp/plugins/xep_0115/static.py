@@ -32,7 +32,7 @@ class StaticCaps(object):
         self.static = static
         self.jid_vers = {}
 
-    def supports(self, jid, node, ifrom, data):
+    async def supports(self, jid, node, ifrom, data):
         """
         Check if a JID supports a given feature.
 
@@ -65,8 +65,8 @@ class StaticCaps(object):
                 return True
 
         try:
-            info = self.disco.get_info(jid=jid, node=node,
-                                       ifrom=ifrom, **data)
+            info = await self.disco.get_info(jid=jid, node=node,
+                                             ifrom=ifrom, **data)
             info = self.disco._wrap(ifrom, jid, info, True)
             return feature in info['disco_info']['features']
         except IqError:
@@ -74,7 +74,7 @@ class StaticCaps(object):
         except IqTimeout:
             return None
 
-    def has_identity(self, jid, node, ifrom, data):
+    async def has_identity(self, jid, node, ifrom, data):
         """
         Check if a JID has a given identity.
 
@@ -110,8 +110,8 @@ class StaticCaps(object):
                 return True
 
         try:
-            info = self.disco.get_info(jid=jid, node=node,
-                                       ifrom=ifrom, **data)
+            info = await self.disco.get_info(jid=jid, node=node,
+                                             ifrom=ifrom, **data)
             info = self.disco._wrap(ifrom, jid, info, True)
             return identity in map(trunc, info['disco_info']['identities'])
         except IqError:
