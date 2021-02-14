@@ -5,7 +5,7 @@
 # See the file LICENSE for copying permission.
 import hashlib
 import logging
-from asyncio import Future, ensure_future
+from asyncio import Future
 from typing import (
     Dict,
     Optional,
@@ -13,7 +13,7 @@ from typing import (
 
 from slixmpp import JID
 from slixmpp.stanza import Presence
-from slixmpp.exceptions import XMPPError, IqTimeout
+from slixmpp.exceptions import XMPPError, IqTimeout, IqError
 from slixmpp.xmlstream import register_stanza_plugin, ElementBase
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0153 import stanza, VCardTempUpdate
@@ -59,7 +59,6 @@ class XEP_0153(BasePlugin):
         self.xmpp.del_event_handler('presence_chat', self._recv_presence)
         self.xmpp.del_event_handler('presence_away', self._recv_presence)
 
-    @future_wrapper
     def set_avatar(self, jid: Optional[JID] = None,
                    avatar: Optional[bytes] = None,
                    mtype: Optional[str] = None, **iqkwargs) -> Future:
@@ -97,10 +96,10 @@ class XEP_0153(BasePlugin):
             except IqTimeout as exc:
                 timeout_cb(exc)
                 raise
-            self.api['reset_hash'](jid)
+            await self.api['reset_hash'](jid)
             self.xmpp.roster[jid].send_last_presence()
 
-        return ensure_future(get_and_set_avatar(), loop=self.xmpp.loop)
+        return self.xmpp.wrap(get_and_set_avatar())
 
     async def _start(self, event):
         try:
@@ -110,22 +109,22 @@ class XEP_0153(BasePlugin):
                 new_hash = ''
             else:
                 new_hash = hashlib.sha1(data).hexdigest()
-            self.api['set_hash'](self.xmpp.boundjid, args=new_hash)
+            await self.api['set_hash'](self.xmpp.boundjid, args=new_hash)
         except XMPPError:
             log.debug('Could not retrieve vCard for %s', self.xmpp.boundjid.bare)
 
-    def _update_presence(self, stanza: ElementBase) -> ElementBase:
+    async def _update_presence(self, stanza: ElementBase) -> ElementBase:
         if not isinstance(stanza, Presence):
             return stanza
 
         if stanza['type'] not in ('available', 'dnd', 'chat', 'away', 'xa'):
             return stanza
 
-        current_hash = self.api['get_hash'](stanza['from'])
+        current_hash = await self.api['get_hash'](stanza['from'])
         stanza['vcard_temp_update']['photo'] = current_hash
         return stanza
 
-    def _recv_presence(self, pres: Presence):
+    async def _recv_presence(self, pres: Presence):
         try:
             if pres.get_plugin('muc', check=True):
                 # Don't process vCard avatars for MUC occupants
@@ -135,7 +134,7 @@ class XEP_0153(BasePlugin):
             pass
 
         if not pres.match('presence/vcard_temp_update'):
-            self.api['set_hash'](pres['from'], args=None)
+            await self.api['set_hash'](pres['from'], args=None)
             return
 
         data = pres['vcard_temp_update']['photo']
@@ -145,33 +144,31 @@ class XEP_0153(BasePlugin):
 
     # =================================================================
 
-    def _reset_hash(self, jid: JID, node: str, ifrom: JID, args: Dict):
+    async def _reset_hash(self, jid: JID, node: str, ifrom: JID, args: Dict):
         own_jid = (jid.bare == self.xmpp.boundjid.bare)
         if self.xmpp.is_component:
             own_jid = (jid.domain == self.xmpp.boundjid.domain)
 
-        self.api['set_hash'](jid, args=None)
+        await self.api['set_hash'](jid, args=None)
         if own_jid:
             self.xmpp.roster[jid].send_last_presence()
 
-        def callback(iq):
-            if iq['type'] == 'error':
-                log.debug('Could not retrieve vCard for %s', jid)
-                return
-            try:
-                data = iq['vcard_temp']['PHOTO']['BINVAL']
-            except ValueError:
-                log.debug('Invalid BINVAL in vCard’s PHOTO for %s:', jid, exc_info=True)
-                data = None
-            if not data:
-                new_hash = ''
-            else:
-                new_hash = hashlib.sha1(data).hexdigest()
+        try:
+            iq = await self.xmpp['xep_0054'].get_vcard(jid=jid.bare, ifrom=ifrom)
+        except (IqError, IqTimeout):
+            log.debug('Could not retrieve vCard for %s', jid)
+            return
+        try:
+            data = iq['vcard_temp']['PHOTO']['BINVAL']
+        except ValueError:
+            log.debug('Invalid BINVAL in vCard’s PHOTO for %s:', jid, exc_info=True)
+            data = None
+        if not data:
+            new_hash = ''
+        else:
+            new_hash = hashlib.sha1(data).hexdigest()
 
-            self.api['set_hash'](jid, args=new_hash)
-
-        self.xmpp['xep_0054'].get_vcard(jid=jid.bare, ifrom=ifrom,
-                                        callback=callback)
+        await self.api['set_hash'](jid, args=new_hash)
 
     def _get_hash(self, jid: JID, node: str, ifrom: JID, args: Dict):
         return self._hashes.get(jid.bare, None)
