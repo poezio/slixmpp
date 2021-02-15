@@ -9,6 +9,7 @@
 # :license: MIT, see LICENSE for more details
 from typing import (
     Any,
+    Awaitable,
     Callable,
     Iterable,
     Iterator,
@@ -851,15 +852,50 @@ class XMLStream(asyncio.BaseProtocol):
         """
         return len(self.__event_handlers.get(name, []))
 
-    def event(self, name, data={}):
+    async def _async_event(self, name: str, data: Any):
+        """Loop over handlers but await coroutines immediately."""
+        handlers = self.__event_handlers.get(name, [])[:]
+        for handler in handlers:
+            handler_callback, disposable = handler
+            if disposable:
+                # If the handler is disposable, we will go ahead and
+                # remove it now instead of waiting for it to be
+                # processed in the queue.
+                try:
+                    self.__event_handlers[name].remove(handler)
+                except ValueError:
+                    pass
+            # If the callback is a coroutine, schedule it instead of
+            # running it directly
+            if iscoroutinefunction(handler_callback):
+                try:
+                    await handler_callback(data)
+                except Exception as exc:
+                    self.exception(exc)
+            else:
+                try:
+                    handler_callback(data)
+                except Exception as e:
+                    self.exception(e)
+
+    def event(self, name: str, data: Any = None, sync: bool = False) -> Optional[Awaitable]:
         """Manually trigger a custom event.
 
         :param name: The name of the event to trigger.
         :param data: Data that will be passed to each event handler.
                      Defaults to an empty dictionary, but is usually
                      a stanza object.
+        :param sync: Run coroutine synchronously. That means an awaitable
+                     will be returned and must be awaited on.
+                     This was thought for stream features which must be
+                     processed in order but may actually lead to an exchange
+                     of stanzas.
+
+        :returns: An awaitable if ``sync`` is ``True``.
         """
         log.debug("Event triggered: %s", name)
+        if sync:
+            return self._async_event(name, data)
 
         handlers = self.__event_handlers.get(name, [])[:]
         for handler in handlers:
