@@ -851,8 +851,46 @@ class XMLStream(asyncio.BaseProtocol):
         """
         return len(self.__event_handlers.get(name, []))
 
-    def event(self, name, data={}):
+    async def event_async(self, name: str, data: Any = {}):
+        """Manually trigger a custom event, but await coroutines immediately.
+
+        This event generator should only be called in situations when
+        in-order processing of events is important, such as features
+        handling.
+
+        :param name: The name of the event to trigger.
+        :param data: Data that will be passed to each event handler.
+                     Defaults to an empty dictionary, but is usually
+                     a stanza object.
+        """
+        handlers = self.__event_handlers.get(name, [])[:]
+        for handler in handlers:
+            handler_callback, disposable = handler
+            if disposable:
+                # If the handler is disposable, we will go ahead and
+                # remove it now instead of waiting for it to be
+                # processed in the queue.
+                try:
+                    self.__event_handlers[name].remove(handler)
+                except ValueError:
+                    pass
+            # If the callback is a coroutine, schedule it instead of
+            # running it directly
+            if iscoroutinefunction(handler_callback):
+                try:
+                    await handler_callback(data)
+                except Exception as exc:
+                    self.exception(exc)
+            else:
+                try:
+                    handler_callback(data)
+                except Exception as e:
+                    self.exception(e)
+
+    def event(self, name: str, data: Any = {}):
         """Manually trigger a custom event.
+        Coroutine handlers are wrapped into a future and sent into the
+        event loop for their execution, and not awaited.
 
         :param name: The name of the event to trigger.
         :param data: Data that will be passed to each event handler.
