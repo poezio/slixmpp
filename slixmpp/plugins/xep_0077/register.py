@@ -203,14 +203,14 @@ class XEP_0077(BasePlugin):
                 self.xmpp.del_filter('in', self._force_stream_feature)
         return stanza
 
-    def _handle_register_feature(self, features):
+    async def _handle_register_feature(self, features):
         if 'mechanisms' in self.xmpp.features:
             # We have already logged in with an account
             return False
 
         if self.create_account and self.xmpp.event_handled('register'):
-            form = self.get_registration()
-            self.xmpp.event('register', form)
+            form = await self.get_registration()
+            await self.xmpp.event_async('register', form)
             return True
         return False
 
