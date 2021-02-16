@@ -12,13 +12,12 @@ from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0077 import stanza, Register, RegisterFeature
-from slixmpp.plugins.xep_0077.component import ComponentRegistration, DummyUserStore
 
 
 log = logging.getLogger(__name__)
 
 
-class XEP_0077(BasePlugin, ComponentRegistration):
+class XEP_0077(BasePlugin):
 
     """
     XEP-0077: In-Band Registration
@@ -34,7 +33,6 @@ class XEP_0077(BasePlugin, ComponentRegistration):
         'order': 50,
         "form_fields": {"username", "password"},
         "form_instructions": "Enter your credentials",
-        "user_store": DummyUserStore(),
     }
 
     def plugin_init(self):
@@ -50,6 +48,10 @@ class XEP_0077(BasePlugin, ComponentRegistration):
                     self._handle_registration,
                 )
             )
+            self._user_store = {}
+            self.api.register("user_get", self._user_get, default=True)
+            self.api.register("user_remove", self._user_remove, default=True)
+            self.api.register("user_validate", self._user_validate, default=True)
         else:
             self.xmpp.register_feature(
                 "register",
@@ -66,6 +68,104 @@ class XEP_0077(BasePlugin, ComponentRegistration):
     def plugin_end(self):
         if not self.xmpp.is_component:
             self.xmpp.unregister_feature('register', self.order)
+
+    def _user_get(self, jid: JID):
+        """
+        Returns a dict-like object containing self.form_fields for this user.
+
+        :param JID jid: JID of the concerned user
+        :returns: None or dict-like
+        """
+        return self._user_store.get(jid.bare)
+    
+    def _user_remove(self, jid: JID):
+        """
+        Returns a dict-like object containing self.form_fields for this user.
+
+        :param JID jid: JID of the concerned user
+        :returns: None or dict-like
+        """
+        return self._user_store.pop(jid.bare)
+
+    async def _user_validate(self, iq: Iq):
+        """
+        Should raise ValueError(msg) in case the registration is not OK.
+        msg will be sent to the user's XMPP client
+        """
+        self._user_store[iq["from"].bare] = {
+            key: iq["register"][key] for key in self.form_fields}
+
+    async def _handle_registration(self, iq: Iq):
+        if iq["type"] == "get":
+            self._send_form(iq)
+        elif iq["type"] == "set":
+            if iq["register"]["remove"]:
+                try:
+                    self.api["user_remove"](iq["from"])
+                except KeyError:
+                    _send_error(
+                        iq,
+                        "404",
+                        "cancel",
+                        "item-not-found",
+                        "User not found",
+                    )
+                else:
+                    reply = iq.reply()
+                    reply.send()
+                    self.xmpp.event("user_unregister", iq)
+                return
+
+            for field in self.form_fields:
+                if not iq["register"][field]:
+                    # Incomplete Registration
+                    _send_error(
+                        iq,
+                        "406",
+                        "modify",
+                        "not-acceptable",
+                        "Please fill in all fields.",
+                    )
+                    return
+
+            try:
+                await self.api["user_validate"](iq, self.form_fields)
+            except ValueError as e:
+                _send_error(
+                    iq,
+                    "406",
+                    "modify",
+                    "not-acceptable",
+                    e.args,
+                )
+            else:
+                reply = iq.reply()
+                reply.send()
+                self.xmpp.event("user_register", iq)
+
+    def _send_form(self, iq):
+        reg = iq["register"]
+
+        user = self.api["user_get"](iq["from"])
+
+        if user is None:
+            user = {}
+        else:
+            reg["registered"] = True
+
+        reg["instructions"] = self.form_instructions
+
+        for field in self.form_fields:
+            data = user.get(field, "")
+            if data:
+                reg[field] = data
+            else:
+                # Add a blank field
+                reg.add_field(field)
+
+        reply = iq.reply()
+        reply.set_payload(reg.xml)
+        reply.send()
 
     def _force_registration(self, event):
         if self.force_registration:
@@ -126,3 +226,15 @@ class XEP_0077(BasePlugin, ComponentRegistration):
             iq['register']['username'] = self.xmpp.boundjid.user
         iq['register']['password'] = password
         return iq.send(timeout=timeout, callback=callback)
+
+def _send_error(iq, code, error_type, name, text=""):
+    # It would be nice to raise XMPPError but the iq payload
+    # should include the register info
+    reply = iq.reply()
+    reply.set_payload(iq["register"].xml)
+    reply.error()
+    reply["error"]["code"] = code
+    reply["error"]["type"] = error_type
+    reply["error"]["condition"] = name
+    reply["error"]["text"] = text
+    reply.send()
