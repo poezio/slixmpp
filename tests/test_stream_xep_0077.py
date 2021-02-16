@@ -1,3 +1,7 @@
+"""
+This only covers the component registration side of the XEP-0077 plugin
+"""
+
 import unittest
 
 from slixmpp import ComponentXMPP, Iq
@@ -12,32 +16,31 @@ class TestRegistration(SlixTest):
             mode="component", plugins=["xep_0077"], jid="shakespeare.lit", server="lit"
         )
 
-    # This one fails inconsistently, maybe because of default values?
-    # def testRegistrationForm(self):
-    #     self.stream_start(
-    #         mode="component", plugins=["xep_0077"], jid="shakespeare.lit", server="lit"
-    #     )
-    #     self.recv(
-    #         """
-    #         <iq type='get' id='reg1' to='shakespeare.lit'>
-    #             <query xmlns='jabber:iq:register'/>
-    #         </iq>
-    #         """,
-    #     )
-    #     self.send(
-    #         f"""
-    #         <iq type='result' id='reg1' from='shakespeare.lit'>
-    #             <query xmlns='jabber:iq:register'>
-    #                 <instructions>{self.xmpp["xep_0077"].form_instructions}</instructions>
-    #                 <username/>
-    #                 <password/>
-    #             </query>
-    #         </iq>
-    #         """,
-    #         defaults=['register']
-    #     )
+    def testRegistrationForm(self):
+        self.stream_start(
+            mode="component", plugins=["xep_0077"], jid="shakespeare.lit", server="lit"
+        )
+        self.recv(
+            """
+            <iq type='get' id='reg1' to='shakespeare.lit' from='bill@server/resource'>
+                <query xmlns='jabber:iq:register'/>
+            </iq>
+            """,
+        )
+        self.send(
+            f"""
+            <iq type='result' id='reg1' from='shakespeare.lit' to='bill@server/resource'>
+                <query xmlns='jabber:iq:register'>
+                    <instructions>{self.xmpp["xep_0077"].form_instructions}</instructions>
+                    <username/>
+                    <password/>
+                </query>
+            </iq>
+            """,
+            use_values=False  # Fails inconsistently without this
+        )
 
-    def testRegistrationSuccess(self):
+    def testRegistrationSuccessAndModif(self):
         self.recv(
             """
             <iq type='set' id='reg2' to='shakespeare.lit' from="bill@server/resource">
@@ -52,6 +55,53 @@ class TestRegistration(SlixTest):
         user_store = self.xmpp["xep_0077"]._user_store
         self.assertEqual(user_store["bill@server"]["username"], "bill")
         self.assertEqual(user_store["bill@server"]["password"], "Calliope")
+
+        self.recv(
+            """
+            <iq type='get' id='reg1' to='shakespeare.lit' from="bill@server/resource">
+                <query xmlns='jabber:iq:register'/>
+            </iq>
+            """,
+        )
+        self.send(
+            f"""
+            <iq type='result' id='reg1' to="bill@server/resource" from='shakespeare.lit'>
+                <query xmlns='jabber:iq:register'>
+                    <instructions>{self.xmpp["xep_0077"].form_instructions}</instructions>
+                    <username>bill</username>
+                    <password>Calliope</password>
+                    <registered />
+                </query>
+            </iq>
+            """,
+            use_values=False  # Fails inconsistently without this
+        )
+
+    def testRegistrationAndRemove(self):
+        self.recv(
+            """
+            <iq type='set' id='reg2' to='shakespeare.lit' from="bill@shakespeare.lit/globe">
+                <query xmlns='jabber:iq:register'>
+                    <username>bill</username>
+                    <password>Calliope</password>
+                </query>
+            </iq>
+            """
+        )
+        self.send("<iq type='result' id='reg2' from='shakespeare.lit' to='bill@shakespeare.lit/globe'/>")
+        self.recv(
+            """
+            <iq type='set' from='bill@shakespeare.lit/globe' id='unreg1'>
+            <query xmlns='jabber:iq:register'>
+                <remove/>
+            </query>
+            </iq>
+            """
+        )
+        self.send("<iq type='result' to='bill@shakespeare.lit/globe' id='unreg1'/>")
+        user_store = self.xmpp["xep_0077"]._user_store
+        self.assertIs(user_store.get("bill@server"), None)
+
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestRegistration)

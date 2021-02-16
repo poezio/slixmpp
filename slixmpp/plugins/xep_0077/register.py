@@ -49,8 +49,9 @@ class XEP_0077(BasePlugin):
                 )
             )
             self._user_store = {}
-            # self.api.register(self._user_get, "user_get", default=True)
-            # self.api.register(self._user_remove, "user_remove", default=False)
+            self.api.register(self._user_get, "user_get")
+            self.api.register(self._user_remove, "user_remove")
+            self.api.register(self._make_registration_form, "make_registration_form")
             self.api.register(self._user_validate, "user_validate")
         else:
             self.xmpp.register_feature(
@@ -69,23 +70,47 @@ class XEP_0077(BasePlugin):
         if not self.xmpp.is_component:
             self.xmpp.unregister_feature('register', self.order)
 
-    def _user_get(self, jid: JID, node=None, ifrom=None):
+    def _user_get(self, jid, node, ifrom, iq):
         """
         Returns a dict-like object containing self.form_fields for this user.
 
         :param JID jid: JID of the concerned user
         :returns: None or dict-like
         """
-        return self._user_store.get(jid.bare)
+        return self._user_store.get(iq["from"].bare)
     
-    def _user_remove(self, jid: JID, node=None, ifrom=None):
+    def _user_remove(self, jid, node, ifrom, iq):
         """
         Returns a dict-like object containing self.form_fields for this user.
 
         :param JID jid: JID of the concerned user
         :returns: None or dict-like
         """
-        return self._user_store.pop(jid.bare)
+        return self._user_store.pop(iq["from"].bare)
+
+    def _make_registration_form(self, jid, node, ifrom, iq: Iq):
+        reg = iq["register"]
+        user = self.api["user_get"](None, None, None, iq)
+
+
+        if user is None:
+            user = {}
+        else:
+            reg["registered"] = True
+
+        reg["instructions"] = self.form_instructions
+
+        for field in self.form_fields:
+            data = user.get(field, "")
+            if data:
+                reg[field] = data
+            else:
+                # Add a blank field
+                reg.add_field(field)
+
+        reply = iq.reply()
+        reply.set_payload(reg.xml)
+        return reply
 
     def _user_validate(self, jid, node, ifrom, registration):
         """
@@ -100,7 +125,7 @@ class XEP_0077(BasePlugin):
         elif iq["type"] == "set":
             if iq["register"]["remove"]:
                 try:
-                    self.api["user_remove"](jid=iq["from"])
+                    self.api["user_remove"](None, None, iq["from"], iq)
                 except KeyError:
                     _send_error(
                         iq,
@@ -144,27 +169,7 @@ class XEP_0077(BasePlugin):
                 self.xmpp.event("user_register", iq)
 
     def _send_form(self, iq):
-        reg = iq["register"]
-
-        user = self.api["user_get"](jid=iq["from"])
-
-        if user is None:
-            user = {}
-        else:
-            reg["registered"] = True
-
-        reg["instructions"] = self.form_instructions
-
-        for field in self.form_fields:
-            data = user.get(field, "")
-            if data:
-                reg[field] = data
-            else:
-                # Add a blank field
-                reg.add_field(field)
-
-        reply = iq.reply()
-        reply.set_payload(reg.xml)
+        reply = self.api["make_registration_form"](None, None, iq["from"], iq)
         reply.send()
 
     def _force_registration(self, event):
