@@ -21,6 +21,36 @@ class XEP_0077(BasePlugin):
 
     """
     XEP-0077: In-Band Registration
+
+    Events:
+
+    ::
+
+        user_register           -- After succesful validation and add to the user store
+                                   in api["user_validate"]
+        user_unregister         -- After succesful user removal in api["user_remove"]
+    
+    Config:
+
+    ::
+
+        form_fields are only form_instructions are only used for component registration
+        in case api["make_registration_form"] is not overriden.
+
+    API:
+    
+    ::
+
+        user_get(jid, node, ifrom, iq)
+            Returns a dict-like object containing `form_fields` for this user or None
+        user_remove(jid, node, ifrom, iq)
+            Removes a user or raise KeyError in case the user is not found in the user store
+        make_registration_form(self, jid, node, ifrom, iq)
+            Returns an iq reply to a registration form request, pre-filled and with
+            <registered/> in case the requesting entity is already registered to us
+        user_validate((self, jid, node, ifrom, registration)
+            Add the user to the user store or raise ValueError(msg) if any problem is encountered
+            msg is sent back to the XMPP client as an error message.
     """
 
     name = 'xep_0077'
@@ -71,21 +101,9 @@ class XEP_0077(BasePlugin):
             self.xmpp.unregister_feature('register', self.order)
 
     def _user_get(self, jid, node, ifrom, iq):
-        """
-        Returns a dict-like object containing self.form_fields for this user.
-
-        :param JID jid: JID of the concerned user
-        :returns: None or dict-like
-        """
         return self._user_store.get(iq["from"].bare)
     
     def _user_remove(self, jid, node, ifrom, iq):
-        """
-        Returns a dict-like object containing self.form_fields for this user.
-
-        :param JID jid: JID of the concerned user
-        :returns: None or dict-like
-        """
         return self._user_store.pop(iq["from"].bare)
 
     def _make_registration_form(self, jid, node, ifrom, iq: Iq):
@@ -113,10 +131,6 @@ class XEP_0077(BasePlugin):
         return reply
 
     def _user_validate(self, jid, node, ifrom, registration):
-        """
-        Should raise ValueError(msg) in case the registration is not OK.
-        msg will be sent to the user's XMPP client
-        """
         self._user_store[ifrom.bare] = {key: registration[key] for key in self.form_fields}
 
     async def _handle_registration(self, iq: Iq):
