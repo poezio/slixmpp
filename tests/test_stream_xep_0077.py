@@ -89,6 +89,11 @@ class TestRegistration(SlixTest):
             """
         )
         self.send("<iq type='result' id='reg2' from='shakespeare.lit' to='bill@shakespeare.lit/globe'/>")
+        pseudo_iq = self.xmpp.Iq()
+        pseudo_iq["from"] = "bill@shakespeare.lit/globe"
+        user = self.xmpp["xep_0077"].api["user_get"](None, None, None, pseudo_iq)
+        self.assertEqual(user["username"], "bill")
+        self.assertEqual(user["password"], "Calliope")
         self.recv(
             """
             <iq type='set' from='bill@shakespeare.lit/globe' id='unreg1'>
@@ -100,7 +105,7 @@ class TestRegistration(SlixTest):
         )
         self.send("<iq type='result' to='bill@shakespeare.lit/globe' id='unreg1'/>")
         user_store = self.xmpp["xep_0077"]._user_store
-        self.assertIs(user_store.get("bill@server"), None)
+        self.assertIs(user_store.get("bill@shakespeare.lit"), None)
 
 
 
