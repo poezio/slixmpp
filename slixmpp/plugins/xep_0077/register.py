@@ -8,14 +8,17 @@ import ssl
 
 from slixmpp.stanza import StreamFeatures, Iq
 from slixmpp.xmlstream import register_stanza_plugin, JID
+from slixmpp.xmlstream.handler import CoroutineCallback
+from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0077 import stanza, Register, RegisterFeature
+from slixmpp.plugins.xep_0077.component import ComponentRegistration, DummyUserStore
 
 
 log = logging.getLogger(__name__)
 
 
-class XEP_0077(BasePlugin):
+class XEP_0077(BasePlugin, ComponentRegistration):
 
     """
     XEP-0077: In-Band Registration
@@ -28,18 +31,32 @@ class XEP_0077(BasePlugin):
     default_config = {
         'create_account': True,
         'force_registration': False,
-        'order': 50
+        'order': 50,
+        "form_fields": {"username", "password"},
+        "form_instructions": "Enter your credentials",
+        "user_store": DummyUserStore(),
     }
 
     def plugin_init(self):
         register_stanza_plugin(StreamFeatures, RegisterFeature)
         register_stanza_plugin(Iq, Register)
 
-        if not self.xmpp.is_component:
-            self.xmpp.register_feature('register',
+        if self.xmpp.is_component:
+            self.xmpp["xep_0030"].add_feature("jabber:iq:register")
+            self.xmpp.register_handler(
+                CoroutineCallback(
+                    "registration",
+                    StanzaPath("/iq/register"),
+                    self._handle_registration,
+                )
+            )
+        else:
+            self.xmpp.register_feature(
+                "register",
                 self._handle_register_feature,
                 restart=False,
-                order=self.order)
+                order=self.order,
+            )
 
         register_stanza_plugin(Register, self.xmpp['xep_0004'].stanza.Form)
         register_stanza_plugin(Register, self.xmpp['xep_0066'].stanza.OOB)
