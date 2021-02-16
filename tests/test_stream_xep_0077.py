@@ -21,14 +21,14 @@ class TestRegistration(SlixTest):
         )
         self.send(
             f"""
-            <iq type='result' id='reg1'>
+            <iq type='result' id='reg1' from='shakespeare.lit'>
                 <query xmlns='jabber:iq:register'>
                     <instructions>{self.xmpp["xep_0077"].form_instructions}</instructions>
                     <username/>
                     <password/>
                 </query>
             </iq>
-            """
+            """,
         )
 
 
