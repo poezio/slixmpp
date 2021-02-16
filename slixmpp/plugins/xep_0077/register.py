@@ -49,9 +49,9 @@ class XEP_0077(BasePlugin):
                 )
             )
             self._user_store = {}
-            self.api.register("user_get", self._user_get, default=True)
-            self.api.register("user_remove", self._user_remove, default=True)
-            self.api.register("user_validate", self._user_validate, default=True)
+            # self.api.register(self._user_get, "user_get", default=True)
+            # self.api.register(self._user_remove, "user_remove", default=False)
+            self.api.register(self._user_validate, "user_validate")
         else:
             self.xmpp.register_feature(
                 "register",
@@ -69,7 +69,7 @@ class XEP_0077(BasePlugin):
         if not self.xmpp.is_component:
             self.xmpp.unregister_feature('register', self.order)
 
-    def _user_get(self, jid: JID):
+    def _user_get(self, jid: JID, node=None, ifrom=None):
         """
         Returns a dict-like object containing self.form_fields for this user.
 
@@ -78,7 +78,7 @@ class XEP_0077(BasePlugin):
         """
         return self._user_store.get(jid.bare)
     
-    def _user_remove(self, jid: JID):
+    def _user_remove(self, jid: JID, node=None, ifrom=None):
         """
         Returns a dict-like object containing self.form_fields for this user.
 
@@ -87,13 +87,12 @@ class XEP_0077(BasePlugin):
         """
         return self._user_store.pop(jid.bare)
 
-    async def _user_validate(self, iq: Iq):
+    def _user_validate(self, jid, node, ifrom, registration):
         """
         Should raise ValueError(msg) in case the registration is not OK.
         msg will be sent to the user's XMPP client
         """
-        self._user_store[iq["from"].bare] = {
-            key: iq["register"][key] for key in self.form_fields}
+        self._user_store[ifrom.bare] = {key: registration[key] for key in self.form_fields}
 
     async def _handle_registration(self, iq: Iq):
         if iq["type"] == "get":
@@ -101,7 +100,7 @@ class XEP_0077(BasePlugin):
         elif iq["type"] == "set":
             if iq["register"]["remove"]:
                 try:
-                    self.api["user_remove"](iq["from"])
+                    self.api["user_remove"](jid=iq["from"])
                 except KeyError:
                     _send_error(
                         iq,
@@ -116,6 +115,7 @@ class XEP_0077(BasePlugin):
                     self.xmpp.event("user_unregister", iq)
                 return
 
+
             for field in self.form_fields:
                 if not iq["register"][field]:
                     # Incomplete Registration
@@ -129,7 +129,7 @@ class XEP_0077(BasePlugin):
                     return
 
             try:
-                await self.api["user_validate"](iq, self.form_fields)
+                self.api["user_validate"](None, None, iq["from"], iq["register"])
             except ValueError as e:
                 _send_error(
                     iq,
@@ -146,7 +146,7 @@ class XEP_0077(BasePlugin):
     def _send_form(self, iq):
         reg = iq["register"]
 
-        user = self.api["user_get"](iq["from"])
+        user = self.api["user_get"](jid=iq["from"])
 
         if user is None:
             user = {}
