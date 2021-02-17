@@ -37,22 +37,5 @@ class TestPermissions(SlixTest):
         # Should this one work? →        # AttributeError: 'Message' object has no attribute 'permission'
         # self.assertEqual(msg.permission["roster"], "both")
 
-    def testRosterQuery(self):
-        # This doesn't use anything from plugins.xep_0356
-        # https://xmpp.org/extensions/xep-0356.html#priv_manage_roster
-        iq = self.Iq()
-        iq.set_query("jabber:iq:roster")
-        iq["id"] = "roster1"
-        iq["from"] = "pubsub.capulet.lit"
-        iq["to"] = "juliet@example.com"
-        iq["type"] = "get"
-
-        xmlstring = """
-        <iq id='roster1' from='pubsub.capulet.lit' to='juliet@example.com' type='get'>
-            <query xmlns='jabber:iq:roster'/>
-        </iq>
-        """
-        self.check(iq, xmlstring)
-
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestPermissions)

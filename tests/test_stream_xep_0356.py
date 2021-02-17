@@ -1,11 +1,11 @@
 import unittest
 
-from slixmpp import ComponentXMPP, Iq
+from slixmpp import ComponentXMPP, Iq, Message
 from slixmpp.roster import RosterItem
 from slixmpp.test import SlixTest
 
 
-class TestRegistration(SlixTest):
+class TestPermissions(SlixTest):
     def setUp(self):
         self.stream_start(
             mode="component",
@@ -39,7 +39,6 @@ class TestRegistration(SlixTest):
 
     def testGetRosterIq(self):
         iq = self.xmpp["xep_0356"]._make_get_roster("juliet@example.com")
-        # Not sure about the right xmlns
         xmlstring = """
         <iq xmlns="jabber:component:accept"
             id='1'
@@ -66,7 +65,6 @@ class TestRegistration(SlixTest):
             },
         }
         iq = self.xmpp["xep_0356"]._make_set_roster(jid, items)
-        # Not sure about the right xmlns
         xmlstring = f"""
         <iq xmlns="jabber:component:accept"
             id='1'
@@ -91,25 +89,20 @@ class TestRegistration(SlixTest):
         <message xmlns="jabber:component:accept" from='pubsub.capulet.lit' to='capulet.net'>
             <privilege xmlns='urn:xmpp:privilege:1'>
                 <forwarded xmlns='urn:xmpp:forward:0'>
-                    <message from="juliet@capulet.lit" to="romeo@montague.lit">
+                    <message from="juliet@capulet.lit" to="romeo@montague.lit" xmlns="jabber:client">
                         <body>I do not hate you</body>
                     </message>
                 </forwarded>
             </privilege>
         </message>
         """
-        msg = self.Message()  # Not sure about the right xmlns
+        msg = Message()
         msg["from"] = "juliet@capulet.lit"
         msg["to"] = "romeo@montague.lit"
         msg["body"] = "I do not hate you"
         
-        priv_msg = self.xmpp["xep_0356"]._make_outgoing_message(msg)
+        priv_msg = self.xmpp["xep_0356"]._make_privileged_message(msg)
         self.check(priv_msg, xmlstring, use_values=False)
 
-    # Apparently unittest/SlixTest cannot do async
-    # async def testGetRoster(self):
-    #     roster = await self.xmpp["xep_0356"].get_roster("juliet@example.com")
-    #     self.assertEqual(roster, None)
 
-
-suite = unittest.TestLoader().loadTestsFromTestCase(TestRegistration)
+suite = unittest.TestLoader().loadTestsFromTestCase(TestPermissions)
