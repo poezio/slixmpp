@@ -232,8 +232,11 @@ class SlixTest(unittest.TestCase):
 
             # Ensure that top level namespaces are used, even if they
             # were not provided.
-            self.fix_namespaces(stanza.xml, 'jabber:client')
-            self.fix_namespaces(xml, 'jabber:client')
+            namespace = 'jabber:client'
+            if self.xmpp:
+                namespace = self.xmpp.default_ns
+            self.fix_namespaces(stanza.xml, namespace)
+            self.fix_namespaces(xml, namespace)
 
             stanza2 = stanza_class(xml=xml)
 
