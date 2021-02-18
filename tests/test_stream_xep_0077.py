@@ -91,7 +91,9 @@ class TestRegistration(SlixTest):
         self.send("<iq type='result' id='reg2' from='shakespeare.lit' to='bill@shakespeare.lit/globe'/>")
         pseudo_iq = self.xmpp.Iq()
         pseudo_iq["from"] = "bill@shakespeare.lit/globe"
-        user = self.xmpp["xep_0077"].api["user_get"](None, None, None, pseudo_iq)
+        fut = self.xmpp.wrap(self.xmpp["xep_0077"].api["user_get"](None, None, None, pseudo_iq))
+        self.run_coro(fut)
+        user = fut.result()
         self.assertEqual(user["username"], "bill")
         self.assertEqual(user["password"], "Calliope")
         self.recv(
