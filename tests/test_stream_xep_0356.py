@@ -14,6 +14,14 @@ class TestPermissions(SlixTest):
             server="capulet.net",
         )
 
+    def testPluginEnd(self):
+        exc = False
+        try:
+            self.xmpp.plugin.disable("xep_0356")
+        except Exception as e:
+            exc = True
+        self.assertFalse(exc)
+
     def testGrantedPrivileges(self):
         # https://xmpp.org/extensions/xep-0356.html#example-4
         results = {"event": False}

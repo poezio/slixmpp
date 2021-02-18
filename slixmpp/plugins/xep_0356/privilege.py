@@ -46,6 +46,9 @@ class XEP_0356(BasePlugin):
             )
         )
 
+    def plugin_end(self):
+        self.xmpp.remove_handler("Privileges")
+
     def _handle_privilege(self, msg: Message):
         """
         Called when the XMPP server advertise the component's privileges.
