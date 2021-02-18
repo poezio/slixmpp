@@ -14,3 +14,4 @@ slixmpp.egg-info/
 .DS_STORE
 .idea/
 .vscode/
+venv/
