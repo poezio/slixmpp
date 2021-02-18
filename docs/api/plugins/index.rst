@@ -75,6 +75,7 @@ Plugin index
     xep_0335
     xep_0352
     xep_0353
+    xep_0356
     xep_0359
     xep_0363
     xep_0369
