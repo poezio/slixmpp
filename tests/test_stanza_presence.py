@@ -2,6 +2,12 @@ import unittest
 import slixmpp
 from slixmpp.test import SlixTest
 
+from slixmpp.plugins.xep_0172 import UserNick
+from slixmpp.xmlstream import register_stanza_plugin
+from slixmpp.stanza import Presence
+
+register_stanza_plugin(Presence, UserNick)
+
 class TestPresenceStanzas(SlixTest):
 
     def testPresenceShowRegression(self):
