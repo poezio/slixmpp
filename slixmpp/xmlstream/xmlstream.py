@@ -533,7 +533,6 @@ class XMLStream(asyncio.BaseProtocol):
             await asyncio.wait_for(
                 self.waiting_queue.join(),
                 wait,
-                loop=self.loop
             )
         except asyncio.TimeoutError:
             wait = 0 # we already consumed the timeout
@@ -1182,20 +1181,25 @@ class XMLStream(asyncio.BaseProtocol):
 
         :param str event: Event to wait on.
         :param int timeout: Timeout
+        :raises: :class:`asyncio.TimeoutError` when the timeout is reached
         """
         fut = asyncio.Future()
+
         def result_handler(event_data):
             if not fut.done():
                 fut.set_result(event_data)
             else:
-                log.debug("Future registered on event '%s' was alredy done", event)
+                log.debug(
+                    "Future registered on event '%s' was alredy done",
+                    event
+                )
 
         self.add_event_handler(
             event,
             result_handler,
             disposable=True,
         )
-        return await asyncio.wait_for(fut, timeout, loop=self.loop)
+        return await asyncio.wait_for(fut, timeout)
 
     @contextmanager
     def event_handler(self, event: str, handler: Callable):
