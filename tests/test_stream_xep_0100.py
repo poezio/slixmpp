@@ -13,14 +13,12 @@ class TestStreamGateway(SlixTest):
                 "xep_0100": {"component_name": "AIM Gateway", "type": "aim"}
             },
         )
-        # Fix for
-        self.xml_ns_hotfix = "jabber:component:accept"
 
     def next_sent(self):
-        sent = self.xmpp.socket.next_sent(0.5)
+        sent = self.xmpp.socket.next_sent(timeout=0.5)
         xml = self.parse_xml(sent)
-        self.fix_namespaces(xml, self.xml_ns_hotfix)
-        sent = self.xmpp._build_stanza(xml, self.xml_ns_hotfix)
+        self.fix_namespaces(xml, "jabber:component:accept")
+        sent = self.xmpp._build_stanza(xml, "jabber:component:accept")
         return sent
 
     def testDisco(self):
@@ -35,7 +33,7 @@ class TestStreamGateway(SlixTest):
             </iq>
             """
         )
-        self.send(  # xmlns="jabber:client" because of bug in slixtest (?)
+        self.send(
             """
             <iq type="result"
                 from="aim.shakespeare.lit"

@@ -35,10 +35,13 @@ class XEP_0100(BasePlugin):
             name=self.component_name, category="gateway", itype=self.type
         )
 
-        self.xmpp.client_roster.auto_authorize = True
-        self.xmpp.client_roster.auto_subscribe = True
+        self.xmpp.client_roster.auto_authorize = False
+        self.xmpp.client_roster.auto_subscribe = False
 
         self.xmpp.add_event_handler("user_register", self.on_user_register)
+        self.xmpp.add_event_handler(
+            "roster_subscription_request", self.on_roster_subscription_request
+        )
         self.xmpp.add_event_handler("user_unregister", self.on_user_unregister)
 
     def get_user(self, stanza):
@@ -54,6 +57,14 @@ class XEP_0100(BasePlugin):
         else:
             log.debug(f"Send subscription request to {user}")
             self.xmpp.client_roster.subscribe(user_jid)
+
+    def on_roster_subscription_request(self, presence: Presence):
+        log.debug(f"Sub request from {presence['from']}")
+        p = presence.reply()
+        p["from"] = self.xmpp.boundjid.bare
+        log.debug(f"Replying {p}")
+        p.send()
+        log.debug(f"Roster: {self.xmpp.client_roster}")
 
     def on_user_unregister(self, iq: Iq):
         user_jid = iq["from"]
