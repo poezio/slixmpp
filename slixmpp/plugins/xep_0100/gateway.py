@@ -60,8 +60,9 @@ class XEP_0100(BasePlugin):
 
     def on_roster_subscription_request(self, presence: Presence):
         log.debug(f"Sub request from {presence['from']}")
-        p = presence.reply()
-        p["from"] = self.xmpp.boundjid.bare
+        p = self.xmpp.make_presence(
+            pfrom=self.xmpp.boundjid.bare, pto=presence["from"].bare, ptype="subscribed"
+        )
         log.debug(f"Replying {p}")
         p.send()
         log.debug(f"Roster: {self.xmpp.client_roster}")
