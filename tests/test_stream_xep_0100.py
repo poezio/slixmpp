@@ -14,7 +14,7 @@ class TestStreamGateway(SlixTest):
             },
         )
         # Fix for
-        self.xml_ns_hotfix = "jabber:client"
+        self.xml_ns_hotfix = "jabber:component:accept"
 
     def next_sent(self):
         sent = self.xmpp.socket.next_sent(0.5)
@@ -37,7 +37,7 @@ class TestStreamGateway(SlixTest):
         )
         self.send(  # xmlns="jabber:client" because of bug in slixtest (?)
             """
-            <iq xmlns="jabber:client" type="result"
+            <iq type="result"
                 from="aim.shakespeare.lit"
                 to="romeo@montague.lit/orchard"
                 id="disco1">
