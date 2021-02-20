@@ -637,7 +637,7 @@ class SlixTest(unittest.TestCase):
 
     def run_coro(self, coro):
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(coro)
+        return loop.run_until_complete(coro)
 
     def stream_close(self):
         """
