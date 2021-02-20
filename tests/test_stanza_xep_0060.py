@@ -3,9 +3,18 @@ from slixmpp.test import SlixTest
 import slixmpp.plugins.xep_0004 as xep_0004
 import slixmpp.plugins.xep_0060.stanza as pubsub
 from slixmpp.xmlstream.stanzabase import ET
+from slixmpp.xmlstream import register_stanza_plugin
 
 
 class TestPubsubStanzas(SlixTest):
+
+    def setUp(self):
+        register_stanza_plugin(
+            xep_0004.FormField, xep_0004.FieldOption, iterable=True
+        )
+        register_stanza_plugin(
+            xep_0004.Form, xep_0004.FormField, iterable=True
+        )
 
     def testAffiliations(self):
         "Testing iq/pubsub/affiliations/affiliation stanzas"

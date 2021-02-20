@@ -2,11 +2,13 @@ import unittest
 from slixmpp import Message
 from slixmpp.test import SlixTest
 from slixmpp.plugins.xep_0424 import stanza
+from slixmpp.plugins.xep_0422 import stanza as astanza
 
 
 class TestRetraction(SlixTest):
 
     def setUp(self):
+        astanza.register_plugins()
         stanza.register_plugins()
 
     def testRetract(self):

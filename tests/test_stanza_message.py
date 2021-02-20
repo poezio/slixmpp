@@ -2,6 +2,7 @@ import unittest
 from slixmpp.test import SlixTest
 from slixmpp.stanza.message import Message
 from slixmpp.stanza.htmlim import HTMLIM
+from slixmpp.plugins.xep_0172 import UserNick
 from slixmpp.xmlstream import register_stanza_plugin
 
 
@@ -9,6 +10,7 @@ class TestMessageStanzas(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Message, HTMLIM)
+        register_stanza_plugin(Message, UserNick)
 
     def testGroupchatReplyRegression(self):
         "Regression groupchat reply should be to barejid"
