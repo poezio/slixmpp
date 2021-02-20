@@ -225,6 +225,10 @@ class SlixTest(unittest.TestCase):
                     "Stanza:\n%s" % str(stanza))
         else:
             stanza_class = stanza.__class__
+            # Hack to preserve namespaces instead of having jabber:client
+            # everywhere.
+            old_ns = stanza_class.namespace
+            stanza_class.namespace =stanza.namespace
             if not isinstance(criteria, ElementBase):
                 xml = self.parse_xml(criteria)
             else:
@@ -232,8 +236,8 @@ class SlixTest(unittest.TestCase):
 
             # Ensure that top level namespaces are used, even if they
             # were not provided.
-            self.fix_namespaces(stanza.xml, 'jabber:client')
-            self.fix_namespaces(xml, 'jabber:client')
+            self.fix_namespaces(stanza.xml)
+            self.fix_namespaces(xml)
 
             stanza2 = stanza_class(xml=xml)
 
@@ -276,6 +280,7 @@ class SlixTest(unittest.TestCase):
                 debug += "Given stanza:\n%s\n" % highlight(tostring(stanza.xml))
                 debug += "Generated stanza:\n%s\n" % highlight(tostring(stanza2.xml))
                 result = self.compare(xml, stanza.xml, stanza2.xml)
+            stanza_class.namespace = old_ns
 
             self.assertTrue(result, debug)
 
@@ -607,8 +612,8 @@ class SlixTest(unittest.TestCase):
             self.fail("No stanza was sent.")
 
         xml = self.parse_xml(sent)
-        self.fix_namespaces(xml, 'jabber:client')
-        sent = self.xmpp._build_stanza(xml, 'jabber:client')
+        self.fix_namespaces(xml)
+        sent = self.xmpp._build_stanza(xml)
         self.check(sent, data,
                    method=method,
                    defaults=defaults,
@@ -638,7 +643,7 @@ class SlixTest(unittest.TestCase):
     # ------------------------------------------------------------------
     # XML Comparison and Cleanup
 
-    def fix_namespaces(self, xml, ns):
+    def fix_namespaces(self, xml, ns=None):
         """
         Assign a namespace to an element and any children that
         don't have a namespace.
@@ -647,6 +652,10 @@ class SlixTest(unittest.TestCase):
             xml -- The XML object to fix.
             ns  -- The namespace to add to the XML object.
         """
+        if ns is None:
+            ns = 'jabber:client'
+            if self.xmpp:
+                ns = self.xmpp.default_ns
         if xml.tag.startswith('{'):
             return
         xml.tag = '{%s}%s' % (ns, xml.tag)
