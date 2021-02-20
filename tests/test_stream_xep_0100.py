@@ -15,6 +15,7 @@ class TestStreamGateway(SlixTest):
         )
 
     def next_sent(self):
+        self.wait_for_send_queue()
         sent = self.xmpp.socket.next_sent(timeout=0.5)
         xml = self.parse_xml(sent)
         self.fix_namespaces(xml, "jabber:component:accept")
