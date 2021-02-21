@@ -63,8 +63,6 @@ class XEP_0100(BasePlugin):
         if not self.xmpp.is_component:
             raise TypeError("Only components can be gateways")
 
-        self.prompt_futures = dict()
-
         self.xmpp["xep_0030"].add_identity(
             name=self.component_name, category="gateway", itype=self.type
         )
