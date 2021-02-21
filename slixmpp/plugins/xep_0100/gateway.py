@@ -87,13 +87,25 @@ class XEP_0100(BasePlugin):
 
         self.xmpp.register_handler(
             Callback(
-                "roster_remove",
+                "legacy_roster_remove",
                 StanzaPath("/iq@type=set/roster/item@subscription=remove"),
                 self._handle_roster_remove,
             )
         )
 
         self.xmpp.add_event_handler("message", self.on_message)
+    
+    def plugin_end(self):
+        self.xmpp.del_event_handler("user_register", self.on_user_register)
+        self.xmpp.del_event_handler("user_unregister", self.on_user_unregister)
+        self.xmpp.del_event_handler("got_online", self.on_got_online)
+        self.xmpp.del_event_handler(
+            "presence_unavailable", self.on_presence_unavailable
+        )
+        self.xmpp.del_event_handler("presence_subscribe", self.on_presence_subscribe)
+        self.xmpp.del_event_handler("message", self.on_message)
+
+        self.xmpp.remove_handler("legacy_roster_remove")
 
     def get_user(self, stanza):
         return self.xmpp["xep_0077"].api["user_get"](None, None, None, stanza)

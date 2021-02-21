@@ -351,6 +351,14 @@ class TestStreamGateway(SlixTest):
         self.assertTrue(result["msg"]["from"] == 'romeo@montague.lit')
         self.assertTrue(result["msg"]["to"] == 'juliet@aim.shakespeare.lit')
 
+    def testPluginEnd(self):
+        exc = False
+        try:
+            self.xmpp.plugin.disable("xep_0100")
+        except Exception:
+            exc = True
+        self.assertFalse(exc)
+
     def add_user(self):
         self.xmpp["xep_0077"].api["user_validate"](
             None,
