@@ -39,10 +39,10 @@ class XEP_0100(BasePlugin):
 
     ::
 
-        async legacy_contact_add(jid, node, ifrom, presence: Presence)
+        async legacy_contact_add(jid, node, ifrom, contact_jid: JID)
             Add contact on the legacy service. Should raise LegacyError if anything goes wrong in
             the process.
-        legacy_contact_remove(jid, node, ifrom, iq: Iq)
+        legacy_contacts_remove(jid, node, ifrom, roster_items: Dict[JID, Dict])
             Remove a contact.
 
     """
@@ -67,7 +67,7 @@ class XEP_0100(BasePlugin):
             name=self.component_name, category="gateway", itype=self.type
         )
 
-        self.api.register(self._legacy_contact_remove, "legacy_contact_remove")
+        self.api.register(self._legacy_contacts_remove, "legacy_contacts_remove")
         self.api.register(self._legacy_contact_add, "legacy_contact_add")
 
         # Without that BaseXMPP sends unsub/unavailable on sub requests and we don't want that
@@ -76,14 +76,12 @@ class XEP_0100(BasePlugin):
 
         self.xmpp.add_event_handler("user_register", self.on_user_register)
         self.xmpp.add_event_handler("user_unregister", self.on_user_unregister)
-
         self.xmpp.add_event_handler("got_online", self.on_got_online)
-
         self.xmpp.add_event_handler(
             "presence_unavailable", self.on_presence_unavailable
         )
-
         self.xmpp.add_event_handler("presence_subscribe", self.on_presence_subscribe)
+        self.xmpp.add_event_handler("message", self.on_message)
 
         self.xmpp.register_handler(
             Callback(
@@ -93,7 +91,6 @@ class XEP_0100(BasePlugin):
             )
         )
 
-        self.xmpp.add_event_handler("message", self.on_message)
     
     def plugin_end(self):
         self.xmpp.del_event_handler("user_register", self.on_user_register)
@@ -123,7 +120,7 @@ class XEP_0100(BasePlugin):
         user = self.get_user(iq)
         if user is None:  # This should not happen
             log.warning(
-                f"{user_jid} has registered but cannot find him/her in user store"
+                f"{user_jid} has registered but cannot find them in user store"
             )
         else:
             log.debug(f"Sending subscription request to {user_jid}")
@@ -140,7 +137,7 @@ class XEP_0100(BasePlugin):
         user_jid = presence["from"]
         user = self.get_user(presence)
         if user is None:  # This should not happen
-            log.warning(f"{user_jid} has gotten online but (s)he is not in user store")
+            log.warning(f"{user_jid} has gotten online but cannot find them in user store")
         else:
             self.xmpp.event("legacy_login", presence)
             self.send_presence(pto=user_jid.bare)
@@ -149,7 +146,7 @@ class XEP_0100(BasePlugin):
         user_jid = presence["from"]
         user = self.get_user(presence)
         if user is None:  # This should not happen
-            log.warning(f"{user_jid} has gotten offline but (s)he is not in user store")
+            log.warning(f"{user_jid} has gotten offline but but cannot find them in user store")
             return
 
         if presence["to"] == self.xmpp.boundjid.bare:
@@ -158,7 +155,7 @@ class XEP_0100(BasePlugin):
         else:
             self.xmpp.event("legacy_presence_unavailable", presence)
 
-    async def _legacy_contact_add(self, jid, node, ifrom, presence: Presence):
+    async def _legacy_contact_add(self, jid, node, ifrom, contact_jid: JID):
         pass
 
     async def on_presence_subscribe(self, presence: Presence):
@@ -171,7 +168,7 @@ class XEP_0100(BasePlugin):
             return
 
         try:
-            await self.api["legacy_contact_add"](None, None, None, presence)
+            await self.api["legacy_contact_add"](None, None, None, presence["to"])
         except LegacyError:
             self.xmpp.send_presence(
                 pfrom=presence["to"],
@@ -194,12 +191,12 @@ class XEP_0100(BasePlugin):
             pto=user_jid,
         )  # TODO: handle resulting subscribed presences
 
-    def _legacy_contact_remove(self, jid, node, ifrom, iq: Iq):
+    def _legacy_contacts_remove(self, jid, node, ifrom, roster_items: typing.Dict[JID, dict]):
         pass
 
     def _handle_roster_remove(self, iq: Iq):
         log.debug("Received remove subscription")
-        self.api["legacy_contact_remove"](None, None, None, iq)
+        self.api["legacy_contacts_remove"](None, None, None, iq["roster"]["items"])
 
     def on_message(self, msg: Message):
         if msg["type"] == "groupchat":
@@ -229,7 +226,7 @@ class XEP_0100(BasePlugin):
         # Should escaping legacy IDs to valid JID local parts be handled here?
         # Maybe by internal API stuff?
         self.xmpp.send_message(
-            mfrom=f"{legacy_contact_id}@{self.xmpp.boundjid.bare}",
+            mfrom=JID(f"{legacy_contact_id}@{self.xmpp.boundjid.bare}"),
             mto=JID(jabber_user_jid).bare,
             mbody=body,
             mtype=mtype,

@@ -287,11 +287,11 @@ class TestStreamGateway(SlixTest):
         result = {}
         # Jabber User sends IQ-set qualified by the 'jabber:iq:roster' namespace, containing subscription
         # attribute with value of "remove".
-        def legacy_contact_remove(jid, node, ifrom, iq):
+        def legacy_contacts_remove(jid, node, ifrom, roster_items):
             result.update(**locals())
 
         self.xmpp["xep_0100"].api.register(
-            legacy_contact_remove, "legacy_contact_remove"
+            legacy_contacts_remove, "legacy_contacts_remove"
         )
 
         # Jabber User sends IQ-set qualified by the 'jabber:iq:roster' namespace, containing subscription
@@ -303,7 +303,7 @@ class TestStreamGateway(SlixTest):
                 id='remove1'>
             <query xmlns='jabber:iq:roster'>
                 <item jid='CapuletNurse@aim.shakespeare.lit'
-                    subscription='remove'/>
+                      subscription='remove'/>
             </query>
             </iq>
             """
@@ -313,8 +313,8 @@ class TestStreamGateway(SlixTest):
         # → nothing to do here then?
 
         self.assertTrue(
-            list(result["iq"]["roster"]["items"].keys())[0]
-            == "CapuletNurse@aim.shakespeare.lit".lower()
+            JID("CapuletNurse@aim.shakespeare.lit")
+            in result["roster_items"]
         )
 
     def testSendMessage(self):
@@ -335,9 +335,10 @@ class TestStreamGateway(SlixTest):
     def testLegacyMessage(self):
         self.add_user()
         result = {}
+
         def legacy_message(msg):
             result["msg"] = msg
-        
+
         self.xmpp.add_event_handler("legacy_message", legacy_message)
         self.recv(
             """
@@ -348,8 +349,8 @@ class TestStreamGateway(SlixTest):
             """
         )
         self.wait_for_send_queue()
-        self.assertTrue(result["msg"]["from"] == 'romeo@montague.lit')
-        self.assertTrue(result["msg"]["to"] == 'juliet@aim.shakespeare.lit')
+        self.assertTrue(result["msg"]["from"] == "romeo@montague.lit")
+        self.assertTrue(result["msg"]["to"] == "juliet@aim.shakespeare.lit")
 
     def testPluginEnd(self):
         exc = False
