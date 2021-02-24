@@ -10,6 +10,7 @@ from getpass import getpass
 from argparse import ArgumentParser
 
 import slixmpp
+from slixmpp.exceptions import IqTimeout
 
 log = logging.getLogger(__name__)
 
@@ -31,15 +32,22 @@ class HttpUpload(slixmpp.ClientXMPP):
 
     async def start(self, event):
         log.info('Uploading file %s...', self.filename)
-        def timeout_callback(arg):
-            raise TimeoutError("could not send message in time")
-        url = await self['xep_0363'].upload_file(
-            self.filename, domain=self.domain, timeout=10, timeout_callback=timeout_callback)
+        try:
+            url = await self['xep_0363'].upload_file(
+                self.filename, domain=self.domain, timeout=10
+            )
+        except IqTimeout:
+            raise TimeoutError('Could not send message in time')
         log.info('Upload success!')
 
         log.info('Sending file to %s', self.recipient)
-        html = '<body xmlns="http://www.w3.org/1999/xhtml"><a href="%s">%s</a></body>' % (url, url)
-        self.send_message(self.recipient, url, mhtml=html)
+        html = (
+            f'<body xmlns="http://www.w3.org/1999/xhtml">'
+            f'<a href="{url}">{url}</a></body>'
+        )
+        message = self.make_message(mto=self.recipient, mbody=url, mhtml=html)
+        message['oob']['url'] = url
+        message.send()
         self.disconnect()
 
 
@@ -83,6 +91,7 @@ if __name__ == '__main__':
         args.password = getpass("Password: ")
 
     xmpp = HttpUpload(args.jid, args.password, args.recipient, args.file, args.domain)
+    xmpp.register_plugin('xep_0066')
     xmpp.register_plugin('xep_0071')
     xmpp.register_plugin('xep_0128')
     xmpp.register_plugin('xep_0363')
