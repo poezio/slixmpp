@@ -8,6 +8,7 @@ XEP-0153: vCard-Based Avatars
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+.. _api-0153:
 
 Internal API methods
 --------------------

@@ -8,6 +8,9 @@ XEP-0319: Last User Interaction in Presence
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+
+.. _api-0319:
+
 Internal API methods
 --------------------
 

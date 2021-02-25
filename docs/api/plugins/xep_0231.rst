@@ -8,6 +8,7 @@ XEP-0231: Bits of Binary
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+.. _api-0231:
 
 Internal API methods
 --------------------

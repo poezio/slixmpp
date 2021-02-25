@@ -9,6 +9,8 @@ XEP-0027: Current Jabber OpenPGP Usage
     :exclude-members: session_bind, plugin_init, plugin_end
 
 
+.. _api-0027:
+
 Internal API methods
 --------------------
 

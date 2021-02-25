@@ -8,6 +8,8 @@ XEP-0054: vcard-temp
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+.. _api-0054:
+
 Internal API methods
 --------------------
 

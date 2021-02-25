@@ -9,6 +9,8 @@ XEP-0012: Last Activity
     :exclude-members: session_bind, plugin_init, plugin_end
 
 
+.. _api-0012:
+
 Internal API methods
 --------------------
 

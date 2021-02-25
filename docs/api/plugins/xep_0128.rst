@@ -8,6 +8,8 @@ XEP-0128: Service Discovery Extensions
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+.. _api-0128:
+
 Internal API methods
 --------------------
 

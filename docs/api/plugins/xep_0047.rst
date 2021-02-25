@@ -11,6 +11,8 @@ XEP-0047: In-band Bytestreams
 .. autoclass:: IBBytestream
     :members:
 
+.. _api-0047:
+
 Internal API methods
 --------------------
 
