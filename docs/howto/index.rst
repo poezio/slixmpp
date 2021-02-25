@@ -6,6 +6,7 @@ Tutorials, FAQs, and How To Guides
 
     stanzas
     create_plugin
+    internal_api
     features
     sasl
     handlersmatchers
