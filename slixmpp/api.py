@@ -1,9 +1,19 @@
-from typing import Any, Optional
+from typing import Any, Optional, Callable
 from asyncio import iscoroutinefunction, Future
 from slixmpp.xmlstream import JID
 
+APIHandler = Callable[
+    [Optional[JID], Optional[str], Optional[JID], Any],
+    Any
+]
 
 class APIWrapper(object):
+    """Slixmpp API wrapper.
+
+    This class provide a shortened binding to access ``self.api`` from
+    plugins without having to specify the plugin name or the global
+    :class:`~.APIRegistry`.
+    """
 
     def __init__(self, api, name):
         self.api = api
@@ -39,6 +49,11 @@ class APIWrapper(object):
 
 
 class APIRegistry(object):
+    """API Registry.
+
+    This class is the global Slixmpp API registry, on which any handler will
+    be registed.
+    """
 
     def __init__(self, xmpp):
         self._handlers = {}
@@ -49,8 +64,8 @@ class APIRegistry(object):
     def _setup(self, ctype: str, op: str):
         """Initialize the API callback dictionaries.
 
-        :param string ctype: The name of the API to initialize.
-        :param string op: The API operation to initialize.
+        :param ctype: The name of the API to initialize.
+        :param op: The API operation to initialize.
         """
         if ctype not in self.settings:
             self.settings[ctype] = {}
@@ -81,11 +96,14 @@ class APIRegistry(object):
         The API callback that is executed is chosen based on the combination
         of the provided JID and node:
 
-        JID   | node  | Handler
-        ==============================
-        Given | Given | Node handler
-        Given | None  | JID handler
-        None  | None  | Global handler
+        ====== ======= ===================
+        JID     node    Handler
+        ====== ======= ===================
+        Given   Given   Node + JID handler
+        Given   None    JID handler
+        None    Given   Node handler
+        None    None    Global handler
+        ====== ======= ===================
 
         A node handler is responsible for servicing a single node at a single
         JID, while a JID handler may respond for any node at a given JID, and
@@ -141,7 +159,7 @@ class APIRegistry(object):
                 if iscoroutinefunction(handler):
                     return self.xmpp.wrap(handler(jid, node, ifrom, args))
                 else:
-                    future = Future()
+                    future: Future = Future()
                     result = handler(jid, node, ifrom, args)
                     future.set_result(result)
                     return future
@@ -150,18 +168,20 @@ class APIRegistry(object):
                 # parameter for existing handlers that don't understand it.
                 return handler(jid, node, args)
 
-    def register(self, handler, ctype, op, jid=None, node=None, default=False):
+    def register(self, handler: APIHandler, ctype: str, op: str,
+                 jid: Optional[JID] = None, node: Optional[str] = None,
+                 default: bool = False):
         """Register an API callback, with JID+node specificity.
 
         The API callback can later be executed based on the
         specificity of the provided JID+node combination.
 
-        See :meth:`~ApiRegistry.run` for more details.
+        See :meth:`~.APIRegistry.run` for more details.
 
-        :param string ctype: The name of the API to use.
-        :param string op: The API operation to perform.
-        :param JID jid: Optionally provide specific JID.
-        :param string node: Optionally provide specific node.
+        :param ctype: The name of the API to use.
+        :param op: The API operation to perform.
+        :param jid: Optionally provide specific JID.
+        :param node: Optionally provide specific node.
         """
         self._setup(ctype, op)
         if jid is None and node is None:
@@ -176,17 +196,18 @@ class APIRegistry(object):
         if default:
             self.register_default(handler, ctype, op)
 
-    def register_default(self, handler, ctype, op):
+    def register_default(self, handler, ctype: str, op: str):
         """Register a default, global handler for an operation.
 
-        :param func handler: The default, global handler for the operation.
-        :param string ctype: The name of the API to modify.
-        :param string op: The API operation to use.
+        :param handler: The default, global handler for the operation.
+        :param ctype: The name of the API to modify.
+        :param op: The API operation to use.
         """
         self._setup(ctype, op)
         self._handler_defaults[ctype][op] = handler
 
-    def unregister(self, ctype, op, jid=None, node=None):
+    def unregister(self, ctype: str, op: str, jid: Optional[JID] = None,
+                   node: Optional[str] = None):
         """Remove an API callback.
 
         The API callback chosen for removal is based on the
@@ -194,21 +215,22 @@ class APIRegistry(object):
 
         See :meth:`~ApiRegistry.run` for more details.
 
-        :param string ctype: The name of the API to use.
-        :param string op: The API operation to perform.
-        :param JID jid: Optionally provide specific JID.
-        :param string node: Optionally provide specific node.
+        :param ctype: The name of the API to use.
+        :param op: The API operation to perform.
+        :param jid: Optionally provide specific JID.
+        :param node: Optionally provide specific node.
         """
         self._setup(ctype, op)
         self.register(None, ctype, op, jid, node)
 
-    def restore_default(self, ctype, op, jid=None, node=None):
+    def restore_default(self, ctype: str, op: str, jid: Optional[JID] = None,
+                        node: Optional[str] = None):
         """Reset an API callback to use a default handler.
 
-        :param string ctype: The name of the API to use.
-        :param string op: The API operation to perform.
-        :param JID jid: Optionally provide specific JID.
-        :param string node: Optionally provide specific node.
+        :param ctype: The name of the API to use.
+        :param op: The API operation to perform.
+        :param jid: Optionally provide specific JID.
+        :param node: Optionally provide specific node.
         """
         self.unregister(ctype, op, jid, node)
         self.register(self._handler_defaults[ctype][op], ctype, op, jid, node)
