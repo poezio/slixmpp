@@ -89,7 +89,8 @@ class XEP_0231(BasePlugin):
         bob['data'] = data
         bob['type'] = mtype
         bob['cid'] = cid
-        bob['max_age'] = max_age
+        if max_age is not None:
+            bob['max_age'] = max_age
 
         await self.api['set_bob'](args=bob)
         # Schedule destruction of the data
