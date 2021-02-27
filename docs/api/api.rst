@@ -50,7 +50,7 @@ The ``self.api.register()`` signature is as follows:
 
 .. code-block:: python
 
-    def register(handler, op, jid=None, node=None, dedfault=False):
+    def register(handler, op, jid=None, node=None, default=False):
         pass
 
 As you can see, :meth:`~.APIRegistry.register` takes an additional ctype
