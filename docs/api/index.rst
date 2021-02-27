@@ -14,3 +14,4 @@ API Reference
     xmlstream/matcher
     xmlstream/xmlstream
     xmlstream/tostring
+    api

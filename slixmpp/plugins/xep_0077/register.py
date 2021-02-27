@@ -29,7 +29,7 @@ class XEP_0077(BasePlugin):
         user_register           -- After succesful validation and add to the user store
                                    in api["user_validate"]
         user_unregister         -- After succesful user removal in api["user_remove"]
-    
+
     Config:
 
     ::
@@ -38,7 +38,7 @@ class XEP_0077(BasePlugin):
         in case api["make_registration_form"] is not overriden.
 
     API:
-    
+
     ::
 
         user_get(jid, node, ifrom, iq)
@@ -102,14 +102,13 @@ class XEP_0077(BasePlugin):
 
     def _user_get(self, jid, node, ifrom, iq):
         return self._user_store.get(iq["from"].bare)
-    
+
     def _user_remove(self, jid, node, ifrom, iq):
         return self._user_store.pop(iq["from"].bare)
 
-    def _make_registration_form(self, jid, node, ifrom, iq: Iq):
+    async def _make_registration_form(self, jid, node, ifrom, iq: Iq):
         reg = iq["register"]
-        user = self.api["user_get"](None, None, None, iq)
-
+        user = await self.api["user_get"](None, None, iq['from'], iq)
 
         if user is None:
             user = {}
@@ -135,11 +134,11 @@ class XEP_0077(BasePlugin):
 
     async def _handle_registration(self, iq: Iq):
         if iq["type"] == "get":
-            self._send_form(iq)
+            await self._send_form(iq)
         elif iq["type"] == "set":
             if iq["register"]["remove"]:
                 try:
-                    self.api["user_remove"](None, None, iq["from"], iq)
+                    await self.api["user_remove"](None, None, iq["from"], iq)
                 except KeyError:
                     _send_error(
                         iq,
@@ -168,7 +167,7 @@ class XEP_0077(BasePlugin):
                     return
 
             try:
-                self.api["user_validate"](None, None, iq["from"], iq["register"])
+                await self.api["user_validate"](None, None, iq["from"], iq["register"])
             except ValueError as e:
                 _send_error(
                     iq,
@@ -182,8 +181,8 @@ class XEP_0077(BasePlugin):
                 reply.send()
                 self.xmpp.event("user_register", iq)
 
-    def _send_form(self, iq):
-        reply = self.api["make_registration_form"](None, None, iq["from"], iq)
+    async def _send_form(self, iq):
+        reply = await self.api["make_registration_form"](None, None, iq["from"], iq)
         reply.send()
 
     def _force_registration(self, event):

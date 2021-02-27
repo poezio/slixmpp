@@ -18,7 +18,7 @@ class TestLastActivity(SlixIntegration):
 
     async def test_activity(self):
         """Check we can set and get last activity"""
-        self.clients[0]['xep_0012'].set_last_activity(
+        await self.clients[0]['xep_0012'].set_last_activity(
             status='coucou',
             seconds=4242,
         )
