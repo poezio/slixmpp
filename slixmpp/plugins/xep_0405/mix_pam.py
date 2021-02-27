@@ -70,7 +70,7 @@ class XEP_0405(BasePlugin):
             iq['client_join']['mix_join'].append(sub)
         result = await iq.send(**iqkwargs)
         result_nodes = {sub['node'] for sub in result['client_join']['mix_join']}
-        return result_nodes.difference(subscribe)
+        return subscribe.difference(result_nodes)
 
     async def leave_channel(self, room: JID, *,
                             ito: Optional[JID] = None,
