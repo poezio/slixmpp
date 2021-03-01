@@ -16,35 +16,27 @@ class XEP_0100(BasePlugin):
 
     Does not cover the deprecated Agent Information and 'jabber:iq:gateway' protocols
 
-    Events:
+    Events registered by this plugin:
 
-    ::
-
-        legacy_login                -- Jabber user got online or just registered
-        legacy_logout               -- Jabber user got offline or just unregistered
-        legacy_presence_unavailable -- Jabber user sent an unavailable presence to a legacy contact
-        gateway_message             -- Jabber user sent a direct message to the gateway component
-        legacy_message              -- Jabber user sent a message to the legacy network
+    - legacy_login: Jabber user got online or just registered
+    - legacy_logout: Jabber user got offline or just unregistered
+    - legacy_presence_unavailable: Jabber user sent an unavailable presence to a legacy contact
+    - gateway_message: Jabber user sent a direct message to the gateway component
+    - legacy_message: Jabber user sent a message to the legacy network
 
 
-    Config:
+    Plugin Parameters:
 
-    ::
-
-        component_name -- Name of the entity
-        type           -- Type of the gateway identity. Should be the name of the legacy service
-        needs_registration -- If set to True, messages received from unregistered users
-                              will not be transmitted to the legacy service
+    - `component_name`: (str) Name of the entity
+    - `type`: (str) Type of the gateway identity. Should be the name of the legacy service
+    - `needs_registration`: (bool) If set to True, messages received from unregistered users will
+      not be transmitted to the legacy service
 
     API:
 
-    ::
-
-        legacy_contact_add(jid, node, ifrom, contact_jid: JID)
-            Add contact on the legacy service. Should raise LegacyError if anything goes wrong in
-            the process.
-        legacy_contact_remove(jid, node, ifrom, presence)
-            Remove a contact.
+    - legacy_contact_add(jid, node, ifrom, contact_jid: JID): Add contact on the legacy service.
+      Should raise LegacyError if anything goes wrong in the process.
+    - legacy_contact_remove(jid, node, ifrom, presence: Presence): Remove a contact.
 
     """
 
