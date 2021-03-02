@@ -42,6 +42,7 @@ __all__ = [
     'xep_0092',  # Software Version
 #   'xep_0095',  # Legacy Stream Initiation. Don’t automatically load
 #   'xep_0096',  # Legacy SI File Transfer. Don’t automatically load
+    'xep_0100',  # Gateway interaction
     'xep_0106',  # JID Escaping
     'xep_0107',  # User Mood
     'xep_0108',  # User Activity
