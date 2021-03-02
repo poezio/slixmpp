@@ -57,6 +57,7 @@ class XEP_0100(BasePlugin):
     def plugin_init(self):
         if not self.xmpp.is_component:
             log.error("Only components can be gateways, aborting plugin load")
+            return
 
         self.xmpp["xep_0030"].add_identity(
             name=self.component_name, category="gateway", itype=self.type
@@ -82,6 +83,9 @@ class XEP_0100(BasePlugin):
         self.xmpp.add_event_handler("message", self.on_message)
 
     def plugin_end(self):
+        if not self.xmpp.is_component:
+            return
+
         self.xmpp.del_event_handler("user_register", self.on_user_register)
         self.xmpp.del_event_handler("user_unregister", self.on_user_unregister)
         self.xmpp.del_event_handler("presence_available", self.on_presence_available)
