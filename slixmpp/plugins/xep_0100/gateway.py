@@ -34,9 +34,10 @@ class XEP_0100(BasePlugin):
 
     API:
 
-    - legacy_contact_add(jid, node, ifrom, contact_jid: JID): Add contact on the legacy service.
+    - legacy_contact_add(jid, node, ifrom: JID, args: JID): Add contact on the legacy service.
       Should raise LegacyError if anything goes wrong in the process.
-    - legacy_contact_remove(jid, node, ifrom, presence: Presence): Remove a contact.
+      `ifrom` is the gateway user's JID and `args` is the legacy contact's JID.
+    - legacy_contact_remove(jid, node, ifrom: JID, args: JID): Remove a contact.
 
     """
 
@@ -161,7 +162,10 @@ class XEP_0100(BasePlugin):
             return
 
         try:
-            await self.api["legacy_contact_add"](None, None, None, presence["to"])
+            await self.api["legacy_contact_add"](
+                ifrom=user_jid,
+                args=presence["to"],
+            )
         except LegacyError:
             self.xmpp.send_presence(
                 pfrom=presence["to"],
@@ -196,7 +200,7 @@ class XEP_0100(BasePlugin):
             if self.needs_registration:
                 return
 
-        await self.api["legacy_contact_remove"](None, None, None, presence)
+        await self.api["legacy_contact_remove"](ifrom=user_jid, args=presence["to"])
 
         for ptype in "unsubscribe", "unsubscribed", "unavailable":
             self.xmpp.send_presence(
@@ -205,7 +209,7 @@ class XEP_0100(BasePlugin):
                 pto=user_jid,
             )
 
-    async def _legacy_contact_remove(self, jid, node, ifrom, presence: Presence):
+    async def _legacy_contact_remove(self, jid, node, ifrom, contact_jid: JID):
         pass
 
     async def on_message(self, msg: Message):

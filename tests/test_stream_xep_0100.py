@@ -5,6 +5,7 @@ from slixmpp import JID
 from slixmpp.test import SlixTest
 
 from slixmpp.plugins import xep_0100
+from slixmpp.plugins.xep_0100 import LegacyError
 
 
 class TestStreamGateway(SlixTest):
@@ -291,12 +292,39 @@ class TestStreamGateway(SlixTest):
             """
         )
 
+    def testAddContactFail(self):
+        self.add_user()
+        res = {}
+        async def legacy_contact_add(jid, node, ifrom, contact_jid):
+            res.update(**locals())
+            raise LegacyError
+        self.xmpp["xep_0100"].api.register(
+            legacy_contact_add, "legacy_contact_add"
+        )
+        self.recv(
+            """
+            <presence type='subscribe'
+                      from='romeo@montague.lit'
+                      to='juliet@aim.shakespeare.lit'/>
+            """
+        )
+        self.send(
+            """
+            <presence type='unsubscribed'
+                      from='juliet@aim.shakespeare.lit'
+                      to='romeo@montague.lit'/>
+            """
+        )
+        self.assertTrue(res["ifrom"] == "romeo@montague.lit")
+        self.assertTrue(res["contact_jid"] == "juliet@aim.shakespeare.lit")
+
+
     def testRemoveContact(self):
         self.add_user()
         result = {}
         # Jabber User sends IQ-set qualified by the 'jabber:iq:roster' namespace, containing subscription
         # attribute with value of "remove".
-        async def legacy_contact_remove(jid, node, ifrom, presence):
+        async def legacy_contact_remove(jid, node, ifrom, contact_jid):
             result.update(**locals())
 
         self.xmpp["xep_0100"].api.register(
@@ -321,9 +349,9 @@ class TestStreamGateway(SlixTest):
                 """
             )
 
-        self.assertTrue(result["presence"]["from"] == "romeo@montague.lit")
+        self.assertTrue(result["ifrom"] == "romeo@montague.lit")
         self.assertTrue(
-            result["presence"]["to"] == JID("CapuletNurse@aim.shakespeare.lit")
+            result["contact_jid"] == JID("CapuletNurse@aim.shakespeare.lit")
         )
 
     def testSendMessage(self):
