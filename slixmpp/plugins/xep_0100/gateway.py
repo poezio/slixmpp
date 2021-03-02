@@ -56,7 +56,7 @@ class XEP_0100(BasePlugin):
 
     def plugin_init(self):
         if not self.xmpp.is_component:
-            raise TypeError("Only components can be gateways")
+            log.error("Only components can be gateways, aborting plugin load")
 
         self.xmpp["xep_0030"].add_identity(
             name=self.component_name, category="gateway", itype=self.type
