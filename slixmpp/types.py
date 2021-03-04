@@ -7,7 +7,10 @@
 This file contains boilerplate to define types relevant to slixmpp.
 """
 
-from typing import Optional
+from typing import (
+    Optional,
+    Union,
+)
 
 try:
     from typing import (
@@ -30,7 +33,6 @@ PresenceTypes = Literal[
 PresenceShows = Literal[
     'away', 'chat', 'dnd', 'xa',
 ]
-
 
 MessageTypes = Literal[
     'chat', 'error', 'groupchat',
@@ -70,3 +72,7 @@ class MucRoomItem(TypedDict, total=False):
 MucRoomItemKeys = Literal[
     'jid', 'role', 'affiliation', 'show', 'status',  'alt_nick',
 ]
+
+OptJid = Optional[JID]
+JidStr = Union[str, JID]
+OptJidStr = Optional[Union[str, JID]]
