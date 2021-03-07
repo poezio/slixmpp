@@ -164,25 +164,25 @@ class XEP_0050(BasePlugin):
         self.xmpp.event('command', iq)
         self.xmpp.event('command_%s' % iq['command']['action'], iq)
 
-    def _handle_command_all(self, iq: Iq) -> None:
+    async def _handle_command_all(self, iq: Iq) -> None:
         action = iq['command']['action']
         sessionid = iq['command']['sessionid']
         session = self.sessions.get(sessionid)
 
         if session is None:
-            return self._handle_command_start(iq)
+            return await self._handle_command_start(iq)
 
         if action in ('next', 'execute'):
-            return self._handle_command_next(iq)
+            return await self._handle_command_next(iq)
         if action == 'prev':
-            return self._handle_command_prev(iq)
+            return await self._handle_command_prev(iq)
         if action == 'complete':
-            return self._handle_command_complete(iq)
+            return await self._handle_command_complete(iq)
         if action == 'cancel':
-            return self._handle_command_cancel(iq)
+            return await self._handle_command_cancel(iq)
         return None
 
-    def _handle_command_start(self, iq):
+    async def _handle_command_start(self, iq):
         """
         Process an initial request to execute a command.
 
@@ -222,11 +222,11 @@ class XEP_0050(BasePlugin):
                            'prev': None,
                            'cancel': None}
 
-        session = handler(iq, initial_session)
+        session = await handler(iq, initial_session)
 
         self._process_command_response(iq, session)
 
-    def _handle_command_next(self, iq):
+    async def _handle_command_next(self, iq):
         """
         Process a request for the next step in the workflow
         for a command with multiple steps.
@@ -246,13 +246,13 @@ class XEP_0050(BasePlugin):
             if len(results) == 1:
                 results = results[0]
 
-            session = handler(results, session)
+            session = await handler(results, session)
 
             self._process_command_response(iq, session)
         else:
             raise XMPPError('item-not-found')
 
-    def _handle_command_prev(self, iq):
+    async def _handle_command_prev(self, iq):
         """
         Process a request for the prev step in the workflow
         for a command with multiple steps.
@@ -272,7 +272,7 @@ class XEP_0050(BasePlugin):
             if len(results) == 1:
                 results = results[0]
 
-            session = handler(results, session)
+            session = await handler(results, session)
 
             self._process_command_response(iq, session)
         else:
@@ -334,7 +334,7 @@ class XEP_0050(BasePlugin):
 
         iq.send()
 
-    def _handle_command_cancel(self, iq):
+    async def _handle_command_cancel(self, iq):
         """
         Process a request to cancel a command's execution.
 
@@ -348,7 +348,7 @@ class XEP_0050(BasePlugin):
         if session:
             handler = session['cancel']
             if handler:
-                handler(iq, session)
+                await handler(iq, session)
             del self.sessions[sessionid]
             iq = iq.reply()
             iq['command']['node'] = node
@@ -360,7 +360,7 @@ class XEP_0050(BasePlugin):
             raise XMPPError('item-not-found')
 
 
-    def _handle_command_complete(self, iq):
+    async def _handle_command_complete(self, iq):
         """
         Process a request to finish the execution of command
         and terminate the workflow.
@@ -385,7 +385,7 @@ class XEP_0050(BasePlugin):
                 results = results[0]
 
             if handler:
-                handler(results, session)
+                await handler(results, session)
 
             del self.sessions[sessionid]
 
