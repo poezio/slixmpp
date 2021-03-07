@@ -123,6 +123,8 @@ class ResultIterator(AsyncIterator):
                 self.query[self.interface]['rsm']['before'] = self.start
             else:
                 self.query[self.interface]['rsm']['after'] = self.start
+        elif self.reverse:
+                self.query[self.interface]['rsm']['before'] = True
 
         try:
             if self.pre_cb:
