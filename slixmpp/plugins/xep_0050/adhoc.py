@@ -3,6 +3,7 @@
 # Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
+import asyncio
 import logging
 import time
 
@@ -170,16 +171,16 @@ class XEP_0050(BasePlugin):
         session = self.sessions.get(sessionid)
 
         if session is None:
-            return await self._handle_command_start(iq)
+            return await _await_if_needed(self._handle_command_start, iq)
 
         if action in ('next', 'execute'):
-            return await self._handle_command_next(iq)
+            return await _await_if_needed(self._handle_command_next, iq)
         if action == 'prev':
-            return await self._handle_command_prev(iq)
+            return await _await_if_needed(self._handle_command_prev, iq)
         if action == 'complete':
-            return await self._handle_command_complete(iq)
+            return await _await_if_needed(self._handle_command_complete, iq)
         if action == 'cancel':
-            return await self._handle_command_cancel(iq)
+            return await _await_if_needed(self._handle_command_cancel, iq)
         return None
 
     async def _handle_command_start(self, iq):
@@ -222,7 +223,7 @@ class XEP_0050(BasePlugin):
                            'prev': None,
                            'cancel': None}
 
-        session = await handler(iq, initial_session)
+        session = await _await_if_needed(handler, iq, initial_session)
 
         self._process_command_response(iq, session)
 
@@ -246,7 +247,7 @@ class XEP_0050(BasePlugin):
             if len(results) == 1:
                 results = results[0]
 
-            session = await handler(results, session)
+            session = await _await_if_needed(handler, results, session)
 
             self._process_command_response(iq, session)
         else:
@@ -272,7 +273,7 @@ class XEP_0050(BasePlugin):
             if len(results) == 1:
                 results = results[0]
 
-            session = await handler(results, session)
+            session = await _await_if_needed(handler, results, session)
 
             self._process_command_response(iq, session)
         else:
@@ -348,7 +349,7 @@ class XEP_0050(BasePlugin):
         if session:
             handler = session['cancel']
             if handler:
-                await handler(iq, session)
+                await _await_if_needed(handler, iq, session)
             del self.sessions[sessionid]
             iq = iq.reply()
             iq['command']['node'] = node
@@ -385,7 +386,7 @@ class XEP_0050(BasePlugin):
                 results = results[0]
 
             if handler:
-                await handler(results, session)
+                await _await_if_needed(handler, results, session)
 
             del self.sessions[sessionid]
 
@@ -616,3 +617,12 @@ class XEP_0050(BasePlugin):
 
         if iq['command']['status'] == 'completed':
             self.terminate_command(session)
+
+
+async def _await_if_needed(handler, *args):
+    if asyncio.iscoroutinefunction(handler):
+        log.debug(f"{handler} is async")
+        return await handler(*args)
+    else:
+        log.debug(f"{handler} is sync")
+        return handler(*args)

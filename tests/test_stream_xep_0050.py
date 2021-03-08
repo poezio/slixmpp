@@ -31,7 +31,7 @@ class TestAdHocCommands(SlixTest):
         Command = self.xmpp['xep_0050'].stanza.Command
         register_stanza_plugin(Command, TestPayload, iterable=True)
 
-        async def handle_command(iq, session):
+        def  handle_command(iq, session):
             initial = session['payload']
             logging.debug(initial)
             new_payload = TestPayload()
@@ -47,7 +47,6 @@ class TestAdHocCommands(SlixTest):
             session['has_next'] = False
 
             return session
-
         self.xmpp['xep_0050'].add_command('tester@localhost', 'foo',
                                           'Do Foo', handle_command)
 
@@ -73,6 +72,451 @@ class TestAdHocCommands(SlixTest):
         """)
 
     def testZeroStepCommand(self):
+        """Test running a command with no steps."""
+
+        def  handle_command(iq, session):
+            form = self.xmpp['xep_0004'].make_form(ftype='result')
+            form.addField(var='foo', ftype='text-single',
+                          label='Foo', value='bar')
+
+            session['payload'] = form
+            session['next'] = None
+            session['has_next'] = False
+
+            return session
+
+        self.xmpp['xep_0050'].add_command('tester@localhost', 'foo',
+                                          'Do Foo', handle_command)
+
+        self.recv("""
+          <iq id="11" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="execute" />
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="11" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="completed"
+                     sessionid="_sessionid_">
+              <x xmlns="jabber:x:data" type="result">
+                <field var="foo" label="Foo" type="text-single">
+                  <value>bar</value>
+                </field>
+              </x>
+            </command>
+          </iq>
+        """)
+
+    def testOneStepCommand(self):
+        """Test running a single step command."""
+        results = []
+
+        def  handle_command(iq, session):
+
+            def  handle_form(form, session):
+                results.append(form.get_values()['foo'])
+                session['payload'] = None
+
+            form = self.xmpp['xep_0004'].make_form('form')
+            form.addField(var='foo', ftype='text-single', label='Foo')
+
+            session['payload'] = form
+            session['next'] = handle_form
+            session['has_next'] = False
+
+            return session
+
+        self.xmpp['xep_0050'].add_command('tester@localhost', 'foo',
+                                          'Do Foo', handle_command)
+
+        self.recv("""
+          <iq id="11" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="execute" />
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="11" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="executing"
+                     sessionid="_sessionid_">
+              <actions>
+                <complete />
+              </actions>
+              <x xmlns="jabber:x:data" type="form">
+                <field var="foo" label="Foo" type="text-single" />
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.recv("""
+          <iq id="12" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="complete"
+                     sessionid="_sessionid_">
+              <x xmlns="jabber:x:data" type="submit">
+                <field var="foo" label="Foo" type="text-single">
+                  <value>blah</value>
+                </field>
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="12" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="completed"
+                     sessionid="_sessionid_" />
+          </iq>
+        """)
+
+        self.assertEqual(results, ['blah'],
+                "Command handler was not executed: %s" % results)
+
+    def testTwoStepCommand(self):
+        """Test using a two-stage command."""
+        results = []
+
+        def  handle_command(iq, session):
+
+            def  handle_step2(form, session):
+                results.append(form.get_values()['bar'])
+                session['payload'] = None
+
+            def  handle_step1(form, session):
+                results.append(form.get_values()['foo'])
+
+                form = self.xmpp['xep_0004'].make_form('form')
+                form.addField(var='bar', ftype='text-single', label='Bar')
+
+                session['payload'] = form
+                session['next'] = handle_step2
+                session['has_next'] = False
+
+                return session
+
+            form = self.xmpp['xep_0004'].make_form('form')
+            form.addField(var='foo', ftype='text-single', label='Foo')
+
+            session['payload'] = form
+            session['next'] = handle_step1
+            session['has_next'] = True
+
+            return session
+
+        self.xmpp['xep_0050'].add_command('tester@localhost', 'foo',
+                                          'Do Foo', handle_command)
+
+        self.recv("""
+          <iq id="11" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="execute" />
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="11" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="executing"
+                     sessionid="_sessionid_">
+              <actions>
+                <next />
+              </actions>
+              <x xmlns="jabber:x:data" type="form">
+                <field var="foo" label="Foo" type="text-single" />
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.recv("""
+          <iq id="12" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="next"
+                     sessionid="_sessionid_">
+              <x xmlns="jabber:x:data" type="submit">
+                <field var="foo" label="Foo" type="text-single">
+                  <value>blah</value>
+                </field>
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="12" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="executing"
+                     sessionid="_sessionid_">
+              <actions>
+                <complete />
+              </actions>
+              <x xmlns="jabber:x:data" type="form">
+                <field var="bar" label="Bar" type="text-single" />
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.recv("""
+          <iq id="13" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="complete"
+                     sessionid="_sessionid_">
+              <x xmlns="jabber:x:data" type="submit">
+                <field var="bar" label="Bar" type="text-single">
+                  <value>meh</value>
+                </field>
+              </x>
+            </command>
+          </iq>
+        """)
+        self.send("""
+          <iq id="13" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="completed"
+                     sessionid="_sessionid_" />
+          </iq>
+        """)
+
+        self.assertEqual(results, ['blah', 'meh'],
+                "Command handler was not executed: %s" % results)
+
+    def testCancelCommand(self):
+        """Test canceling command."""
+        results = []
+
+        def  handle_command(iq, session):
+
+            def  handle_form(form, session):
+                results.append(form['values']['foo'])
+
+            def  handle_cancel(iq, session):
+                results.append('canceled')
+
+            form = self.xmpp['xep_0004'].make_form('form')
+            form.addField(var='foo', ftype='text-single', label='Foo')
+
+            session['payload'] = form
+            session['next'] = handle_form
+            session['cancel'] = handle_cancel
+            session['has_next'] = False
+
+            return session
+
+        self.xmpp['xep_0050'].add_command('tester@localhost', 'foo',
+                                          'Do Foo', handle_command)
+
+        self.recv("""
+          <iq id="11" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="execute" />
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="11" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="executing"
+                     sessionid="_sessionid_">
+              <actions>
+                <complete />
+              </actions>
+              <x xmlns="jabber:x:data" type="form">
+                <field var="foo" label="Foo" type="text-single" />
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.recv("""
+          <iq id="12" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="cancel"
+                     sessionid="_sessionid_">
+              <x xmlns="jabber:x:data" type="submit">
+                <field var="foo" label="Foo" type="text-single">
+                  <value>blah</value>
+                </field>
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="12" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="canceled"
+                     sessionid="_sessionid_" />
+          </iq>
+        """)
+
+        self.assertEqual(results, ['canceled'],
+                "Cancelation handler not executed: %s" % results)
+
+    def testCommandNote(self):
+        """Test adding notes to commands."""
+
+        def  handle_command(iq, session):
+            form = self.xmpp['xep_0004'].make_form(ftype='result')
+            form.addField(var='foo', ftype='text-single',
+                          label='Foo', value='bar')
+
+            session['payload'] = form
+            session['next'] = None
+            session['has_next'] = False
+            session['notes'] = [('info', 'testing notes')]
+
+            return session
+
+        self.xmpp['xep_0050'].add_command('tester@localhost', 'foo',
+                                          'Do Foo', handle_command)
+
+        self.recv("""
+          <iq id="11" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="execute" />
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="11" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="completed"
+                     sessionid="_sessionid_">
+              <note type="info">testing notes</note>
+              <x xmlns="jabber:x:data" type="result">
+                <field var="foo" label="Foo" type="text-single">
+                  <value>bar</value>
+                </field>
+              </x>
+            </command>
+          </iq>
+        """)
+
+    def testMultiPayloads(self):
+        """Test using commands with multiple payloads."""
+        results = []
+
+        def  handle_command(iq, session):
+
+            def  handle_form(forms, session):
+                for form in forms:
+                    results.append(form.get_values()['FORM_TYPE'])
+                session['payload'] = None
+
+            form1 = self.xmpp['xep_0004'].make_form('form')
+            form1.addField(var='FORM_TYPE', ftype='hidden', value='form_1')
+            form1.addField(var='foo', ftype='text-single', label='Foo')
+
+            form2 = self.xmpp['xep_0004'].make_form('form')
+            form2.addField(var='FORM_TYPE', ftype='hidden', value='form_2')
+            form2.addField(var='foo', ftype='text-single', label='Foo')
+
+            session['payload'] = [form1, form2]
+            session['next'] = handle_form
+            session['has_next'] = False
+
+            return session
+
+        self.xmpp['xep_0050'].add_command('tester@localhost', 'foo',
+                                          'Do Foo', handle_command)
+
+        self.recv("""
+          <iq id="11" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="execute" />
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="11" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="executing"
+                     sessionid="_sessionid_">
+              <actions>
+                <complete />
+              </actions>
+              <x xmlns="jabber:x:data" type="form">
+                <field var="FORM_TYPE" type="hidden">
+                  <value>form_1</value>
+                </field>
+                <field var="foo" label="Foo" type="text-single" />
+              </x>
+              <x xmlns="jabber:x:data" type="form">
+                <field var="FORM_TYPE" type="hidden">
+                  <value>form_2</value>
+                </field>
+                <field var="foo" label="Foo" type="text-single" />
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.recv("""
+          <iq id="12" type="set" to="tester@localhost" from="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     action="complete"
+                     sessionid="_sessionid_">
+             <x xmlns="jabber:x:data" type="submit">
+                <field var="FORM_TYPE" type="hidden">
+                  <value>form_1</value>
+                </field>
+                <field var="foo" type="text-single">
+                  <value>bar</value>
+                </field>
+              </x>
+              <x xmlns="jabber:x:data" type="submit">
+                <field var="FORM_TYPE" type="hidden">
+                  <value>form_2</value>
+                </field>
+                <field var="foo" type="text-single">
+                  <value>bar</value>
+                </field>
+              </x>
+            </command>
+          </iq>
+        """)
+
+        self.send("""
+          <iq id="12" type="result" to="foo@bar">
+            <command xmlns="http://jabber.org/protocol/commands"
+                     node="foo"
+                     status="completed"
+                     sessionid="_sessionid_" />
+          </iq>
+        """)
+
+        self.assertEqual(results, [['form_1'], ['form_2']],
+                "Command handler was not executed: %s" % results)
+
+    def testZeroStepCommandAsync(self):
         """Test running a command with no steps."""
 
         async def handle_command(iq, session):
@@ -112,7 +556,7 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-    def testOneStepCommand(self):
+    def testOneStepCommandAsync(self):
         """Test running a single step command."""
         results = []
 
@@ -185,7 +629,7 @@ class TestAdHocCommands(SlixTest):
         self.assertEqual(results, ['blah'],
                 "Command handler was not executed: %s" % results)
 
-    def testTwoStepCommand(self):
+    def testTwoStepCommandAsync(self):
         """Test using a two-stage command."""
         results = []
 
@@ -300,7 +744,7 @@ class TestAdHocCommands(SlixTest):
         self.assertEqual(results, ['blah', 'meh'],
                 "Command handler was not executed: %s" % results)
 
-    def testCancelCommand(self):
+    def testCancelCommandAsync(self):
         """Test canceling command."""
         results = []
 
@@ -376,7 +820,7 @@ class TestAdHocCommands(SlixTest):
         self.assertEqual(results, ['canceled'],
                 "Cancelation handler not executed: %s" % results)
 
-    def testCommandNote(self):
+    def testCommandNoteAsync(self):
         """Test adding notes to commands."""
 
         async def handle_command(iq, session):
@@ -418,9 +862,7 @@ class TestAdHocCommands(SlixTest):
           </iq>
         """)
 
-
-
-    def testMultiPayloads(self):
+    def testMultiPayloadsAsync(self):
         """Test using commands with multiple payloads."""
         results = []
 
