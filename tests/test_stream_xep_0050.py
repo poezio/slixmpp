@@ -31,7 +31,7 @@ class TestAdHocCommands(SlixTest):
         Command = self.xmpp['xep_0050'].stanza.Command
         register_stanza_plugin(Command, TestPayload, iterable=True)
 
-        def  handle_command(iq, session):
+        def handle_command(iq, session):
             initial = session['payload']
             logging.debug(initial)
             new_payload = TestPayload()
@@ -74,7 +74,7 @@ class TestAdHocCommands(SlixTest):
     def testZeroStepCommand(self):
         """Test running a command with no steps."""
 
-        def  handle_command(iq, session):
+        def handle_command(iq, session):
             form = self.xmpp['xep_0004'].make_form(ftype='result')
             form.addField(var='foo', ftype='text-single',
                           label='Foo', value='bar')
@@ -115,9 +115,9 @@ class TestAdHocCommands(SlixTest):
         """Test running a single step command."""
         results = []
 
-        def  handle_command(iq, session):
+        def handle_command(iq, session):
 
-            def  handle_form(form, session):
+            def handle_form(form, session):
                 results.append(form.get_values()['foo'])
                 session['payload'] = None
 
@@ -188,13 +188,13 @@ class TestAdHocCommands(SlixTest):
         """Test using a two-stage command."""
         results = []
 
-        def  handle_command(iq, session):
+        def handle_command(iq, session):
 
-            def  handle_step2(form, session):
+            def handle_step2(form, session):
                 results.append(form.get_values()['bar'])
                 session['payload'] = None
 
-            def  handle_step1(form, session):
+            def handle_step1(form, session):
                 results.append(form.get_values()['foo'])
 
                 form = self.xmpp['xep_0004'].make_form('form')
@@ -303,12 +303,12 @@ class TestAdHocCommands(SlixTest):
         """Test canceling command."""
         results = []
 
-        def  handle_command(iq, session):
+        def handle_command(iq, session):
 
-            def  handle_form(form, session):
+            def handle_form(form, session):
                 results.append(form['values']['foo'])
 
-            def  handle_cancel(iq, session):
+            def handle_cancel(iq, session):
                 results.append('canceled')
 
             form = self.xmpp['xep_0004'].make_form('form')
@@ -378,7 +378,7 @@ class TestAdHocCommands(SlixTest):
     def testCommandNote(self):
         """Test adding notes to commands."""
 
-        def  handle_command(iq, session):
+        def handle_command(iq, session):
             form = self.xmpp['xep_0004'].make_form(ftype='result')
             form.addField(var='foo', ftype='text-single',
                           label='Foo', value='bar')
@@ -421,9 +421,9 @@ class TestAdHocCommands(SlixTest):
         """Test using commands with multiple payloads."""
         results = []
 
-        def  handle_command(iq, session):
+        def handle_command(iq, session):
 
-            def  handle_form(forms, session):
+            def handle_form(forms, session):
                 for form in forms:
                     results.append(form.get_values()['FORM_TYPE'])
                 session['payload'] = None
