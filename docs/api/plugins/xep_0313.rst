@@ -14,5 +14,6 @@ Stanza elements
 
 .. automodule:: slixmpp.plugins.xep_0313.stanza
     :members:
+    :member-order: bysource
     :undoc-members:
 
