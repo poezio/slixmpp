@@ -72,7 +72,7 @@ class TestStreamPubsub(SlixTest):
                   <field var="pubsub#access_model">
                     <value>whitelist</value>
                   </field>
-                  <field var="FORM_TYPE">
+                  <field var="FORM_TYPE" type="hidden">
                     <value>http://jabber.org/protocol/pubsub#node_config</value>
                   </field>
                 </x>
@@ -210,7 +210,7 @@ class TestStreamPubsub(SlixTest):
               <subscribe node="somenode" jid="tester@localhost" />
               <options>
                 <x xmlns="jabber:x:data" type="submit">
-                  <field var="FORM_TYPE">
+                  <field var="FORM_TYPE" type="hidden">
                     <value>http://jabber.org/protocol/pubsub#subscribe_options</value>
                   </field>
                   <field var="pubsub#digest">
@@ -358,7 +358,7 @@ class TestStreamPubsub(SlixTest):
             <pubsub xmlns="http://jabber.org/protocol/pubsub#owner">
               <configure node="somenode">
                 <x xmlns="jabber:x:data" type="submit">
-                  <field var="FORM_TYPE">
+                  <field var="FORM_TYPE" type="hidden">
                     <value>http://jabber.org/protocol/pubsub#node_config</value>
                   </field>
                   <field var="pubsub#title">
@@ -441,7 +441,7 @@ class TestStreamPubsub(SlixTest):
               </publish>
               <publish-options>
                 <x xmlns="jabber:x:data" type="submit">
-                  <field var="FORM_TYPE">
+                  <field var="FORM_TYPE" type="hidden">
                     <value>http://jabber.org/protocol/pubsub#publish-options</value>
                   </field>
                   <field var="pubsub#access_model">
@@ -622,7 +622,7 @@ class TestStreamPubsub(SlixTest):
             <pubsub xmlns="http://jabber.org/protocol/pubsub">
               <options node="somenode" jid="tester@localhost">
                 <x xmlns="jabber:x:data" type="submit">
-                  <field var="FORM_TYPE">
+                  <field var="FORM_TYPE" type="hidden">
                     <value>http://jabber.org/protocol/pubsub#subscribe_options</value>
                   </field>
                   <field var="pubsub#digest">

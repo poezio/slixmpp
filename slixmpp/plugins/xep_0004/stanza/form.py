@@ -48,7 +48,8 @@ class Form(ElementBase):
             fields = self.get_fields()
             for var in fields:
                 field = fields[var]
-                del field['type']
+                if field['type'] != 'hidden':
+                    del field['type']
                 del field['label']
                 del field['desc']
                 del field['required']
@@ -74,7 +75,8 @@ class Form(ElementBase):
                 for option in options:
                     field.add_option(**option)
         else:
-            del field['type']
+            if field['type'] != 'hidden':
+                del field['type']
         self.append(field)
         return field
 
