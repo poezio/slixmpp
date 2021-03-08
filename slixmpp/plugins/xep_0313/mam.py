@@ -15,6 +15,7 @@ from slixmpp.xmlstream.matcher import MatchXMLMask
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0313 import stanza
+from slixmpp.plugins.xep_0004.stanza import Form
 
 
 log = logging.getLogger(__name__)
@@ -28,15 +29,21 @@ class XEP_0313(BasePlugin):
 
     name = 'xep_0313'
     description = 'XEP-0313: Message Archive Management'
-    dependencies = {'xep_0030', 'xep_0050', 'xep_0059', 'xep_0297'}
+    dependencies = {
+        'xep_0004', 'xep_0030', 'xep_0050', 'xep_0059', 'xep_0297'
+    }
     stanza = stanza
 
     def plugin_init(self):
+        register_stanza_plugin(stanza.MAM, Form)
         register_stanza_plugin(Iq, stanza.MAM)
         register_stanza_plugin(Iq, stanza.Preferences)
         register_stanza_plugin(Message, stanza.Result)
         register_stanza_plugin(Iq, stanza.Fin)
-        register_stanza_plugin(stanza.Result, self.xmpp['xep_0297'].stanza.Forwarded)
+        register_stanza_plugin(
+            stanza.Result,
+            self.xmpp['xep_0297'].stanza.Forwarded
+        )
         register_stanza_plugin(stanza.MAM, self.xmpp['xep_0059'].stanza.Set)
         register_stanza_plugin(stanza.Fin, self.xmpp['xep_0059'].stanza.Set)
 
