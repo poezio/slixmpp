@@ -170,12 +170,155 @@ class MAM(ElementBase):
 
 
 class Fin(ElementBase):
+    """A MAM fin element (end of query).
+
+    .. code-block:: xml
+
+        <iq type='result' id='juliet1'>
+          <fin xmlns='urn:xmpp:mam:2'>
+            <set xmlns='http://jabber.org/protocol/rsm'>
+              <first index='0'>28482-98726-73623</first>
+              <last>09af3-cc343-b409f</last>
+            </set>
+          </fin>
+        </iq>
+
+    """
     name = 'fin'
     namespace = 'urn:xmpp:mam:2'
     plugin_attrib = 'mam_fin'
 
+
 class Result(ElementBase):
+    """A MAM result payload.
+
+    .. code-block:: xml
+
+        <message id='aeb213' to='juliet@capulet.lit/chamber'>
+          <result xmlns='urn:xmpp:mam:2' queryid='f27' id='28482-98726-73623'>
+            <forwarded xmlns='urn:xmpp:forward:0'>
+              <delay xmlns='urn:xmpp:delay' stamp='2010-07-10T23:08:25Z'/>
+              <message xmlns='jabber:client' from="witch@shakespeare.lit"
+                       to="macbeth@shakespeare.lit">
+                <body>Hail to thee</body>
+              </message>
+            </forwarded>
+          </result>
+        </message>
+    """
     name = 'result'
     namespace = 'urn:xmpp:mam:2'
     plugin_attrib = 'mam_result'
+    #: Available interfaces:
+    #:
+    #: - ``queryid``: MAM queryid
+    #: - ``id``: ID of the result
     interfaces = {'queryid', 'id'}
+
+
+class Metadata(ElementBase):
+    """Element containing archive metadata
+
+    .. code-block:: xml
+
+        <iq type='result' id='jui8921rr9'>
+          <metadata xmlns='urn:xmpp:mam:2'>
+            <start id='YWxwaGEg' timestamp='2008-08-22T21:09:04Z' />
+            <end id='b21lZ2Eg' timestamp='2020-04-20T14:34:21Z' />
+          </metadata>
+        </iq>
+
+    """
+    name = 'metadata'
+    namespace = 'urn:xmpp:mam:2'
+    plugin_attrib = 'mam_metadata'
+
+
+class Start(ElementBase):
+    """Metadata about the start of an archive.
+
+    .. code-block:: xml
+
+        <iq type='result' id='jui8921rr9'>
+          <metadata xmlns='urn:xmpp:mam:2'>
+            <start id='YWxwaGEg' timestamp='2008-08-22T21:09:04Z' />
+            <end id='b21lZ2Eg' timestamp='2020-04-20T14:34:21Z' />
+          </metadata>
+        </iq>
+
+    """
+    name = 'start'
+    namespace = 'urn:xmpp:mam:2'
+    plugin_attrib = name
+    #: Available interfaces:
+    #:
+    #: - ``id``: ID of the first message of the archive
+    #: - ``timestamp`` (``datetime``): timestamp of the first message of the
+    #:   archive
+    interfaces = {'id', 'timestamp'}
+
+    def get_timestamp(self) -> Optional[datetime]:
+        """Get the timestamp.
+
+        :returns: The timestamp.
+        """
+        stamp = self.xml.attrib.get('timestamp', None)
+        if stamp is not None:
+            return xep_0082.parse(stamp)
+        return stamp
+
+    def set_timestamp(self, value: Union[datetime, str]):
+        """Set the timestamp.
+
+        :param value: Value of the timestamp (either a datetime or a
+                      XEP-0082 timestamp string.
+        """
+        if isinstance(value, str):
+            value = xep_0082.parse(value)
+        value = xep_0082.format_datetime(value)
+        self.xml.attrib['timestamp'] = value
+
+
+class End(ElementBase):
+    """Metadata about the end of an archive.
+
+    .. code-block:: xml
+
+        <iq type='result' id='jui8921rr9'>
+          <metadata xmlns='urn:xmpp:mam:2'>
+            <start id='YWxwaGEg' timestamp='2008-08-22T21:09:04Z' />
+            <end id='b21lZ2Eg' timestamp='2020-04-20T14:34:21Z' />
+          </metadata>
+        </iq>
+
+    """
+    name = 'end'
+    namespace = 'urn:xmpp:mam:2'
+    plugin_attrib = name
+    #: Available interfaces:
+    #:
+    #: - ``id``: ID of the first message of the archive
+    #: - ``timestamp`` (``datetime``): timestamp of the first message of the
+    #:   archive
+    interfaces = {'id', 'timestamp'}
+
+    def get_timestamp(self) -> Optional[datetime]:
+        """Get the timestamp.
+
+        :returns: The timestamp.
+        """
+        stamp = self.xml.attrib.get('timestamp', None)
+        if stamp is not None:
+            return xep_0082.parse(stamp)
+        return stamp
+
+    def set_timestamp(self, value: Union[datetime, str]):
+        """Set the timestamp.
+
+        :param value: Value of the timestamp (either a datetime or a
+                      XEP-0082 timestamp string.
+        """
+        if isinstance(value, str):
+            value = xep_0082.parse(value)
+        value = xep_0082.format_datetime(value)
+        self.xml.attrib['timestamp'] = value
