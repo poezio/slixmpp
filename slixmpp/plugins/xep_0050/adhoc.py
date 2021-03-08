@@ -171,16 +171,16 @@ class XEP_0050(BasePlugin):
         session = self.sessions.get(sessionid)
 
         if session is None:
-            return await _await_if_needed(self._handle_command_start, iq)
+            return await self._handle_command_start(iq)
 
         if action in ('next', 'execute'):
-            return await _await_if_needed(self._handle_command_next, iq)
+            return await self._handle_command_next(iq)
         if action == 'prev':
-            return await _await_if_needed(self._handle_command_prev, iq)
+            return await self._handle_command_prev(iq)
         if action == 'complete':
-            return await _await_if_needed(self._handle_command_complete, iq)
+            return await self._handle_command_complete(iq)
         if action == 'cancel':
-            return await _await_if_needed(self._handle_command_cancel, iq)
+            return await self._handle_command_cancel(iq)
         return None
 
     async def _handle_command_start(self, iq):
