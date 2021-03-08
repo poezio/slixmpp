@@ -314,7 +314,7 @@ class TestPubsubStanzas(SlixTest):
               <create node="testnode2" />
               <configure>
                 <x xmlns="jabber:x:data" type="submit">
-                  <field var="FORM_TYPE">
+                  <field var="FORM_TYPE" type="hidden">
                     <value>http://jabber.org/protocol/pubsub#node_config</value>
                   </field>
                   <field var="pubsub#node_type">
