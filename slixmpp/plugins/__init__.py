@@ -110,5 +110,6 @@ __all__ = [
     'xep_0428',  # Message Fallback
     'xep_0437',  # Room Activity Indicators
     'xep_0439',  # Quick Response
+    'xep_0441',  # Message Archive Management Preferences
     'xep_0444',  # Message Reactions
 ]

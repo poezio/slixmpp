@@ -37,7 +37,6 @@ class XEP_0313(BasePlugin):
     def plugin_init(self):
         register_stanza_plugin(stanza.MAM, Form)
         register_stanza_plugin(Iq, stanza.MAM)
-        register_stanza_plugin(Iq, stanza.Preferences)
         register_stanza_plugin(Message, stanza.Result)
         register_stanza_plugin(Iq, stanza.Fin)
         register_stanza_plugin(
