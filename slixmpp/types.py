@@ -76,3 +76,5 @@ MucRoomItemKeys = Literal[
 OptJid = Optional[JID]
 JidStr = Union[str, JID]
 OptJidStr = Optional[Union[str, JID]]
+
+MAMDefault = Literal['always', 'never', 'roster']
