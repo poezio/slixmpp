@@ -621,8 +621,8 @@ class XEP_0050(BasePlugin):
 
 async def _await_if_needed(handler, *args):
     if asyncio.iscoroutinefunction(handler):
-        log.debug(f"{handler} is async")
+        log.debug(f"%s is async", handler)
         return await handler(*args)
     else:
-        log.debug(f"{handler} is sync")
+        log.debug(f"%s is sync", handler)
         return handler(*args)
