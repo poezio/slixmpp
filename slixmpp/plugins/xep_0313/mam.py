@@ -225,9 +225,10 @@ class XEP_0313(BasePlugin):
         iq['mam']['with'] = with_jid
 
         stanza_mask = self.xmpp.Message()
-        stanza_mask.xml.remove(
-            stanza_mask.xml.find('{urn:xmpp:sid:0}origin-id')
-        )
+
+        auto_origin = stanza_mask.xml.find('{urn:xmpp:sid:0}origin-id')
+        if auto_origin is not None:
+            stanza_mask.xml.remove(auto_origin)
         del stanza_mask['id']
         del stanza_mask['lang']
         stanza_mask['from'] = jid
