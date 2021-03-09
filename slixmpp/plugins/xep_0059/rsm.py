@@ -95,6 +95,9 @@ class ResultIterator:
                not r[self.recv_interface]['rsm']['last']:
                 raise StopAsyncIteration
 
+            if self.post_cb:
+                self.post_cb(r)
+
             if r[self.recv_interface]['rsm']['count'] and \
                r[self.recv_interface]['rsm']['first_index']:
                 count = int(r[self.recv_interface]['rsm']['count'])
@@ -107,9 +110,6 @@ class ResultIterator:
                 self.start = r[self.recv_interface]['rsm']['first']
             else:
                 self.start = r[self.recv_interface]['rsm']['last']
-
-            if self.post_cb:
-                self.post_cb(r)
             return r
         except XMPPError:
             raise StopAsyncIteration
