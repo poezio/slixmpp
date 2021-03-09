@@ -22,6 +22,10 @@ class TestMAM(SlixTest):
         register_stanza_plugin(stanza.MAM, rstanza.Set)
         register_stanza_plugin(stanza.Fin, rstanza.Set)
 
+        register_stanza_plugin(Iq, stanza.Metadata)
+        register_stanza_plugin(stanza.Metadata, stanza.Start)
+        register_stanza_plugin(stanza.Metadata, stanza.End)
+
     def testMAMQuery(self):
         """Test that we can build a simple MAM query."""
         iq = Iq()
@@ -76,6 +80,26 @@ class TestMAM(SlixTest):
               </query>
             </iq>
         """, use_values=False)
+
+    def testMAMMetadata(self):
+        """Test that we can build a MAM metadata payload"""
+
+        iq = Iq()
+        iq['type'] = 'result'
+        iq['mam_metadata']['start']['id'] = 'YWxwaGEg'
+        iq['mam_metadata']['start']['timestamp'] = '2008-08-22T21:09:04Z'
+        iq['mam_metadata']['end']['id'] = 'b21lZ2Eg'
+        iq['mam_metadata']['end']['timestamp'] = '2020-04-20T14:34:21Z'
+
+        self.check(iq, """
+            <iq type='result'>
+              <metadata xmlns='urn:xmpp:mam:2'>
+                <start id='YWxwaGEg' timestamp='2008-08-22T21:09:04Z' />
+                <end id='b21lZ2Eg' timestamp='2020-04-20T14:34:21Z' />
+              </metadata>
+            </iq>
+        """)
+
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestMAM)
