@@ -187,6 +187,24 @@ class Fin(ElementBase):
     name = 'fin'
     namespace = 'urn:xmpp:mam:2'
     plugin_attrib = 'mam_fin'
+    interfaces = {'results'}
+
+    def setup(self, xml=None):
+        ElementBase.setup(self, xml)
+        self._results: List[Message] = []
+
+    # The results interface is meant only as an easy
+    # way to access the set of collected message responses
+    # from the query.
+
+    def get_results(self) -> List[Message]:
+        return self._results
+
+    def set_results(self, values: List[Message]):
+        self._results = values
+
+    def del_results(self):
+        self._results = []
 
 
 class Result(ElementBase):

@@ -112,6 +112,7 @@ class XEP_0313(BasePlugin):
             results = cb_data['collector'].stop()
             if result['type'] == 'result':
                 result['mam']['results'] = results
+                result['mam_fin']['results'] = results
 
         if iterator:
             return self.xmpp['xep_0059'].iterate(
@@ -185,6 +186,7 @@ class XEP_0313(BasePlugin):
             results = cb_data['collector'].stop()
             if result['type'] == 'result':
                 result['mam']['results'] = results
+                result['mam_fin']['results'] = results
 
         iterator = self.xmpp['xep_0059'].iterate(
             iq, 'mam', 'results', amount=amount,
