@@ -8,6 +8,9 @@ XEP-0059: Result Set Management
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+.. autoclass:: ResultIterator
+    :members:
+    :member-order: bysource
 
 Stanza elements
 ---------------
