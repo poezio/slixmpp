@@ -170,7 +170,6 @@ class XEP_0115(BasePlugin):
         try:
             node = '%s#%s' % (pres['caps']['node'], ver)
             caps = await self.xmpp['xep_0030'].get_info(pres['from'], node,
-                                                             coroutine=True,
                                                              ifrom=ifrom)
 
             if isinstance(caps, Iq):
