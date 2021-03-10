@@ -385,30 +385,30 @@ class XEP_0030(BasePlugin):
             elif jid in (None, ''):
                 local = True
 
+        ifrom = kwargs.pop('ifrom', None)
         if local:
             log.debug("Looking up local disco#info data "
                       "for %s, node %s.", jid, node)
             info = await self.api['get_info'](
-                jid, node, kwargs.get('ifrom', None),
+                jid, node, ifrom,
                 kwargs
             )
             info = self._fix_default_info(info)
-            return self._wrap(kwargs.get('ifrom', None), jid, info)
+            return self._wrap(ifrom, jid, info)
 
         if cached:
             log.debug("Looking up cached disco#info data "
                       "for %s, node %s.", jid, node)
             info = await self.api['get_cached_info'](
-                jid, node,
-                kwargs.get('ifrom', None),
+                jid, node, ifrom,
                 kwargs
             )
             if info is not None:
-                return self._wrap(kwargs.get('ifrom', None), jid, info)
+                return self._wrap(ifrom, jid, info)
 
         iq = self.xmpp.Iq()
         # Check dfrom parameter for backwards compatibility
-        iq['from'] = kwargs.get('ifrom', kwargs.get('dfrom', ''))
+        iq['from'] = ifrom or kwargs.get('dfrom', '')
         iq['to'] = jid
         iq['type'] = 'get'
         iq['disco_info']['node'] = node if node else ''
