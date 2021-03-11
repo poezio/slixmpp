@@ -1,4 +1,3 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2017 Emmanuel Gil Peyrot
 # This file is part of Slixmpp.
@@ -15,6 +14,9 @@ log = logging.getLogger(__name__)
 
 
 class XEP_0300(BasePlugin):
+    """
+    XEP-0300: Use of Cryptographic Hash Functions in XMPP
+    """
 
     name = 'xep_0300'
     description = 'XEP-0300: Use of Cryptographic Hash Functions in XMPP'
@@ -22,7 +24,7 @@ class XEP_0300(BasePlugin):
     stanza = stanza
     default_config = {
         'block_size': 1024 * 1024,  # One MiB
-        'preferded': 'sha-256',
+        'preferred': 'sha-256',
         'enable_sha-1': False,
         'enable_sha-256': True,
         'enable_sha-512': True,
@@ -61,7 +63,7 @@ class XEP_0300(BasePlugin):
 
     def plugin_end(self):
         for namespace in self.enabled_hashes:
-            self.xmpp['xep_0030'].del_feature(namespace)
+            self.xmpp['xep_0030'].del_feature(feature=namespace)
         self.enabled_hashes.clear()
 
         self.xmpp['xep_0030'].del_feature(feature=Hash.namespace)
