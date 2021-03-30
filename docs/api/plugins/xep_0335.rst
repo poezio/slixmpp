@@ -1,6 +1,6 @@
 
-XEP 0335
-========
+XEP-0335: JSON Containers
+=========================
 
 .. module:: slixmpp.plugins.xep_0335
 

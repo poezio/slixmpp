@@ -13,3 +13,5 @@ slixmpp.egg-info/
 .baboon/
 .DS_STORE
 .idea/
+.vscode/
+venv/

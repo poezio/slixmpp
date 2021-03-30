@@ -37,7 +37,7 @@ extensions = [
 
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+#templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -51,7 +51,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'Slixmpp'
 year = datetime.datetime.now().year
-copyright = u'{}, Nathan Fritz, Lance Stout'.format(year)
+copyright = u'{}, Mathieu Pasquet, Maxime Buquet, Emmanuel Gil Peyrot, Florent Le Coz'.format(year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -102,7 +102,7 @@ pygments_style = 'tango'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'haiku'
+html_theme = 'furo'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -227,7 +227,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'slixmpp', u'Slixmpp Documentation',
-     [u'Nathan Fritz, Lance Stout'], 1)
+     [u'Mathieu Pasquet, Maxime Buquet, Emmanuel Gil Peyrot, Florent Le Coz'], 1)
 ]
 
-intersphinx_mapping = {'python': ('http://docs.python.org/3.4', 'python-objects.inv')}
+intersphinx_mapping = {'python': ('http://docs.python.org/3.9', 'python-objects.inv')}

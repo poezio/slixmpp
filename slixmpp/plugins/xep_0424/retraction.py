@@ -1,10 +1,7 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from typing import Optional
 
 from slixmpp import JID, Message
@@ -25,7 +22,7 @@ class XEP_0424(BasePlugin):
     '''XEP-0424: Message Retraction'''
 
     name = 'xep_0424'
-    description = 'Message Retraction'
+    description = 'XEP-0424: Message Retraction'
     dependencies = {'xep_0422', 'xep_0030', 'xep_0359', 'xep_0428', 'xep_0334'}
     stanza = stanza
     namespace = stanza.NS

@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import datetime as dt
 
 from slixmpp.plugins import BasePlugin, register_plugin

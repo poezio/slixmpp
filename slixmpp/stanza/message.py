@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2010  Nathanael C. Fritz
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from slixmpp.stanza.rootstanza import RootStanza
 from slixmpp.xmlstream import StanzaBase, ET
 
@@ -96,7 +93,7 @@ class Message(RootStanza):
 
         self.xml.attrib['id'] = value
 
-        if not self.stream.use_origin_id:
+        if self.stream and not self.stream.use_origin_id:
             return None
 
         sub = self.xml.find(ORIGIN_NAME)

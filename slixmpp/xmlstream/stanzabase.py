@@ -1,22 +1,17 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.xmlstream.stanzabase
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- module implements a wrapper layer for XML objects
-    that allows them to be treated like dictionaries.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
-from __future__ import with_statement, unicode_literals
+# slixmpp.xmlstream.stanzabase
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# module implements a wrapper layer for XML objects
+# that allows them to be treated like dictionaries.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
+from __future__ import annotations
 
 import copy
 import logging
 import weakref
+from typing import Optional
 from xml.etree import ElementTree as ET
 
 from slixmpp.xmlstream import JID
@@ -466,7 +461,13 @@ class ElementBase(object):
         """
         return self.init_plugin(attrib, lang)
 
-    def _get_plugin(self, name, lang=None, check=False):
+    def get_plugin(self, name: str, lang: Optional[str] = None, check: bool = False) -> Optional[ElementBase]:
+        """Retrieve a stanza plugin.
+
+        :param check: Return None instead of creating the object if True.
+        :param name: Stanza plugin attribute name.
+        :param lang: xml:lang of the element to retrieve.
+        """
         if lang is None:
             lang = self.get_lang()
 
@@ -614,7 +615,7 @@ class ElementBase(object):
                 self[full_interface] = value
             elif interface in self.plugin_attrib_map:
                 if interface not in iterable_interfaces:
-                    plugin = self._get_plugin(interface, lang)
+                    plugin = self.get_plugin(interface, lang)
                     if plugin:
                         plugin.values = value
         return self
@@ -660,7 +661,7 @@ class ElementBase(object):
             if self.plugin_overrides:
                 name = self.plugin_overrides.get(get_method, None)
                 if name:
-                    plugin = self._get_plugin(name, lang)
+                    plugin = self.get_plugin(name, lang)
                     if plugin:
                         handler = getattr(plugin, get_method, None)
                         if handler:
@@ -677,7 +678,7 @@ class ElementBase(object):
                 else:
                     return self._get_attr(attrib)
         elif attrib in self.plugin_attrib_map:
-            plugin = self._get_plugin(attrib, lang)
+            plugin = self.get_plugin(attrib, lang)
             if plugin and plugin.is_extension:
                 return plugin[full_attrib]
             return plugin
@@ -732,7 +733,7 @@ class ElementBase(object):
                 if self.plugin_overrides:
                     name = self.plugin_overrides.get(set_method, None)
                     if name:
-                        plugin = self._get_plugin(name, lang)
+                        plugin = self.get_plugin(name, lang)
                         if plugin:
                             handler = getattr(plugin, set_method, None)
                             if handler:
@@ -764,7 +765,7 @@ class ElementBase(object):
             else:
                 self.__delitem__(attrib)
         elif attrib in self.plugin_attrib_map:
-            plugin = self._get_plugin(attrib, lang)
+            plugin = self.get_plugin(attrib, lang)
             if plugin:
                 plugin[full_attrib] = value
         return self
@@ -816,7 +817,7 @@ class ElementBase(object):
             if self.plugin_overrides:
                 name = self.plugin_overrides.get(del_method, None)
                 if name:
-                    plugin = self._get_plugin(attrib, lang)
+                    plugin = self.get_plugin(attrib, lang)
                     if plugin:
                         handler = getattr(plugin, del_method, None)
                         if handler:
@@ -832,7 +833,7 @@ class ElementBase(object):
                 else:
                     self._del_attr(attrib)
         elif attrib in self.plugin_attrib_map:
-            plugin = self._get_plugin(attrib, lang, check=True)
+            plugin = self.get_plugin(attrib, lang, check=True)
             if not plugin:
                 return self
             if plugin.is_extension:
@@ -1037,12 +1038,10 @@ class ElementBase(object):
             parent_path = "/".join(path[:len(path) - level - 1])
 
             elements = self.xml.findall(element_path)
-            
             if parent_path == '':
-                parent_path = None             
-            if parent_path is not None:     
+                parent_path = None
+            if parent_path is not None:
                 parent = self.xml.find(parent_path)
-                        
             if elements:
                 if parent is None:
                     parent = self.xml
@@ -1117,7 +1116,7 @@ class ElementBase(object):
             next_tag = xpath[1].split('@')[0].split('}')[-1]
             langs = [name[1] for name in self.plugins if name[0] == next_tag]
             for lang in langs:
-                plugin = self._get_plugin(next_tag, lang)
+                plugin = self.get_plugin(next_tag, lang)
                 if plugin and plugin.match(xpath[1:]):
                     return True
             return False
@@ -1340,6 +1339,9 @@ class ElementBase(object):
     def __repr__(self):
         """Use the stanza's serialized XML as its representation."""
         return self.__str__()
+
+    # Compatibility.
+    _get_plugin = get_plugin
 
 
 class StanzaBase(ElementBase):

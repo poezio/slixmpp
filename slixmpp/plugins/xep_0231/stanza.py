@@ -1,12 +1,9 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2012 Nathanael C. Fritz
-    Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2012 Nathanael C. Fritz
+# Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import base64
 
 
@@ -21,10 +18,14 @@ class BitsOfBinary(ElementBase):
     interfaces = {'cid', 'max_age', 'type', 'data'}
 
     def get_max_age(self):
-        return int(self._get_attr('max-age'))
+        try:
+            return int(self._get_attr('max-age'))
+        except ValueError:
+            return None
 
     def set_max_age(self, value):
-        self._set_attr('max-age', str(value))
+        if value is not None:
+            self._set_attr('max-age', str(value))
 
     def get_data(self):
         return base64.b64decode(bytes(self.xml.text))

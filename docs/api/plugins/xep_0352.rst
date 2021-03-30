@@ -1,6 +1,6 @@
 
-XEP 0352
-========
+XEP-0352: Client State Indication
+=================================
 
 .. module:: slixmpp.plugins.xep_0352
 

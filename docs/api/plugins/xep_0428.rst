@@ -1,6 +1,6 @@
 
-XEP 0428
-========
+XEP-0428: Fallback Indication
+=============================
 
 .. module:: slixmpp.plugins.xep_0428
 

@@ -1,6 +1,6 @@
 
-XEP 0332
-========
+XEP-0332: HTTP over XMPP transport
+==================================
 
 .. module:: slixmpp.plugins.xep_0332
 

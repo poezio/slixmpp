@@ -1,6 +1,6 @@
 
-XEP 0059
-========
+XEP-0059: Result Set Management
+===============================
 
 .. module:: slixmpp.plugins.xep_0059
 
@@ -8,6 +8,9 @@ XEP 0059
     :members:
     :exclude-members: session_bind, plugin_init, plugin_end
 
+.. autoclass:: ResultIterator
+    :members:
+    :member-order: bysource
 
 Stanza elements
 ---------------

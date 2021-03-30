@@ -1,14 +1,14 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permissio
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permissio
 import logging
 
-import slixmpp
+from asyncio import Future
+from typing import Optional
+
+from slixmpp import JID
 from slixmpp.stanza import Message, Iq
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
@@ -24,6 +24,11 @@ class XEP_0280(BasePlugin):
 
     """
     XEP-0280 Message Carbons
+
+    Events triggered by this plugin:
+
+    - :term:`carbon_received`
+    - :term:`carbon_sent`
     """
 
     name = 'xep_0280'
@@ -60,28 +65,22 @@ class XEP_0280(BasePlugin):
     def session_bind(self, jid):
         self.xmpp.plugin['xep_0030'].add_feature('urn:xmpp:carbons:2')
 
-    def _handle_carbon_received(self, msg):
+    def _handle_carbon_received(self, msg: Message):
         if msg['from'].bare == self.xmpp.boundjid.bare:
             self.xmpp.event('carbon_received', msg)
 
-    def _handle_carbon_sent(self, msg):
+    def _handle_carbon_sent(self, msg: Message):
         if msg['from'].bare == self.xmpp.boundjid.bare:
             self.xmpp.event('carbon_sent', msg)
 
-    def enable(self, ifrom=None, timeout=None, callback=None,
-               timeout_callback=None):
-        iq = self.xmpp.Iq()
-        iq['type'] = 'set'
-        iq['from'] = ifrom
+    def enable(self, ifrom: Optional[JID] = None, **iqkwargs) -> Future:
+        """Enable carbons."""
+        iq = self.xmpp.make_iq_set(ifrom=ifrom)
         iq.enable('carbon_enable')
-        return iq.send(timeout_callback=timeout_callback, timeout=timeout,
-                       callback=callback)
+        return iq.send(**iqkwargs)
 
-    def disable(self, ifrom=None, timeout=None, callback=None,
-                timeout_callback=None):
-        iq = self.xmpp.Iq()
-        iq['type'] = 'set'
-        iq['from'] = ifrom
+    def disable(self, ifrom: Optional[JID] = None, **iqkwargs) -> Future:
+        """Disable carbons."""
+        iq = self.xmpp.make_iq_set(ifrom=ifrom)
         iq.enable('carbon_disable')
-        return iq.send(timeout_callback=timeout_callback, timeout=timeout,
-                       callback=callback)
+        return iq.send(**iqkwargs)

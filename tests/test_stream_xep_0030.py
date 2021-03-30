@@ -1,5 +1,5 @@
+import asyncio
 import time
-import threading
 
 import unittest
 from slixmpp.test import SlixTest
@@ -288,7 +288,9 @@ class TestStreamDisco(SlixTest):
 
         self.xmpp.add_event_handler('disco_info', handle_disco_info)
 
-        self.xmpp['xep_0030'].get_info('user@localhost', 'foo')
+
+        self.xmpp.wrap(self.xmpp['xep_0030'].get_info('user@localhost', 'foo'))
+        self.wait_()
 
         self.send("""
           <iq type="get" to="user@localhost" id="1">
@@ -483,7 +485,8 @@ class TestStreamDisco(SlixTest):
 
         self.xmpp.add_event_handler('disco_items', handle_disco_items)
 
-        self.xmpp['xep_0030'].get_items('user@localhost', 'foo')
+        self.xmpp.wrap(self.xmpp['xep_0030'].get_items('user@localhost', 'foo'))
+        self.wait_()
 
         self.send("""
           <iq type="get" to="user@localhost" id="1">
@@ -509,30 +512,28 @@ class TestStreamDisco(SlixTest):
         self.assertEqual(results, items,
                 "Unexpected items: %s" % results)
 
-    '''
-    def testGetItemsIterator(self):
+    def testGetItemsIterators(self):
         """Test interaction between XEP-0030 and XEP-0059 plugins."""
-
-        raised_exceptions = []
+        iteration_finished = []
+        jids_found = set()
 
         self.stream_start(mode='client',
                           plugins=['xep_0030', 'xep_0059'])
 
-        results = self.xmpp['xep_0030'].get_items(jid='foo@localhost',
-                                                  node='bar',
-                                                  iterator=True)
-        results.amount = 10
+        async def run_test():
+            iterator = await self.xmpp['xep_0030'].get_items(
+                jid='foo@localhost',
+                node='bar',
+                iterator=True
+            )
+            iterator.amount = 10
+            async for page in iterator:
+                for item in page['disco_items']['items']:
+                    jids_found.add(item[0])
+            iteration_finished.append(True)
 
-        def run_test():
-            try:
-                results.next()
-            except StopIteration:
-                raised_exceptions.append(True)
-
-        t = threading.Thread(name="get_items_iterator",
-                             target=run_test)
-        t.start()
-
+        test_run = self.xmpp.wrap(run_test())
+        self.wait_()
         self.send("""
           <iq id="2" type="get" to="foo@localhost">
             <query xmlns="http://jabber.org/protocol/disco#items"
@@ -546,17 +547,51 @@ class TestStreamDisco(SlixTest):
         self.recv("""
           <iq id="2" type="result" to="tester@localhost">
             <query xmlns="http://jabber.org/protocol/disco#items">
+              <item jid="a@b" node="1"/>
+              <item jid="b@b" node="2"/>
+              <item jid="c@b" node="3"/>
+              <item jid="d@b" node="4"/>
+              <item jid="e@b" node="5"/>
               <set xmlns="http://jabber.org/protocol/rsm">
+                <first index='0'>a@b</first>
+                <last>e@b</last>
+                <count>10</count>
               </set>
             </query>
           </iq>
         """)
-
-        t.join()
-
-        self.assertEqual(raised_exceptions, [True],
-             "StopIteration was not raised: %s" % raised_exceptions)
-    '''
+        self.wait_()
+        self.send("""
+          <iq id="3" type="get" to="foo@localhost">
+            <query xmlns="http://jabber.org/protocol/disco#items"
+                   node="bar">
+              <set xmlns="http://jabber.org/protocol/rsm">
+                <max>10</max>
+                <after>e@b</after>
+              </set>
+            </query>
+          </iq>
+        """)
+        self.recv("""
+          <iq id="3" type="result" to="tester@localhost">
+            <query xmlns="http://jabber.org/protocol/disco#items">
+              <item jid="f@b" node="6"/>
+              <item jid="g@b" node="7"/>
+              <item jid="h@b" node="8"/>
+              <item jid="i@b" node="9"/>
+              <item jid="j@b" node="10"/>
+              <set xmlns="http://jabber.org/protocol/rsm">
+                <first index='5'>f@b</first>
+                <last>j@b</last>
+                <count>10</count>
+              </set>
+            </query>
+          </iq>
+        """)
+        expected_jids = {'%s@b' % i for i in 'abcdefghij'}
+        self.run_coro(test_run)
+        self.assertEqual(expected_jids, jids_found)
+        self.assertEqual(iteration_finished, [True])
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestStreamDisco)

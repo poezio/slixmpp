@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2013 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2013 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import logging
 import threading
 
@@ -84,7 +81,7 @@ class XEP_0095(BasePlugin):
             self._methods_order.remove((order, method, plugin_name))
             self._methods_order.sort()
 
-    def _handle_request(self, iq):
+    async def _handle_request(self, iq):
         profile = iq['si']['profile']
         sid = iq['si']['id']
 
@@ -122,7 +119,7 @@ class XEP_0095(BasePlugin):
         receiver = iq['to']
         sender = iq['from']
 
-        self.api['add_pending'](receiver, sid, sender, {
+        await self.api['add_pending'](receiver, sid, sender, {
             'response_id': iq['id'],
             'method': selected_method,
             'profile': profile
@@ -156,8 +153,13 @@ class XEP_0095(BasePlugin):
                 options=methods)
         return si.send(**iqargs)
 
-    def accept(self, jid, sid, payload=None, ifrom=None, stream_handler=None):
-        stream = self.api['get_pending'](ifrom, sid, jid)
+    async def accept(self, jid, sid, payload=None, ifrom=None, stream_handler=None):
+        """Accept a stream initiation.
+
+        .. versionchanged:: 1.8.0
+            This function is now a coroutine.
+        """
+        stream = await self.api['get_pending'](ifrom, sid, jid)
         iq = self.xmpp.Iq()
         iq['id'] = stream['response_id']
         iq['to'] = jid
@@ -177,16 +179,21 @@ class XEP_0095(BasePlugin):
         method_plugin = self._methods[stream['method']][0]
         self.xmpp[method_plugin].api['preauthorize_sid'](ifrom, sid, jid)
 
-        self.api['del_pending'](ifrom, sid, jid)
+        await self.api['del_pending'](ifrom, sid, jid)
 
         if stream_handler:
             self.xmpp.add_event_handler('stream:%s:%s' % (sid, jid),
                     stream_handler,
                     disposable=True)
-        return iq.send()
+        return await iq.send()
 
-    def decline(self, jid, sid, ifrom=None):
-        stream = self.api['get_pending'](ifrom, sid, jid)
+    async def decline(self, jid, sid, ifrom=None):
+        """Decline a stream initiation.
+
+        .. versionchanged:: 1.8.0
+            This function is now a coroutine.
+        """
+        stream = await self.api['get_pending'](ifrom, sid, jid)
         if not stream:
             return
         iq = self.xmpp.Iq()
@@ -196,8 +203,8 @@ class XEP_0095(BasePlugin):
         iq['type'] = 'error'
         iq['error']['condition'] = 'forbidden'
         iq['error']['text'] = 'Offer declined'
-        self.api['del_pending'](ifrom, sid, jid)
-        return iq.send()
+        await self.api['del_pending'](ifrom, sid, jid)
+        return await iq.send()
 
     def _add_pending(self, jid, node, ifrom, data):
         with self._pending_lock:

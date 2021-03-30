@@ -1,6 +1,6 @@
 
-XEP 0080
-========
+XEP-0080: User Location
+=======================
 
 .. module:: slixmpp.plugins.xep_0080
 

@@ -1,37 +1,60 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.basexmpp
-    ~~~~~~~~~~~~~~~~~~
-
-    This module provides the common XMPP functionality
-    for both clients and components.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
+# slixmpp.basexmpp
+# ~~~~~~~~~~~~~~~~~~
+# This module provides the common XMPP functionality
+# for both clients and components.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
+from __future__ import annotations
 
 import asyncio
 import logging
+
+from typing import (
+    Dict,
+    Optional,
+    Union,
+    TYPE_CHECKING,
+)
 
 from slixmpp import plugins, roster, stanza
 from slixmpp.api import APIRegistry
 from slixmpp.exceptions import IqError, IqTimeout
 
-from slixmpp.stanza import Message, Presence, Iq, StreamError
+from slixmpp.stanza import (
+    Message,
+    Presence,
+    Iq,
+    StreamError,
+)
 from slixmpp.stanza.roster import Roster
 
 from slixmpp.xmlstream import XMLStream, JID
 from slixmpp.xmlstream import ET, register_stanza_plugin
 from slixmpp.xmlstream.matcher import MatchXPath
 from slixmpp.xmlstream.handler import Callback
-from slixmpp.xmlstream.stanzabase import XML_NS
+from slixmpp.xmlstream.stanzabase import (
+    ElementBase,
+    XML_NS,
+)
 
 from slixmpp.plugins import PluginManager, load_plugin
 
 
 log = logging.getLogger(__name__)
+
+
+from slixmpp.types import (
+    PresenceShows,
+    PresenceTypes,
+    MessageTypes,
+    IqTypes,
+)
+
+if TYPE_CHECKING:
+    # Circular imports
+    from slixmpp.pluginsdict import PluginsDict
+
 
 class BaseXMPP(XMLStream):
 
@@ -43,6 +66,10 @@ class BaseXMPP(XMLStream):
     :param default_ns: Ensure that the correct default XML namespace
                        is used during initialization.
     """
+
+    # This is technically not correct, but much more useful to typecheck
+    # than the internal use of the PluginManager API
+    plugin: PluginsDict
 
     def __init__(self, jid='', default_ns='jabber:client', **kwargs):
         XMLStream.__init__(self, **kwargs)
@@ -221,7 +248,7 @@ class BaseXMPP(XMLStream):
                     self.plugin[name].post_init()
                 self.plugin[name].post_inited = True
 
-    def register_plugin(self, plugin, pconfig=None, module=None):
+    def register_plugin(self, plugin: str, pconfig: Optional[Dict] = None, module=None):
         """Register and configure  a plugin for use in this stream.
 
         :param plugin: The name of the plugin class. Plugin names must
@@ -271,32 +298,34 @@ class BaseXMPP(XMLStream):
         """Return a plugin given its name, if it has been registered."""
         return self.plugin.get(key, default)
 
-    def Message(self, *args, **kwargs):
+    def Message(self, *args, **kwargs) -> Message:
         """Create a Message stanza associated with this stream."""
         msg = Message(self, *args, **kwargs)
         msg['lang'] = self.default_lang
         return msg
 
-    def Iq(self, *args, **kwargs):
+    def Iq(self, *args, **kwargs) -> Iq:
         """Create an Iq stanza associated with this stream."""
         return Iq(self, *args, **kwargs)
 
-    def Presence(self, *args, **kwargs):
+    def Presence(self, *args, **kwargs) -> Presence:
         """Create a Presence stanza associated with this stream."""
         pres = Presence(self, *args, **kwargs)
         pres['lang'] = self.default_lang
         return pres
 
-    def make_iq(self, id=0, ifrom=None, ito=None, itype=None, iquery=None):
-        """Create a new Iq stanza with a given Id and from JID.
+    def make_iq(self, id: str = "0", ifrom: Optional[JID] = None,
+                ito: Optional[JID] = None, itype: Optional[IqTypes] = None,
+                iquery: Optional[str] = None) -> Iq:
+        """Create a new :class:`~.Iq` stanza with a given Id and from JID.
 
         :param id: An ideally unique ID value for this stanza thread.
                    Defaults to 0.
-        :param ifrom: The from :class:`~slixmpp.xmlstream.jid.JID`
+        :param ifrom: The from :class:`~.JID`
                       to use for this stanza.
-        :param ito: The destination :class:`~slixmpp.xmlstream.jid.JID`
+        :param ito: The destination :class:`~.JID`
                     for this stanza.
-        :param itype: The :class:`~slixmpp.stanza.iq.Iq`'s type,
+        :param itype: The :class:`~.Iq`'s type,
                       one of: ``'get'``, ``'set'``, ``'result'``,
                       or ``'error'``.
         :param iquery: Optional namespace for adding a query element.
@@ -309,15 +338,17 @@ class BaseXMPP(XMLStream):
         iq['query'] = iquery
         return iq
 
-    def make_iq_get(self, queryxmlns=None, ito=None, ifrom=None, iq=None):
-        """Create an :class:`~slixmpp.stanza.iq.Iq` stanza of type ``'get'``.
+    def make_iq_get(self, queryxmlns: Optional[str] =None,
+                    ito: Optional[JID] = None, ifrom: Optional[JID] = None,
+                    iq: Optional[Iq] = None) -> Iq:
+        """Create an :class:`~.Iq` stanza of type ``'get'``.
 
         Optionally, a query element may be added.
 
         :param queryxmlns: The namespace of the query to use.
-        :param ito: The destination :class:`~slixmpp.xmlstream.jid.JID`
+        :param ito: The destination :class:`~.JID`
                     for this stanza.
-        :param ifrom: The ``'from'`` :class:`~slixmpp.xmlstream.jid.JID`
+        :param ifrom: The ``'from'`` :class:`~.JID`
                       to use for this stanza.
         :param iq: Optionally use an existing stanza instead
                    of generating a new one.
@@ -332,15 +363,17 @@ class BaseXMPP(XMLStream):
             iq['from'] = ifrom
         return iq
 
-    def make_iq_result(self, id=None, ito=None, ifrom=None, iq=None):
+    def make_iq_result(self, id: Optional[str] = None,
+                       ito: Optional[JID] = None, ifrom: Optional[JID] = None,
+                       iq: Optional[Iq] = None) -> Iq:
         """
-        Create an :class:`~slixmpp.stanza.iq.Iq` stanza of type
+        Create an :class:`~.Iq` stanza of type
         ``'result'`` with the given ID value.
 
         :param id: An ideally unique ID value. May use :meth:`new_id()`.
-        :param ito: The destination :class:`~slixmpp.xmlstream.jid.JID`
+        :param ito: The destination :class:`~.JID`
                     for this stanza.
-        :param ifrom: The ``'from'`` :class:`~slixmpp.xmlstream.jid.JID`
+        :param ifrom: The ``'from'`` :class:`~.JID`
                       to use for this stanza.
         :param iq: Optionally use an existing stanza instead
                    of generating a new one.
@@ -357,21 +390,23 @@ class BaseXMPP(XMLStream):
             iq['from'] = ifrom
         return iq
 
-    def make_iq_set(self, sub=None, ito=None, ifrom=None, iq=None):
+    def make_iq_set(self, sub: Optional[Union[ElementBase, ET.Element]] = None,
+                    ito: Optional[JID] = None, ifrom: Optional[JID] = None,
+                    iq: Optional[Iq] = None) -> Iq:
         """
-        Create an :class:`~slixmpp.stanza.iq.Iq` stanza of type ``'set'``.
+        Create an :class:`~.Iq` stanza of type ``'set'``.
 
         Optionally, a substanza may be given to use as the
         stanza's payload.
 
         :param sub: Either an
-                    :class:`~slixmpp.xmlstream.stanzabase.ElementBase`
+                    :class:`~.ElementBase`
                     stanza object or an
                     :class:`~xml.etree.ElementTree.Element` XML object
-                    to use as the :class:`~slixmpp.stanza.iq.Iq`'s payload.
-        :param ito: The destination :class:`~slixmpp.xmlstream.jid.JID`
+                    to use as the :class:`~.Iq`'s payload.
+        :param ito: The destination :class:`~.JID`
                     for this stanza.
-        :param ifrom: The ``'from'`` :class:`~slixmpp.xmlstream.jid.JID`
+        :param ifrom: The ``'from'`` :class:`~.JID`
                       to use for this stanza.
         :param iq: Optionally use an existing stanza instead
                    of generating a new one.
@@ -391,7 +426,7 @@ class BaseXMPP(XMLStream):
                       condition='feature-not-implemented',
                       text=None, ito=None, ifrom=None, iq=None):
         """
-        Create an :class:`~slixmpp.stanza.iq.Iq` stanza of type ``'error'``.
+        Create an :class:`~.Iq` stanza of type ``'error'``.
 
         :param id: An ideally unique ID value. May use :meth:`new_id()`.
         :param type: The type of the error, such as ``'cancel'`` or
@@ -399,9 +434,9 @@ class BaseXMPP(XMLStream):
         :param condition: The error condition. Defaults to
                           ``'feature-not-implemented'``.
         :param text: A message describing the cause of the error.
-        :param ito: The destination :class:`~slixmpp.xmlstream.jid.JID`
+        :param ito: The destination :class:`~.JID`
                     for this stanza.
-        :param ifrom: The ``'from'`` :class:`~slixmpp.xmlstream.jid.JID`
+        :param ifrom: The ``'from'`` :class:`~jid.JID`
                       to use for this stanza.
         :param iq: Optionally use an existing stanza instead
                    of generating a new one.
@@ -418,17 +453,19 @@ class BaseXMPP(XMLStream):
             iq['from'] = ifrom
         return iq
 
-    def make_iq_query(self, iq=None, xmlns='', ito=None, ifrom=None):
+    def make_iq_query(self, iq: Optional[Iq] = None, xmlns: str = '',
+                      ito: Optional[JID] = None,
+                      ifrom: Optional[JID] = None) -> Iq:
         """
-        Create or modify an :class:`~slixmpp.stanza.iq.Iq` stanza
+        Create or modify an :class:`~.Iq` stanza
         to use the given query namespace.
 
         :param iq: Optionally use an existing stanza instead
                    of generating a new one.
         :param xmlns: The query's namespace.
-        :param ito: The destination :class:`~slixmpp.xmlstream.jid.JID`
+        :param ito: The destination :class:`~.JID`
                     for this stanza.
-        :param ifrom: The ``'from'`` :class:`~slixmpp.xmlstream.jid.JID`
+        :param ifrom: The ``'from'`` :class:`~.JID`
                       to use for this stanza.
         """
         if not iq:
@@ -440,7 +477,7 @@ class BaseXMPP(XMLStream):
             iq['from'] = ifrom
         return iq
 
-    def make_query_roster(self, iq=None):
+    def make_query_roster(self, iq: Optional[Iq] = None) -> ET.Element:
         """Create a roster query element.
 
         :param iq: Optionally use an existing stanza instead
@@ -450,11 +487,14 @@ class BaseXMPP(XMLStream):
             iq['query'] = 'jabber:iq:roster'
         return ET.Element("{jabber:iq:roster}query")
 
-    def make_message(self, mto, mbody=None, msubject=None, mtype=None,
-                     mhtml=None, mfrom=None, mnick=None):
+    def make_message(self, mto: JID, mbody: Optional[str] = None,
+                     msubject: Optional[str] = None,
+                     mtype: Optional[MessageTypes] = None,
+                     mhtml: Optional[str] = None, mfrom: Optional[JID] = None,
+                     mnick: Optional[str] = None) -> Message:
         """
         Create and initialize a new
-        :class:`~slixmpp.stanza.message.Message` stanza.
+        :class:`~.Message` stanza.
 
         :param mto: The recipient of the message.
         :param mbody: The main contents of the message.
@@ -476,11 +516,16 @@ class BaseXMPP(XMLStream):
             message['html']['body'] = mhtml
         return message
 
-    def make_presence(self, pshow=None, pstatus=None, ppriority=None,
-                      pto=None, ptype=None, pfrom=None, pnick=None):
+    def make_presence(self, pshow: Optional[PresenceShows] = None,
+                      pstatus: Optional[str] = None,
+                      ppriority: Optional[int] = None,
+                      pto: Optional[JID] = None,
+                      ptype: Optional[PresenceTypes] = None,
+                      pfrom: Optional[JID] = None,
+                      pnick: Optional[str] = None) -> Presence:
         """
         Create and initialize a new
-        :class:`~slixmpp.stanza.presence.Presence` stanza.
+        :class:`~.Presence` stanza.
 
         :param pshow: The presence's show value.
         :param pstatus: The presence's status message.
@@ -500,11 +545,14 @@ class BaseXMPP(XMLStream):
         presence['nick'] = pnick
         return presence
 
-    def send_message(self, mto, mbody, msubject=None, mtype=None,
-                     mhtml=None, mfrom=None, mnick=None):
+    def send_message(self, mto: JID, mbody: Optional[str] = None,
+                     msubject: Optional[str] = None,
+                     mtype: Optional[MessageTypes] = None,
+                     mhtml: Optional[str] = None, mfrom: Optional[JID] = None,
+                     mnick: Optional[str] = None):
         """
         Create, initialize, and send a new
-        :class:`~slixmpp.stanza.message.Message` stanza.
+        :class:`~.Message` stanza.
 
         :param mto: The recipient of the message.
         :param mbody: The main contents of the message.
@@ -520,11 +568,16 @@ class BaseXMPP(XMLStream):
         self.make_message(mto, mbody, msubject, mtype,
                           mhtml, mfrom, mnick).send()
 
-    def send_presence(self, pshow=None, pstatus=None, ppriority=None,
-                      pto=None, pfrom=None, ptype=None, pnick=None):
+    def send_presence(self, pshow: Optional[PresenceShows] = None,
+                      pstatus: Optional[str] = None,
+                      ppriority: Optional[int] = None,
+                      pto: Optional[JID] = None,
+                      ptype: Optional[PresenceTypes] = None,
+                      pfrom: Optional[JID] = None,
+                      pnick: Optional[str] = None):
         """
         Create, initialize, and send a new
-        :class:`~slixmpp.stanza.presence.Presence` stanza.
+        :class:`~.Presence` stanza.
 
         :param pshow: The presence's show value.
         :param pstatus: The presence's status message.
@@ -541,7 +594,7 @@ class BaseXMPP(XMLStream):
                                    ptype='subscribe', pnick=None):
         """
         Create, initialize, and send a new
-        :class:`~slixmpp.stanza.presence.Presence` stanza of
+        :class:`~.Presence` stanza of
         type ``'subscribe'``.
 
         :param pto: The recipient of a directed presence.

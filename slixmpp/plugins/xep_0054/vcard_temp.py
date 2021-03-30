@@ -1,17 +1,17 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import logging
+from asyncio import Future
+from typing import Optional
 
-from slixmpp import JID, Iq
+from slixmpp import JID
+from slixmpp.stanza import Iq
 from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream import register_stanza_plugin
-from slixmpp.xmlstream.handler import Callback
+from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0054 import VCardTemp, stanza
@@ -46,7 +46,7 @@ class XEP_0054(BasePlugin):
         self._vcard_cache = {}
 
         self.xmpp.register_handler(
-                Callback('VCardTemp',
+                CoroutineCallback('VCardTemp',
                     StanzaPath('iq/vcard_temp'),
                     self._handle_get_vcard))
 
@@ -57,12 +57,24 @@ class XEP_0054(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature('vcard-temp')
 
-    def make_vcard(self):
+    def make_vcard(self) -> VCardTemp:
+        """Return an empty vcard element."""
         return VCardTemp()
 
-    @future_wrapper
-    def get_vcard(self, jid=None, ifrom=None, local=None, cached=False,
-                  callback=None, timeout=None, timeout_callback=None):
+    async def get_vcard(self, jid: Optional[JID] = None, *,
+                        local: Optional[bool] = None, cached: bool = False,
+                        ifrom: Optional[JID] = None,
+                        **iqkwargs) -> Iq:
+        """Retrieve a VCard.
+
+        .. versionchanged:: 1.8.0
+            This function is now a coroutine.
+
+        :param jid: JID of the entity to fetch the VCard from.
+        :param local: Only check internally for a vcard.
+        :param cached: Whether to check in the local cache before
+                       sending a query.
+        """
         if local is None:
             if jid is not None and not isinstance(jid, JID):
                 jid = JID(jid)
@@ -77,7 +89,7 @@ class XEP_0054(BasePlugin):
                 local = True
 
         if local:
-            vcard = self.api['get_vcard'](jid, None, ifrom)
+            vcard = await self.api['get_vcard'](jid, None, ifrom)
             if not isinstance(vcard, Iq):
                 iq = self.xmpp.Iq()
                 if vcard is None:
@@ -87,7 +99,7 @@ class XEP_0054(BasePlugin):
             return vcard
 
         if cached:
-            vcard = self.api['get_vcard'](jid, None, ifrom)
+            vcard = await self.api['get_vcard'](jid, None, ifrom)
             if vcard is not None:
                 if not isinstance(vcard, Iq):
                     iq = self.xmpp.Iq()
@@ -95,36 +107,35 @@ class XEP_0054(BasePlugin):
                     return iq
                 return vcard
 
-        iq = self.xmpp.Iq()
-        iq['to'] = jid
-        iq['from'] = ifrom
-        iq['type'] = 'get'
+        iq = self.xmpp.make_iq_get(ito=jid, ifrom=ifrom)
         iq.enable('vcard_temp')
+        return await iq.send(**iqkwargs)
 
-        return iq.send(callback=callback, timeout=timeout,
-                       timeout_callback=timeout_callback)
+    async def publish_vcard(self, vcard: Optional[VCardTemp] = None,
+                            jid: Optional[JID] = None,
+                            ifrom: Optional[JID] = None, **iqkwargs):
+        """Publish a vcard.
 
-    @future_wrapper
-    def publish_vcard(self, vcard=None, jid=None, ifrom=None,
-                      callback=None, timeout=None, timeout_callback=None):
-        self.api['set_vcard'](jid, None, ifrom, vcard)
+        .. versionchanged:: 1.8.0
+            This function is now a coroutine.
+
+        :param vcard: The VCard to publish.
+        :param jid: The JID to publish the VCard to.
+        """
+        await self.api['set_vcard'](jid, None, ifrom, vcard)
         if self.xmpp.is_component:
             return
 
-        iq = self.xmpp.Iq()
-        iq['to'] = jid
-        iq['from'] = ifrom
-        iq['type'] = 'set'
+        iq = self.xmpp.make_iq_set(ito=jid, ifrom=ifrom)
         iq.append(vcard)
-        return iq.send(callback=callback, timeout=timeout,
-                       timeout_callback=timeout_callback)
+        await iq.send(**iqkwargs)
 
-    def _handle_get_vcard(self, iq):
+    async def _handle_get_vcard(self, iq: Iq):
         if iq['type'] == 'result':
-            self.api['set_vcard'](jid=iq['from'], args=iq['vcard_temp'])
+            await self.api['set_vcard'](jid=iq['from'], args=iq['vcard_temp'])
             return
         elif iq['type'] == 'get' and self.xmpp.is_component:
-            vcard = self.api['get_vcard'](iq['from'].bare)
+            vcard = await self.api['get_vcard'](iq['to'].bare, ifrom=iq['from'])
             if isinstance(vcard, Iq):
                 vcard.send()
             else:

@@ -1,6 +1,6 @@
 
-XEP 0313
-========
+XEP-0313: Message Archive Management
+====================================
 
 .. module:: slixmpp.plugins.xep_0313
 
@@ -14,5 +14,6 @@ Stanza elements
 
 .. automodule:: slixmpp.plugins.xep_0313.stanza
     :members:
+    :member-order: bysource
     :undoc-members:
 

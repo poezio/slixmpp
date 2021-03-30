@@ -1,10 +1,7 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from typing import (
     Any,
     Dict,
@@ -50,7 +47,7 @@ class XEP_0369(BasePlugin):
     '''XEP-0369: MIX-CORE'''
 
     name = 'xep_0369'
-    description = 'MIX-CORE'
+    description = 'XEP-0369: MIX-CORE'
     dependencies = {'xep_0030', 'xep_0060', 'xep_0082', 'xep_0004'}
     stanza = stanza
     namespace = stanza.NS
@@ -72,9 +69,22 @@ class XEP_0369(BasePlugin):
 
     def session_bind(self, jid):
         self.xmpp.plugin['xep_0030'].add_feature(stanza.NS)
+        self.xmpp.plugin['xep_0060'].map_node_event(
+            'urn:xmpp:mix:nodes:participants',
+            'mix_participant_info',
+        )
+        self.xmpp.plugin['xep_0060'].map_node_event(
+            'urn:xmpp:mix:nodes:info',
+            'mix_channel_info',
+        )
 
     def plugin_end(self):
         self.xmpp.plugin['xep_0030'].del_feature(feature=stanza.NS)
+        node_map = self.xmpp.plugin['xep_0060'].node_event_map
+        if 'urn:xmpp:mix:nodes:info' in node_map:
+            del node_map['urn:xmpp:mix:nodes:info']
+        if 'urn:xmpp:mix:nodes:participants' in node_map:
+            del node_map['urn:xmpp:mix:nodes:participants']
 
     async def get_channel_info(self, channel: JID) -> InfoType:
         """"

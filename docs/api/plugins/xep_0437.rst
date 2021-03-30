@@ -1,6 +1,6 @@
 
-XEP 0437
-========
+XEP-0437: Room Activity Indicators
+==================================
 
 .. module:: slixmpp.plugins.xep_0437
 

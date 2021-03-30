@@ -1,6 +1,6 @@
 
-XEP 0004
-========
+XEP-0004: Data Forms
+====================
 
 .. module:: slixmpp.plugins.xep_0004
 

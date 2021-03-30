@@ -1,12 +1,8 @@
-# -*- encoding: utf-8 -*-
 
-"""
-    slixmpp.xmlstream.dns
-    ~~~~~~~~~~~~~~~~~~~~~~~
-
-    :copyright: (c) 2012 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
+# slixmpp.xmlstream.dns
+# ~~~~~~~~~~~~~~~~~~~~~~~
+# :copyright: (c) 2012 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 
 from slixmpp.xmlstream.asyncio import asyncio
 import socket

@@ -1,10 +1,7 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from typing import (
     Dict,
     Optional,
@@ -31,7 +28,7 @@ class XEP_0404(BasePlugin):
     '''XEP-0404: MIX JID Hidden Channels'''
 
     name = 'xep_0404'
-    description = 'MIX-ANON'
+    description = 'XEP-0404: MIX-ANON'
     dependencies = {'xep_0369'}
     stanza = stanza
     namespace = stanza.NS

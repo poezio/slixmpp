@@ -1,18 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.xmlstream.tostring
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module converts XML objects into Unicode strings and
-    intelligently includes namespaces only when necessary to
-    keep the output readable.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.xmlstream.tostring
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This module converts XML objects into Unicode strings and
+# intelligently includes namespaces only when necessary to
+# keep the output readable.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 XML_NS = 'http://www.w3.org/XML/1998/namespace'
 
 

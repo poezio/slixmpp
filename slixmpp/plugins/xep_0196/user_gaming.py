@@ -1,13 +1,11 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 
 import logging
 
+from asyncio import Future
 from slixmpp import JID
 from typing import Optional, Callable
 from slixmpp.plugins.base import BasePlugin
@@ -43,11 +41,7 @@ class XEP_0196(BasePlugin):
                        character_name: Optional[str] = None,
                        character_profile: Optional[str] = None,
                        server_address: Optional[str] = None,
-                       options: Optional[Form] = None,
-                       ifrom: Optional[JID] = None,
-                       callback: Optional[Callable] = None,
-                       timeout: Optional[int] = None,
-                       timeout_callback: Optional[Callable]=None):
+                       **pubsubkwargs) -> Future:
         """
         Publish the user's current gaming status.
 
@@ -69,20 +63,19 @@ class XEP_0196(BasePlugin):
         gaming['character_profile'] = character_profile
         gaming['server_name'] = server_name
         gaming['server_address'] = server_address
-        return self.xmpp['xep_0163'].publish(gaming,
-                                             node=UserGaming.namespace,
-                                             options=options, ifrom=ifrom,
-                                             callback=callback, timeout=timeout,
-                                             timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            gaming,
+            node=UserGaming.namespace,
+            **pubsubkwargs
+        )
 
-    def stop(self, ifrom=None, callback=None, timeout=None,
-                   timeout_callback=None):
+    def stop(self, **pubsubkwargs) -> Future:
         """
         Clear existing user gaming information to stop notifications.
         """
         gaming = UserGaming()
-        return self.xmpp['xep_0163'].publish(gaming,
-                                             node=UserGaming.namespace,
-                                             ifrom=ifrom, callback=callback,
-                                             timeout=timeout,
-                                             timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            gaming,
+            node=UserGaming.namespace,
+            **pubsubkwargs
+        )

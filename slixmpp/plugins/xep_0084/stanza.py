@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from base64 import b64encode, b64decode
 
 from slixmpp.util import bytes
@@ -64,6 +61,35 @@ class Info(ElementBase):
     plugin_attrib = 'info'
     plugin_multi_attrib = 'items'
     interfaces = {'bytes', 'height', 'id', 'type', 'url', 'width'}
+
+    def _get_int(self, name: str) -> int:
+        try:
+            return int(self._get_attr(name))
+        except ValueError:
+            return 0
+
+    def _set_int(self, name: str, value: int):
+        if value not in ('', None):
+            int(value)
+        self._set_attr(name, value)
+
+    def get_bytes(self) -> int:
+        return self._get_int('bytes')
+
+    def _set_bytes(self, value: int):
+        self._set_int('bytes', value)
+
+    def get_height(self) -> int:
+        self._get_int('height')
+
+    def set_height(self, value: int):
+        self._set_int('height', value)
+
+    def get_width(self) -> int:
+        self._get_int(self, 'width')
+
+    def set_width(self, value: int):
+        self._set_int('with', value)
 
 
 class Pointer(ElementBase):

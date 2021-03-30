@@ -1,6 +1,6 @@
 
-XEP 0202
-========
+XEP-0202: Entity Time
+=====================
 
 .. module:: slixmpp.plugins.xep_0202
 

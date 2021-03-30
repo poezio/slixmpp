@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2013 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2013 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of slixmpp.
+# See the file LICENSE for copying permission.
 import logging
 
 from slixmpp.stanza import Iq

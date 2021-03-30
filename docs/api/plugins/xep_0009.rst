@@ -1,6 +1,6 @@
 
-XEP 0009
-========
+XEP-0009: Jabber-RPC
+====================
 
 .. module:: slixmpp.plugins.xep_0009
 

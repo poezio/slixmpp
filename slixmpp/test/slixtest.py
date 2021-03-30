@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2010 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2010 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import unittest
 from queue import Queue
 from xml.parsers.expat import ExpatError
@@ -228,6 +225,10 @@ class SlixTest(unittest.TestCase):
                     "Stanza:\n%s" % str(stanza))
         else:
             stanza_class = stanza.__class__
+            # Hack to preserve namespaces instead of having jabber:client
+            # everywhere.
+            old_ns = stanza_class.namespace
+            stanza_class.namespace =stanza.namespace
             if not isinstance(criteria, ElementBase):
                 xml = self.parse_xml(criteria)
             else:
@@ -235,8 +236,8 @@ class SlixTest(unittest.TestCase):
 
             # Ensure that top level namespaces are used, even if they
             # were not provided.
-            self.fix_namespaces(stanza.xml, 'jabber:client')
-            self.fix_namespaces(xml, 'jabber:client')
+            self.fix_namespaces(stanza.xml)
+            self.fix_namespaces(xml)
 
             stanza2 = stanza_class(xml=xml)
 
@@ -279,6 +280,7 @@ class SlixTest(unittest.TestCase):
                 debug += "Given stanza:\n%s\n" % highlight(tostring(stanza.xml))
                 debug += "Generated stanza:\n%s\n" % highlight(tostring(stanza2.xml))
                 result = self.compare(xml, stanza.xml, stanza2.xml)
+            stanza_class.namespace = old_ns
 
             self.assertTrue(result, debug)
 
@@ -432,7 +434,9 @@ class SlixTest(unittest.TestCase):
             timeout      -- Time to wait in seconds for data to be received by
                             a live connection.
         """
+        self.wait_()
         self.xmpp.data_received(data)
+        self.wait_()
 
     def recv_header(self, sto='',
                           sfrom='',
@@ -610,8 +614,8 @@ class SlixTest(unittest.TestCase):
             self.fail("No stanza was sent.")
 
         xml = self.parse_xml(sent)
-        self.fix_namespaces(xml, 'jabber:client')
-        sent = self.xmpp._build_stanza(xml, 'jabber:client')
+        self.fix_namespaces(xml)
+        sent = self.xmpp._build_stanza(xml)
         self.check(sent, data,
                    method=method,
                    defaults=defaults,
@@ -621,9 +625,19 @@ class SlixTest(unittest.TestCase):
         loop = asyncio.get_event_loop()
         future = asyncio.ensure_future(self.xmpp.run_filters(), loop=loop)
         queue = self.xmpp.waiting_queue
-        print(queue)
         loop.run_until_complete(queue.join())
         future.cancel()
+
+    def wait_(self):
+        async def yield_some():
+            for i in range(100):
+                await asyncio.sleep(0)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(yield_some())
+
+    def run_coro(self, coro):
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(coro)
 
     def stream_close(self):
         """
@@ -641,7 +655,7 @@ class SlixTest(unittest.TestCase):
     # ------------------------------------------------------------------
     # XML Comparison and Cleanup
 
-    def fix_namespaces(self, xml, ns):
+    def fix_namespaces(self, xml, ns=None):
         """
         Assign a namespace to an element and any children that
         don't have a namespace.
@@ -650,6 +664,10 @@ class SlixTest(unittest.TestCase):
             xml -- The XML object to fix.
             ns  -- The namespace to add to the XML object.
         """
+        if ns is None:
+            ns = 'jabber:client'
+            if self.xmpp:
+                ns = self.xmpp.default_ns
         if xml.tag.startswith('{'):
             return
         xml.tag = '{%s}%s' % (ns, xml.tag)

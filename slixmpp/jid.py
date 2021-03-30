@@ -1,22 +1,20 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.jid
-    ~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module allows for working with Jabber IDs (JIDs).
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
+# slixmpp.jid
+# ~~~~~~~~~~~~~~~~~~~~~~~
+# This module allows for working with Jabber IDs (JIDs).
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
+from __future__ import annotations
 
 import re
 import socket
 
-from copy import deepcopy
 from functools import lru_cache
-from typing import Optional
+from typing import (
+    Optional,
+    Union,
+)
 
 from slixmpp.stringprep import nodeprep, resourceprep, idna, StringprepError
 
@@ -48,7 +46,7 @@ JID_UNESCAPE_TRANSFORMATIONS = {'\\20': ' ',
 
 # TODO: Find the best cache size for a standard usage.
 @lru_cache(maxsize=1024)
-def _parse_jid(data):
+def _parse_jid(data: str):
     """
     Parse string data into the node, domain, and resource
     components of a JID, if possible.
@@ -311,7 +309,7 @@ class JID:
 
     __slots__ = ('_node', '_domain', '_resource', '_bare', '_full')
 
-    def __init__(self, jid: Optional[str] = None):
+    def __init__(self, jid: Optional[Union[str, 'JID']] = None):
         if not jid:
             self._node = ''
             self._domain = ''
@@ -353,23 +351,23 @@ class JID:
                       else self._bare)
 
     @property
-    def node(self):
+    def node(self) -> str:
         return self._node
 
     @property
-    def domain(self):
+    def domain(self) -> str:
         return self._domain
 
     @property
-    def resource(self):
+    def resource(self) -> str:
         return self._resource
 
     @property
-    def bare(self):
+    def bare(self) -> str:
         return self._bare
 
     @property
-    def full(self):
+    def full(self) -> str:
         return self._full
 
     @node.setter

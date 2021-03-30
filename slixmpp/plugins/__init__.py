@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2010 Nathanael C. Fritz
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2010 Nathanael C. Fritz
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from slixmpp.plugins.base import PluginManager, PluginNotFound, BasePlugin
 from slixmpp.plugins.base import register_plugin, load_plugin
 
@@ -45,6 +42,7 @@ __all__ = [
     'xep_0092',  # Software Version
 #   'xep_0095',  # Legacy Stream Initiation. Don’t automatically load
 #   'xep_0096',  # Legacy SI File Transfer. Don’t automatically load
+    'xep_0100',  # Gateway interaction
     'xep_0106',  # JID Escaping
     'xep_0107',  # User Mood
     'xep_0108',  # User Activity
@@ -112,5 +110,6 @@ __all__ = [
     'xep_0428',  # Message Fallback
     'xep_0437',  # Room Activity Indicators
     'xep_0439',  # Quick Response
+    'xep_0441',  # Message Archive Management Preferences
     'xep_0444',  # Message Reactions
 ]

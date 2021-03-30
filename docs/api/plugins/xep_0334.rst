@@ -1,6 +1,6 @@
 
-XEP 0334
-========
+XEP-0334: Message Processing Hints
+==================================
 
 .. module:: slixmpp.plugins.xep_0334
 

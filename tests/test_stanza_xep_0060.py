@@ -3,9 +3,18 @@ from slixmpp.test import SlixTest
 import slixmpp.plugins.xep_0004 as xep_0004
 import slixmpp.plugins.xep_0060.stanza as pubsub
 from slixmpp.xmlstream.stanzabase import ET
+from slixmpp.xmlstream import register_stanza_plugin
 
 
 class TestPubsubStanzas(SlixTest):
+
+    def setUp(self):
+        register_stanza_plugin(
+            xep_0004.FormField, xep_0004.FieldOption, iterable=True
+        )
+        register_stanza_plugin(
+            xep_0004.Form, xep_0004.FormField, iterable=True
+        )
 
     def testAffiliations(self):
         "Testing iq/pubsub/affiliations/affiliation stanzas"
@@ -305,7 +314,7 @@ class TestPubsubStanzas(SlixTest):
               <create node="testnode2" />
               <configure>
                 <x xmlns="jabber:x:data" type="submit">
-                  <field var="FORM_TYPE">
+                  <field var="FORM_TYPE" type="hidden">
                     <value>http://jabber.org/protocol/pubsub#node_config</value>
                   </field>
                   <field var="pubsub#node_type">

@@ -1,16 +1,15 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from slixmpp.thirdparty import GPG
 
+from asyncio import Future
+
 from slixmpp.stanza import Presence, Message
-from slixmpp.plugins.base import BasePlugin, register_plugin
-from slixmpp.xmlstream import ElementBase, register_stanza_plugin
+from slixmpp.plugins.base import BasePlugin
+from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins.xep_0027 import stanza, Signed, Encrypted
@@ -35,6 +34,9 @@ def _extract_data(data, kind):
 
 
 class XEP_0027(BasePlugin):
+    """
+    XEP-0027: Current Jabber OpenPGP Usage
+    """
 
     name = 'xep_0027'
     description = 'XEP-0027: Current Jabber OpenPGP Usage'
@@ -125,16 +127,36 @@ class XEP_0027(BasePlugin):
         v = self.gpg.verify(template % (data, sig))
         return v
 
-    def set_keyid(self, jid=None, keyid=None):
-        self.api['set_keyid'](jid, args=keyid)
+    def set_keyid(self, jid=None, keyid=None) -> Future:
+        """Set a keyid for a specific JID.
 
-    def get_keyid(self, jid=None):
+        .. versionchanged:: 1.8.0
+            This function now returns a Future.
+        """
+        return self.api['set_keyid'](jid, args=keyid)
+
+    def get_keyid(self, jid=None) -> Future:
+        """Get a keyid for a jid.
+
+        .. versionchanged:: 1.8.0
+            This function now returns a Future.
+        """
         return self.api['get_keyid'](jid)
 
-    def del_keyid(self, jid=None):
-        self.api['del_keyid'](jid)
+    def del_keyid(self, jid=None) -> Future:
+        """Delete a keyid.
 
-    def get_keyids(self):
+        .. versionchanged:: 1.8.0
+            This function now returns a Future.
+        """
+        return self.api['del_keyid'](jid)
+
+    def get_keyids(self) -> Future:
+        """Get stored keyids.
+
+        .. versionchanged:: 1.8.0
+            This function now returns a Future.
+        """
         return self.api['get_keyids']()
 
     def _handle_signed_presence(self, pres):

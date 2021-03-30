@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.xmlstream.handler.callback
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.xmlstream.handler.callback
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 from slixmpp.xmlstream.handler.base import BaseHandler
 from slixmpp.xmlstream.asyncio import asyncio
 

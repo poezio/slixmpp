@@ -1,10 +1,7 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from typing import Optional
 
 from slixmpp import JID, Message
@@ -19,7 +16,7 @@ class XEP_0425(BasePlugin):
     '''XEP-0425: Message Moderation'''
 
     name = 'xep_0425'
-    description = 'Message Moderation'
+    description = 'XEP-0425: Message Moderation'
     dependencies = {'xep_0424', 'xep_0421'}
     stanza = stanza
     namespace = stanza.NS

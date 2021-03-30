@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import copy
 import logging
 
@@ -22,6 +19,7 @@ class Form(ElementBase):
     namespace = 'jabber:x:data'
     name = 'x'
     plugin_attrib = 'form'
+    plugin_multi_attrib = 'forms'
     interfaces = OrderedSet(('instructions', 'reported', 'title', 'type', 'items', 'values'))
     sub_interfaces = {'title'}
     form_types = {'cancel', 'form', 'result', 'submit'}
@@ -50,7 +48,8 @@ class Form(ElementBase):
             fields = self.get_fields()
             for var in fields:
                 field = fields[var]
-                del field['type']
+                if field['type'] != 'hidden':
+                    del field['type']
                 del field['label']
                 del field['desc']
                 del field['required']
@@ -76,7 +75,8 @@ class Form(ElementBase):
                 for option in options:
                     field.add_option(**option)
         else:
-            del field['type']
+            if field['type'] != 'hidden':
+                del field['type']
         self.append(field)
         return field
 

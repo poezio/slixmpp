@@ -1,13 +1,11 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 
 import logging
 
+from asyncio import Future
 from typing import Optional, Callable
 from slixmpp import JID
 from slixmpp.stanza.message import Message
@@ -45,34 +43,27 @@ class XEP_0172(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_nick', UserNick)
 
-    def publish_nick(self, nick: Optional[str] = None,
-                     options: Optional[Form] = None,
-                     ifrom: Optional[JID] = None,
-                     timeout_callback: Optional[Callable] = None,
-                     callback: Optional[Callable] = None,
-                     timeout: Optional[int] = None):
+    def publish_nick(self, nick: Optional[str] = None, **pubsubkwargs) -> Future:
         """
         Publish the user's current nick.
 
         :param nick: The user nickname to publish.
-        :param options: Optional form of publish options.
         """
         nickname = UserNick()
         nickname['nick'] = nick
-        self.xmpp['xep_0163'].publish(nickname, node=UserNick.namespace,
-                                      options=options, ifrom=ifrom,
-                                      callback=callback, timeout=timeout,
-                                      timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            nickname,
+            node=UserNick.namespace,
+            **pubsubkwargs
+        )
 
-    def stop(self, ifrom: Optional[JID] = None,
-             timeout_callback: Optional[Callable] = None,
-              callback: Optional[Callable] = None,
-              timeout: Optional[int] = None):
+    def stop(self, **pubsubkwargs) -> Future:
         """
         Clear existing user nick information to stop notifications.
         """
         nick = UserNick()
-        return self.xmpp['xep_0163'].publish(nick, node=UserNick.namespace,
-                                             ifrom=ifrom, callback=callback,
-                                             timeout=timeout,
-                                             timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            nick,
+            node=UserNick.namespace,
+            **pubsubkwargs
+        )

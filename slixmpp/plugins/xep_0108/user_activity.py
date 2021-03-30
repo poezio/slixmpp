@@ -1,13 +1,12 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2011 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 
 import logging
 
+from asyncio import Future
+from typing import Optional
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0108 import stanza, UserActivity
 
@@ -33,9 +32,8 @@ class XEP_0108(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0163'].register_pep('user_activity', UserActivity)
 
-    def publish_activity(self, general, specific=None, text=None,
-                         options=None, ifrom=None, callback=None,
-                         timeout=None, timeout_callback=None):
+    def publish_activity(self, general: str, specific: Optional[str] = None,
+                         text: Optional[str] = None, **pubsubkwargs) -> Future:
         """
         Publish the user's current activity.
 
@@ -44,24 +42,23 @@ class XEP_0108(BasePlugin):
                          of the general category.
         :param text: Optional natural-language description or reason
                      for the activity.
-        :param options: Optional form of publish options.
         """
         activity = UserActivity()
         activity['value'] = (general, specific)
         activity['text'] = text
-        self.xmpp['xep_0163'].publish(activity, node=UserActivity.namespace,
-                                      options=options, ifrom=ifrom,
-                                      callback=callback,
-                                      timeout=timeout,
-                                      timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            activity,
+            node=UserActivity.namespace,
+            **pubsubkwargs
+        )
 
-    def stop(self, ifrom=None, callback=None, timeout=None,
-             timeout_callback=None):
+    def stop(self, **pubsubkwargs) -> Future:
         """
         Clear existing user activity information to stop notifications.
         """
         activity = UserActivity()
-        self.xmpp['xep_0163'].publish(activity, node=UserActivity.namespace,
-                                      ifrom=ifrom, callback=callback,
-                                      timeout=timeout,
-                                      timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            activity,
+            node=UserActivity.namespace,
+            **pubsubkwargs
+        )

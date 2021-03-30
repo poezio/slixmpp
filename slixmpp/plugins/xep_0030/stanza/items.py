@@ -1,12 +1,34 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2010 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2010 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
+from typing import (
+    Iterable,
+    Optional,
+    Set,
+    Tuple,
+)
+from slixmpp import JID
+from slixmpp.xmlstream import (
+    ElementBase,
+    ET,
+    register_stanza_plugin,
+)
 
-    See the file LICENSE for copying permission.
-"""
 
-from slixmpp.xmlstream import ElementBase, register_stanza_plugin
+class DiscoItem(ElementBase):
+    name = 'item'
+    namespace = 'http://jabber.org/protocol/disco#items'
+    plugin_attrib = name
+    interfaces = {'jid', 'node', 'name'}
+
+    def get_node(self) -> Optional[str]:
+        """Return the item's node name or ``None``."""
+        return self._get_attr('node', None)
+
+    def get_name(self) -> Optional[str]:
+        """Return the item's human readable name, or ``None``."""
+        return self._get_attr('name', None)
 
 
 class DiscoItems(ElementBase):
@@ -14,7 +36,7 @@ class DiscoItems(ElementBase):
     """
     Example disco#items stanzas:
 
-    ::
+    .. code-block:: xml
 
         <iq type="get">
           <query xmlns="http://jabber.org/protocol/disco#items" />
@@ -31,25 +53,24 @@ class DiscoItems(ElementBase):
           </query>
         </iq>
 
-    Stanza Interface:
-    ::
-
-        node  -- The name of the node to either
-                 query or return info from.
-        items -- A list of 3-tuples, where each tuple contains
-                 the JID, node, and name of an item.
-
     """
 
     name = 'query'
     namespace = 'http://jabber.org/protocol/disco#items'
     plugin_attrib = 'disco_items'
+    #: Stanza Interface:
+    #:
+    #: - ``node``: The name of the node to either
+    #:   query or return info from.
+    #: - ``items``: A list of 3-tuples, where each tuple contains
+    #:   the JID, node, and name of an item.
+    #:
     interfaces = {'node', 'items'}
 
     # Cache items
-    _items = set()
+    _items: Set[Tuple[JID, Optional[str]]]
 
-    def setup(self, xml=None):
+    def setup(self, xml: Optional[ET.ElementTree] = None):
         """
         Populate the stanza object using an optional XML object.
 
@@ -62,7 +83,8 @@ class DiscoItems(ElementBase):
         ElementBase.setup(self, xml)
         self._items = {item[0:2] for item in self['items']}
 
-    def add_item(self, jid, node=None, name=None):
+    def add_item(self, jid: JID, node: Optional[str] = None,
+                 name: Optional[str] = None):
         """
         Add a new item element. Each item is required to have a
         JID, but may also specify a node value to reference
@@ -83,7 +105,7 @@ class DiscoItems(ElementBase):
             return True
         return False
 
-    def del_item(self, jid, node=None):
+    def del_item(self, jid: JID, node: Optional[str] = None) -> bool:
         """
         Remove a single item.
 
@@ -99,7 +121,7 @@ class DiscoItems(ElementBase):
                     return True
         return False
 
-    def get_items(self):
+    def get_items(self) -> Set[DiscoItem]:
         """Return all items."""
         items = set()
         for item in self['substanzas']:
@@ -107,7 +129,7 @@ class DiscoItems(ElementBase):
                 items.add((item['jid'], item['node'], item['name']))
         return items
 
-    def set_items(self, items):
+    def set_items(self, items: Iterable[DiscoItem]):
         """
         Set or replace all items. The given items must be in a
         list or set where each item is a tuple of the form:
@@ -128,21 +150,6 @@ class DiscoItems(ElementBase):
         for item in items:
             self.xml.remove(item.xml)
             self.iterables.remove(item)
-
-
-class DiscoItem(ElementBase):
-    name = 'item'
-    namespace = 'http://jabber.org/protocol/disco#items'
-    plugin_attrib = name
-    interfaces = {'jid', 'node', 'name'}
-
-    def get_node(self):
-        """Return the item's node name or ``None``."""
-        return self._get_attr('node', None)
-
-    def get_name(self):
-        """Return the item's human readable name, or ``None``."""
-        return self._get_attr('name', None)
 
 
 register_stanza_plugin(DiscoItems, DiscoItem, iterable=True)

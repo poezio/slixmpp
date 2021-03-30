@@ -1,18 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.util.stringprep_profiles
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module makes it easier to define profiles of stringprep,
-    such as nodeprep and resourceprep for JID validation, and
-    SASLprep for SASL.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2012 Nathanael C. Fritz, Lance J.T. Stout
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.util.stringprep_profiles
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This module makes it easier to define profiles of stringprep,
+# such as nodeprep and resourceprep for JID validation, and
+# SASLprep for SASL.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2012 Nathanael C. Fritz, Lance J.T. Stout
+# :license: MIT, see LICENSE for more details
 
 from __future__ import unicode_literals
 

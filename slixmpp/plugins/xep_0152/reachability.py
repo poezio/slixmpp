@@ -1,12 +1,11 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2013 Nathanael C. Fritz, Lance J.T. Stout
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2013 Nathanael C. Fritz, Lance J.T. Stout
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import logging
+
+from asyncio import Future
 
 from slixmpp import JID
 from typing import Dict, List, Optional, Callable
@@ -37,17 +36,12 @@ class XEP_0152(BasePlugin):
         self.xmpp['xep_0163'].register_pep('reachability', Reachability)
 
     def publish_reachability(self, addresses: List[Dict[str, str]],
-                             options: Optional[Form] = None,
-                             ifrom: Optional[JID] = None,
-                             callback: Optional[Callable] = None,
-                             timeout: Optional[int] = None,
-                             timeout_callback: Optional[Callable] = None):
+                             **pubsubkwargs) -> Future:
         """
         Publish alternative addresses where the user can be reached.
 
         :param addresses: A list of dictionaries containing the URI and
                           optional description for each address.
-        :param options: Optional form of publish options.
         """
         if not isinstance(addresses, (list, tuple)):
             addresses = [addresses]
@@ -60,25 +54,19 @@ class XEP_0152(BasePlugin):
             for key, val in address.items():
                 addr[key] = val
             reach.append(addr)
-        return self.xmpp['xep_0163'].publish(reach,
-                node=Reachability.namespace,
-                options=options,
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout,
-                timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            reach,
+            node=Reachability.namespace,
+            **pubsubkwargs
+        )
 
-    def stop(self, ifrom: Optional[JID] = None,
-             callback: Optional[Callable] = None,
-             timeout: Optional[int] = None,
-             timeout_callback: Optional[Callable] = None):
+    def stop(self, **pubsubkwargs) -> Future:
         """
         Clear existing user activity information to stop notifications.
         """
         reach = Reachability()
-        return self.xmpp['xep_0163'].publish(reach,
-                node=Reachability.namespace,
-                ifrom=ifrom,
-                callback=callback,
-                timeout=timeout,
-                timeout_callback=timeout_callback)
+        return self.xmpp['xep_0163'].publish(
+            reach,
+            node=Reachability.namespace,
+            **pubsubkwargs
+        )

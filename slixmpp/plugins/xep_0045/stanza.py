@@ -1,12 +1,9 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2010 Nathanael C. Fritz
-    Copyright (C) 2020 "Maxime “pep” Buquet <pep@bouah.net>"
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2010 Nathanael C. Fritz
+# Copyright (C) 2020 "Maxime “pep” Buquet <pep@bouah.net>"
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from typing import (
     Iterable,
     Set,

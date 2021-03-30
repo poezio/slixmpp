@@ -83,10 +83,11 @@ setup(
     platforms=['any'],
     packages=packages,
     ext_modules=ext_modules,
-    install_requires=['aiodns>=1.0', 'pyasn1', 'pyasn1_modules'],
+    install_requires=['aiodns>=1.0', 'pyasn1', 'pyasn1_modules', 'typing_extensions; python_version < "3.8.0"'],
     extras_require={
         'XEP-0363': ['aiohttp'],
         'XEP-0444 compliance': ['emoji'],
+        'Safer XML parsing': ['defusedxml'],
     },
     classifiers=CLASSIFIERS,
     cmdclass={'test': TestCommand}

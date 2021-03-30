@@ -1,25 +1,23 @@
-"""
-    slixmpp.xmlstream.xmlstream
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module provides the module for creating and
-    interacting with generic XML streams, along with
-    the necessary eventing infrastructure.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.xmlstream.xmlstream
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This module provides the module for creating and
+# interacting with generic XML streams, along with
+# the necessary eventing infrastructure.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 from typing import (
     Any,
+    Coroutine,
     Callable,
     Iterable,
+    Iterator,
     List,
     Optional,
     Set,
     Union,
+    Tuple,
 )
 
 import functools
@@ -30,7 +28,7 @@ import weakref
 import uuid
 
 from asyncio import iscoroutinefunction, wait, Future
-
+from contextlib import contextmanager
 import xml.etree.ElementTree as ET
 
 from slixmpp.xmlstream.asyncio import asyncio
@@ -88,7 +86,9 @@ class XMLStream(asyncio.BaseProtocol):
         # The socket that is used internally by the transport object
         self.socket = None
 
-        self.connect_loop_wait = 0
+        # The backoff of the connect routine (increases exponentially
+        # after each failure)
+        self._connect_loop_wait = 0
 
         self.parser = None
         self.xml_depth = 0
@@ -157,10 +157,6 @@ class XMLStream(asyncio.BaseProtocol):
         #: non-SSL traffic and another for SSL traffic.
         self.use_ssl = False
 
-        #: If set to ``True``, attempt to connect through an HTTP
-        #: proxy based on the settings in :attr:`proxy_config`.
-        self.use_proxy = False
-
         #: If set to ``True``, attempt to use IPv6.
         self.use_ipv6 = True
 
@@ -172,13 +168,6 @@ class XMLStream(asyncio.BaseProtocol):
         #: Use CDATA for escaping instead of XML entities. Defaults
         #: to ``False``.
         self.use_cdata = False
-
-        #: An optional dictionary of proxy settings. It may provide:
-        #: :host: The host offering proxy services.
-        #: :port: The port for the proxy service.
-        #: :username: Optional username for accessing the proxy.
-        #: :password: Optional password for accessing the proxy.
-        self.proxy_config = {}
 
         #: The default namespace of the stream content, not of the
         #: stream wrapper itself.
@@ -221,7 +210,7 @@ class XMLStream(asyncio.BaseProtocol):
         self._current_connection_attempt = None
 
         #: A list of DNS results that have not yet been tried.
-        self.dns_answers = None
+        self._dns_answers: Optional[Iterator[Tuple[str, str, int]]] = None
 
         #: The service name to check with DNS SRV records. For
         #: example, setting this to ``'xmpp-client'`` would query the
@@ -295,7 +284,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         self.disconnect_reason = None
         self.cancel_connection_attempt()
-        self.connect_loop_wait = 0
+        self._connect_loop_wait = 0
         if host and port:
             self.address = (host, int(port))
         try:
@@ -320,11 +309,11 @@ class XMLStream(asyncio.BaseProtocol):
     async def _connect_routine(self):
         self.event_when_connected = "connected"
 
-        if self.connect_loop_wait > 0:
-            self.event('reconnect_delay', self.connect_loop_wait)
-            await asyncio.sleep(self.connect_loop_wait, loop=self.loop)
+        if self._connect_loop_wait > 0:
+            self.event('reconnect_delay', self._connect_loop_wait)
+            await asyncio.sleep(self._connect_loop_wait, loop=self.loop)
 
-        record = await self.pick_dns_answer(self.default_domain)
+        record = await self._pick_dns_answer(self.default_domain)
         if record is not None:
             host, address, dns_port = record
             port = dns_port if dns_port else self.address[1]
@@ -333,7 +322,7 @@ class XMLStream(asyncio.BaseProtocol):
         else:
             # No DNS records left, stop iterating
             # and try (host, port) as a last resort
-            self.dns_answers = None
+            self._dns_answers = None
 
         if self.use_ssl:
             ssl_context = self.get_ssl_context()
@@ -348,7 +337,7 @@ class XMLStream(asyncio.BaseProtocol):
                                                    self.address[1],
                                                    ssl=ssl_context,
                                                    server_hostname=self.default_domain if self.use_ssl else None)
-            self.connect_loop_wait = 0
+            self._connect_loop_wait = 0
         except Socket.gaierror as e:
             self.event('connection_failed',
                        'No DNS record available for %s' % self.default_domain)
@@ -357,7 +346,7 @@ class XMLStream(asyncio.BaseProtocol):
             self.event("connection_failed", e)
             if self._current_connection_attempt is None:
                 return
-            self.connect_loop_wait = self.connect_loop_wait * 2 + 1
+            self._connect_loop_wait = self._connect_loop_wait * 2 + 1
             self._current_connection_attempt = asyncio.ensure_future(
                 self._connect_routine(),
                 loop=self.loop,
@@ -401,7 +390,7 @@ class XMLStream(asyncio.BaseProtocol):
         self._current_connection_attempt = None
         self.init_parser()
         self.send_raw(self.stream_header)
-        self.dns_answers = None
+        self._dns_answers = None
 
     def data_received(self, data):
         """Called when incoming data is received on the socket.
@@ -545,7 +534,6 @@ class XMLStream(asyncio.BaseProtocol):
             await asyncio.wait_for(
                 self.waiting_queue.join(),
                 wait,
-                loop=self.loop
             )
         except asyncio.TimeoutError:
             wait = 0 # we already consumed the timeout
@@ -786,7 +774,7 @@ class XMLStream(asyncio.BaseProtocol):
             idx += 1
         return False
 
-    async def get_dns_records(self, domain, port=None):
+    async def get_dns_records(self, domain: str, port: Optional[int] = None) -> List[Tuple[str, str, int]]:
         """Get the DNS records for a domain.
 
         :param domain: The domain in question.
@@ -806,7 +794,7 @@ class XMLStream(asyncio.BaseProtocol):
                                     loop=self.loop)
         return result
 
-    async def pick_dns_answer(self, domain, port=None):
+    async def _pick_dns_answer(self, domain: str, port: Optional[int] = None) -> Optional[Tuple[str, str, int]]:
         """Pick a server and port from DNS answers.
 
         Gets DNS answers if none available.
@@ -815,12 +803,12 @@ class XMLStream(asyncio.BaseProtocol):
         :param domain: The domain in question.
         :param port: If the results don't include a port, use this one.
         """
-        if self.dns_answers is None:
+        if self._dns_answers is None:
             dns_records = await self.get_dns_records(domain, port)
-            self.dns_answers = iter(dns_records)
+            self._dns_answers = iter(dns_records)
 
         try:
-            return next(self.dns_answers)
+            return next(self._dns_answers)
         except StopIteration:
             return
 
@@ -863,8 +851,46 @@ class XMLStream(asyncio.BaseProtocol):
         """
         return len(self.__event_handlers.get(name, []))
 
-    def event(self, name, data={}):
+    async def event_async(self, name: str, data: Any = {}):
+        """Manually trigger a custom event, but await coroutines immediately.
+
+        This event generator should only be called in situations when
+        in-order processing of events is important, such as features
+        handling.
+
+        :param name: The name of the event to trigger.
+        :param data: Data that will be passed to each event handler.
+                     Defaults to an empty dictionary, but is usually
+                     a stanza object.
+        """
+        handlers = self.__event_handlers.get(name, [])[:]
+        for handler in handlers:
+            handler_callback, disposable = handler
+            if disposable:
+                # If the handler is disposable, we will go ahead and
+                # remove it now instead of waiting for it to be
+                # processed in the queue.
+                try:
+                    self.__event_handlers[name].remove(handler)
+                except ValueError:
+                    pass
+            # If the callback is a coroutine, schedule it instead of
+            # running it directly
+            if iscoroutinefunction(handler_callback):
+                try:
+                    await handler_callback(data)
+                except Exception as exc:
+                    self.exception(exc)
+            else:
+                try:
+                    handler_callback(data)
+                except Exception as e:
+                    self.exception(e)
+
+    def event(self, name: str, data: Any = {}):
         """Manually trigger a custom event.
+        Coroutine handlers are wrapped into a future and sent into the
+        event loop for their execution, and not awaited.
 
         :param name: The name of the event to trigger.
         :param data: Data that will be passed to each event handler.
@@ -1194,17 +1220,45 @@ class XMLStream(asyncio.BaseProtocol):
 
         :param str event: Event to wait on.
         :param int timeout: Timeout
+        :raises: :class:`asyncio.TimeoutError` when the timeout is reached
         """
         fut = asyncio.Future()
+
         def result_handler(event_data):
             if not fut.done():
                 fut.set_result(event_data)
             else:
-                log.debug("Future registered on event '%s' was alredy done", event)
+                log.debug(
+                    "Future registered on event '%s' was alredy done",
+                    event
+                )
 
         self.add_event_handler(
             event,
             result_handler,
             disposable=True,
         )
-        return await asyncio.wait_for(fut, timeout, loop=self.loop)
+        return await asyncio.wait_for(fut, timeout)
+
+    @contextmanager
+    def event_handler(self, event: str, handler: Callable):
+        """
+        Context manager that adds then removes an event handler.
+        """
+        self.add_event_handler(event, handler)
+        try:
+            yield
+        except Exception as exc:
+            raise
+        finally:
+            self.del_event_handler(event, handler)
+
+    def wrap(self, coroutine: Coroutine[Any, Any, Any]) -> Future:
+        """Make a Future out of a coroutine with the current loop.
+
+        :param coroutine: The coroutine to wrap.
+        """
+        return asyncio.ensure_future(
+            coroutine,
+            loop=self.loop,
+        )

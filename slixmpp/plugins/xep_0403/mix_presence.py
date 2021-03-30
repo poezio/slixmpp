@@ -1,10 +1,7 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
-    This file is part of Slixmpp.
-
-    See the file LICENSE for copying permission.
-"""
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Mathieu Pasquet <mathieui@mathieui.net>
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 from typing import (
     Optional,
     Set,
@@ -27,7 +24,7 @@ class XEP_0403(BasePlugin):
     '''XEP-0403: MIX-Presence'''
 
     name = 'xep_0403'
-    description = 'MIX-Presence'
+    description = 'XEP-0403: MIX-Presence'
     dependencies = {'xep_0369'}
     stanza = stanza
     namespace = stanza.NS

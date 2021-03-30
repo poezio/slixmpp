@@ -1,6 +1,6 @@
 
-XEP 0020
-========
+XEP-0020: Feature Negotiation
+=============================
 
 .. module:: slixmpp.plugins.xep_0020
 

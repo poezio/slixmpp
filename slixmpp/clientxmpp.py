@@ -1,17 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.clientxmpp
-    ~~~~~~~~~~~~~~~~~~~~
 
-    This module provides XMPP functionality that
-    is specific to client connections.
-
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.clientxmpp
+# ~~~~~~~~~~~~~~~~~~~~
+# This module provides XMPP functionality that
+# is specific to client connections.
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 import asyncio
 import logging
 

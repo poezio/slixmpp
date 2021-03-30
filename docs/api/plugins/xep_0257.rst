@@ -1,6 +1,6 @@
 
-XEP 0257
-========
+XEP-0257: Client Certificate Management for SASL EXTERNAL
+=========================================================
 
 .. module:: slixmpp.plugins.xep_0257
 

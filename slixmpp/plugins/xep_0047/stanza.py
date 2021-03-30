@@ -1,3 +1,6 @@
+# Slixmpp: The Slick XMPP Library
+# This file is part of Slixmpp
+# See the file LICENSE for copying permission
 import re
 import base64
 

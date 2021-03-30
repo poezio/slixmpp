@@ -1,11 +1,8 @@
-"""
-    slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Emmanuel Gil Peyrot
-    This file is part of slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Emmanuel Gil Peyrot
+# This file is part of slixmpp.
+# See the file LICENSE for copying permission.
 import logging
 
 from typing import Iterable, Tuple, Optional

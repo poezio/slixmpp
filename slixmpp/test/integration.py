@@ -1,11 +1,8 @@
-"""
-    Slixmpp: The Slick XMPP Library
-    Copyright (C) 2020 Mathieu Pasquet
-    This file is part of Slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# Slixmpp: The Slick XMPP Library
+# Copyright (C) 2020 Mathieu Pasquet
+# This file is part of Slixmpp.
+# See the file LICENSE for copying permission.
 import asyncio
 import os
 try:
@@ -16,7 +13,9 @@ except ImportError:
     # not usable.
     from unittest import TestCase as IsolatedAsyncioTestCase
 from typing import (
+    Dict,
     List,
+    Optional,
 )
 
 from slixmpp import JID
@@ -39,11 +38,14 @@ class SlixIntegration(IsolatedAsyncioTestCase):
         """get a str from an env var"""
         return os.getenv(name)
 
-    def register_plugins(self, plugins: List[str]):
+    def register_plugins(self, plugins: List[str], configs: Optional[List[Dict]] = None):
         """Register plugins on all known clients"""
-        for plugin in plugins:
+        for index, plugin in enumerate(plugins):
             for client in self.clients:
-                client.register_plugin(plugin)
+                if configs is not None:
+                    client.register_plugin(plugin, pconfig=configs[index])
+                else:
+                    client.register_plugin(plugin)
 
     def add_client(self, jid: JID, password: str):
         """Register a new client"""

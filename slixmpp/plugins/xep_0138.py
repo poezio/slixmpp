@@ -1,11 +1,8 @@
-"""
-    slixmpp: The Slick XMPP Library
-    Copyright (C) 2011  Nathanael C. Fritz
-    This file is part of slixmpp.
 
-    See the file LICENSE for copying permission.
-"""
-
+# slixmpp: The Slick XMPP Library
+# Copyright (C) 2011  Nathanael C. Fritz
+# This file is part of slixmpp.
+# See the file LICENSE for copying permission.
 import logging
 import zlib
 

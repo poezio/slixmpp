@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-    slixmpp.exceptions
-    ~~~~~~~~~~~~~~~~~~~~
 
-    Part of Slixmpp: The Slick XMPP Library
-
-    :copyright: (c) 2011 Nathanael C. Fritz
-    :license: MIT, see LICENSE for more details
-"""
-
+# slixmpp.exceptions
+# ~~~~~~~~~~~~~~~~~~~~
+# Part of Slixmpp: The Slick XMPP Library
+# :copyright: (c) 2011 Nathanael C. Fritz
+# :license: MIT, see LICENSE for more details
 
 class XMPPError(Exception):
 
@@ -101,3 +96,17 @@ class IqError(XMPPError):
 
         #: The :class:`~slixmpp.stanza.iq.Iq` error result stanza.
         self.iq = iq
+
+
+class PresenceError(XMPPError):
+    """
+    An exception raised in specific circumstances for presences
+    of type 'error' received.
+    """
+    def __init__(self, pres):
+        super().__init__(
+            condition=pres['error']['condition'],
+            text=pres['error']['text'],
+            etype=pres['error']['type'],
+        )
+        self.presence = pres
