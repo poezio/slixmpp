@@ -18,6 +18,7 @@ from slixmpp.xmlstream.matcher import MatchXPath
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.features.feature_mechanisms import stanza
 
+import asyncio
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class FeatureMechanisms(BasePlugin):
     default_config = {
         'use_mech': None,
         'use_mechs': None,
+        'allow_skip': False,
         'min_mech': None,
         'sasl_callback': None,
         'security_callback': None,
@@ -56,6 +58,8 @@ class FeatureMechanisms(BasePlugin):
         self.mech = None
         self.mech_list = set()
         self.attempted_mechs = set()
+
+        self.auth_finished = asyncio.Event()
 
         register_stanza_plugin(StreamFeatures, stanza.Mechanisms)
 
@@ -127,7 +131,7 @@ class FeatureMechanisms(BasePlugin):
                 result[value] = self.config.get(value, False)
         return result
 
-    def _handle_sasl_auth(self, features):
+    async def _handle_sasl_auth(self, features):
         """
         Handle authenticating using SASL.
 
@@ -156,8 +160,15 @@ class FeatureMechanisms(BasePlugin):
             self.use_mechs = limited_mechs
 
         self.mech_list = set(features['mechanisms'])
+        if self.allow_skip:
+            self.mech_list.add('SKIP')
 
-        return self._send_auth()
+        self.auth_finished.clear()
+        self._send_auth()
+        await self.auth_finished.wait()
+        result = self.auth_result
+        del self.auth_result
+        return result
 
     def _send_auth(self):
         mech_list = self.mech_list - self.attempted_mechs
@@ -175,10 +186,14 @@ class FeatureMechanisms(BasePlugin):
                 # method
                 self.xmpp.event("no_auth")
             self.attempted_mechs = set()
-            return self.xmpp.disconnect()
+            self.xmpp.disconnect()
+            self.auth_result = True
+            self.auth_finished.set()
         except StringPrepError:
             log.exception("A credential value did not pass SASLprep.")
             self.xmpp.disconnect()
+            self.auth_result = True
+            self.auth_finished.set()
 
         resp = stanza.Auth(self.xmpp)
         resp['mechanism'] = self.mech.name
@@ -192,13 +207,16 @@ class FeatureMechanisms(BasePlugin):
                       "A security breach is possible.")
             self.attempted_mechs.add(self.mech.name)
             self.xmpp.disconnect()
+            self.auth_result = True
+            self.auth_finished.set()
         except sasl.SASLFailed:
             self.attempted_mechs.add(self.mech.name)
             self._send_auth()
+        except sasl.SASLSkip:
+            self.auth_result = False
+            self.auth_finished.set()
         else:
             resp.send()
-
-        return True
 
     def _handle_challenge(self, stanza):
         """SASL challenge received. Process and send response."""
@@ -212,6 +230,8 @@ class FeatureMechanisms(BasePlugin):
                       "A security breach is possible.")
             self.attempted_mechs.add(self.mech.name)
             self.xmpp.disconnect()
+            self.auth_result = True
+            self.auth_finished.set()
         except sasl.SASLFailed:
             self.stanza.Abort(self.xmpp).send()
         else:
@@ -228,6 +248,8 @@ class FeatureMechanisms(BasePlugin):
                       "A security breach is possible.")
             self.attempted_mechs.add(self.mech.name)
             self.xmpp.disconnect()
+            self.auth_result = True
+            self.auth_finished.set()
         else:
             self.attempted_mechs = set()
             self.xmpp.authenticated = True
@@ -236,6 +258,8 @@ class FeatureMechanisms(BasePlugin):
             # Restart the stream
             self.xmpp.init_parser()
             self.xmpp.send_raw(self.xmpp.stream_header)
+            self.auth_result = True
+            self.auth_finished.set()
 
     def _handle_fail(self, stanza):
         """SASL authentication failed. Disconnect and shutdown."""

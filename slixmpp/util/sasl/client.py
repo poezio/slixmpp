@@ -100,6 +100,11 @@ class SASLMutualAuthFailed(SASLFailed):
         self.message = value
 
 
+class SASLSkip(Exception):
+    def __init__(self, value=''):
+        self.message = value
+
+
 class Mech(object):
 
     name = 'GENERIC'

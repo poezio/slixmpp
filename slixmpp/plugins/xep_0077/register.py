@@ -31,7 +31,7 @@ class XEP_0077(BasePlugin):
     default_config = {
         'create_account': True,
         'force_registration': False,
-        'order': 50
+        'order': 150
     }
 
     def plugin_init(self):
@@ -48,6 +48,8 @@ class XEP_0077(BasePlugin):
         register_stanza_plugin(Register, self.xmpp['xep_0066'].stanza.OOB)
 
         self.xmpp.add_event_handler('connected', self._force_registration)
+
+        self.xmpp['feature_mechanisms'].allow_skip = True
 
     def plugin_end(self):
         if not self.xmpp.is_component:

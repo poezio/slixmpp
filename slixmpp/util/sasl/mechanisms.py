@@ -23,10 +23,21 @@ from base64 import b64encode, b64decode
 from slixmpp.util import bytes, hash, XOR, quote, num_to_bytes
 from slixmpp.util.sasl.client import sasl_mech, Mech, \
                                        SASLCancelled, SASLFailed, \
-                                       SASLMutualAuthFailed
+                                       SASLMutualAuthFailed, SASLSkip
+
 
 
 @sasl_mech(0)
+class SKIP(Mech):
+    "Skip login altogether"
+    
+    name = 'SKIP'
+
+    def process(self, challenge=b''):
+        raise SASLSkip
+
+
+@sasl_mech(1)
 class ANONYMOUS(Mech):
 
     name = 'ANONYMOUS'
@@ -35,7 +46,7 @@ class ANONYMOUS(Mech):
         return b'Anonymous, Suelta'
 
 
-@sasl_mech(1)
+@sasl_mech(2)
 class LOGIN(Mech):
 
     name = 'LOGIN'
@@ -55,7 +66,7 @@ class LOGIN(Mech):
             return self.credentials['password']
 
 
-@sasl_mech(2)
+@sasl_mech(3)
 class PLAIN(Mech):
 
     name = 'PLAIN'
@@ -136,7 +147,7 @@ class X_OAUTH2(Mech):
                b'\x00' + self.credentials['access_token']
 
 
-@sasl_mech(3)
+@sasl_mech(4)
 class X_GOOGLE_TOKEN(Mech):
 
     name = 'X-GOOGLE-TOKEN'
