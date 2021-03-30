@@ -94,7 +94,10 @@ class XEP_0077(BasePlugin):
 
         self.xmpp.add_event_handler('connected', self._force_registration)
 
-        self.xmpp['feature_mechanisms'].allow_skip = True
+        try:
+            self.xmpp['feature_mechanisms'].allow_skip = True
+        except AttributeError:
+            pass
 
     def plugin_end(self):
         if not self.xmpp.is_component:
