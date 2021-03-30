@@ -60,7 +60,9 @@ class XEP_0077(BasePlugin):
     default_config = {
         'create_account': True,
         'force_registration': False,
-        'order': 150
+        'order': 150,
+        "form_fields": {"username", "password"},
+        "form_instructions": "Enter your credentials",
     }
 
     def plugin_init(self):
