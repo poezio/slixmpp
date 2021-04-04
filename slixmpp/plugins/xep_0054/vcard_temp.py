@@ -4,7 +4,6 @@
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
 import logging
-from asyncio import Future
 from typing import Optional
 
 from slixmpp import JID
@@ -15,7 +14,6 @@ from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0054 import VCardTemp, stanza
-from slixmpp import future_wrapper
 
 
 log = logging.getLogger(__name__)

@@ -27,11 +27,11 @@ import ssl
 import weakref
 import uuid
 
+import asyncio
 from asyncio import iscoroutinefunction, wait, Future
 from contextlib import contextmanager
 import xml.etree.ElementTree as ET
 
-from slixmpp.xmlstream.asyncio import asyncio
 from slixmpp.xmlstream import tostring
 from slixmpp.xmlstream.stanzabase import StanzaBase, ElementBase
 from slixmpp.xmlstream.resolver import resolve, default_resolver

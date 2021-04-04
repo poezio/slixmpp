@@ -1,4 +1,3 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2015 Emmanuel Gil Peyrot
 # This file is part of Slixmpp.
@@ -7,11 +6,10 @@ import asyncio
 import logging
 from uuid import uuid4
 
-from slixmpp.plugins import BasePlugin, register_plugin
-from slixmpp import future_wrapper, Iq, Message
-from slixmpp.exceptions import XMPPError, IqError, IqTimeout
+from slixmpp.plugins import BasePlugin
+from slixmpp import Iq, Message
 from slixmpp.jid import JID
-from slixmpp.xmlstream import JID, register_stanza_plugin
+from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins.xep_0070 import stanza, Confirm
@@ -52,7 +50,6 @@ class XEP_0070(BasePlugin):
     def session_bind(self, jid):
         self.xmpp['xep_0030'].add_feature('http://jabber.org/protocol/http-auth')
 
-    @future_wrapper
     def ask_confirm(self, jid, id, url, method, *, ifrom=None, message=None):
         jid = JID(jid)
         if jid.resource:
@@ -70,7 +67,9 @@ class XEP_0070(BasePlugin):
             if message is not None:
                 stanza['body'] = message.format(id=id, url=url, method=method)
             stanza.send()
-            return stanza
+            fut = asyncio.Future()
+            fut.set_result(stanza)
+            return fut
         else:
             return stanza.send()
 

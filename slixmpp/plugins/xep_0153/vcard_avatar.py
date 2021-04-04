@@ -17,7 +17,6 @@ from slixmpp.exceptions import XMPPError, IqTimeout, IqError
 from slixmpp.xmlstream import register_stanza_plugin, ElementBase
 from slixmpp.plugins.base import BasePlugin
 from slixmpp.plugins.xep_0153 import stanza, VCardTempUpdate
-from slixmpp import future_wrapper
 
 
 log = logging.getLogger(__name__)
