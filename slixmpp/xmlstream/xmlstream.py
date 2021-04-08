@@ -223,11 +223,20 @@ class XMLStream(asyncio.BaseProtocol):
         #: An asyncio Future being done when the stream is disconnected.
         self.disconnected: Future = Future()
 
+        # If the session has been started or not
+        self._session_started = False
+        # If we want to bypass the send() check (e.g. unit tests)
+        self._always_send_everything = False
+
         self.add_event_handler('disconnected', self._remove_schedules)
+        self.add_event_handler('disconnected', self._set_disconnected)
         self.add_event_handler('session_start', self._start_keepalive)
+        self.add_event_handler('session_start', self._set_session_start)
+        self.add_event_handler('session_resumed', self._set_session_start)
 
         self._run_out_filters: Optional[Future] = None
         self.__slow_tasks: List[Future] = []
+        self.__queued_stanzas: List[Tuple[StanzaBase, bool]] = []
 
     @property
     def loop(self):
@@ -247,6 +256,17 @@ class XMLStream(asyncio.BaseProtocol):
         are unique in this stream.
         """
         return uuid.uuid4().hex
+
+    def _set_session_start(self, event):
+        """
+        On session start, queue all pending stanzas to be sent.
+        """
+        self._session_started = True
+        for stanza in self.__queued_stanzas:
+            self.waiting_queue.put_nowait(stanza)
+
+    def _set_disconnected(self, event):
+        self._session_started = False
 
     def _set_disconnected_future(self):
         """Set the self.disconnected future on disconnect"""
@@ -1115,6 +1135,17 @@ class XMLStream(asyncio.BaseProtocol):
                                  filters is useful when resending stanzas.
                                  Defaults to ``True``.
         """
+        # When not connected, allow features/starttls/etc to go through
+        # but not stanzas or arbitrary payloads.
+        if not self._always_send_everything and not self._session_started:
+            # Avoid circular imports
+            from slixmpp.stanza.rootstanza import RootStanza
+            from slixmpp.stanza import Iq
+            is_bind = isinstance(data, Iq) and data.get_plugin('bind', check=True)
+            if isinstance(data, (RootStanza, str)) and not is_bind:
+                self.__queued_stanzas.append(data)
+                log.debug('NOT SENT: %s %s', type(data), data)
+                return
         self.waiting_queue.put_nowait((data, use_filters))
 
     def send_xml(self, data):
