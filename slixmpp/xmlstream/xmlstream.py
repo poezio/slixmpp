@@ -35,6 +35,7 @@ from slixmpp.xmlstream.asyncio import asyncio
 from slixmpp.xmlstream import tostring
 from slixmpp.xmlstream.stanzabase import StanzaBase, ElementBase
 from slixmpp.xmlstream.resolver import resolve, default_resolver
+from slixmpp.stanza.rootstanza import RootStanza
 
 #: The time in seconds to wait before timing out waiting for response stanzas.
 RESPONSE_TIMEOUT = 30
@@ -198,6 +199,9 @@ class XMLStream(asyncio.BaseProtocol):
         #: if the connection is terminated.
         self.end_session_on_disconnect = True
 
+        # If the session has been started or not
+        self._session_started = False
+
         #: A mapping of XML namespaces to well-known prefixes.
         self.namespace_map = {StanzaBase.xml_ns: 'xml'}
 
@@ -224,10 +228,14 @@ class XMLStream(asyncio.BaseProtocol):
         self.disconnected: Future = Future()
 
         self.add_event_handler('disconnected', self._remove_schedules)
+        self.add_event_handler('disconnected', self._set_disconnected)
         self.add_event_handler('session_start', self._start_keepalive)
+        self.add_event_handler('session_start', self._set_session_start)
+        self.add_event_handler('session_resumed', self._set_session_start)
 
         self._run_out_filters: Optional[Future] = None
         self.__slow_tasks: List[Future] = []
+        self.__queued_stanzas = List[Tuple[StanzaBase, bool]] = []
 
     @property
     def loop(self):
@@ -247,6 +255,17 @@ class XMLStream(asyncio.BaseProtocol):
         are unique in this stream.
         """
         return uuid.uuid4().hex
+
+    def _set_session_start(self, event):
+        """
+        On session start, queue all pending stanzas to be sent.
+        """
+        self._session_started = True
+        for stanza in self.__queued_stanzas:
+            self.waiting_queue.put_nowait(stanza)
+
+    def _set_disconnected(self, event):
+        self._session_started = False
 
     def _set_disconnected_future(self):
         """Set the self.disconnected future on disconnect"""
@@ -1115,7 +1134,12 @@ class XMLStream(asyncio.BaseProtocol):
                                  filters is useful when resending stanzas.
                                  Defaults to ``True``.
         """
-        self.waiting_queue.put_nowait((data, use_filters))
+        # When not connected, allow features/starttls/etc to go through
+        # but not stanzas or arbitrary payloads.
+        if not self._session_started and isinstance(data, (RootStanza, str)):
+            self.__queued_stanzas.append(data)
+        else:
+            self.waiting_queue.put_nowait((data, use_filters))
 
     def send_xml(self, data):
         """Send an XML object on the stream
