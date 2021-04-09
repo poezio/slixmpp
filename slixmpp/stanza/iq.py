@@ -58,14 +58,14 @@ class Iq(RootStanza):
     types = {'get', 'result', 'set', 'error'}
     plugin_attrib = name
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, recv=False, **kwargs):
         """
         Initialize a new <iq> stanza with an 'id' value.
 
         Overrides StanzaBase.__init__.
         """
         StanzaBase.__init__(self, *args, **kwargs)
-        if self['id'] == '':
+        if not recv and self['id'] == '':
             if self.stream is not None:
                 self['id'] = self.stream.new_id()
             else:

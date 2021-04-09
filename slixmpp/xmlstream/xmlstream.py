@@ -1157,7 +1157,7 @@ class XMLStream(asyncio.BaseProtocol):
                xml.tag == stanza_class.tag_name():
                 stanza_type = stanza_class
                 break
-        stanza = stanza_type(self, xml)
+        stanza = stanza_type(self, xml, recv=True)
         if stanza['lang'] is None and self.peer_default_lang:
             stanza['lang'] = self.peer_default_lang
         return stanza
