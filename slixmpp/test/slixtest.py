@@ -334,6 +334,7 @@ class SlixTest(unittest.TestCase):
                                       plugin_config=plugin_config)
         else:
             raise ValueError("Unknown XMPP connection mode.")
+        self.xmpp._always_send_everything = True
 
         self.xmpp.connection_made(TestTransport(self.xmpp))
         self.xmpp.session_bind_event.set()
