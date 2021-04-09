@@ -1381,7 +1381,7 @@ class StanzaBase(ElementBase):
     namespace = 'jabber:client'
 
     def __init__(self, stream=None, xml=None, stype=None,
-                 sto=None, sfrom=None, sid=None, parent=None):
+                 sto=None, sfrom=None, sid=None, parent=None, recv=False):
         self.stream = stream
         if stream is not None:
             self.namespace = stream.default_ns

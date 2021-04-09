@@ -53,14 +53,14 @@ class Message(RootStanza):
     lang_interfaces = sub_interfaces
     types = {'normal', 'chat', 'headline', 'error', 'groupchat'}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, recv=False, **kwargs):
         """
         Initialize a new <message /> stanza with an optional 'id' value.
 
         Overrides StanzaBase.__init__.
         """
         StanzaBase.__init__(self, *args, **kwargs)
-        if self['id'] == '':
+        if not recv and self['id'] == '':
             if self.stream is not None and self.stream.use_message_ids:
                 self['id'] = self.stream.new_id()
             else:
