@@ -10,6 +10,7 @@ import logging
 import hashlib
 
 from slixmpp.basexmpp import BaseXMPP
+from slixmpp.stanza import Handshake
 from slixmpp.xmlstream import XMLStream
 from slixmpp.xmlstream import ET
 from slixmpp.xmlstream.matcher import MatchXPath
@@ -123,9 +124,10 @@ class ComponentXMPP(BaseXMPP):
         sid = xml.get('id', '')
         pre_hash = bytes('%s%s' % (sid, self.secret), 'utf-8')
 
-        handshake = ET.Element('{jabber:component:accept}handshake')
-        handshake.text = hashlib.sha1(pre_hash).hexdigest().lower()
-        self.send_xml(handshake)
+        handshake = Handshake()
+        handshake['value'] = hashlib.sha1(pre_hash).hexdigest().lower()
+
+        self.send(handshake)
 
     def _handle_handshake(self, xml):
         """The handshake has been accepted.
