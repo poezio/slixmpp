@@ -487,7 +487,7 @@ class ElementBase(object):
             else:
                 return None if check else self.init_plugin(name, lang)
 
-    def init_plugin(self, attrib, lang=None, existing_xml=None, reuse=True):
+    def init_plugin(self, attrib, lang=None, existing_xml=None, element=None, reuse=True):
         """Enable and initialize a stanza plugin.
 
         :param string attrib: The :attr:`plugin_attrib` value of the
@@ -504,7 +504,10 @@ class ElementBase(object):
         if reuse and (attrib, lang) in self.plugins:
             return self.plugins[(attrib, lang)]
 
-        plugin = plugin_class(parent=self, xml=existing_xml)
+        if element is not None:
+            plugin = element
+        else:
+            plugin = plugin_class(parent=self, xml=existing_xml)
 
         if plugin.is_extension:
             self.plugins[(attrib, None)] = plugin
@@ -1172,14 +1175,18 @@ class ElementBase(object):
             else:
                 raise TypeError
         self.xml.append(item.xml)
-        self.iterables.append(item)
-        if item.__class__ in self.plugin_iterables:
-            if item.__class__.plugin_multi_attrib:
-                self.init_plugin(item.__class__.plugin_multi_attrib)
-        elif item.__class__ == self.plugin_tag_map.get(item.tag_name(), None):
+        if item.__class__ == self.plugin_tag_map.get(item.tag_name(), None):
             self.init_plugin(item.plugin_attrib,
                              existing_xml=item.xml,
+                             element=item,
                              reuse=False)
+        elif item.__class__ in self.plugin_iterables:
+            self.iterables.append(item)
+            if item.__class__.plugin_multi_attrib:
+                self.init_plugin(item.__class__.plugin_multi_attrib)
+        else:
+            self.iterables.append(item)
+
         return self
 
     def appendxml(self, xml):
@@ -1269,14 +1276,14 @@ class ElementBase(object):
 
         # Check that this stanza is a superset of the other stanza.
         values = self.values
+        other_values = other.values
         for key in other.keys():
-            if key not in values or values[key] != other[key]:
+            if key not in values or values.get(key) != other_values.get(key):
                 return False
 
         # Check that the other stanza is a superset of this stanza.
-        values = other.values
         for key in self.keys():
-            if key not in values or values[key] != self[key]:
+            if key not in values or other_values.get(key) != values.get(key):
                 return False
 
         # Both stanzas are supersets of each other, therefore they
