@@ -22,7 +22,8 @@ class TestPrivateStorage(SlixIntegration):
             el,
         )
         result = await self.clients[0]['xep_0049'].retrieve('bookmarks')
-        self.assertEqual(str(result['private']['bookmarks']), str(el))
+
+        self.assertEqual(result['private']['bookmarks'], el)
 
         # Purge bookmarks
         await self.clients[0]['xep_0049'].store(

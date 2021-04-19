@@ -1140,9 +1140,12 @@ class XMLStream(asyncio.BaseProtocol):
         if not self._always_send_everything and not self._session_started:
             # Avoid circular imports
             from slixmpp.stanza.rootstanza import RootStanza
-            from slixmpp.stanza import Iq
-            is_bind = isinstance(data, Iq) and data.get_plugin('bind', check=True)
-            if isinstance(data, (RootStanza, str)) and not is_bind:
+            from slixmpp.stanza import Iq, Handshake
+            passthrough = (
+                (isinstance(data, Iq) and data.get_plugin('bind', check=True))
+                or isinstance(data, Handshake)
+            )
+            if isinstance(data, (RootStanza, str)) and not passthrough:
                 self.__queued_stanzas.append(data)
                 log.debug('NOT SENT: %s %s', type(data), data)
                 return
