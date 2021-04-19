@@ -11,9 +11,13 @@ class TestUserAvatar(SlixIntegration):
             self.envjid('CI_ACCOUNT1'),
             self.envstr('CI_ACCOUNT1_PASSWORD'),
         )
-        self.register_plugins(['xep_0084'])
+        self.register_plugins(['xep_0084', 'xep_0115'])
         self.data = b'coucou coucou'
         await self.connect_clients()
+        await asyncio.gather(
+            self.clients[0]['xep_0115'].update_caps(),
+            self.clients[1]['xep_0115'].update_caps(),
+        )
 
     async def _clear_avatar(self):
         """Utility for purging remote state"""
