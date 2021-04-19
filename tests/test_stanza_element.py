@@ -456,6 +456,7 @@ class TestElementBase(SlixTest):
 
         class TestSubStanza(ElementBase):
             name = "sub"
+            plugin_attrib = name
             namespace = "baz"
             interfaces = {'attrib'}
 
