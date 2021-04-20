@@ -7,6 +7,7 @@
 # This software is licensed as described in the README.rst and LICENSE
 # file, which you should have received as part of this distribution.
 
+import runpy
 import os
 from pathlib import Path
 from subprocess import call, DEVNULL, check_output, CalledProcessError
@@ -17,9 +18,10 @@ except ImportError:
     from distutils.core import setup
 
 from run_tests import TestCommand
-from slixmpp.version import __version__
 
-VERSION = __version__
+version_mod = runpy.run_path('slixmpp/version.py')
+VERSION = version_mod['__version__']
+
 DESCRIPTION = ('Slixmpp is an elegant Python library for XMPP (aka Jabber).')
 with open('README.rst', encoding='utf8') as readme:
     LONG_DESCRIPTION = readme.read()
