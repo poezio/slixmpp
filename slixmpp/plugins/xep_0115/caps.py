@@ -8,6 +8,7 @@ import hashlib
 import base64
 
 from asyncio import Future
+from typing import Optional
 
 from slixmpp import __version__
 from slixmpp.stanza import StreamFeatures, Presence, Iq
@@ -15,10 +16,10 @@ from slixmpp.xmlstream import register_stanza_plugin, JID
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.util import MemoryCache
-from slixmpp import asyncio
-from slixmpp.exceptions import XMPPError, IqError, IqTimeout
+from slixmpp.exceptions import XMPPError
 from slixmpp.plugins import BasePlugin
 from slixmpp.plugins.xep_0115 import stanza, StaticCaps
+from slixmpp.types import OptJidStr
 
 
 log = logging.getLogger(__name__)
@@ -285,7 +286,17 @@ class XEP_0115(BasePlugin):
         binary = hash(S.encode('utf8')).digest()
         return base64.b64encode(binary).decode('utf-8')
 
-    async def update_caps(self, jid=None, node=None, preserve=False):
+    async def update_caps(self, jid: OptJidStr = None,
+                          node: Optional[str] = None,
+                          preserve: bool = False,
+                          broadcast: bool = True):
+        """Update caps for a local JID based on current data.
+
+        :param jid: JID whose info to update
+        :param node: Node to fetch info from
+        :param broadcast: Send a presence after updating.
+        :param preserve: Send presence only to contacts found in the roster.
+        """
         try:
             info = await self.xmpp['xep_0030'].get_info(jid, node, local=True)
             if isinstance(info, Iq):
@@ -299,7 +310,7 @@ class XEP_0115(BasePlugin):
             await self.cache_caps(ver, info)
             await self.assign_verstring(jid, ver)
 
-            if self.xmpp.sessionstarted and self.broadcast:
+            if broadcast and self.xmpp.sessionstarted and self.broadcast:
                 if self.xmpp.is_component or preserve:
                     for contact in self.xmpp.roster[jid]:
                         self.xmpp.roster[jid][contact].send_last_presence()
