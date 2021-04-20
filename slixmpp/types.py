@@ -16,11 +16,13 @@ try:
     from typing import (
         Literal,
         TypedDict,
+        Protocol,
     )
 except ImportError:
     from typing_extensions import (
         Literal,
         TypedDict,
+        Protocol,
     )
 
 from slixmpp.jid import JID
