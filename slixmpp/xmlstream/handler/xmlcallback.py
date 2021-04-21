@@ -4,6 +4,7 @@
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
 from slixmpp.xmlstream.handler import Callback
+from slixmpp.xmlstream.stanzabase import StanzaBase
 
 
 class XMLCallback(Callback):
@@ -17,7 +18,7 @@ class XMLCallback(Callback):
         run -- Overrides Callback.run
     """
 
-    def run(self, payload, instream=False):
+    def run(self, payload: StanzaBase, instream: bool = False) -> None:
         """
         Execute the callback function with the matched stanza's
         XML contents, instead of the stanza itself.

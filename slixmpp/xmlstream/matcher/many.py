@@ -3,7 +3,9 @@
 # Copyright (C) 2010  Nathanael C. Fritz
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
+from typing import Iterable
 from slixmpp.xmlstream.matcher.base import MatcherBase
+from slixmpp.xmlstream.stanzabase import StanzaBase
 
 
 class MatchMany(MatcherBase):
@@ -18,8 +20,9 @@ class MatchMany(MatcherBase):
     Methods:
         match -- Overrides MatcherBase.match.
     """
+    _criteria: Iterable[MatcherBase]
 
-    def match(self, xml):
+    def match(self, xml: StanzaBase) -> bool:
         """
         Match a stanza against multiple criteria. The match is successful
         if one of the criteria matches.

@@ -3,6 +3,7 @@
 # Copyright (C) 2010  Nathanael C. Fritz
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
+from slixmpp.xmlstream.stanzabase import StanzaBase
 from slixmpp.xmlstream.handler import Waiter
 
 
@@ -17,7 +18,7 @@ class XMLWaiter(Waiter):
         prerun -- Overrides Waiter.prerun
     """
 
-    def prerun(self, payload):
+    def prerun(self, payload: StanzaBase) -> None:
         """
         Store the XML contents of the stanza to return to the
         waiting event handler.

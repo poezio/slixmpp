@@ -1,10 +1,17 @@
-
 # slixmpp.xmlstream.handler.callback
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Part of Slixmpp: The Slick XMPP Library
 # :copyright: (c) 2011 Nathanael C. Fritz
 # :license: MIT, see LICENSE for more details
+from __future__ import annotations
+
+from typing import Optional, Callable, Any, TYPE_CHECKING
 from slixmpp.xmlstream.handler.base import BaseHandler
+from slixmpp.xmlstream.matcher.base import MatcherBase
+
+if TYPE_CHECKING:
+    from slixmpp.xmlstream.stanzabase import StanzaBase
+    from slixmpp.xmlstream.xmlstream import XMLStream
 
 
 class Callback(BaseHandler):
@@ -28,8 +35,6 @@ class Callback(BaseHandler):
     :param matcher: A :class:`~slixmpp.xmlstream.matcher.base.MatcherBase`
                     derived object for matching stanza objects.
     :param pointer: The function to execute during callback.
-    :param bool thread: **DEPRECATED.** Remains only for
-                        backwards compatibility.
     :param bool once: Indicates if the handler should be used only
                       once. Defaults to False.
     :param bool instream: Indicates if the callback should be executed
@@ -38,31 +43,36 @@ class Callback(BaseHandler):
     :param stream: The :class:`~slixmpp.xmlstream.xmlstream.XMLStream`
                    instance this handler should monitor.
     """
+    _once: bool
+    _instream: bool
+    _pointer: Callable[[StanzaBase], Any]
 
-    def __init__(self, name, matcher, pointer, thread=False,
-                 once=False, instream=False, stream=None):
+    def __init__(self, name: str, matcher: MatcherBase,
+                 pointer: Callable[[StanzaBase], Any],
+                 once: bool = False, instream: bool = False,
+                 stream: Optional[XMLStream] = None):
         BaseHandler.__init__(self, name, matcher, stream)
         self._pointer = pointer
         self._once = once
         self._instream = instream
 
-    def prerun(self, payload):
+    def prerun(self, payload: StanzaBase) -> None:
         """Execute the callback during stream processing, if
         the callback was created with ``instream=True``.
 
         :param payload: The matched
-            :class:`~slixmpp.xmlstream.stanzabase.ElementBase` object.
+            :class:`~slixmpp.xmlstream.stanzabase.StanzaBase` object.
         """
         if self._once:
             self._destroy = True
         if self._instream:
             self.run(payload, True)
 
-    def run(self, payload, instream=False):
+    def run(self, payload: StanzaBase, instream: bool = False) -> None:
         """Execute the callback function with the matched stanza payload.
 
         :param payload: The matched
-            :class:`~slixmpp.xmlstream.stanzabase.ElementBase` object.
+            :class:`~slixmpp.xmlstream.stanzabase.StanzaBase` object.
         :param bool instream: Force the handler to execute during stream
                               processing. This should only be used by
                               :meth:`prerun()`. Defaults to ``False``.
