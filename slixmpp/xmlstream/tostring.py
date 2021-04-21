@@ -1,4 +1,3 @@
-
 # slixmpp.xmlstream.tostring
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This module converts XML objects into Unicode strings and
@@ -7,11 +6,20 @@
 # Part of Slixmpp: The Slick XMPP Library
 # :copyright: (c) 2011 Nathanael C. Fritz
 # :license: MIT, see LICENSE for more details
+from __future__ import annotations
+
+from typing import Optional, Set, TYPE_CHECKING
+from xml.etree.ElementTree import Element
+if TYPE_CHECKING:
+    from slixmpp.xmlstream import XMLStream
+
 XML_NS = 'http://www.w3.org/XML/1998/namespace'
 
 
-def tostring(xml=None, xmlns='', stream=None, outbuffer='',
-             top_level=False, open_only=False, namespaces=None):
+def tostring(xml: Optional[Element] = None, xmlns: str = '',
+             stream: Optional[XMLStream] = None, outbuffer: str = '',
+             top_level: bool = False, open_only: bool = False,
+             namespaces: Optional[Set[str]] = None) -> str:
     """Serialize an XML object to a Unicode string.
 
     If an outer xmlns is provided using ``xmlns``, then the current element's
@@ -35,6 +43,8 @@ def tostring(xml=None, xmlns='', stream=None, outbuffer='',
 
     :rtype: Unicode string
     """
+    if xml is None:
+        return ''
     # Add previous results to the start of the output.
     output = [outbuffer]
 
@@ -123,11 +133,12 @@ def tostring(xml=None, xmlns='', stream=None, outbuffer='',
         # Remove namespaces introduced in this context. This is necessary
         # because the namespaces object continues to be shared with other
         # contexts.
-        namespaces.remove(ns)
+        if namespaces is not None:
+            namespaces.remove(ns)
     return ''.join(output)
 
 
-def escape(text, use_cdata=False):
+def escape(text: str, use_cdata: bool = False) -> str:
     """Convert special characters in XML to escape sequences.
 
     :param string text: The XML text to convert.
