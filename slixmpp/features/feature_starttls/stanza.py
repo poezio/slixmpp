@@ -6,7 +6,7 @@
 from slixmpp.xmlstream import StanzaBase, ElementBase
 
 
-class STARTTLS(ElementBase):
+class STARTTLS(StanzaBase):
 
     """
     """
