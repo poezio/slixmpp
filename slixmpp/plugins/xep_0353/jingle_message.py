@@ -44,7 +44,7 @@ class XEP_0353(BasePlugin):
         self.xmpp.register_handler(
             Callback('Proceed',
                 StanzaPath('message/jingle_proceed'),
-                self._handle_accept))
+                self._handle_proceed))
         self.xmpp.register_handler(
             Callback('Rejecting Intent to Start a Session',
                 StanzaPath('message/jingle_reject'),
