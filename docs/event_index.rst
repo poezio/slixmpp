@@ -534,7 +534,7 @@ The current list of plugin prefixes is the following:
 - ``user_activity``: :class:`~.XEP_0108`
 - ``user_tune``: :class:`~.XEP_0118`
 - ``reachability``: :class:`~.XEP_0152`
-- ``user_nick``: :class:`~.XEP_0163`
+- ``user_nick``: :class:`~.XEP_0172`
 - ``user_gaming``: :class:`~.XEP_0196`
 - ``mix_participant_info``: :class:`~.XEP_0369`
 - ``mix_channel_info``: :class:`~.XEP_0369`
