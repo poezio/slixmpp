@@ -52,7 +52,7 @@ class FeatureSTARTTLS(BasePlugin):
         elif self.xmpp.disable_starttls:
             return False
         else:
-            self.xmpp.send(features['starttls'])
+            self.xmpp.send(stanza.STARTTLS())
             return True
 
     async def _handle_starttls_proceed(self, proceed):
