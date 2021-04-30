@@ -1053,11 +1053,13 @@ class XMLStream(asyncio.BaseProtocol):
         """
         data = await task
         self.__slow_tasks.remove(task)
-        for filter in self.__filters['out']:
+        if data is None:
+            return
+        for filter in self.__filters['out'][:]:
             if filter in already_used:
                 continue
             if iscoroutinefunction(filter):
-                data = await task
+                data = await filter(data)
             else:
                 data = filter(data)
             if data is None:
@@ -1093,7 +1095,7 @@ class XMLStream(asyncio.BaseProtocol):
                                     timeout=1,
                                 )
                                 if pending:
-                                    self.slow_tasks.append(task)
+                                    self.__slow_tasks.append(task)
                                     asyncio.ensure_future(
                                         self._continue_slow_send(
                                             task,
@@ -1101,7 +1103,9 @@ class XMLStream(asyncio.BaseProtocol):
                                         ),
                                         loop=self.loop,
                                     )
-                                    raise Exception("Slow coro, rescheduling")
+                                    raise ContinueQueue(
+                                        "Slow coroutine, rescheduling filters"
+                                    )
                                 data = task.result()
                             else:
                                 data = filter(data)
