@@ -264,6 +264,7 @@ class XMLStream(asyncio.BaseProtocol):
         self._session_started = True
         for stanza in self.__queued_stanzas:
             self.waiting_queue.put_nowait(stanza)
+        self.__queued_stanzas = []
 
     def _set_disconnected(self, event):
         self._session_started = False
