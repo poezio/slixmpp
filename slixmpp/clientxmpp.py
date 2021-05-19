@@ -165,6 +165,8 @@ class ClientXMPP(BaseXMPP):
             host, port = (self.boundjid.host, 5222)
             self.dns_service = 'xmpp-client'
 
+        self.init_plugins()
+
         return XMLStream.connect(self, host, port, use_ssl=use_ssl,
                                  force_starttls=force_starttls, disable_starttls=disable_starttls)
 

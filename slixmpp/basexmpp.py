@@ -239,7 +239,6 @@ class BaseXMPP(XMLStream):
             self.event('legacy_protocol')
 
     def process(self, *, forever=True, timeout=None):
-        self.init_plugins()
         XMLStream.process(self, forever=forever, timeout=timeout)
 
     def init_plugins(self):
