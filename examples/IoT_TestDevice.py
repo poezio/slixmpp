@@ -14,6 +14,7 @@ from argparse import ArgumentParser
 from urllib import urlopen
 from getpass import getpass
 
+import asyncio
 import slixmpp
 from slixmpp.plugins.xep_0323.device import Device
 
@@ -164,13 +165,13 @@ if __name__ == '__main__':
         xmpp.beClientOrServer(server=True)
         while not(xmpp.testForRelease()):
             xmpp.connect()
-            xmpp.process(forever=False)
+            asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
             logging.debug("lost connection")
     if args.sensorjid:
         logging.debug("will try to call another device for data")
         xmpp.beClientOrServer(server=False,clientJID=args.sensorjid)
         xmpp.connect()
-        xmpp.process(forever=False)
+        asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
         logging.debug("ready ending")
 
     else:

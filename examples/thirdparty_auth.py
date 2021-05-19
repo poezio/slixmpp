@@ -17,6 +17,7 @@ except ImportError:
     from urllib.parse import urlencode
     from http.client import HTTPSConnection
 
+import asyncio
 import slixmpp
 from slixmpp.xmlstream import JID
 
@@ -217,4 +218,4 @@ if __name__ == '__main__':
     # Google only allows one SASL attempt per connection, so in order to
     # enable the X-GOOGLE-TOKEN mechanism, we'll disable TLS.
     xmpp.connect()
-    xmpp.process()
+    asyncio.get_event_loop().run_forever()

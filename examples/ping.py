@@ -10,6 +10,7 @@ from getpass import getpass
 from argparse import ArgumentParser
 from slixmpp.exceptions import IqError, IqTimeout
 
+import asyncio
 import slixmpp
 
 
@@ -105,4 +106,4 @@ if __name__ == '__main__':
 
     # Connect to the XMPP server and start processing XMPP stanzas.
     xmpp.connect()
-    xmpp.process(forever=False)
+    asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
