@@ -41,8 +41,7 @@ class ClientXMPP(BaseXMPP):
         xmpp = ClientXMPP('user@server.tld/resource', 'password')
         # ... Register plugins and event handlers ...
         xmpp.connect()
-        xmpp.process(block=False) # block=True will block the current
-                                  # thread. By default, block=False
+        asyncio.get_event_loop().run_forever()
 
     :param jid: The JID of the XMPP user account.
     :param password: The password for the XMPP user account.

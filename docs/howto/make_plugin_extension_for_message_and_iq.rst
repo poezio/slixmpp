@@ -137,6 +137,7 @@ Two slixmpp clients should be created in order to check if everything works corr
     from getpass import getpass
     import time
 
+    import asyncio
     import slixmpp
     from slixmpp.xmlstream import ET
 
@@ -190,10 +191,11 @@ Two slixmpp clients should be created in order to check if everything works corr
 
         xmpp.connect()
         try:
-            xmpp.process()
+            asyncio.get_event_loop().run_forever()
         except KeyboardInterrupt:
             try:
                 xmpp.disconnect()
+                asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
             except:
                 pass
 
@@ -204,6 +206,7 @@ Two slixmpp clients should be created in order to check if everything works corr
     from argparse import ArgumentParser
     from getpass import getpass
 
+    import asyncio
     import slixmpp
     import example_plugin
 
@@ -250,10 +253,11 @@ Two slixmpp clients should be created in order to check if everything works corr
 
         xmpp.connect()
         try:
-            xmpp.process()
+            asyncio.get_event_loop().run_forever()
         except KeyboardInterrupt:
             try:
                 xmpp.disconnect()
+                asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
             except:
                 pass
 
@@ -1013,6 +1017,7 @@ The following code presents exactly this:
     from argparse import ArgumentParser
     from getpass import getpass
 
+    import asyncio
     import slixmpp
     import example_plugin
 
@@ -1071,10 +1076,11 @@ The following code presents exactly this:
 
         xmpp.connect()
         try:
-            xmpp.process()
+            asyncio.get_event_loop().run_forever()
         except KeyboardInterrupt:
             try:
                 xmpp.disconnect()
+                asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
             except:
                 pass
 
@@ -1087,6 +1093,7 @@ The following code presents exactly this:
     from getpass import getpass
     import time
 
+    import asyncio
     import slixmpp
     from slixmpp.xmlstream import ET
 
@@ -1222,10 +1229,11 @@ The following code presents exactly this:
 
         xmpp.connect()
         try:
-            xmpp.process()
+            asyncio.get_event_loop().run_forever()
         except KeyboardInterrupt:
             try:
                 xmpp.disconnect()
+                asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
             except:
                 pass
 
@@ -1445,6 +1453,7 @@ Complete code from tutorial
     from getpass import getpass
     import time
 
+    import asyncio
     import slixmpp
     from slixmpp.xmlstream import ET
 
@@ -1594,10 +1603,11 @@ Complete code from tutorial
 
         xmpp.connect()
         try:
-            xmpp.process()
+            asyncio.get_event_loop().run_forever()
         except KeyboardInterrupt:
             try:
                 xmpp.disconnect()
+                asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
             except:
                 pass
 
@@ -1612,6 +1622,7 @@ Complete code from tutorial
     from getpass import getpass
     import time
 
+    import asyncio
     import slixmpp
     from slixmpp.xmlstream import ET
 
@@ -1761,10 +1772,11 @@ Complete code from tutorial
 
         xmpp.connect()
         try:
-            xmpp.process()
+            asyncio.get_event_loop().run_forever()
         except KeyboardInterrupt:
             try:
                 xmpp.disconnect()
+                asyncio.get_event_loop().run_until_complete(xmpp.disconnected)
             except:
                 pass
 

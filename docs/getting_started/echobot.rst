@@ -35,13 +35,11 @@ To get started, here is a brief outline of the structure that the final project 
     #!/usr/bin/env python
     # -*- coding: utf-8 -*-
 
-    import sys
-    import asyncio
     import logging
-    import getpass
-
+    from getpass import getpass
     from argparse import ArgumentParser
 
+    import asyncio
     import slixmpp
 
     '''Here we will create out echo bot class'''
@@ -301,23 +299,24 @@ to :meth:`slixmpp.clientxmpp.ClientXMPP.connect`.
 
         # .. option parsing & echo bot configuration
         xmpp.connect():
-        xmpp.process(forever=True)
+        asyncio.get_event_loop().run_forever()
 
 
 The :meth:`slixmpp.basexmpp.BaseXMPP.connect` will only schedule a connection
 asynchronously. To actually connect, you need to let the event loop take over.
-This is done with the :meth:`slixmpp.basexmpp.BaseXMPP.process` method,
-which can either run forever (``forever=True``, the default), run for a (maximum)
-duration of time (``timeout=n``), and/or run until it gets disconnected (``forever=False``).
+This is done the normal asyncio way, which you can learn about in the `official
+Python documentation <https://docs.python.org/3/library/asyncio-eventloop.html#event-loop-methods>`_.
+Here we are making it run forever, but you can use any asyncio handling you
+want, for instance to integrate slixmpp into an existing event loop.
 
-However, calling ``process()`` is not required if you already have an event loop
-running, so you can handle the logic around it however you like.
+Another common usecase is to make it run only until it gets disconnected, with
+``asyncio.get_event_loop().run_until_complete(xmpp.disconnected)``.
 
 .. note::
 
-    Before slixmpp, :meth:slixmpp.basexmpp.BaseXMPP.process` took ``block`` and ``threaded``
-    arguments. These do not make sense anymore and have been removed. Slixmpp does not use
-    threads at all.
+    In previous versions of slixmpp, there was a ``process()`` method which
+    handled the event loop for you, but it was a very common source of
+    confusion for people unfamiliar with asyncio.
 
 .. _echobot_complete:
 

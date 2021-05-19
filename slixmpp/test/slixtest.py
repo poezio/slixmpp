@@ -350,7 +350,7 @@ class SlixTest(unittest.TestCase):
         self.xmpp._id = 0
         self.xmpp.new_id = new_id
 
-        # Must have the stream header ready for xmpp.process() to work.
+        # Must have the stream header ready for the asyncio loop to work.
         if not header:
             header = self.xmpp.stream_header
 
