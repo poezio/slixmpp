@@ -95,6 +95,8 @@ class ComponentXMPP(BaseXMPP):
 
         self.server_name = self.boundjid.host
 
+        self.init_plugins()
+
         log.debug("Connecting to %s:%s", host, port)
         return XMLStream.connect(self, host=host, port=port,
                                        use_ssl=use_ssl)
