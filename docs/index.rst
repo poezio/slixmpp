@@ -90,7 +90,7 @@ Here's your first Slixmpp Bot:
 
         xmpp = EchoBot('somejid@example.com', 'use_getpass')
         xmpp.connect()
-        xmpp.process()
+        asyncio.get_event_loop().run_forever()
 
 
 Documentation Index
