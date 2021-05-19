@@ -491,24 +491,6 @@ class XMLStream(asyncio.BaseProtocol):
                 loop=self.loop,
             )
 
-    def process(self, *, forever: bool = True, timeout: Optional[int] = None) -> None:
-        """Process all the available XMPP events (receiving or sending data on the
-        socket(s), calling various registered callbacks, calling expired
-        timers, handling signal events, etc).  If timeout is None, this
-        function will run forever. If timeout is a number, this function
-        will return after the given time in seconds.
-        """
-        if timeout is None:
-            if forever:
-                self.loop.run_forever()
-            else:
-                self.loop.run_until_complete(self.disconnected)
-        else:
-            tasks: List[Future] = [asyncio.sleep(timeout, loop=self.loop)]
-            if not forever:
-                tasks.append(self.disconnected)
-            self.loop.run_until_complete(asyncio.wait(tasks, loop=self.loop))
-
     def init_parser(self) -> None:
         """init the XML parser. The parser must always be reset for each new
         connexion
