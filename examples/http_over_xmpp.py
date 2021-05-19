@@ -7,6 +7,7 @@
 # This file is part of slixmpp.
 # See the file LICENSE for copying permission.
 
+import asyncio
 from slixmpp import ClientXMPP
 
 from argparse import ArgumentParser
@@ -89,4 +90,4 @@ if __name__ == '__main__':
 
     xmpp = HTTPOverXMPPClient(args.jid, args.password)
     xmpp.connect()
-    xmpp.process()
+    asyncio.get_event_loop().run_forever()

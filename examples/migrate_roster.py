@@ -6,6 +6,7 @@ import logging
 from getpass import getpass
 from argparse import ArgumentParser
 
+import asyncio
 import slixmpp
 
 
@@ -79,7 +80,7 @@ async def on_session(event):
 old_xmpp.add_event_handler('session_start', on_session)
 
 if old_xmpp.connect():
-    old_xmpp.process(forever=False)
+    asyncio.get_event_loop().run_until_complete(old_xmpp.disconnected)
 
 if not roster:
     print('No roster to migrate')
@@ -106,4 +107,4 @@ async def on_session2(event):
 new_xmpp.add_event_handler('session_start', on_session2)
 
 new_xmpp.connect()
-new_xmpp.process(forever=False)
+asyncio.get_event_loop().run_until_complete(new_xmpp.disconnected)
