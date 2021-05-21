@@ -591,6 +591,19 @@ class XEP_0045(BasePlugin):
             msg['muc']['decline']['reason'] = reason
         self.xmpp.send(msg)
 
+    def request_voice(self, room: JID, role: str, *, mfrom: Optional[JID] = None):
+        """Request voice in a moderated room.
+
+        :param room: Room to request voice from.
+        """
+        #form = self.xmpp['xep_0004'].make_form(ftype='submit')
+        msg = self.xmpp.make_message(room, mfrom=mfrom)
+        form = msg['form']
+        form['type'] = 'submit'
+        form.add_field(var='FORM_TYPE', ftype='hidden', value='http://jabber.org/protocol/muc#request')
+        form.add_field(var='muc#role', ftype='list-single', label='Requested role', value=role)
+        self.xmpp.send(msg)
+
     def jid_in_room(self, room: JID, jid: JID) -> bool:
         """Check if a JID is present in a room.
 
