@@ -80,3 +80,11 @@ JidStr = Union[str, JID]
 OptJidStr = Optional[Union[str, JID]]
 
 MAMDefault = Literal['always', 'never', 'roster']
+
+FilterString = Literal['in', 'out', 'out_sync']
+
+__all__ = [
+    'Protocol', 'TypedDict', 'Literal', 'OptJid', 'JidStr', 'MAMDefault',
+    'PresenceTypes', 'PresenceShows', 'MessageTypes', 'IqTypes', 'MucRole',
+    'MucAffiliation', 'FilterString',
+]
