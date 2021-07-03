@@ -137,7 +137,7 @@ class XMLStream(asyncio.BaseProtocol):
     force_starttls: Optional[bool]
     disable_starttls: Optional[bool]
 
-    waiting_queue: asyncio.Queue[Tuple[Union[StanzaBase, str], bool]]
+    waiting_queue: asyncio.Queue
 
     # A dict of {name: handle}
     scheduled_events: Dict[str, TimerHandle]
@@ -243,7 +243,7 @@ class XMLStream(asyncio.BaseProtocol):
     __filters: _FiltersDict
 
     # Current connection attempt (Future)
-    _current_connection_attempt: Optional[Future[None]]
+    _current_connection_attempt: Optional[Future]
 
     #: A list of DNS results that have not yet been tried.
     _dns_answers: Optional[Iterator[Tuple[str, str, int]]]
@@ -257,7 +257,7 @@ class XMLStream(asyncio.BaseProtocol):
     disconnect_reason: Optional[str]
 
     #: An asyncio Future being done when the stream is disconnected.
-    disconnected: Future[bool]
+    disconnected: Future
 
     # If the session has been started or not
     _session_started: bool
@@ -504,7 +504,7 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.loop.run_until_complete(self.disconnected)
         else:
-            tasks: List[Future[bool]] = [asyncio.sleep(timeout, loop=self.loop)]
+            tasks: List[Future] = [asyncio.sleep(timeout, loop=self.loop)]
             if not forever:
                 tasks.append(self.disconnected)
             self.loop.run_until_complete(asyncio.wait(tasks, loop=self.loop))
@@ -626,7 +626,7 @@ class XMLStream(asyncio.BaseProtocol):
             self._current_connection_attempt.cancel()
             self._current_connection_attempt = None
 
-    def disconnect(self, wait: Union[float, int] = 2.0, reason: Optional[str] = None, ignore_send_queue: bool = False) -> Future[None]:
+    def disconnect(self, wait: Union[float, int] = 2.0, reason: Optional[str] = None, ignore_send_queue: bool = False) -> Future:
         """Close the XML stream and wait for an acknowldgement from the server for
         at most `wait` seconds.  After the given number of seconds has
         passed without a response from the server, or when the server
@@ -665,7 +665,7 @@ class XMLStream(asyncio.BaseProtocol):
         else:
             self._set_disconnected_future()
             self.event("disconnected", reason)
-            future: Future[None] = Future()
+            future: Future = Future()
             future.set_result(None)
             return future
 
@@ -1395,7 +1395,7 @@ class XMLStream(asyncio.BaseProtocol):
         :param int timeout: Timeout
         :raises: :class:`asyncio.TimeoutError` when the timeout is reached
         """
-        fut: Future[Any] = asyncio.Future()
+        fut: Future = asyncio.Future()
 
         def result_handler(event_data: Any) -> None:
             if not fut.done():
@@ -1426,7 +1426,7 @@ class XMLStream(asyncio.BaseProtocol):
         finally:
             self.del_event_handler(event, handler)
 
-    def wrap(self, coroutine: Coroutine[None, None, T]) -> Future[T]:
+    def wrap(self, coroutine: Coroutine[None, None, T]) -> Future:
         """Make a Future out of a coroutine with the current loop.
 
         :param coroutine: The coroutine to wrap.
