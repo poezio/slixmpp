@@ -1,8 +1,9 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2010  Nathanael C. Fritz
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
+from __future__ import annotations
+from typing import Optional
 from slixmpp.xmlstream import ElementBase, ET
 
 
@@ -62,10 +63,10 @@ class Error(ElementBase):
                   'remote-server-timeout', 'resource-constraint',
                   'service-unavailable', 'subscription-required',
                   'undefined-condition', 'unexpected-request'}
-    condition_ns = 'urn:ietf:params:xml:ns:xmpp-stanzas'
+    condition_ns: str = 'urn:ietf:params:xml:ns:xmpp-stanzas'
     types = {'cancel', 'continue', 'modify', 'auth', 'wait'}
 
-    def setup(self, xml=None):
+    def setup(self, xml: Optional[ET.Element]=None):
         """
         Populate the stanza object using an optional XML object.
 
@@ -84,7 +85,7 @@ class Error(ElementBase):
         if self.parent is not None:
             self.parent()['type'] = 'error'
 
-    def get_condition(self):
+    def get_condition(self) -> str:
         """Return the condition element's name."""
         for child in self.xml:
             if "{%s}" % self.condition_ns in child.tag:
@@ -93,7 +94,7 @@ class Error(ElementBase):
                     return cond
         return ''
 
-    def set_condition(self, value):
+    def set_condition(self, value: str) -> Error:
         """
         Set the tag name of the condition element.
 
@@ -105,7 +106,7 @@ class Error(ElementBase):
             self.xml.append(ET.Element("{%s}%s" % (self.condition_ns, value)))
         return self
 
-    def del_condition(self):
+    def del_condition(self) -> None:
         """Remove the condition element."""
         for child in self.xml:
             if "{%s}" % self.condition_ns in child.tag:
@@ -139,14 +140,14 @@ class Error(ElementBase):
     def get_redirect(self):
         return self._get_sub_text('{%s}redirect' % self.condition_ns, '')
 
-    def set_gone(self, value):
+    def set_gone(self, value: str):
         if value:
             del self['condition']
             return self._set_sub_text('{%s}gone' % self.condition_ns, value)
         elif self['condition'] == 'gone':
             del self['condition']
 
-    def set_redirect(self, value):
+    def set_redirect(self, value: str):
         if value:
             del self['condition']
             ns = self.condition_ns

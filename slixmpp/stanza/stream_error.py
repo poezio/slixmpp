@@ -62,13 +62,13 @@ class StreamError(Error, StanzaBase):
         'system-shutdown', 'undefined-condition', 'unsupported-encoding',
         'unsupported-feature', 'unsupported-stanza-type',
         'unsupported-version'}
-    condition_ns = 'urn:ietf:params:xml:ns:xmpp-streams'
+    condition_ns: str = 'urn:ietf:params:xml:ns:xmpp-streams'
 
-    def get_see_other_host(self):
+    def get_see_other_host(self) -> str:
         ns = self.condition_ns
         return self._get_sub_text('{%s}see-other-host' % ns, '')
 
-    def set_see_other_host(self, value):
+    def set_see_other_host(self, value: str) -> None:
         if value:
             del self['condition']
             ns = self.condition_ns
@@ -76,5 +76,5 @@ class StreamError(Error, StanzaBase):
         elif self['condition'] == 'see-other-host':
             del self['condition']
 
-    def del_see_other_host(self):
+    def del_see_other_host(self) -> None:
         self._del_sub('{%s}see-other-host' % self.condition_ns)
