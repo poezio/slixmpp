@@ -8,22 +8,16 @@
 # :license: MIT, see LICENSE for more details
 import asyncio
 import logging
+from typing import Optional, Any, Callable, Tuple
 
 from slixmpp.jid import JID
-from slixmpp.stanza import StreamFeatures
+from slixmpp.stanza import StreamFeatures, Iq
 from slixmpp.basexmpp import BaseXMPP
 from slixmpp.exceptions import XMPPError
+from slixmpp.types import JidStr
 from slixmpp.xmlstream import XMLStream
 from slixmpp.xmlstream.matcher import StanzaPath, MatchXPath
 from slixmpp.xmlstream.handler import Callback, CoroutineCallback
-
-# Flag indicating if DNS SRV records are available for use.
-try:
-    import dns.resolver
-except ImportError:
-    DNSPYTHON = False
-else:
-    DNSPYTHON = True
 
 
 log = logging.getLogger(__name__)
@@ -53,7 +47,7 @@ class ClientXMPP(BaseXMPP):
     :param escape_quotes: **Deprecated.**
     """
 
-    def __init__(self, jid, password, plugin_config=None,
+    def __init__(self, jid: JidStr, password: str, plugin_config=None,
                  plugin_whitelist=None, escape_quotes=True, sasl_mech=None,
                  lang='en', **kwargs):
         if not plugin_whitelist:
@@ -103,7 +97,8 @@ class ClientXMPP(BaseXMPP):
                 CoroutineCallback('Stream Features',
                      MatchXPath('{%s}features' % self.stream_ns),
                      self._handle_stream_features))
-        def roster_push_filter(iq):
+
+        def roster_push_filter(iq: Iq) -> None:
             from_ = iq['from']
             if from_ and from_ != JID('') and from_ != self.boundjid.bare:
                 reply = iq.reply()
@@ -131,15 +126,15 @@ class ClientXMPP(BaseXMPP):
             self['feature_mechanisms'].use_mech = sasl_mech
 
     @property
-    def password(self):
+    def password(self) -> str:
         return self.credentials.get('password', '')
 
     @password.setter
-    def password(self, value):
+    def password(self, value: str) -> None:
         self.credentials['password'] = value
 
-    def connect(self, address=tuple(), use_ssl=False,
-                force_starttls=True, disable_starttls=False):
+    def connect(self, address: Optional[Tuple[str, int]] = None, use_ssl: bool = False,
+            force_starttls: bool = True, disable_starttls: bool = False) -> None:
         """Connect to the XMPP server.
 
         When no address is given, a SRV lookup for the server will
@@ -161,14 +156,15 @@ class ClientXMPP(BaseXMPP):
         # XMPP client port and allow SRV lookup.
         if address:
             self.dns_service = None
+            host, port = address
         else:
-            address = (self.boundjid.host, 5222)
+            host, port = (self.boundjid.host, 5222)
             self.dns_service = 'xmpp-client'
 
-        return XMLStream.connect(self, address[0], address[1], use_ssl=use_ssl,
+        return XMLStream.connect(self, host, port, use_ssl=use_ssl,
                                  force_starttls=force_starttls, disable_starttls=disable_starttls)
 
-    def register_feature(self, name, handler, restart=False, order=5000):
+    def register_feature(self, name: str, handler: Callable, restart: bool = False, order: int = 5000) -> None:
         """Register a stream feature handler.
 
         :param name: The name of the stream feature.
@@ -183,13 +179,13 @@ class ClientXMPP(BaseXMPP):
         self._stream_feature_order.append((order, name))
         self._stream_feature_order.sort()
 
-    def unregister_feature(self, name, order):
+    def unregister_feature(self, name: str, order: int) -> None:
         if name in self._stream_feature_handlers:
             del self._stream_feature_handlers[name]
         self._stream_feature_order.remove((order, name))
         self._stream_feature_order.sort()
 
-    def update_roster(self, jid, **kwargs):
+    def update_roster(self, jid: JID, **kwargs) -> None:
         """Add or change a roster item.
 
         :param jid: The JID of the entry to modify.
@@ -251,7 +247,7 @@ class ClientXMPP(BaseXMPP):
 
         return iq.send(callback, timeout, timeout_callback)
 
-    def _reset_connection_state(self, event=None):
+    def _reset_connection_state(self, event: Optional[Any] = None) -> None:
         #TODO: Use stream state here
         self.authenticated = False
         self.sessionstarted = False
@@ -259,7 +255,7 @@ class ClientXMPP(BaseXMPP):
         self.bindfail = False
         self.features = set()
 
-    async def _handle_stream_features(self, features):
+    async def _handle_stream_features(self, features: StreamFeatures) -> Optional[bool]:
         """Process the received stream features.
 
         :param features: The features stanza.
@@ -278,7 +274,7 @@ class ClientXMPP(BaseXMPP):
         log.debug('Finished processing stream features.')
         self.event('stream_negotiated')
 
-    def _handle_roster(self, iq):
+    def _handle_roster(self, iq: Iq) -> None:
         """Update the roster after receiving a roster stanza.
 
         :param iq: The roster stanza.
@@ -310,7 +306,7 @@ class ClientXMPP(BaseXMPP):
             resp.enable('roster')
             resp.send()
 
-    def _handle_session_bind(self, jid):
+    def _handle_session_bind(self, jid: JID) -> None:
         """Set the client roster to the JID set by the server.
 
         :param :class:`slixmpp.xmlstream.jid.JID` jid: The bound JID as
