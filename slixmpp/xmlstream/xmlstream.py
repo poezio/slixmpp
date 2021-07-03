@@ -137,7 +137,7 @@ class XMLStream(asyncio.BaseProtocol):
     force_starttls: Optional[bool]
     disable_starttls: Optional[bool]
 
-    waiting_queue: asyncio.Queue[Tuple[Union[StanzaBase, str], bool]]
+    waiting_queue: asyncio.Queue
 
     # A dict of {name: handle}
     scheduled_events: Dict[str, TimerHandle]
