@@ -299,17 +299,17 @@ class BaseXMPP(XMLStream):
         """Return a plugin given its name, if it has been registered."""
         return self.plugin.get(key, default)
 
-    def Message(self, *args, **kwargs) -> Message:
+    def Message(self, *args, **kwargs) -> stanza.Message:
         """Create a Message stanza associated with this stream."""
         msg = Message(self, *args, **kwargs)
         msg['lang'] = self.default_lang
         return msg
 
-    def Iq(self, *args, **kwargs) -> Iq:
+    def Iq(self, *args, **kwargs) -> stanza.Iq:
         """Create an Iq stanza associated with this stream."""
         return Iq(self, *args, **kwargs)
 
-    def Presence(self, *args, **kwargs) -> Presence:
+    def Presence(self, *args, **kwargs) -> stanza.Presence:
         """Create a Presence stanza associated with this stream."""
         pres = Presence(self, *args, **kwargs)
         pres['lang'] = self.default_lang
@@ -317,7 +317,7 @@ class BaseXMPP(XMLStream):
 
     def make_iq(self, id: str = "0", ifrom: OptJidStr = None,
                 ito: OptJidStr = None, itype: Optional[IqTypes] = None,
-                iquery: Optional[str] = None) -> Iq:
+                iquery: Optional[str] = None) -> stanza.Iq:
         """Create a new :class:`~.Iq` stanza with a given Id and from JID.
 
         :param id: An ideally unique ID value for this stanza thread.
@@ -341,7 +341,7 @@ class BaseXMPP(XMLStream):
 
     def make_iq_get(self, queryxmlns: Optional[str] =None,
                     ito: OptJidStr = None, ifrom: OptJidStr = None,
-                    iq: Optional[Iq] = None) -> Iq:
+                    iq: Optional[stanza.Iq] = None) -> stanza.Iq:
         """Create an :class:`~.Iq` stanza of type ``'get'``.
 
         Optionally, a query element may be added.
@@ -366,7 +366,7 @@ class BaseXMPP(XMLStream):
 
     def make_iq_result(self, id: Optional[str] = None,
                        ito: OptJidStr = None, ifrom: OptJidStr = None,
-                       iq: Optional[Iq] = None) -> Iq:
+                       iq: Optional[stanza.Iq] = None) -> stanza.Iq:
         """
         Create an :class:`~.Iq` stanza of type
         ``'result'`` with the given ID value.
@@ -393,7 +393,7 @@ class BaseXMPP(XMLStream):
 
     def make_iq_set(self, sub: Optional[Union[ElementBase, ET.Element]] = None,
                     ito: OptJidStr = None, ifrom: OptJidStr = None,
-                    iq: Optional[Iq] = None) -> Iq:
+                    iq: Optional[stanza.Iq] = None) -> stanza.Iq:
         """
         Create an :class:`~.Iq` stanza of type ``'set'``.
 
@@ -454,9 +454,9 @@ class BaseXMPP(XMLStream):
             iq['from'] = ifrom
         return iq
 
-    def make_iq_query(self, iq: Optional[Iq] = None, xmlns: str = '',
+    def make_iq_query(self, iq: Optional[stanza.Iq] = None, xmlns: str = '',
                       ito: OptJidStr = None,
-                      ifrom: OptJidStr = None) -> Iq:
+                      ifrom: OptJidStr = None) -> stanza.Iq:
         """
         Create or modify an :class:`~.Iq` stanza
         to use the given query namespace.
@@ -478,7 +478,7 @@ class BaseXMPP(XMLStream):
             iq['from'] = ifrom
         return iq
 
-    def make_query_roster(self, iq: Optional[Iq] = None) -> ET.Element:
+    def make_query_roster(self, iq: Optional[stanza.Iq] = None) -> ET.Element:
         """Create a roster query element.
 
         :param iq: Optionally use an existing stanza instead
@@ -492,7 +492,7 @@ class BaseXMPP(XMLStream):
                      msubject: Optional[str] = None,
                      mtype: Optional[MessageTypes] = None,
                      mhtml: Optional[str] = None, mfrom: OptJidStr = None,
-                     mnick: Optional[str] = None) -> Message:
+                     mnick: Optional[str] = None) -> stanza.Message:
         """
         Create and initialize a new
         :class:`~.Message` stanza.
@@ -523,7 +523,7 @@ class BaseXMPP(XMLStream):
                       pto: OptJidStr = None,
                       ptype: Optional[PresenceTypes] = None,
                       pfrom: OptJidStr = None,
-                      pnick: Optional[str] = None) -> Presence:
+                      pnick: Optional[str] = None) -> stanza.Presence:
         """
         Create and initialize a new
         :class:`~.Presence` stanza.
