@@ -354,6 +354,15 @@ class JID:
     def bare(self) -> str:
         return self._bare
 
+    @bare.setter
+    def bare(self, value: str):
+        node, domain, resource = _parse_jid(value)
+        assert not resource
+        self._node = node
+        self._domain = domain
+        self._update_bare_full()
+
+
     @property
     def node(self) -> str:
         return self._node
@@ -370,14 +379,6 @@ class JID:
     @domain.setter
     def domain(self, value: str):
         self._domain = _validate_domain(value)
-        self._update_bare_full()
-
-    @bare.setter
-    def bare(self, value: str):
-        node, domain, resource = _parse_jid(value)
-        assert not resource
-        self._node = node
-        self._domain = domain
         self._update_bare_full()
 
     @property
