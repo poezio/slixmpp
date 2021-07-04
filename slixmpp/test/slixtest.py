@@ -17,9 +17,7 @@ from slixmpp.xmlstream.matcher import StanzaPath, MatcherId, MatchIDSender
 from slixmpp.xmlstream.matcher import MatchXMLMask, MatchXPath
 
 import asyncio
-cls = asyncio.get_event_loop().__class__
 
-cls.idle_call = lambda self, callback: callback()
 
 class SlixTest(unittest.TestCase):
 
