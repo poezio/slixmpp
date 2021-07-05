@@ -1,11 +1,9 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2010  Nathanael C. Fritz
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
 from slixmpp.stanza.rootstanza import RootStanza
 from slixmpp.xmlstream import StanzaBase
-from slixmpp.basexmpp import BaseXMPP
 
 
 class Presence(RootStanza):
@@ -70,8 +68,10 @@ class Presence(RootStanza):
         """
         StanzaBase.__init__(self, *args, **kwargs)
         if not recv and self['id'] == '':
-            if isinstance(self.stream, BaseXMPP) and self.stream.use_presence_ids:
-                self['id'] = self.stream.new_id()
+            if self.stream:
+                use_ids = getattr(self.stream, 'use_presence_ids', None)
+                if use_ids:
+                    self['id'] = self.stream.new_id()
 
     def set_show(self, show: str):
         """
