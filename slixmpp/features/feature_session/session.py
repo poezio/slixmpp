@@ -11,6 +11,7 @@ from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins import BasePlugin
 
 from slixmpp.features.feature_session import stanza
+from typing import  ClassVar, Set
 
 
 log = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ class FeatureSession(BasePlugin):
 
     name = 'feature_session'
     description = 'RFC 3920: Stream Feature: Start Session'
-    dependencies = set()
+    dependencies: ClassVar[Set[str]] = set()
     stanza = stanza
 
     def plugin_init(self):
