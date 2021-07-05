@@ -11,11 +11,11 @@ from typing import (
     Optional
 )
 
-from slixmpp.plugins import BasePlugin, register_plugin
-from slixmpp import future_wrapper, JID
+from slixmpp.plugins import BasePlugin
+from slixmpp import JID
 from slixmpp.stanza import Iq
 from slixmpp.exceptions import XMPPError
-from slixmpp.xmlstream import JID, register_stanza_plugin
+from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins.xep_0012 import stanza, LastActivity

@@ -351,34 +351,8 @@ class JID:
                       else self._bare)
 
     @property
-    def node(self) -> str:
-        return self._node
-
-    @property
-    def domain(self) -> str:
-        return self._domain
-
-    @property
-    def resource(self) -> str:
-        return self._resource
-
-    @property
     def bare(self) -> str:
         return self._bare
-
-    @property
-    def full(self) -> str:
-        return self._full
-
-    @node.setter
-    def node(self, value: str):
-        self._node = _validate_node(value)
-        self._update_bare_full()
-
-    @domain.setter
-    def domain(self, value: str):
-        self._domain = _validate_domain(value)
-        self._update_bare_full()
 
     @bare.setter
     def bare(self, value: str):
@@ -388,10 +362,37 @@ class JID:
         self._domain = domain
         self._update_bare_full()
 
+
+    @property
+    def node(self) -> str:
+        return self._node
+
+    @node.setter
+    def node(self, value: str):
+        self._node = _validate_node(value)
+        self._update_bare_full()
+
+    @property
+    def domain(self) -> str:
+        return self._domain
+
+    @domain.setter
+    def domain(self, value: str):
+        self._domain = _validate_domain(value)
+        self._update_bare_full()
+
+    @property
+    def resource(self) -> str:
+        return self._resource
+
     @resource.setter
     def resource(self, value: str):
         self._resource = _validate_resource(value)
         self._update_bare_full()
+
+    @property
+    def full(self) -> str:
+        return self._full
 
     @full.setter
     def full(self, value: str):

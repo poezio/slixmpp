@@ -12,6 +12,8 @@ from slixmpp.xmlstream.matcher import MatchXPath
 from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.features.feature_starttls import stanza
 
+from typing import ClassVar, Set
+
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +22,7 @@ class FeatureSTARTTLS(BasePlugin):
 
     name = 'feature_starttls'
     description = 'RFC 6120: Stream Feature: STARTTLS'
-    dependencies = set()
+    dependencies: ClassVar[Set[str]] = set()
     stanza = stanza
 
     def plugin_init(self):
@@ -52,7 +54,7 @@ class FeatureSTARTTLS(BasePlugin):
         elif self.xmpp.disable_starttls:
             return False
         else:
-            self.xmpp.send(features['starttls'])
+            self.xmpp.send(stanza.STARTTLS())
             return True
 
     async def _handle_starttls_proceed(self, proceed):

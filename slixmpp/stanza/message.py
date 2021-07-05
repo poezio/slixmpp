@@ -61,8 +61,10 @@ class Message(RootStanza):
         """
         StanzaBase.__init__(self, *args, **kwargs)
         if not recv and self['id'] == '':
-            if self.stream is not None and self.stream.use_message_ids:
-                self['id'] = self.stream.new_id()
+            if self.stream:
+                use_ids = getattr(self.stream, 'use_message_ids', None)
+                if use_ids:
+                    self['id'] = self.stream.new_id()
             else:
                 del self['origin_id']
 
@@ -93,8 +95,10 @@ class Message(RootStanza):
 
         self.xml.attrib['id'] = value
 
-        if self.stream and not self.stream.use_origin_id:
-            return None
+        if self.stream:
+            use_orig_ids = getattr(self.stream, 'use_origin_id', None)
+            if not use_orig_ids:
+                return None
 
         sub = self.xml.find(ORIGIN_NAME)
         if sub is not None:

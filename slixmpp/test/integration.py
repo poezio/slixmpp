@@ -11,7 +11,7 @@ except ImportError:
     # Python < 3.8
     # just to make sure the imports do not break, but
     # not usable.
-    from unittest import TestCase as IsolatedAsyncioTestCase
+    from unittest import TestCase as IsolatedAsyncioTestCase  # type: ignore
 from typing import (
     Dict,
     List,

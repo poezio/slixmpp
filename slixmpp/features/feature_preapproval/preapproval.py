@@ -1,4 +1,3 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2012  Nathanael C. Fritz
 # This file is part of Slixmpp.
@@ -9,6 +8,7 @@ from slixmpp.stanza import StreamFeatures
 from slixmpp.features.feature_preapproval import stanza
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.base import BasePlugin
+from typing import ClassVar, Set
 
 
 log = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ class FeaturePreApproval(BasePlugin):
 
     name = 'feature_preapproval'
     description = 'RFC 6121: Stream Feature: Subscription Pre-Approval'
-    dependences = set()
+    dependencies: ClassVar[Set[str]] = set()
     stanza = stanza
 
     def plugin_init(self):

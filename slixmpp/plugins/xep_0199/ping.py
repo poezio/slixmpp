@@ -3,6 +3,7 @@
 # Copyright (C) 2010 Nathanael C. Fritz
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
+import asyncio
 import time
 import logging
 
@@ -11,7 +12,6 @@ from typing import Optional, Callable, List
 
 from slixmpp.jid import JID
 from slixmpp.stanza import Iq
-from slixmpp import asyncio
 from slixmpp.exceptions import IqError, IqTimeout
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.xmlstream.matcher import StanzaPath

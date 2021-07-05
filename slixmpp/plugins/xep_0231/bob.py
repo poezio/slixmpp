@@ -9,14 +9,13 @@ import hashlib
 from asyncio import Future
 from typing import Optional
 
-from slixmpp import future_wrapper, JID
+from slixmpp import JID
 from slixmpp.stanza import Iq, Message, Presence
-from slixmpp.exceptions import XMPPError
 from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins.base import BasePlugin
-from slixmpp.plugins.xep_0231 import stanza, BitsOfBinary
+from slixmpp.plugins.xep_0231 import BitsOfBinary
 
 
 log = logging.getLogger(__name__)

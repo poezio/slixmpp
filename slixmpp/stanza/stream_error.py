@@ -4,7 +4,8 @@
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
 from slixmpp.stanza.error import Error
-from slixmpp.xmlstream import StanzaBase
+from slixmpp.xmlstream import StanzaBase, ET
+from typing import Optional, Dict, Union
 
 
 class StreamError(Error, StanzaBase):
@@ -62,19 +63,20 @@ class StreamError(Error, StanzaBase):
         'system-shutdown', 'undefined-condition', 'unsupported-encoding',
         'unsupported-feature', 'unsupported-stanza-type',
         'unsupported-version'}
-    condition_ns = 'urn:ietf:params:xml:ns:xmpp-streams'
+    condition_ns: str = 'urn:ietf:params:xml:ns:xmpp-streams'
 
-    def get_see_other_host(self):
+    def get_see_other_host(self) -> Union[str, Dict[str, str]]:
         ns = self.condition_ns
         return self._get_sub_text('{%s}see-other-host' % ns, '')
 
-    def set_see_other_host(self, value):
+    def set_see_other_host(self, value: str) -> Optional[ET.Element]:
         if value:
             del self['condition']
             ns = self.condition_ns
             return self._set_sub_text('{%s}see-other-host' % ns, value)
         elif self['condition'] == 'see-other-host':
             del self['condition']
+        return None
 
-    def del_see_other_host(self):
+    def del_see_other_host(self) -> None:
         self._del_sub('{%s}see-other-host' % self.condition_ns)

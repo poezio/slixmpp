@@ -4,6 +4,7 @@
 # See the file LICENSE for copying permission.
 
 from slixmpp.xmlstream import StanzaBase
+from typing import Optional
 
 
 class Handshake(StanzaBase):
@@ -18,7 +19,7 @@ class Handshake(StanzaBase):
     def set_value(self, value: str):
         self.xml.text = value
 
-    def get_value(self) -> str:
+    def get_value(self) -> Optional[str]:
         return self.xml.text
 
     def del_value(self):

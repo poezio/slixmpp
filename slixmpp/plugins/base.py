@@ -12,6 +12,8 @@ import copy
 import logging
 import threading
 
+from typing import Any, Dict, Set, ClassVar
+
 
 log = logging.getLogger(__name__)
 
@@ -250,17 +252,17 @@ class BasePlugin(object):
 
     #: A short name for the plugin based on the implemented specification.
     #: For example, a plugin for XEP-0030 would use `'xep_0030'`.
-    name = ''
+    name: str = ''
 
     #: A longer name for the plugin, describing its purpose. For example,
     #: a plugin for XEP-0030 would use `'Service Discovery'` as its
     #: description value.
-    description = ''
+    description: str = ''
 
     #: Some plugins may depend on others in order to function properly.
     #: Any plugin names included in :attr:`~BasePlugin.dependencies` will
     #: be initialized as needed if this plugin is enabled.
-    dependencies = set()
+    dependencies: ClassVar[Set[str]] = set()
 
     #: The basic, standard configuration for the plugin, which may
     #: be overridden when initializing the plugin. The configuration
@@ -268,7 +270,7 @@ class BasePlugin(object):
     #: the plugin. For example, including the configuration field 'foo'
     #: would mean accessing `plugin.foo` returns the current value of
     #: `plugin.config['foo']`.
-    default_config = {}
+    default_config: ClassVar[Dict[str, Any]] = {}
 
     def __init__(self, xmpp, config=None):
         self.xmpp = xmpp

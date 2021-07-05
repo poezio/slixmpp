@@ -1,4 +1,3 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2010  Nathanael C. Fritz
 # This file is part of Slixmpp.
@@ -61,7 +60,7 @@ class Presence(RootStanza):
              'subscribed', 'unsubscribe', 'unsubscribed'}
     showtypes = {'dnd', 'chat', 'xa', 'away'}
 
-    def __init__(self, *args, recv=False, **kwargs):
+    def __init__(self, *args, recv: bool = False, **kwargs):
         """
         Initialize a new <presence /> stanza with an optional 'id' value.
 
@@ -69,10 +68,12 @@ class Presence(RootStanza):
         """
         StanzaBase.__init__(self, *args, **kwargs)
         if not recv and self['id'] == '':
-            if self.stream is not None and self.stream.use_presence_ids:
-                self['id'] = self.stream.new_id()
+            if self.stream:
+                use_ids = getattr(self.stream, 'use_presence_ids', None)
+                if use_ids:
+                    self['id'] = self.stream.new_id()
 
-    def set_show(self, show):
+    def set_show(self, show: str):
         """
         Set the value of the <show> element.
 
@@ -84,7 +85,7 @@ class Presence(RootStanza):
             self._set_sub_text('show', text=show)
         return self
 
-    def get_type(self):
+    def get_type(self) -> str:
         """
         Return the value of the <presence> stanza's type attribute, or
         the value of the <show> element if valid.
@@ -96,7 +97,7 @@ class Presence(RootStanza):
             out = 'available'
         return out
 
-    def set_type(self, value):
+    def set_type(self, value: str):
         """
         Set the type attribute's value, and the <show> element
         if applicable.
@@ -119,7 +120,7 @@ class Presence(RootStanza):
         self._del_attr('type')
         self._del_sub('show')
 
-    def set_priority(self, value):
+    def set_priority(self, value: int):
         """
         Set the entity's priority value. Some server use priority to
         determine message routing behavior.
