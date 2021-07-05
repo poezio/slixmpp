@@ -1254,7 +1254,7 @@ class XMLStream(asyncio.BaseProtocol):
                     else:
                         str_data = data
                     self.send_raw(str_data)
-                else:
+                elif isinstance(data, (str, bytes)):
                     self.send_raw(data)
             except ContinueQueue as exc:
                 log.debug('Stanza in send queue not sent: %s', exc)
