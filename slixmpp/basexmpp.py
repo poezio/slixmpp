@@ -264,9 +264,9 @@ class BaseXMPP(XMLStream):
         if not pconfig:
             pconfig = self.plugin_config.get(plugin, {})
 
-        if not self.plugin.registered(plugin):
+        if not self.plugin.registered(plugin):  # type: ignore
             load_plugin(plugin, module)
-        self.plugin.enable(plugin, pconfig)
+        self.plugin.enable(plugin, pconfig)  # type: ignore
 
     def register_plugins(self):
         """Register and initialize all built-in plugins.

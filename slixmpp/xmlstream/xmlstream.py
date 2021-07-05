@@ -1183,7 +1183,7 @@ class XMLStream(asyncio.BaseProtocol):
             if filter in already_used:
                 continue
             if iscoroutinefunction(filter):
-                data = await filter(data)
+                data = await filter(data)  # type: ignore
             else:
                 filter = cast(SyncFilter, filter)
                 data = filter(data)

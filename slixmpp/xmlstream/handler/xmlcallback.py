@@ -31,4 +31,4 @@ class XMLCallback(Callback):
                         stream processing. Used only by prerun.
                         Defaults to False.
         """
-        Callback.run(self, payload.xml, instream)
+        Callback.run(self, payload.xml, instream)  # type: ignore

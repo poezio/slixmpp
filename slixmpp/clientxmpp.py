@@ -133,8 +133,9 @@ class ClientXMPP(BaseXMPP):
     def password(self, value: str) -> None:
         self.credentials['password'] = value
 
-    def connect(self, address: Optional[Tuple[str, int]] = None, use_ssl: bool = False,
-            force_starttls: bool = True, disable_starttls: bool = False) -> None:
+    def connect(self, address: Optional[Tuple[str, int]] = None,  # type: ignore
+                use_ssl: bool = False, force_starttls: bool = True,
+                disable_starttls: bool = False) -> None:
         """Connect to the XMPP server.
 
         When no address is given, a SRV lookup for the server will

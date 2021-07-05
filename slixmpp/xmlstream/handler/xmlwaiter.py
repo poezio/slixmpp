@@ -28,4 +28,4 @@ class XMLWaiter(Waiter):
         Arguments:
             payload -- The matched stanza object.
         """
-        Waiter.prerun(self, payload.xml)
+        Waiter.prerun(self, payload.xml)  # type: ignore
