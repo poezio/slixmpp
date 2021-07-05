@@ -415,7 +415,7 @@ class BaseXMPP(XMLStream):
         if not iq:
             iq = self.Iq()
         iq['type'] = 'set'
-        if sub != None:
+        if sub is not None:
             iq.append(sub)
         if ito:
             iq['to'] = ito

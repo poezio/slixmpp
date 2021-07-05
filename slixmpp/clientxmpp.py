@@ -8,7 +8,7 @@
 # :license: MIT, see LICENSE for more details
 import asyncio
 import logging
-from typing import Optional, Any, Callable, Tuple
+from typing import Optional, Any, Callable, Tuple, Dict, Set, List
 
 from slixmpp.jid import JID
 from slixmpp.stanza import StreamFeatures, Iq
@@ -16,6 +16,7 @@ from slixmpp.basexmpp import BaseXMPP
 from slixmpp.exceptions import XMPPError
 from slixmpp.types import JidStr
 from slixmpp.xmlstream import XMLStream
+from slixmpp.xmlstream.stanzabase import StanzaBase
 from slixmpp.xmlstream.matcher import StanzaPath, MatchXPath
 from slixmpp.xmlstream.handler import Callback, CoroutineCallback
 
@@ -63,7 +64,7 @@ class ClientXMPP(BaseXMPP):
         self.default_port = 5222
         self.default_lang = lang
 
-        self.credentials = {}
+        self.credentials: Dict[str, str] = {}
 
         self.password = password
 
@@ -75,9 +76,9 @@ class ClientXMPP(BaseXMPP):
                 "version='1.0'")
         self.stream_footer = "</stream:stream>"
 
-        self.features = set()
-        self._stream_feature_handlers = {}
-        self._stream_feature_order = []
+        self.features: Set[str] = set()
+        self._stream_feature_handlers: Dict[str, Tuple[Callable, bool]] = {}
+        self._stream_feature_order: List[Tuple[int, str]] = []
 
         self.dns_service = 'xmpp-client'
 
@@ -94,11 +95,14 @@ class ClientXMPP(BaseXMPP):
         self.register_stanza(StreamFeatures)
 
         self.register_handler(
-                CoroutineCallback('Stream Features',
-                     MatchXPath('{%s}features' % self.stream_ns),
-                     self._handle_stream_features))
+            CoroutineCallback(
+                'Stream Features',
+                MatchXPath('{%s}features' % self.stream_ns),
+                self._handle_stream_features,  # type: ignore
+            )
+        )
 
-        def roster_push_filter(iq: Iq) -> None:
+        def roster_push_filter(iq: StanzaBase) -> None:
             from_ = iq['from']
             if from_ and from_ != JID('') and from_ != self.boundjid.bare:
                 reply = iq.reply()
@@ -274,6 +278,7 @@ class ClientXMPP(BaseXMPP):
                     return True
         log.debug('Finished processing stream features.')
         self.event('stream_negotiated')
+        return None
 
     def _handle_roster(self, iq: Iq) -> None:
         """Update the roster after receiving a roster stanza.
