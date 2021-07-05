@@ -47,7 +47,6 @@ class CoroutineCallback(BaseHandler):
 
     _once: bool
     _instream: bool
-    _pointer: CoroutineFunction
 
     def __init__(self, name: str, matcher: MatcherBase,
                  pointer: CoroutineFunction, once: bool = False,
@@ -62,7 +61,7 @@ class CoroutineCallback(BaseHandler):
             except Exception as e:
                 stanza.exception(e)
 
-        self._pointer = pointer_wrapper
+        self._pointer: CoroutineFunction = pointer_wrapper
         self._once = once
         self._instream = instream
 

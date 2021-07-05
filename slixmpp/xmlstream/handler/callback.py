@@ -45,13 +45,13 @@ class Callback(BaseHandler):
     """
     _once: bool
     _instream: bool
-    _pointer: Callable[[StanzaBase], Any]
 
     def __init__(self, name: str, matcher: MatcherBase,
                  pointer: Callable[[StanzaBase], Any],
                  once: bool = False, instream: bool = False,
                  stream: Optional[XMLStream] = None):
         BaseHandler.__init__(self, name, matcher, stream)
+        self._pointer: Callable[[StanzaBase], Any] = pointer
         self._pointer = pointer
         self._once = once
         self._instream = instream
