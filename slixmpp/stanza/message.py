@@ -5,6 +5,7 @@
 # See the file LICENSE for copying permission.
 from slixmpp.stanza.rootstanza import RootStanza
 from slixmpp.xmlstream import StanzaBase, ET
+from slixmpp.basexmpp import BaseXMPP
 
 
 ORIGIN_NAME = '{urn:xmpp:sid:0}origin-id'
@@ -61,7 +62,7 @@ class Message(RootStanza):
         """
         StanzaBase.__init__(self, *args, **kwargs)
         if not recv and self['id'] == '':
-            if self.stream is not None and self.stream.use_message_ids:
+            if isinstance(self.stream, BaseXMPP) and self.stream.use_message_ids:
                 self['id'] = self.stream.new_id()
             else:
                 del self['origin_id']
@@ -93,7 +94,7 @@ class Message(RootStanza):
 
         self.xml.attrib['id'] = value
 
-        if self.stream and not self.stream.use_origin_id:
+        if isinstance(self.stream, BaseXMPP) and not self.stream.use_origin_id:
             return None
 
         sub = self.xml.find(ORIGIN_NAME)

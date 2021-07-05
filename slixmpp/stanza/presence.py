@@ -5,6 +5,7 @@
 # See the file LICENSE for copying permission.
 from slixmpp.stanza.rootstanza import RootStanza
 from slixmpp.xmlstream import StanzaBase
+from slixmpp.basexmpp import BaseXMPP
 
 
 class Presence(RootStanza):
@@ -69,7 +70,7 @@ class Presence(RootStanza):
         """
         StanzaBase.__init__(self, *args, **kwargs)
         if not recv and self['id'] == '':
-            if self.stream is not None and self.stream.use_presence_ids:
+            if isinstance(self.stream, BaseXMPP) and self.stream.use_presence_ids:
                 self['id'] = self.stream.new_id()
 
     def set_show(self, show: str):
