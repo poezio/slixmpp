@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from typing import Dict, Set, Tuple, Optional
 
 # Make a call to strptime before starting threads to
 # prevent thread safety issues.
@@ -32,13 +33,13 @@ class CertificateError(Exception):
     pass
 
 
-def decode_str(data):
+def decode_str(data: bytes) -> str:
     encoding = 'utf-16-be' if isinstance(data, BMPString) else 'utf-8'
     return bytes(data).decode(encoding)
 
 
-def extract_names(raw_cert):
-    results = {'CN': set(),
+def extract_names(raw_cert: bytes) -> Dict[str, Set[str]]:
+    results: Dict[str, Set[str]] = {'CN': set(),
                'DNS': set(),
                'SRV': set(),
                'URI': set(),
@@ -96,7 +97,7 @@ def extract_names(raw_cert):
     return results
 
 
-def extract_dates(raw_cert):
+def extract_dates(raw_cert: bytes) -> Tuple[Optional[datetime], Optional[datetime]]:
     if not HAVE_PYASN1:
         log.warning("Could not find pyasn1 and pyasn1_modules. " + \
                     "SSL certificate expiration COULD NOT BE VERIFIED.")
@@ -125,23 +126,28 @@ def extract_dates(raw_cert):
     return not_before, not_after
 
 
-def get_ttl(raw_cert):
+def get_ttl(raw_cert: bytes) -> Optional[timedelta]:
     not_before, not_after = extract_dates(raw_cert)
-    if not_after is None:
+    if not_after is None or not_before is None:
         return None
     return not_after - datetime.utcnow()
 
 
-def verify(expected, raw_cert):
+def verify(expected: str, raw_cert: bytes) -> Optional[bool]:
     if not HAVE_PYASN1:
         log.warning("Could not find pyasn1 and pyasn1_modules. " + \
                     "SSL certificate COULD NOT BE VERIFIED.")
-        return
+        return None
 
     not_before, not_after = extract_dates(raw_cert)
     cert_names = extract_names(raw_cert)
 
     now = datetime.utcnow()
+
+    if not not_before or not not_after:
+        raise CertificateError(
+            "Error while checking the dates of the certificate"
+        )
 
     if not_before > now:
         raise CertificateError(

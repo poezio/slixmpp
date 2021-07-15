@@ -2,15 +2,19 @@ import builtins
 import sys
 import hashlib
 
+from typing import Optional, Union, Callable, List
 
-def unicode(text):
+bytes_ = builtins.bytes  # alias the stdlib type but ew
+
+
+def unicode(text: Union[bytes_, str]) -> str:
     if not isinstance(text, str):
         return text.decode('utf-8')
     else:
         return text
 
 
-def bytes(text):
+def bytes(text: Optional[Union[str, bytes_]]) -> bytes_:
     """
     Convert Unicode text to UTF-8 encoded bytes.
 
@@ -34,7 +38,7 @@ def bytes(text):
         return builtins.bytes(text, encoding='utf-8')
 
 
-def quote(text):
+def quote(text: Union[str, bytes_]) -> bytes_:
     """
     Enclose in quotes and escape internal slashes and double quotes.
 
@@ -44,7 +48,7 @@ def quote(text):
     return b'"' + text.replace(b'\\', b'\\\\').replace(b'"', b'\\"') + b'"'
 
 
-def num_to_bytes(num):
+def num_to_bytes(num: int) -> bytes_:
     """
     Convert an integer into a four byte sequence.
 
@@ -58,21 +62,21 @@ def num_to_bytes(num):
     return bval
 
 
-def bytes_to_num(bval):
+def bytes_to_num(bval: bytes_) -> int:
     """
     Convert a four byte sequence to an integer.
 
     :param bytes bval: A four byte sequence to turn into an integer.
     """
     num = 0
-    num += ord(bval[0] << 24)
-    num += ord(bval[1] << 16)
-    num += ord(bval[2] << 8)
-    num += ord(bval[3])
+    num += (bval[0] << 24)
+    num += (bval[1] << 16)
+    num += (bval[2] << 8)
+    num += (bval[3])
     return num
 
 
-def XOR(x, y):
+def XOR(x: bytes_, y: bytes_) -> bytes_:
     """
     Return the results of an XOR operation on two equal length byte strings.
 
@@ -85,7 +89,7 @@ def XOR(x, y):
     return builtins.bytes([a ^ b for a, b in zip(x, y)])
 
 
-def hash(name):
+def hash(name: str) -> Optional[Callable]:
     """
     Return a hash function implementing the given algorithm.
 
@@ -102,7 +106,7 @@ def hash(name):
     return None
 
 
-def hashes():
+def hashes() -> List[str]:
     """
     Return a list of available hashing algorithms.
 
@@ -115,28 +119,3 @@ def hashes():
         t += ['MD2']
     hashes = ['SHA-' + h[3:] for h in dir(hashlib) if h.startswith('sha')]
     return t + hashes
-
-
-def setdefaultencoding(encoding):
-    """
-    Set the current default string encoding used by the Unicode implementation.
-
-    Actually calls sys.setdefaultencoding under the hood - see the docs for that
-    for more details.  This method exists only as a way to call find/call it
-    even after it has been 'deleted' when the site module is executed.
-
-    :param string encoding: An encoding name, compatible with sys.setdefaultencoding
-    """
-    func = getattr(sys, 'setdefaultencoding', None)
-    if func is None:
-        import gc
-        import types
-        for obj in gc.get_objects():
-            if (isinstance(obj, types.BuiltinFunctionType)
-                    and obj.__name__ == 'setdefaultencoding'):
-                func = obj
-                break
-        if func is None:
-            raise RuntimeError("Could not find setdefaultencoding")
-        sys.setdefaultencoding = func
-    return func(encoding)

@@ -16,11 +16,13 @@ try:
     from typing import (
         Literal,
         TypedDict,
+        Protocol,
     )
 except ImportError:
     from typing_extensions import (
         Literal,
         TypedDict,
+        Protocol,
     )
 
 from slixmpp.jid import JID
@@ -78,3 +80,11 @@ JidStr = Union[str, JID]
 OptJidStr = Optional[Union[str, JID]]
 
 MAMDefault = Literal['always', 'never', 'roster']
+
+FilterString = Literal['in', 'out', 'out_sync']
+
+__all__ = [
+    'Protocol', 'TypedDict', 'Literal', 'OptJid', 'JidStr', 'MAMDefault',
+    'PresenceTypes', 'PresenceShows', 'MessageTypes', 'IqTypes', 'MucRole',
+    'MucAffiliation', 'FilterString',
+]

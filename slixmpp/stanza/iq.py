@@ -3,10 +3,10 @@
 # Copyright (C) 2010  Nathanael C. Fritz
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
+import asyncio
 from slixmpp.stanza.rootstanza import RootStanza
 from slixmpp.xmlstream import StanzaBase, ET
-from slixmpp.xmlstream.handler import Waiter, Callback, CoroutineCallback
-from slixmpp.xmlstream.asyncio import asyncio
+from slixmpp.xmlstream.handler import Callback, CoroutineCallback
 from slixmpp.xmlstream.matcher import MatchIDSender, MatcherId
 from slixmpp.exceptions import IqTimeout, IqError
 

@@ -1,4 +1,3 @@
-
 # slixmpp.util.sasl.client
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This module was originally based on Dave Cridland's Suelta library.
@@ -6,9 +5,11 @@
 # :copryight: (c) 2004-2013 David Alan Cridland
 # :copyright: (c) 2013 Nathanael C. Fritz, Lance J.T. Stout
 # :license: MIT, see LICENSE for more details
+from __future__ import annotations
 import logging
 import stringprep
 
+from typing import Iterable, Set, Callable, Dict, Any, Optional, Type
 from slixmpp.util import hashes, bytes, stringprep_profiles
 
 
@@ -16,11 +17,11 @@ log = logging.getLogger(__name__)
 
 
 #: Global registry mapping mechanism names to implementation classes.
-MECHANISMS = {}
+MECHANISMS: Dict[str, Type[Mech]] = {}
 
 
 #: Global registry mapping mechanism names to security scores.
-MECH_SEC_SCORES = {}
+MECH_SEC_SCORES: Dict[str, int] = {}
 
 
 #: The SASLprep profile of stringprep used to validate simple username
@@ -45,9 +46,10 @@ saslprep = stringprep_profiles.create(
     unassigned=[stringprep.in_table_a1])
 
 
-def sasl_mech(score):
+def sasl_mech(score: int):
     sec_score = score
-    def register(mech):
+
+    def register(mech: Type[Mech]):
         n = 0
         mech.score = sec_score
         if mech.use_hashes:
@@ -99,9 +101,9 @@ class Mech(object):
     score = -1
     use_hashes = False
     channel_binding = False
-    required_credentials = set()
-    optional_credentials = set()
-    security = set()
+    required_credentials: Set[str] = set()
+    optional_credentials: Set[str] = set()
+    security: Set[str] = set()
 
     def __init__(self, name, credentials, security_settings):
         self.credentials = credentials
@@ -118,7 +120,14 @@ class Mech(object):
         return b''
 
 
-def choose(mech_list, credentials, security_settings, limit=None, min_mech=None):
+CredentialsCallback = Callable[[Iterable[str], Iterable[str]], Dict[str, Any]]
+SecurityCallback = Callable[[Iterable[str]], Dict[str, Any]]
+
+
+def choose(mech_list: Iterable[Type[Mech]], credentials: CredentialsCallback,
+           security_settings: SecurityCallback,
+           limit: Optional[Iterable[Type[Mech]]] = None,
+           min_mech: Optional[str] = None) -> Mech:
     available_mechs = set(MECHANISMS.keys())
     if limit is None:
         limit = set(mech_list)
@@ -130,7 +139,10 @@ def choose(mech_list, credentials, security_settings, limit=None, min_mech=None)
     mech_list = mech_list.intersection(limit)
     available_mechs = available_mechs.intersection(mech_list)
 
-    best_score = MECH_SEC_SCORES.get(min_mech, -1)
+    if min_mech is None:
+        best_score = -1
+    else:
+        best_score = MECH_SEC_SCORES.get(min_mech, -1)
     best_mech = None
     for name in available_mechs:
         if name in MECH_SEC_SCORES:

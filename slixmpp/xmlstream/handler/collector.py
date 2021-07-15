@@ -4,11 +4,17 @@
 # Part of Slixmpp: The Slick XMPP Library
 # :copyright: (c) 2012 Nathanael C. Fritz, Lance J.T. Stout
 # :license: MIT, see LICENSE for more details
+from __future__ import annotations
+
 import logging
-from queue import Queue, Empty
+from typing import List, Optional, TYPE_CHECKING
 
+from slixmpp.xmlstream.stanzabase import StanzaBase
 from slixmpp.xmlstream.handler.base import BaseHandler
+from slixmpp.xmlstream.matcher.base import MatcherBase
 
+if TYPE_CHECKING:
+    from slixmpp.xmlstream.xmlstream import XMLStream
 
 log = logging.getLogger(__name__)
 
@@ -27,35 +33,35 @@ class Collector(BaseHandler):
     :param stream: The :class:`~slixmpp.xmlstream.xmlstream.XMLStream`
                    instance this handler should monitor.
     """
+    _stanzas: List[StanzaBase]
 
-    def __init__(self, name, matcher, stream=None):
+    def __init__(self, name: str, matcher: MatcherBase, stream: Optional[XMLStream] = None):
         BaseHandler.__init__(self, name, matcher, stream=stream)
-        self._payload = Queue()
+        self._stanzas = []
 
-    def prerun(self, payload):
+    def prerun(self, payload: StanzaBase) -> None:
         """Store the matched stanza when received during processing.
 
         :param payload: The matched
-            :class:`~slixmpp.xmlstream.stanzabase.ElementBase` object.
+            :class:`~slixmpp.xmlstream.stanzabase.StanzaBase` object.
         """
-        self._payload.put(payload)
+        self._stanzas.append(payload)
 
-    def run(self, payload):
+    def run(self, payload: StanzaBase) -> None:
         """Do not process this handler during the main event loop."""
         pass
 
-    def stop(self):
+    def stop(self) -> List[StanzaBase]:
         """
         Stop collection of matching stanzas, and return the ones that
         have been stored so far.
         """
+        stream_ref = self.stream
+        if stream_ref is None:
+            raise ValueError('stop() called without a stream!')
+        stream = stream_ref()
+        if stream is None:
+            raise ValueError('stop() called without a stream!')
         self._destroy = True
-        results = []
-        try:
-            while True:
-                results.append(self._payload.get(False))
-        except Empty:
-            pass
-
-        self.stream().remove_handler(self.name)
-        return results
+        stream.remove_handler(self.name)
+        return self._stanzas

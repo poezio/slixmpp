@@ -1,4 +1,3 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2011  Nathanael C. Fritz
 # This file is part of Slixmpp.
@@ -15,6 +14,8 @@ from slixmpp.xmlstream.matcher import MatchXPath
 from slixmpp.xmlstream.handler import Callback
 from slixmpp.features.feature_mechanisms import stanza
 
+from typing import ClassVar, Set
+
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class FeatureMechanisms(BasePlugin):
 
     name = 'feature_mechanisms'
     description = 'RFC 6120: Stream Feature: SASL'
-    dependencies = set()
+    dependencies: ClassVar[Set[str]] = set()
     stanza = stanza
     default_config = {
         'use_mech': None,

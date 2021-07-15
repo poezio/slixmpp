@@ -1,6 +1,16 @@
 stages:
+  - lint
   - test
   - trigger
+
+mypy:
+  stage: lint
+  tags:
+    - docker
+  image: python:3
+  script:
+    - pip3 install mypy
+    - mypy slixmpp
 
 test:
   stage: test

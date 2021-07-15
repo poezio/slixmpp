@@ -3,7 +3,8 @@
 # Copyright (C) 2010  Nathanael C. Fritz
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
-from slixmpp.xmlstream import StanzaBase
+from slixmpp.xmlstream import StanzaBase, ElementBase
+from typing import ClassVar, Dict, Type
 
 
 class StreamFeatures(StanzaBase):
@@ -15,8 +16,8 @@ class StreamFeatures(StanzaBase):
     namespace = 'http://etherx.jabber.org/streams'
     interfaces = {'features', 'required', 'optional'}
     sub_interfaces = interfaces
-    plugin_tag_map = {}
-    plugin_attrib_map = {}
+    plugin_attrib_map: ClassVar[Dict[str, Type[ElementBase]]] = {}
+    plugin_tag_map: ClassVar[Dict[str, Type[ElementBase]]] = {}
 
     def setup(self, xml):
         StanzaBase.setup(self, xml)

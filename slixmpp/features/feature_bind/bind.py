@@ -1,4 +1,3 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2011  Nathanael C. Fritz
 # This file is part of Slixmpp.
@@ -11,6 +10,7 @@ from slixmpp.stanza import Iq, StreamFeatures
 from slixmpp.features.feature_bind import stanza
 from slixmpp.xmlstream import register_stanza_plugin
 from slixmpp.plugins import BasePlugin
+from typing import ClassVar, Set
 
 
 log = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ class FeatureBind(BasePlugin):
 
     name = 'feature_bind'
     description = 'RFC 6120: Stream Feature: Resource Binding'
-    dependencies = set()
+    dependencies: ClassVar[Set[str]] = set()
     stanza = stanza
 
     def plugin_init(self):
