@@ -179,6 +179,21 @@ class MUCInvite(ElementBase):
     interfaces = {'to', 'from', 'reason'}
     sub_interfaces = {'reason'}
 
+    def get_to(self):
+        return JID(self['to'])
+
+    def set_to(self, value):
+        if not isinstance(value, JID):
+            value = JID(value)
+        self['to'] = value
+
+    def get_from(self):
+        return JID(self['from'])
+
+    def set_from(self, value):
+        if not isinstance(value, JID):
+            value = JID(value)
+        self['from'] = value
 
 class MUCDecline(ElementBase):
     name = 'decline'
@@ -186,6 +201,22 @@ class MUCDecline(ElementBase):
     namespace = NS_USER
     interfaces = {'to', 'from', 'reason'}
     sub_interfaces = {'reason'}
+
+    def get_to(self):
+        return JID(self['to'])
+
+    def set_to(self, value):
+        if not isinstance(value, JID):
+            value = JID(value)
+        self['to'] = value
+
+    def get_from(self):
+        return JID(self['from'])
+
+    def set_from(self, value):
+        if not isinstance(value, JID):
+            value = JID(value)
+        self['from'] = value
 
 
 class MUCHistory(ElementBase):
