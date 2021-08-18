@@ -62,6 +62,28 @@ AFFILIATIONS = ('outcast', 'member', 'admin', 'owner', 'none')
 ROLES = ('moderator', 'participant', 'visitor', 'none')
 
 
+class DictWrapper(dict):
+    """
+        Wrapper for XEP_0045.rooms dict to help pin-point issues related to poezio#3549.
+        https://lab.louiz.org/poezio/poezio/-/issues/3549
+    """
+
+    def __getitem__(self, val):
+        if hasattr(self, val):
+            log.debug(
+                'DictWrapper.__getitem__(%r): %r',
+                val, getattr(self, val),
+            )
+        return super.__getitem__(val)
+
+    def __delitem__(self, val):
+        log.debug(
+            'DictWrapper.__delitem__(%r)',
+            val, exc_info=True,
+        )
+        return super.__delitem__(val)
+
+
 class XEP_0045(BasePlugin):
 
     """
@@ -77,7 +99,7 @@ class XEP_0045(BasePlugin):
     our_nicks: Dict[JID, str]
 
     def plugin_init(self):
-        self.rooms = {}
+        self.rooms = DictWrapper()
         self.our_nicks = {}
         # load MUC support in presence stanzas
         register_stanza_plugin(MUCMessage, MUCUserItem)
