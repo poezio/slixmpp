@@ -118,7 +118,7 @@ class XEP_0199(BasePlugin):
                         tmp_futures.append(future)
                 self.__pending_futures = tmp_futures
 
-            future = asyncio.ensure_future(
+            future = asyncio.create_task(
                 self._keepalive(event),
                 loop=self.xmpp.loop,
             )

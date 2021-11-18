@@ -622,7 +622,7 @@ class SlixTest(unittest.TestCase):
 
     def wait_for_send_queue(self):
         loop = asyncio.get_event_loop()
-        future = asyncio.ensure_future(self.xmpp.run_filters(), loop=loop)
+        future = asyncio.create_task(self.xmpp.run_filters(), loop=loop)
         queue = self.xmpp.waiting_queue
         loop.run_until_complete(queue.join())
         future.cancel()
