@@ -133,15 +133,15 @@ def _validate_domain(domain: str):
         try:
             domain = idna(domain)
         except StringprepError:
-            raise InvalidJID('idna validation failed')
+            raise InvalidJID(f'idna validation failed: {domain}')
 
         if ':' in domain:
-            raise InvalidJID('Domain containing a port')
+            raise InvalidJID(f'Domain containing a port: {domain}')
         for label in domain.split('.'):
             if not label:
-                raise InvalidJID('Domain containing too many dots')
+                raise InvalidJID(f'Domain containing too many dots: {domain}')
             if '-' in (label[0], label[-1]):
-                raise InvalidJID('Domain started or ended with -')
+                raise InvalidJID(f'Domain starting or ending with -: {domain}')
 
     if not domain:
         raise InvalidJID('Domain must not be 0 bytes')
