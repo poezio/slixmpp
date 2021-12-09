@@ -1,11 +1,11 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
 import asyncio
 import logging
-import collections
+import collections.abc
+import collections.abc.MutableSet
 
 from slixmpp.stanza import Message, Presence, Iq, StreamFeatures
 from slixmpp.xmlstream import register_stanza_plugin
