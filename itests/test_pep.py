@@ -34,7 +34,14 @@ class TestPEP(SlixIntegration):
         """Check we can get and set public PEP data"""
         stanza = Mystanza()
         stanza['test'] = str(uuid4().hex)
-        await self.clients[0]['xep_0222'].store(stanza, id='toto')
+        try:
+            await self.clients[0]['xep_0060'].delete_node(
+                self.clients[0].boundjid.bare,
+                node=stanza.namespace,
+            )
+        except:
+            pass
+        await self.clients[0]['xep_0222'].store(stanza, node=stanza.namespace, id='toto')
         fetched = await self.clients[0]['xep_0222'].retrieve(
             stanza.namespace,
         )
