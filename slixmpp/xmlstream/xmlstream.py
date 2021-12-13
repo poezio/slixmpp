@@ -417,7 +417,6 @@ class XMLStream(asyncio.BaseProtocol):
         if self._run_out_filters is None or self._run_out_filters.done():
             self._run_out_filters = asyncio.create_task(
                 self.run_filters(),
-                loop=self.loop,
             )
 
         self.disconnect_reason = None
@@ -441,7 +440,6 @@ class XMLStream(asyncio.BaseProtocol):
         self.event("connecting")
         self._current_connection_attempt = asyncio.create_task(
             self._connect_routine(),
-            loop=self.loop,
         )
 
     async def _connect_routine(self) -> None:
@@ -449,7 +447,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         if self._connect_loop_wait > 0:
             self.event('reconnect_delay', self._connect_loop_wait)
-            await asyncio.sleep(self._connect_loop_wait, loop=self.loop)
+            await asyncio.sleep(self._connect_loop_wait)
 
         record = await self._pick_dns_answer(self.default_domain)
         if record is not None:
@@ -488,7 +486,6 @@ class XMLStream(asyncio.BaseProtocol):
             self._connect_loop_wait = self._connect_loop_wait * 2 + 1
             self._current_connection_attempt = asyncio.create_task(
                 self._connect_routine(),
-                loop=self.loop,
             )
 
     def process(self, *, forever: bool = True, timeout: Optional[int] = None) -> None:
@@ -504,10 +501,10 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.loop.run_until_complete(self.disconnected)
         else:
-            tasks: List[Future] = [asyncio.sleep(timeout, loop=self.loop)]
+            tasks: List[Future] = [asyncio.sleep(timeout)]
             if not forever:
                 tasks.append(self.disconnected)
-            self.loop.run_until_complete(asyncio.wait(tasks, loop=self.loop))
+            self.loop.run_until_complete(asyncio.wait(tasks))
 
     def init_parser(self) -> None:
         """init the XML parser. The parser must always be reset for each new
@@ -655,12 +652,10 @@ class XMLStream(asyncio.BaseProtocol):
                 self.cancel_connection_attempt()
                 return asyncio.create_task(
                     self._end_stream_wait(wait, reason=reason),
-                    loop=self.loop,
                 )
             else:
                 return asyncio.create_task(
                     self._consume_send_queue_before_disconnecting(reason, wait),
-                    loop=self.loop,
                 )
         else:
             self._set_disconnected_future()
@@ -715,7 +710,7 @@ class XMLStream(asyncio.BaseProtocol):
         log.debug("reconnecting...")
         async def handler(event: Any) -> None:
             # We yield here to allow synchronous handlers to work first
-            await asyncio.sleep(0, loop=self.loop)
+            await asyncio.sleep(0)
             self.connect()
         self.add_event_handler('disconnected', handler, disposable=True)
         self.disconnect(wait, reason)
@@ -1060,7 +1055,6 @@ class XMLStream(asyncio.BaseProtocol):
                             self.exception(e)
                 asyncio.create_task(
                     handler_callback_routine(handler_callback),
-                    loop=self.loop,
                 )
             else:
                 try:
@@ -1229,7 +1223,6 @@ class XMLStream(asyncio.BaseProtocol):
                                             task,
                                             already_run_filters
                                         ),
-                                        loop=self.loop,
                                     )
                                     raise ContinueQueue(
                                         "Slow coroutine, rescheduling filters"
@@ -1433,5 +1426,4 @@ class XMLStream(asyncio.BaseProtocol):
         """
         return asyncio.create_task(
             coroutine,
-            loop=self.loop,
         )

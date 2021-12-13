@@ -120,7 +120,6 @@ class XEP_0199(BasePlugin):
 
             future = asyncio.create_task(
                 self._keepalive(event),
-                loop=self.xmpp.loop,
             )
             self.__pending_futures.append(future)
         self.xmpp.schedule('Ping keepalive',

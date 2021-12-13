@@ -351,7 +351,6 @@ class XEP_0045(BasePlugin):
                 maxchars=maxchars,
                 maxstanzas=maxstanzas,
             ),
-            loop=self.xmpp.loop,
         )
 
     def leave_muc(self, room: JID, nick: str, msg: str = '', pfrom: Optional[JID] = None):

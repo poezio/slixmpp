@@ -63,7 +63,6 @@ class XEP_0163(BasePlugin):
                                               jid=jid)
         asyncio.create_task(
             self.xmpp['xep_0115'].update_caps(jid, broadcast=False),
-            loop=self.xmpp.loop,
         )
 
     def remove_interest(self, namespace: str, jid: Optional[JID] = None):
@@ -84,7 +83,6 @@ class XEP_0163(BasePlugin):
                                               feature='%s+notify' % namespace)
         asyncio.create_task(
             self.xmpp['xep_0115'].update_caps(jid, broadcast=False),
-            loop=self.xmpp.loop,
         )
 
     def publish(self, stanza: ElementBase, node: Optional[str] = None,
