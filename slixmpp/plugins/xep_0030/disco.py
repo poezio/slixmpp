@@ -326,7 +326,6 @@ class XEP_0030(BasePlugin):
             info_futures, _ = await asyncio.wait(
                 infos,
                 timeout=timeout,
-                loop=self.xmpp.loop
             )
 
             self.domain_infos[domain] = [

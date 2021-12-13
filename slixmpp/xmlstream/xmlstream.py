@@ -449,7 +449,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         if self._connect_loop_wait > 0:
             self.event('reconnect_delay', self._connect_loop_wait)
-            await asyncio.sleep(self._connect_loop_wait, loop=self.loop)
+            await asyncio.sleep(self._connect_loop_wait)
 
         record = await self._pick_dns_answer(self.default_domain)
         if record is not None:
@@ -504,10 +504,10 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.loop.run_until_complete(self.disconnected)
         else:
-            tasks: List[Future] = [asyncio.sleep(timeout, loop=self.loop)]
+            tasks: List[Future] = [asyncio.sleep(timeout)]
             if not forever:
                 tasks.append(self.disconnected)
-            self.loop.run_until_complete(asyncio.wait(tasks, loop=self.loop))
+            self.loop.run_until_complete(asyncio.wait(tasks))
 
     def init_parser(self) -> None:
         """init the XML parser. The parser must always be reset for each new
@@ -715,7 +715,7 @@ class XMLStream(asyncio.BaseProtocol):
         log.debug("reconnecting...")
         async def handler(event: Any) -> None:
             # We yield here to allow synchronous handlers to work first
-            await asyncio.sleep(0, loop=self.loop)
+            await asyncio.sleep(0)
             self.connect()
         self.add_event_handler('disconnected', handler, disposable=True)
         self.disconnect(wait, reason)
