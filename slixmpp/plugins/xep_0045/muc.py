@@ -342,7 +342,7 @@ class XEP_0045(BasePlugin):
                 maxchars = 9
             else:
                 maxstanzas = int(maxhistory)
-        return asyncio.create_task(
+        return asyncio.ensure_future(
             self.join_muc_wait(
                 room=room,
                 nick=nick,
