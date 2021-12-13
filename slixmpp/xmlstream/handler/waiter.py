@@ -80,7 +80,7 @@ class Waiter(BaseHandler):
 
         try:
             await wait_for(
-                self._event.wait(), timeout, loop=stream.loop
+                self._event.wait(), timeout,
             )
         except TimeoutError:
             log.warning("Timed out waiting for %s", self.name)

@@ -415,7 +415,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         """
         if self._run_out_filters is None or self._run_out_filters.done():
-            self._run_out_filters = asyncio.create_task(
+            self._run_out_filters = asyncio.ensure_future(
                 self.run_filters(),
                 loop=self.loop,
             )
@@ -439,7 +439,7 @@ class XMLStream(asyncio.BaseProtocol):
             self.disable_starttls = disable_starttls
 
         self.event("connecting")
-        self._current_connection_attempt = asyncio.create_task(
+        self._current_connection_attempt = asyncio.ensure_future(
             self._connect_routine(),
             loop=self.loop,
         )
@@ -449,7 +449,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         if self._connect_loop_wait > 0:
             self.event('reconnect_delay', self._connect_loop_wait)
-            await asyncio.sleep(self._connect_loop_wait, loop=self.loop)
+            await asyncio.sleep(self._connect_loop_wait)
 
         record = await self._pick_dns_answer(self.default_domain)
         if record is not None:
@@ -486,7 +486,7 @@ class XMLStream(asyncio.BaseProtocol):
             if self._current_connection_attempt is None:
                 return
             self._connect_loop_wait = self._connect_loop_wait * 2 + 1
-            self._current_connection_attempt = asyncio.create_task(
+            self._current_connection_attempt = asyncio.ensure_future(
                 self._connect_routine(),
                 loop=self.loop,
             )
@@ -504,10 +504,10 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.loop.run_until_complete(self.disconnected)
         else:
-            tasks: List[Future] = [asyncio.sleep(timeout, loop=self.loop)]
+            tasks: List[Future] = [asyncio.sleep(timeout)]
             if not forever:
                 tasks.append(self.disconnected)
-            self.loop.run_until_complete(asyncio.wait(tasks, loop=self.loop))
+            self.loop.run_until_complete(asyncio.wait(tasks))
 
     def init_parser(self) -> None:
         """init the XML parser. The parser must always be reset for each new
@@ -653,12 +653,12 @@ class XMLStream(asyncio.BaseProtocol):
             self.disconnect_reason = reason
             if self.waiting_queue.empty() or ignore_send_queue:
                 self.cancel_connection_attempt()
-                return asyncio.create_task(
+                return asyncio.ensure_future(
                     self._end_stream_wait(wait, reason=reason),
                     loop=self.loop,
                 )
             else:
-                return asyncio.create_task(
+                return asyncio.ensure_future(
                     self._consume_send_queue_before_disconnecting(reason, wait),
                     loop=self.loop,
                 )
@@ -715,7 +715,7 @@ class XMLStream(asyncio.BaseProtocol):
         log.debug("reconnecting...")
         async def handler(event: Any) -> None:
             # We yield here to allow synchronous handlers to work first
-            await asyncio.sleep(0, loop=self.loop)
+            await asyncio.sleep(0)
             self.connect()
         self.add_event_handler('disconnected', handler, disposable=True)
         self.disconnect(wait, reason)
@@ -1058,7 +1058,7 @@ class XMLStream(asyncio.BaseProtocol):
                             old_exception(e)
                         else:
                             self.exception(e)
-                asyncio.create_task(
+                asyncio.ensure_future(
                     handler_callback_routine(handler_callback),
                     loop=self.loop,
                 )
@@ -1224,7 +1224,7 @@ class XMLStream(asyncio.BaseProtocol):
                                 )
                                 if pending:
                                     self.__slow_tasks.append(task)
-                                    asyncio.create_task(
+                                    asyncio.ensure_future(
                                         self._continue_slow_send(
                                             task,
                                             already_run_filters
@@ -1431,7 +1431,7 @@ class XMLStream(asyncio.BaseProtocol):
 
         :param coroutine: The coroutine to wrap.
         """
-        return asyncio.create_task(
+        return asyncio.ensure_future(
             coroutine,
             loop=self.loop,
         )

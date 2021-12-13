@@ -115,7 +115,7 @@ class IBBytestream(object):
         self.xmpp.add_event_handler('ibb_stream_end', on_close)
         self.xmpp.add_event_handler('ibb_stream_data', on_data)
         try:
-            await asyncio.wait_for(end_future, timeout, loop=self.xmpp.loop)
+            await asyncio.wait_for(end_future, timeout)
         except asyncio.TimeoutError:
             raise IqTimeout(result)
         finally:

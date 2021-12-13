@@ -6,7 +6,7 @@
 # :license: MIT, see LICENSE for more details
 from __future__ import annotations
 
-import asyncio
+from asyncio import iscoroutinefunction, ensure_future
 from typing import Optional, Callable, Awaitable, TYPE_CHECKING
 
 from slixmpp.xmlstream.stanzabase import StanzaBase
@@ -52,7 +52,7 @@ class CoroutineCallback(BaseHandler):
                  pointer: CoroutineFunction, once: bool = False,
                  instream: bool = False, stream: Optional[XMLStream] = None):
         BaseHandler.__init__(self, name, matcher, stream)
-        if not asyncio.iscoroutinefunction(pointer):
+        if not iscoroutinefunction(pointer):
             raise ValueError("Given function is not a coroutine")
 
         async def pointer_wrapper(stanza: StanzaBase) -> None:
@@ -87,7 +87,7 @@ class CoroutineCallback(BaseHandler):
                               :meth:`prerun()`. Defaults to ``False``.
         """
         if not self._instream or instream:
-            asyncio.create_task(self._pointer(payload))
+            ensure_future(self._pointer(payload))
             if self._once:
                 self._destroy = True
                 del self._pointer

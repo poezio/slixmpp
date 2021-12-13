@@ -23,6 +23,29 @@ test:
     - pip3 install emoji aiohttp
     - ./run_tests.py
 
+test-3.10:
+  stage: test
+  tags:
+    - docker
+  image: python:3.10
+  script:
+    - apt update
+    - apt install -y python3 python3-pip cython3 gpg
+    - pip3 install emoji aiohttp
+    - ./run_tests.py
+
+test-3.11:
+  stage: test
+  tags:
+    - docker
+  image: python:3.11-rc
+  allow_failure: true
+  script:
+    - apt update
+    - apt install -y python3 python3-pip cython3 gpg
+    - pip3 install emoji aiohttp
+    - ./run_tests.py
+
 test_integration:
   stage: test
   tags:
@@ -38,40 +61,10 @@ test_integration:
     - pip3 install emoji aiohttp aiodns
     - ./run_integration_tests.py
 
-test_integration-3.10:
-  stage: test
-  tags:
-    - docker
-  image: python:3.10
-  only:
-    variables:
-        - $CI_ACCOUNT1
-        - $CI_ACCOUNT2
-  script:
-    - apt update
-    - apt install -y python3 python3-pip cython3 gpg
-    - pip3 install emoji aiohttp aiodns
-    - ./run_integration_tests.py
-
-test_integration-3.11:
-  stage: test
-  tags:
-    - docker
-  image: python:3.11-rc
-  only:
-    variables:
-        - $CI_ACCOUNT1
-        - $CI_ACCOUNT2
-  script:
-    - apt update
-    - apt install -y python3 python3-pip cython3 gpg
-    - pip3 install emoji aiohttp aiodns
-    - ./run_integration_tests.py
-
 trigger_poezio:
   stage: trigger
   tags:
     - docker
-  image: appropriate/curl:latest
+  image: curlimages/curl:7.79.1
   script:
     - curl --request POST -F token="$SLIXMPP_TRIGGER_TOKEN" -F ref=master https://lab.louiz.org/api/v4/projects/18/trigger/pipeline
