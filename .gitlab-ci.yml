@@ -39,6 +39,7 @@ test-3.11:
   tags:
     - docker
   image: python:3.11-rc
+  allow_failure: true
   script:
     - apt update
     - apt install -y python3 python3-pip cython3 gpg
