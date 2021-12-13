@@ -38,6 +38,36 @@ test_integration:
     - pip3 install emoji aiohttp aiodns
     - ./run_integration_tests.py
 
+test_integration-3.10:
+  stage: test
+  tags:
+    - docker
+  image: python:3.10
+  only:
+    variables:
+        - $CI_ACCOUNT1
+        - $CI_ACCOUNT2
+  script:
+    - apt update
+    - apt install -y python3 python3-pip cython3 gpg
+    - pip3 install emoji aiohttp aiodns
+    - ./run_integration_tests.py
+
+test_integration-3.11:
+  stage: test
+  tags:
+    - docker
+  image: python:3.11-rc
+  only:
+    variables:
+        - $CI_ACCOUNT1
+        - $CI_ACCOUNT2
+  script:
+    - apt update
+    - apt install -y python3 python3-pip cython3 gpg
+    - pip3 install emoji aiohttp aiodns
+    - ./run_integration_tests.py
+
 trigger_poezio:
   stage: trigger
   tags:
