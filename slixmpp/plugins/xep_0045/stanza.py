@@ -235,6 +235,7 @@ class MUCOwnerQuery(ElementBase):
 class MUCOwnerDestroy(ElementBase):
     name = 'destroy'
     plugin_attrib = 'destroy'
+    namespace = NS_OWNER
     interfaces = {'reason', 'jid'}
     sub_interfaces = {'reason'}
 
@@ -288,3 +289,11 @@ class MUCActor(ElementBase):
         if jid:
             return JID(jid)
         return jid
+
+
+class MUCDestroy(ElementBase):
+    name = 'destroy'
+    plugin_attrib = 'destroy'
+    namespace = NS_USER
+    interfaces = {'reason', 'jid'}
+    sub_interfaces = {'reason'}

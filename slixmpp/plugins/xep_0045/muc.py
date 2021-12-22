@@ -35,6 +35,7 @@ from slixmpp.plugins.xep_0045 import stanza
 from slixmpp.plugins.xep_0045.stanza import (
     MUCInvite,
     MUCDecline,
+    MUCDestroy,
     MUCPresence,
     MUCJoin,
     MUCMessage,
@@ -88,6 +89,7 @@ class XEP_0045(BasePlugin):
         register_stanza_plugin(MUCMessage, MUCStatus)
         register_stanza_plugin(MUCPresence, MUCStatus)
         register_stanza_plugin(Presence, MUCPresence)
+        register_stanza_plugin(MUCPresence, MUCDestroy)
         register_stanza_plugin(Presence, MUCJoin)
         register_stanza_plugin(MUCJoin, MUCHistory)
         register_stanza_plugin(Message, MUCMessage)
