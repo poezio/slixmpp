@@ -33,7 +33,6 @@ import socket as Socket
 import ssl
 import weakref
 import uuid
-from pathlib import Path
 
 from contextlib import contextmanager
 import xml.etree.ElementTree as ET
@@ -47,6 +46,7 @@ from asyncio import (
     iscoroutinefunction,
     wait,
 )
+from pathlib import Path
 
 from slixmpp.types import FilterString
 from slixmpp.xmlstream.tostring import tostring
@@ -162,7 +162,7 @@ class XMLStream(asyncio.BaseProtocol):
     #:
     #:     On Mac OS X, certificates in the system keyring will
     #:     be consulted, even if they are not in the provided file.
-    ca_certs: Optional[Path]
+    ca_certs: Optional[Union[str, Iterator[str]]]
 
     #: Path to a file containing a client certificate to use for
     #: authenticating via SASL EXTERNAL. If set, there must also
@@ -760,8 +760,14 @@ class XMLStream(asyncio.BaseProtocol):
                 log.debug('Loaded cert file %s and key file %s',
                           self.certfile, self.keyfile)
         if self.ca_certs is not None:
+            ca_cert = self.ca_certs
+            if not isinstance(self.ca_certs, str):
+                for bundle in self.ca_certs:
+                    if Path(bundle).is_file():
+                        ca_cert: str = bundle
+                        break
             self.ssl_context.verify_mode = ssl.CERT_REQUIRED
-            self.ssl_context.load_verify_locations(cafile=self.ca_certs)
+            self.ssl_context.load_verify_locations(cafile=ca_cert)
 
         return self.ssl_context
 
