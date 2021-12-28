@@ -33,6 +33,7 @@ import socket as Socket
 import ssl
 import weakref
 import uuid
+from pathlib import Path
 
 from contextlib import contextmanager
 import xml.etree.ElementTree as ET
@@ -161,7 +162,7 @@ class XMLStream(asyncio.BaseProtocol):
     #:
     #:     On Mac OS X, certificates in the system keyring will
     #:     be consulted, even if they are not in the provided file.
-    ca_certs: Optional[str]
+    ca_certs: Optional[Path]
 
     #: Path to a file containing a client certificate to use for
     #: authenticating via SASL EXTERNAL. If set, there must also
