@@ -44,4 +44,5 @@ class XEP_0425(BasePlugin):
         iq = self.xmpp.make_iq_set(ito=room.bare, ifrom=ifrom)
         iq['apply_to']['id'] = id
         iq['apply_to']['moderate']['reason'] = reason
+        iq['apply_to']['moderate'].enable('retract')
         await iq.send(**iqkwargs)
