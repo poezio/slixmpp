@@ -22,7 +22,7 @@ def fault2xml(fault):
 
 def xml2fault(params):
     vals = []
-    for value in params.xml.findall('{%s}value' % _namespace):
+    for value in params.findall('{%s}value' % _namespace):
         vals.append(_xml2py(value))
     fault = dict()
     fault['code'] = vals[0]['faultCode']
