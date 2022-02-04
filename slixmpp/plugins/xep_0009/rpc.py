@@ -53,8 +53,8 @@ class XEP_0009(BasePlugin):
 
     def make_iq_method_call(self, pto, pmethod, params):
         iq = self.xmpp.make_iq_set()
-        iq.attrib['to'] = pto
-        iq.attrib['from'] = self.xmpp.boundjid.full
+        iq['to'] = pto
+        iq['from'] = self.xmpp.boundjid.full
         iq.enable('rpc_query')
         iq['rpc_query']['method_call']['method_name'] = pmethod
         iq['rpc_query']['method_call']['params'] = params
@@ -62,16 +62,16 @@ class XEP_0009(BasePlugin):
 
     def make_iq_method_response(self, pid, pto, params):
         iq = self.xmpp.make_iq_result(pid)
-        iq.attrib['to'] = pto
-        iq.attrib['from'] = self.xmpp.boundjid.full
+        iq['to'] = pto
+        iq['from'] = self.xmpp.boundjid.full
         iq.enable('rpc_query')
         iq['rpc_query']['method_response']['params'] = params
         return iq
 
     def make_iq_method_response_fault(self, pid, pto, params):
         iq = self.xmpp.make_iq_result(pid)
-        iq.attrib['to'] = pto
-        iq.attrib['from'] = self.xmpp.boundjid.full
+        iq['to'] = pto
+        iq['from'] = self.xmpp.boundjid.full
         iq.enable('rpc_query')
         iq['rpc_query']['method_response']['params'] = None
         iq['rpc_query']['method_response']['fault'] = params
