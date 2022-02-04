@@ -771,6 +771,9 @@ class XMLStream(asyncio.BaseProtocol):
                           self.certfile, self.keyfile)
         if self.ca_certs is not None:
             ca_cert: Optional[Path] = None
+            # XXX: Compat before d733c54518.
+            if isinstance(self.ca_certs, str):
+                self.ca_certs = Path(self.ca_certs)
             if isinstance(self.ca_certs, Path):
                 if self.ca_certs.is_file():
                     ca_cert = self.ca_certs
