@@ -11,7 +11,7 @@ Block on IQ sending
 
 .. code-block:: python
 
-    result = yield from iq.send()
+    result = await iq.send()
 
 .. warning::
 
@@ -28,13 +28,7 @@ The same changes from the SleekXMPP API apply, so you can do:
 
 .. code-block:: python
 
-    iq_info = yield from self.xmpp['xep_0030'].get_info(jid)
-
-But the following will only return a Future:
-
-.. code-block:: python
-
-    iq_info = self.xmpp['xep_0030'].get_info(jid)
+    iq_info = await self.xmpp['xep_0030'].get_info(jid)
 
 
 Callbacks, Event Handlers, and Stream Handlers
@@ -42,7 +36,7 @@ Callbacks, Event Handlers, and Stream Handlers
 
 IQ callbacks and :term:`Event Handlers <event handler>` can be coroutine
 functions; in this case, they will be scheduled in the event loop using
-:meth:`.asyncio.async` and not ran immediately.
+:meth:`.asyncio.ensure_future` and not ran immediately.
 
 A :class:`.CoroutineCallback` class has been added as well for
 :term:`Stream Handlers <stream handler>`, which will use
@@ -94,18 +88,18 @@ a simple <message>.
 
 .. code-block:: python
 
-    import asyncio, aiohttp, slixmpp
+    import aiohttp, slixmpp
 
-    @asyncio.coroutine
-    def get_pythonorg(event):
-        req = yield from aiohttp.request('get', 'http://www.python.org')
-        text = yield from req.text
+    async def get_pythonorg(event):
+        async with aiohttp.ClientSession() as session:
+            async with session.get('http://www.python.org') as resp:
+                text = await req.text()
         client.send_message(mto='jid2@example', mbody=text)
 
-    @asyncio.coroutine
-    def get_asyncioorg(event):
-        req = yield from aiohttp.request('get', 'http://www.asyncio.org')
-        text = yield from req.text
+    async def get_asyncioorg(event):
+        async with aiohttp.ClientSession() as session:
+            async with session.get('http://www.asyncio.org') as resp:
+                text = await req.text()
         client.send_message(mto='jid3@example', mbody=text)
 
     client = slixmpp.ClientXMPP('jid@example', 'password')
@@ -132,11 +126,10 @@ JID indicating its findings.
             self.register_plugin('xep_0092')
             self.add_event_handler('message', self.on_message)
 
-        @asyncio.coroutine
-        def on_message(self, event):
+        async def on_message(self, event):
             # You should probably handle IqError and IqTimeout exceptions here
             # but this is an example.
-            version = yield from self['xep_0092'].get_version(message['from'])
+            version = await self['xep_0092'].get_version(message['from'])
             text = "%s sent me a message, he runs %s" % (message['from'],
                                                          version['software_version']['name'])
             self.send_message(mto='master@example.tld', mbody=text)
