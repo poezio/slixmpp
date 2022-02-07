@@ -99,6 +99,13 @@ class IBBytestream(object):
         :returns: All bytes accumulated in the stream.
         """
         result = b''
+        while not self.recv_queue.empty():
+            result += self.recv_queue.get_nowait()
+            if max_data and len(result) > max_data:
+                return result
+        if self.stream_in_closed:
+            return result
+
         end_future = asyncio.Future()
 
         def on_close(stream):
