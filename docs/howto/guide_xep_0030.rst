@@ -172,14 +172,14 @@ the `XEP-0059 <http://xmpp.org/extensions/xep-0059.html>`_ plug-in.
 
 .. code-block:: python
 
-    info = yield from self['xep_0030'].get_info(jid='foo@example.com',
-                                                node='bar',
-                                                ifrom='baz@mycomponent.example.com',
-                                                timeout=30)
+    info = await self['xep_0030'].get_info(jid='foo@example.com',
+                                           node='bar',
+                                           ifrom='baz@mycomponent.example.com',
+                                           timeout=30)
 
-    items = self['xep_0030'].get_info(jid='foo@example.com',
-                                      node='bar',
-                                      iterator=True)
+    items = await self['xep_0030'].get_items(jid='foo@example.com',
+                                             node='bar',
+                                             iterator=True)
 
 For more examples on how to use basic disco queries, check the ``disco_browser.py``
 example in the ``examples`` directory.
@@ -194,7 +194,7 @@ a full Iq stanza.
 
 .. code-block:: python
 
-    info = self['xep_0030'].get_info(node='foo', local=True)
-    items = self['xep_0030'].get_items(jid='somejid@mycomponent.example.com',
-                                       node='bar',
-                                       local=True)
+    info = await self['xep_0030'].get_info(node='foo', local=True)
+    items = await self['xep_0030'].get_items(jid='somejid@mycomponent.example.com',
+                                             node='bar',
+                                             local=True)
