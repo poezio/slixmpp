@@ -32,8 +32,9 @@ import functools
 import logging
 import socket as Socket
 import ssl
-import weakref
 import uuid
+import warnings
+import weakref
 
 from contextlib import contextmanager
 import xml.etree.ElementTree as ET
@@ -508,7 +509,17 @@ class XMLStream(asyncio.BaseProtocol):
         timers, handling signal events, etc).  If timeout is None, this
         function will run forever. If timeout is a number, this function
         will return after the given time in seconds.
+
+        Will be removed in slixmpp 1.9.0
+
+        :deprecated: 1.8.0
         """
+        warnings.warn(
+            'This function will be removed in slixmpp 1.9 and above.'
+            ' Use the asyncio normal functions instead.',
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         if timeout is None:
             if forever:
                 self.loop.run_forever()
