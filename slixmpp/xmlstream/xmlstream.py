@@ -1239,7 +1239,7 @@ class XMLStream(asyncio.BaseProtocol):
         else:
             self.send_raw(data)
 
-    async def run_filters(self) -> NoReturn:
+    async def run_filters(self) -> None:
         """
         Background loop that processes stanzas to send.
         """
@@ -1295,6 +1295,9 @@ class XMLStream(asyncio.BaseProtocol):
                     self.send_raw(data)
             except ContinueQueue as exc:
                 log.debug('Stanza in send queue not sent: %s', exc)
+            except asyncio.CancelledError:
+                log.debug('Send coroutine received cancel(), stopping')
+                return
             except Exception:
                 log.error('Exception raised in send queue:', exc_info=True)
             self.waiting_queue.task_done()
