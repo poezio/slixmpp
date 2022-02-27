@@ -9,6 +9,7 @@ Tutorials, FAQs, and How To Guides
     internal_api
     features
     sasl
+    remove_process
     handlersmatchers
     guide_xep_0030
     xmpp_tdg

@@ -149,6 +149,8 @@ class XEP_0313(BasePlugin):
         """
         Iterate over each message of MAM query.
 
+        .. versionadded:: 1.8.0
+
         :param jid: Entity holding the MAM records
         :param start: MAM query start time
         :param end: MAM query end time
@@ -239,7 +241,7 @@ class XEP_0313(BasePlugin):
     async def get_fields(self, jid: Optional[JID] = None, **iqkwargs) -> Form:
         """Get MAM query fields.
 
-        .. versionaddedd:: 1.8.0
+        .. versionadded:: 1.8.0
 
         :param jid: JID to retrieve the policy from.
         :return: The Form of allowed options

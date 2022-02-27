@@ -193,7 +193,7 @@ implementation should work correctly.
 
 .. tip::
     To see how to implement in-band registration as a Slixmpp plugin,
-    see the tutorial :ref:`tutorial-create-plugin`.
+    see the tutorial :ref:`create-plugin`.
 
 `View full source (5) <http://github.com/legastero/xmpp-tdg/blob/master/code/CheshiR/RegistrableComponent.py>`_ |
 `View original code (5) <http://github.com/remko/xmpp-tdg/blob/master/code/CheshiR/RegistrableComponent.py>`_
