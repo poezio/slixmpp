@@ -1012,5 +1012,12 @@
             <file-release rdf:resource="https://lab.louiz.org/poezio/slixmpp/-/archive/slix-1.7.1/slixmpp-slix-1.7.1.tar.gz"/>
         </Version>
     </release>
+    <release>
+        <Version>
+            <revision>1.8.0</revision>
+            <created>2022-02-27</created>
+            <file-release rdf:resource="https://lab.louiz.org/poezio/slixmpp/-/archive/slix-1.8.0/slixmpp-slix-1.8.0.tar.gz"/>
+        </Version>
+    </release>
 </Project>
 </rdf:RDF>
