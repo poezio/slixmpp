@@ -56,6 +56,7 @@ from slixmpp.types import (
     PresenceArgs,
 )
 
+JoinResult = Tuple[Presence, Message, List[Presence], List[Message]]
 
 log = logging.getLogger(__name__)
 
@@ -71,7 +72,7 @@ class XEP_0045(BasePlugin):
 
     name = 'xep_0045'
     description = 'XEP-0045: Multi-User Chat'
-    dependencies = {'xep_0030', 'xep_0004'}
+    dependencies = {'xep_0030', 'xep_0004', 'xep_0203'}
     stanza = stanza
 
     rooms: Dict[JID, Dict[str, MucRoomItem]]
@@ -254,6 +255,7 @@ class XEP_0045(BasePlugin):
         if msg['body'] or msg['thread']:
             return
         self.xmpp.event('groupchat_subject', msg)
+        self.xmpp.event('muc::%s::groupchat_subject' % msg['from'].bare, msg)
 
     async def join_muc_wait(self, room: JID, nick: str, *,
                             password: Optional[str] = None,
@@ -262,7 +264,7 @@ class XEP_0045(BasePlugin):
                             seconds: Optional[int] = None,
                             since: Optional[datetime] = None,
                             presence_options: Optional[PresenceArgs] = None,
-                            timeout: Optional[int] = None) -> Presence:
+                            timeout: Optional[int] = None) -> JoinResult:
         """
         Try to join a MUC and block until we are joined or get an error.
 
@@ -282,7 +284,8 @@ class XEP_0045(BasePlugin):
                  presence error.
         :raises: An asyncio.TimeoutError if there is neither success nor
                 presence error when the timeout is reached.
-        :return: Our own presence
+        :return: A tuple containing our own presence, the subject, a list
+                 of occupants and a list of history messages.
         """
         if presence_options is None:
             presence_options = {}
@@ -305,23 +308,55 @@ class XEP_0045(BasePlugin):
         self.rooms[room] = {}
         self.our_nicks[room] = nick
         stanza.send()
+        return await self._await_join(room, timeout)
 
-        future: asyncio.Future = asyncio.Future()
-        context1 = self.xmpp.event_handler("muc::%s::self-presence" % room, future.set_result)
-        context2 = self.xmpp.event_handler("muc::%s::presence-error" % room, future.set_result)
-        with context1, context2:
+    async def _await_join(self, room: JID, timeout: Optional[int] = None) -> JoinResult:
+        """Do the heavy lifting for awaiting a MUC join
+
+        A muc join, once the join stanza is sent, is:
+            occupant presences → self-presence → room history → room subject
+        """
+        presence_done: asyncio.Future = asyncio.Future()
+        topic_received: asyncio.Future = asyncio.Future()
+        history_buffer: List[Message] = []
+        occupant_buffer: List[Presence] = []
+
+        def add_message(msg: Message):
+            delay = msg.get_plugin('delay', check=True)
+            print(delay)
+            if delay is not None and delay['from'] == room:
+                history_buffer.append(msg)
+
+        def add_occupant(pres: Presence):
+            occupant_buffer.append(pres)
+
+        catch_occupants = self.xmpp.event_handler("muc::%s::got_online" % room, add_occupant)
+        catch_history = self.xmpp.event_handler("muc::%s::message" % room, add_message)
+        subject_handler = self.xmpp.event_handler("muc::%s::groupchat_subject" % room, topic_received.set_result)
+        self_presence = self.xmpp.event_handler("muc::%s::self-presence" % room, presence_done.set_result)
+        presence_error = self.xmpp.event_handler("muc::%s::presence-error" % room, presence_done.set_result)
+
+        with subject_handler, catch_history, catch_occupants:
+            with self_presence, presence_error:
+                done, pending = await asyncio.wait(
+                    [presence_done],
+                    timeout=timeout,
+                )
+            if pending:
+                raise asyncio.TimeoutError()
+            pres: Presence = presence_done.result()
+            if pres['type'] == 'error':
+                raise PresenceError(pres)
             done, pending = await asyncio.wait(
-                [future],
+                [topic_received],
                 timeout=timeout,
             )
-        if pending:
-            raise asyncio.TimeoutError()
-        pres = await future
-        if pres['type'] == 'error':
-            raise PresenceError(pres)
+            if pending:
+                raise asyncio.TimeoutError()
+        subject: Message = topic_received.result()
         # update known nick in case it has changed
         self.our_nicks[room] = pres['from'].resource
-        return pres
+        return (pres, subject, occupant_buffer, history_buffer)
 
     def join_muc(self, room: JID, nick: str, maxhistory="0", password='',
                  pstatus='', pshow='', pfrom='') -> asyncio.Future:
