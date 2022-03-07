@@ -23,7 +23,7 @@ class TestReactions(SlixTest):
 
     def setUp(self):
         register_stanza_plugin(Message, stanza.Reactions)
-        register_stanza_plugin(stanza.Reactions, stanza.Reaction)
+        register_stanza_plugin(stanza.Reactions, stanza.Reaction, iterable=True)
 
     def testCreateReactions(self):
         """Testing creating Reactions."""
