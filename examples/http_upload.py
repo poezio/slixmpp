@@ -32,12 +32,14 @@ class HttpUpload(slixmpp.ClientXMPP):
         recipient: JID,
         filename: Path,
         domain: Optional[JID] = None,
+        encrypted: bool = False,
     ):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
         self.recipient = recipient
         self.filename = filename
         self.domain = domain
+        self.encrypted = encrypted
 
         self.add_event_handler("session_start", self.start)
 
@@ -45,7 +47,10 @@ class HttpUpload(slixmpp.ClientXMPP):
         log.info('Uploading file %s...', self.filename)
         try:
             url = await self['xep_0363'].upload_file(
-                self.filename, domain=self.domain, timeout=10
+                self.filename,
+                domain=self.domain,
+                encrypted=self.encrypted,
+                timeout=10,
             )
         except IqTimeout:
             raise TimeoutError('Could not send message in time')
@@ -90,6 +95,10 @@ if __name__ == '__main__':
     parser.add_argument("--domain",
                         help="Domain to use for HTTP File Upload (leave out for your own server’s)")
 
+    parser.add_argument("-e", "--encrypt", dest="encrypted",
+                        help="Whether to encrypt", action="store_const",
+                        default=False)
+
     args = parser.parse_args()
 
     # Setup logging.
@@ -111,6 +120,7 @@ if __name__ == '__main__':
         recipient=JID(args.recipient),
         filename=Path(args.file),
         domain=domain,
+        encrypted=args.encrypted,
     )
     xmpp.register_plugin('xep_0066')
     xmpp.register_plugin('xep_0071')
