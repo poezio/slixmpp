@@ -6,6 +6,10 @@
 import logging
 import os.path
 
+from pathlib import Path
+from io import BytesIO, BufferedReader
+from os import urandom
+
 from aiohttp import ClientSession
 from asyncio import Future
 from mimetypes import guess_type
@@ -14,7 +18,8 @@ from typing import (
     IO,
 )
 
-from pathlib import Path
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from slixmpp import JID, __version__
 from slixmpp.stanza import Iq
@@ -47,6 +52,9 @@ class FileTooBig(FileUploadError):
         return 'File size too large: {} (max: {} bytes)' \
             .format(self.args[0], self.args[1])
 
+class InvalidURLScheme(FileUploadError):
+    pass
+
 class HTTPError(FileUploadError):
     """
     Raised when we receive an HTTP error response during upload.
@@ -58,6 +66,25 @@ class HTTPError(FileUploadError):
     """
     def __str__(self):
         return 'Could not upload file: %d (%s)' % (self.args[0], self.args[1])
+
+
+def encrypt_file(plain: BufferedReader) -> Tuple[BytesIO, str]:
+    """Encrypts file as specified in XEP-0454 for use in file sharing"""
+    aes_gcm_iv = urandom(12)
+    aes_gcm_key = urandom(32)
+
+    aes_gcm = Cipher(
+        algorithms.AES(aes_gcm_key),
+        modes.GCM(aes_gcm_iv),
+        backend=default_backend(),
+    ).encryptor()
+
+    data = aes_gcm.update(plain.read() + aes_gcm.tag) + aes_gcm.finalize()
+
+    payload = BytesIO(data)
+    anchor = aes_gcm_iv.hex() + aes_gcm_key.hex()
+    return (payload, anchor)
+
 
 class XEP_0363(BasePlugin):
     """
@@ -136,6 +163,7 @@ class XEP_0363(BasePlugin):
                           content_type: Optional[str] = None, *,
                           input_file: Optional[IO[bytes]]=None,
                           domain: Optional[JID] = None,
+                          encrypted: bool = False,
                           **iqkwargs) -> str:
         '''Helper function which does all of the uploading discovery and
         process.
@@ -174,6 +202,10 @@ class XEP_0363(BasePlugin):
         if input_file is None:
             input_file = open(filename, 'rb')
 
+        anchor: Optional[str] = None
+        if encrypted:
+            input_file, anchor = encrypt_file(input_file)
+
         if size is None:
             size = input_file.seek(0, 2)
             input_file.seek(0)
@@ -208,4 +240,10 @@ class XEP_0363(BasePlugin):
                 raise HTTPError(response.status, await response.text())
             log.info('Response code: %d (%s)', response.status, await response.text())
             response.close()
-            return slot['get']['url']
+
+            url = slot['get']['url']
+            if encrypted:
+                if not url.startswith('https://'):
+                    raise InvalidURLScheme
+                url = 'aesgcm://' + url.removeprefix('https://') + '#' + anchor
+            return url
