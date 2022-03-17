@@ -5,11 +5,15 @@
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
 
+from typing import Optional
+
 import logging
+from pathlib import Path
 from getpass import getpass
 from argparse import ArgumentParser
 
 import slixmpp
+from slixmpp import JID
 from slixmpp.exceptions import IqTimeout
 
 log = logging.getLogger(__name__)
@@ -21,7 +25,14 @@ class HttpUpload(slixmpp.ClientXMPP):
     A basic client asking an entity if they confirm the access to an HTTP URL.
     """
 
-    def __init__(self, jid, password, recipient, filename, domain=None):
+    def __init__(
+        self,
+        jid: JID,
+        password: str,
+        recipient: JID,
+        filename: Path,
+        domain: Optional[JID] = None,
+    ):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
         self.recipient = recipient
@@ -86,11 +97,21 @@ if __name__ == '__main__':
                         format='%(levelname)-8s %(message)s')
 
     if args.jid is None:
-        args.jid = input("Username: ")
+        args.jid = JID(input("Username: "))
     if args.password is None:
         args.password = getpass("Password: ")
 
-    xmpp = HttpUpload(args.jid, args.password, args.recipient, args.file, args.domain)
+    domain = args.domain
+    if domain is not None:
+        domain = JID(domain)
+
+    xmpp = HttpUpload(
+        jid=args.jid,
+        password=args.password,
+        recipient=JID(args.recipient),
+        filename=Path(args.file),
+        domain=domain,
+    )
     xmpp.register_plugin('xep_0066')
     xmpp.register_plugin('xep_0071')
     xmpp.register_plugin('xep_0128')
