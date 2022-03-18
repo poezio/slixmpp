@@ -526,7 +526,7 @@ class XMLStream(asyncio.BaseProtocol):
             else:
                 self.loop.run_until_complete(self.disconnected)
         else:
-            tasks: List[Future] = [asyncio.sleep(timeout)]
+            tasks: List[Awaitable] = [asyncio.sleep(timeout)]
             if not forever:
                 tasks.append(self.disconnected)
             self.loop.run_until_complete(asyncio.wait(tasks))
