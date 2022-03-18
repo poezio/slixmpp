@@ -123,7 +123,7 @@ class XEP_0454(BasePlugin):
         self,
         filename: Path,
         _size: Optional[int] = None,
-        _content_type: Optional[str] = None,
+        content_type: Optional[str] = None,
         **kwargs,
     ) -> str:
         """
@@ -154,7 +154,7 @@ class XEP_0454(BasePlugin):
         input_enc.seek(0)
         kwargs['size'] = size
 
-        kwargs['content_type'] = 'application/octet-stream'
+        kwargs['content_type'] = content_type
 
         url = await self.xmpp['xep_0363'].upload_file(**kwargs)
         return self.format_url(url, fragment)
