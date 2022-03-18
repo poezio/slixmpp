@@ -4,14 +4,18 @@
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
 import logging
+from os import getenv
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-# Use defusedxml if available
-try:
-    import defusedxml
-    defusedxml.defuse_stdlib()
-except ImportError:
-    pass
+# Use defusedxml if wanted
+# Since enabling it can have adverse consequences for the programs using
+# slixmpp, do not enable it by default.
+if  getenv('SLIXMPP_ENABLE_DEFUSEDXML', default='false').lower() == 'true':
+    try:
+        import defusedxml
+        defusedxml.defuse_stdlib()
+    except ImportError:
+        pass
 
 from slixmpp.stanza import Message, Presence, Iq
 from slixmpp.jid import JID, InvalidJID
