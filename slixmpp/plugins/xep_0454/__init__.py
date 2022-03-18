@@ -64,7 +64,8 @@ class XEP_0454(BasePlugin):
                 break
             payload += aes_gcm.update(buf)
 
-        payload += aes_gcm.tag + aes_gcm.finalize()
+        aes_gcm.finalize()
+        payload += aes_gcm.tag
         fragment = aes_gcm_iv.hex() + aes_gcm_key.hex()
         return (payload, fragment)
 
