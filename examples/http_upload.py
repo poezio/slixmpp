@@ -7,6 +7,7 @@
 
 from typing import Optional
 
+import sys
 import logging
 from pathlib import Path
 from getpass import getpass
@@ -32,20 +33,25 @@ class HttpUpload(slixmpp.ClientXMPP):
         recipient: JID,
         filename: Path,
         domain: Optional[JID] = None,
+        encrypted: bool = False,
     ):
         slixmpp.ClientXMPP.__init__(self, jid, password)
 
         self.recipient = recipient
         self.filename = filename
         self.domain = domain
+        self.encrypted = encrypted
 
         self.add_event_handler("session_start", self.start)
 
     async def start(self, event):
         log.info('Uploading file %s...', self.filename)
         try:
-            url = await self['xep_0363'].upload_file(
-                self.filename, domain=self.domain, timeout=10
+            upload_file = self['xep_0363'].upload_file
+            if self.encrypted:
+                upload_file = self['xep_0454'].upload_file
+            url = await upload_file(
+                self.filename, domain=self.domain, timeout=10,
             )
         except IqTimeout:
             raise TimeoutError('Could not send message in time')
@@ -90,6 +96,10 @@ if __name__ == '__main__':
     parser.add_argument("--domain",
                         help="Domain to use for HTTP File Upload (leave out for your own server’s)")
 
+    parser.add_argument("-e", "--encrypt", dest="encrypted",
+                        help="Whether to encrypt", action="store_true",
+                        default=False)
+
     args = parser.parse_args()
 
     # Setup logging.
@@ -105,17 +115,27 @@ if __name__ == '__main__':
     if domain is not None:
         domain = JID(domain)
 
+    if args.encrypted:
+        print(
+            'You are using the --encrypt flag. '
+            'Be aware that the transport being used is NOT end-to-end '
+            'encrypted. The server will be able to decrypt the file.',
+            file=sys.stderr,
+        )
+
     xmpp = HttpUpload(
         jid=args.jid,
         password=args.password,
         recipient=JID(args.recipient),
         filename=Path(args.file),
         domain=domain,
+        encrypted=args.encrypted,
     )
     xmpp.register_plugin('xep_0066')
     xmpp.register_plugin('xep_0071')
     xmpp.register_plugin('xep_0128')
     xmpp.register_plugin('xep_0363')
+    xmpp.register_plugin('xep_0454')
 
     # Connect to the XMPP server and start processing XMPP stanzas.
     xmpp.connect()
