@@ -14,6 +14,7 @@ from typing import IO, Optional, Tuple
 
 from os import urandom
 from pathlib import Path
+from io import BytesIO, SEEK_END
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
@@ -32,6 +33,7 @@ class XEP_0454(BasePlugin):
 
     name = 'xep_0454'
     description = 'XEP-0454: OMEMO Media Sharing'
+    dependencies = {'xep_0363'}
 
     @classmethod
     def encrypt(cls, input_file: Optional[IO[bytes]] = None, filename: Optional[Path] = None) -> Tuple[bytes, str]:
@@ -72,5 +74,44 @@ class XEP_0454(BasePlugin):
         if not url.startswith('https://') or url.find('#') != -1:
             raise InvalidURL
         url = 'aesgcm://' + url.removeprefix('https://') + '#' + fragment
+
+    async def upload_file(
+        self,
+        filename: Path,
+        _size: Optional[int] = None,
+        _content_type: Optional[str] = None,
+        **kwargs,
+    ) -> str:
+        """
+            Wrapper to xep_0363 (HTTP Upload)'s upload_file method.
+
+            :param input_file: Binary file stream on the file.
+            :param filename: Path to the file to upload.
+
+            Same as `XEP_0454.encrypt`, one of input_file or filename must be
+            specified. If both are passed, input_file will be used and
+            filename ignored.
+
+            Other arguments passed in are passed to the actual
+            `XEP_0363.upload_file` call.
+        """
+        input_file = kwargs.get('input_file')
+        payload, fragment = self.encrypt(input_file, filename)
+
+        # Prepare kwargs for upload_file call
+        filename = urandom(12).hex()  # Random filename to hide user-provided path
+        kwargs['filename'] = filename
+
+        input_enc = BytesIO(payload)
+        kwargs['input_file'] = input_enc
+
+        # Size must also be overriden if provided
+        size = input_enc.seek(0, SEEK_END)
+        input_enc.seek(0)
+        kwargs['size'] = size
+
+        kwargs['content_type'] = 'application/octet-stream'
+
+        return self.format_url(url, fragment)
 
 register_plugin(XEP_0454)
