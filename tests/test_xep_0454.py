@@ -32,4 +32,10 @@ class TestMediaSharing(SlixTest):
 
         self.assertEqual(plain, result)
 
+    def testFormatURL(self):
+        url = 'https://foo.bar'
+        fragment = 'a' * 88
+        result = XEP_0454.format_url(url, fragment)
+        self.assertEqual('aesgcm://foo.bar#' + 'a' * 88, result)
+
 suite = unittest.TestLoader().loadTestsFromTestCase(TestMediaSharing)
