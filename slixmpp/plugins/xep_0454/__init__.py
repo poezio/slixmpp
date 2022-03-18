@@ -57,14 +57,18 @@ class XEP_0454(BasePlugin):
             modes.GCM(aes_gcm_iv),
         ).encryptor()
 
-        # TODO: use streaming API from CipherContext
-        if input_file:
-            plain = input_file.read()
-        else:
-            with filename.open(mode='rb') as file:
-                plain = file.read()
+        if input_file is None:
+            input_file = open(filename, 'rb')
 
-        payload = aes_gcm.update(plain) + aes_gcm.tag + aes_gcm.finalize()
+        payload = b''
+        while True:
+            buf = input_file.read(4096)
+            if not buf:
+                break
+            payload += aes_gcm.update(buf)
+
+        aes_gcm.finalize()
+        payload += aes_gcm.tag
         fragment = aes_gcm_iv.hex() + aes_gcm_key.hex()
         return (payload, fragment)
 
