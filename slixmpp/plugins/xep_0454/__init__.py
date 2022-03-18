@@ -16,7 +16,6 @@ from os import urandom
 from pathlib import Path
 from io import BytesIO
 
-from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from slixmpp.plugins import BasePlugin
@@ -53,7 +52,6 @@ class XEP_0454(BasePlugin):
         aes_gcm = Cipher(
             algorithms.AES(aes_gcm_key),
             modes.GCM(aes_gcm_iv),
-            backend=default_backend(),
         ).encryptor()
 
         # TODO: use streaming API from CipherContext
