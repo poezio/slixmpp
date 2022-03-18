@@ -36,7 +36,7 @@ class XEP_0454(BasePlugin):
     dependencies = {'xep_0363'}
 
     @classmethod
-    def encrypt(cls, input_file: Optional[IO[bytes]], filename: Path) -> Tuple[bytes, str]:
+    def encrypt(cls, input_file: Optional[IO[bytes]] = None, filename: Optional[Path] = None) -> Tuple[bytes, str]:
         """
             Encrypts file as specified in XEP-0454 for use in file sharing
 
