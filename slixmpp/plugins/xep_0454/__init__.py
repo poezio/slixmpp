@@ -73,6 +73,46 @@ class XEP_0454(BasePlugin):
         return (payload, fragment)
 
     @classmethod
+    def decrypt(cls, input_file: IO[bytes], fragment: str) -> bytes:
+        """
+            Decrypts file-like.
+
+            :param input_file: Binary file stream on the file, containing the
+                               tag (16 bytes) at the end.
+            :param fragment: 88 hex chars string composed of iv (24 chars)
+                             + key (64 chars).
+        """
+
+        assert len(fragment) == 88
+        aes_gcm_iv = bytes.fromhex(fragment[:24])
+        aes_gcm_key = bytes.fromhex(fragment[24:])
+
+        # Find 16 bytes tag
+        input_file.seek(-16, SEEK_END)
+        tag = input_file.read()
+
+        aes_gcm = Cipher(
+            algorithms.AES(aes_gcm_key),
+            modes.GCM(aes_gcm_iv, tag),
+        ).decryptor()
+
+        size = input_file.seek(0, SEEK_END)
+        input_file.seek(0)
+
+        count = size - 16
+        plain = b''
+        while count >= 0:
+            buf = input_file.read(4096)
+            count -= len(buf)
+            if count <= 0:
+                buf += input_file.read()
+                buf = buf[:-16]
+            plain += aes_gcm.update(buf)
+        plain += aes_gcm.finalize()
+
+        return plain
+
+    @classmethod
     def format_url(cls, url: str, fragment: str) -> str:
         """Helper to format a HTTPS URL to an AESGCM URI"""
         if not url.startswith('https://') or url.find('#') != -1:
