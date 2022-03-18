@@ -14,7 +14,7 @@ from typing import IO, Optional, Tuple
 
 from os import urandom
 from pathlib import Path
-from io import BytesIO
+from io import BytesIO, SEEK_END
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
@@ -102,7 +102,7 @@ class XEP_0454(BasePlugin):
         kwargs['input_file'] = input_enc
 
         # Size must also be overriden if provided
-        size = input_enc.seek(0, 2)
+        size = input_enc.seek(0, SEEK_END)
         input_enc.seek(0)
         kwargs['size'] = size
 
