@@ -20,7 +20,7 @@ test:
   script:
     - apt update
     - apt install -y python3 python3-pip cython3 gpg
-    - pip3 install emoji aiohttp
+    - pip3 install emoji aiohttp cryptography
     - ./run_tests.py
 
 test-3.10:
@@ -31,7 +31,7 @@ test-3.10:
   script:
     - apt update
     - apt install -y python3 python3-pip cython3 gpg
-    - pip3 install emoji aiohttp
+    - pip3 install emoji aiohttp cryptography
     - ./run_tests.py
 
 test-3.11:
@@ -43,7 +43,7 @@ test-3.11:
   script:
     - apt update
     - apt install -y python3 python3-pip cython3 gpg
-    - pip3 install emoji aiohttp
+    - pip3 install emoji aiohttp cryptography
     - ./run_tests.py
 
 test_integration:

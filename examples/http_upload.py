@@ -48,7 +48,15 @@ class HttpUpload(slixmpp.ClientXMPP):
         log.info('Uploading file %s...', self.filename)
         try:
             upload_file = self['xep_0363'].upload_file
-            if self.encrypted:
+            if self.encrypted and not self['xep_0454']:
+                print(
+                    'The xep_0454 module isn\'t available. '
+                    'Ensure you have \'cryptography\' '
+                    'from extras_require installed.',
+                    file=sys.stderr,
+                )
+                return
+            elif self.encrypted:
                 upload_file = self['xep_0454'].upload_file
             url = await upload_file(
                 self.filename, domain=self.domain, timeout=10,
@@ -135,7 +143,13 @@ if __name__ == '__main__':
     xmpp.register_plugin('xep_0071')
     xmpp.register_plugin('xep_0128')
     xmpp.register_plugin('xep_0363')
-    xmpp.register_plugin('xep_0454')
+    try:
+        xmpp.register_plugin('xep_0454')
+    except slixmpp.plugins.base.PluginNotFound:
+        log.error(
+            'Could not load xep_0454. '
+            'Ensure you have \'cryptography\' from extras_require installed.'
+        )
 
     # Connect to the XMPP server and start processing XMPP stanzas.
     xmpp.connect()
