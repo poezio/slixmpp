@@ -26,6 +26,11 @@ class InvalidURL(Exception):
     """Raised for URLs that either aren't HTTPS or already contain a fragment."""
 
 
+EXTENSIONS_MAP = {
+    'jpeg': 'jpg',
+    'text': 'txt',
+}
+
 class XEP_0454(BasePlugin):
     """
         XEP-0454: OMEMO Media Sharing
@@ -118,6 +123,14 @@ class XEP_0454(BasePlugin):
             raise InvalidURL
         return 'aesgcm://' + url.removeprefix('https://') + '#' + fragment
 
+    @staticmethod
+    def map_extensions(ext: str) -> str:
+        """
+            Apply conversions to extensions to reduce the number of
+            variations, (e.g., JPEG -> jpg).
+        """
+        return EXTENSIONS_MAP.get(ext, ext).lower()
+
     async def upload_file(
         self,
         filename: Path,
@@ -142,8 +155,10 @@ class XEP_0454(BasePlugin):
         payload, fragment = self.encrypt(input_file, filename)
 
         # Prepare kwargs for upload_file call
-        filename = urandom(12).hex()  # Random filename to hide user-provided path
-        kwargs['filename'] = filename
+        new_filename = urandom(12).hex()  # Random filename to hide user-provided path
+        if filename.suffix:
+            new_filename += self.map_extensions(filename.suffix)
+        kwargs['filename'] = new_filename
 
         input_enc = BytesIO(payload)
         kwargs['input_file'] = input_enc
