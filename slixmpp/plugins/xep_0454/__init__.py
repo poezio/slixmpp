@@ -35,8 +35,8 @@ class XEP_0454(BasePlugin):
     description = 'XEP-0454: OMEMO Media Sharing'
     dependencies = {'xep_0363'}
 
-    @classmethod
-    def encrypt(cls, input_file: Optional[IO[bytes]] = None, filename: Optional[Path] = None) -> Tuple[bytes, str]:
+    @staticmethod
+    def encrypt(input_file: Optional[IO[bytes]] = None, filename: Optional[Path] = None) -> Tuple[bytes, str]:
         """
             Encrypts file as specified in XEP-0454 for use in file sharing
 
@@ -71,8 +71,8 @@ class XEP_0454(BasePlugin):
         fragment = aes_gcm_iv.hex() + aes_gcm_key.hex()
         return (payload, fragment)
 
-    @classmethod
-    def decrypt(cls, input_file: IO[bytes], fragment: str) -> bytes:
+    @staticmethod
+    def decrypt(input_file: IO[bytes], fragment: str) -> bytes:
         """
             Decrypts file-like.
 
@@ -111,8 +111,8 @@ class XEP_0454(BasePlugin):
 
         return plain
 
-    @classmethod
-    def format_url(cls, url: str, fragment: str) -> str:
+    @staticmethod
+    def format_url(url: str, fragment: str) -> str:
         """Helper to format a HTTPS URL to an AESGCM URI"""
         if not url.startswith('https://') or url.find('#') != -1:
             raise InvalidURL
