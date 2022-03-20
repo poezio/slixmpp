@@ -121,7 +121,7 @@ class XEP_0454(BasePlugin):
         """Helper to format a HTTPS URL to an AESGCM URI"""
         if not url.startswith('https://') or url.find('#') != -1:
             raise InvalidURL
-        return 'aesgcm://' + url.removeprefix('https://') + '#' + fragment
+        return 'aesgcm://' + url[len('https://'):] + '#' + fragment
 
     @staticmethod
     def map_extensions(ext: str) -> str:
