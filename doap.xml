@@ -892,6 +892,14 @@
             <xmpp:since>1.6.0</xmpp:since>
         </xmpp:SupportedXep>
     </implements>
+    <implements>
+        <xmpp:SupportedXep>
+            <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0454.html"/>
+            <xmpp:status>no thumbnail support</xmpp:status>
+            <xmpp:version>0.1.0</xmpp:version>
+            <xmpp:since>1.8.1</xmpp:since>
+        </xmpp:SupportedXep>
+    </implements>
 
     <release>
         <Version>

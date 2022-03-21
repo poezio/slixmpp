@@ -14,6 +14,8 @@ from typing import (
     IO,
 )
 
+from pathlib import Path
+
 from slixmpp import JID, __version__
 from slixmpp.stanza import Iq
 from slixmpp.plugins import BasePlugin
@@ -113,7 +115,7 @@ class XEP_0363(BasePlugin):
                 if feature == Request.namespace:
                     return info
 
-    def request_slot(self, jid: JID, filename: str, size: int,
+    def request_slot(self, jid: JID, filename: Path, size: int,
                     content_type: Optional[str] = None, *,
                     ifrom: Optional[JID] = None, **iqkwargs) -> Future:
         """Request an HTTP upload slot from a service.
@@ -125,12 +127,12 @@ class XEP_0363(BasePlugin):
         """
         iq = self.xmpp.make_iq_get(ito=jid, ifrom=ifrom)
         request = iq['http_upload_request']
-        request['filename'] = filename
+        request['filename'] = str(filename)
         request['size'] = str(size)
         request['content-type'] = content_type or self.default_content_type
         return iq.send(**iqkwargs)
 
-    async def upload_file(self, filename: str, size: Optional[int] = None,
+    async def upload_file(self, filename: Path, size: Optional[int] = None,
                           content_type: Optional[str] = None, *,
                           input_file: Optional[IO[bytes]]=None,
                           domain: Optional[JID] = None,
