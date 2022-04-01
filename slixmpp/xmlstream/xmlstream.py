@@ -1319,8 +1319,12 @@ class XMLStream(asyncio.BaseProtocol):
             from slixmpp.stanza.rootstanza import RootStanza
             from slixmpp.stanza import Iq, Handshake
             passthrough = (
-                (isinstance(data, Iq) and data.get_plugin('bind', check=True))
-                or isinstance(data, Handshake)
+                (
+                    isinstance(data, Iq) and (
+                        data.get_plugin('bind', check=True)
+                        or data.get_plugin('session', check=True)
+                    )
+                ) or isinstance(data, Handshake)
             )
             if isinstance(data, (RootStanza, str)) and not passthrough:
                 self.__queued_stanzas.append((data, use_filters))
