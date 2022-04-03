@@ -1,3 +1,4 @@
+import asyncio
 import unittest
 from slixmpp.test.integration import SlixIntegration
 
@@ -28,6 +29,16 @@ class TestDisco(SlixIntegration):
             self.clients[0].boundjid.full
         )
         self.assertNotIn('urn:xmpp:fake:0', info['disco_info']['features'])
+
+    async def test_inflight_dedup(self):
+        """Check that doing 15 of the same disco request will generate only
+        one outgoing stanza"""
+        infos = []
+        for _ in range(10):
+            infos.append(self.clients[1]['xep_0030'].get_info(self.clients[0].boundjid.full))
+        res = await asyncio.gather(*infos)
+        iq_number = set(i['id'] for i in res)
+        self.assertEqual(len(iq_number), 1)
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestDisco)

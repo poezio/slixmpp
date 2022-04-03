@@ -113,7 +113,8 @@ class XEP_0030(BasePlugin):
                 'get_items', 'set_items', 'del_items', 'add_identity',
                 'del_identity', 'add_feature', 'del_feature', 'add_item',
                 'del_item', 'del_identities', 'del_features', 'cache_info',
-                'get_cached_info', 'supports', 'has_identity']
+                'get_cached_info', 'supports', 'has_identity',
+                'get_in_flight', 'set_in_flight', 'del_in_flight']
 
         for op in self._disco_ops:
             self.api.register(getattr(self.static, op), op, default=True)
@@ -405,13 +406,21 @@ class XEP_0030(BasePlugin):
             if info is not None:
                 return self._wrap(ifrom, jid, info)
 
-        iq = self.xmpp.Iq()
-        # Check dfrom parameter for backwards compatibility
-        iq['from'] = ifrom or kwargs.get('dfrom', '')
-        iq['to'] = jid
-        iq['type'] = 'get'
-        iq['disco_info']['node'] = node if node else ''
-        return await iq.send(**kwargs)
+        ifrom = ifrom or kwargs.get('dfrom', '')
+        future = self.api['get_in_flight'](ifrom, jid, node)
+        if future is None:
+            iq = self.xmpp.Iq()
+            # Check dfrom parameter for backwards compatibility
+            iq['from'] = ifrom
+            iq['to'] = jid
+            iq['type'] = 'get'
+            iq['disco_info']['node'] = node if node else ''
+            future = iq.send(**kwargs)
+            self.api['set_in_flight'](ifrom, jid, node, future)
+        try:
+            return await future
+        finally:
+            self.api['del_in_flight'](ifrom, jid, node)
 
     def set_info(self, jid: OptJid = None, node: Optional[str] = None,
                  info: Optional[Union[Iq, DiscoInfo]] = None) -> Future:

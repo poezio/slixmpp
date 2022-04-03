@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import logging
 
+from asyncio import Future
 from typing import (
     Optional,
     Any,
@@ -37,6 +38,10 @@ class NodeType(TypedDict):
 NodesType = Dict[
     Tuple[str, str, str],
     NodeType
+]
+InFlightDiscos = Dict[
+    Tuple[OptJid, JID, Optional[str]],
+    Future
 ]
 
 
@@ -70,6 +75,7 @@ class StaticDisco:
         self.nodes: NodesType = {}
         self.xmpp: BaseXMPP = xmpp
         self.disco: 'XEP_0030' = disco
+        self.in_flight_discos: InFlightDiscos = {}
 
     def add_node(self, jid: OptJidStr = None, node: Optional[str] = None,
                  ifrom: OptJidStr = None) -> NodeType:
@@ -475,3 +481,15 @@ class StaticDisco:
         if not self.node_exists(jid, node, ifrom):
             return None
         return self.get_node(jid, node, ifrom)['info']
+
+    def del_in_flight(self, ifrom: OptJid, jid: JID, node: Optional[str]) -> None:
+        self.in_flight_discos.pop((ifrom, jid, node), None)
+
+    def set_in_flight(self, ifrom: OptJid, jid: JID, node: Optional[str],
+                      future: Future) -> None:
+        if not (ifrom, jid, node) in self.in_flight_discos:
+            self.in_flight_discos[(ifrom, jid, node)] = future
+
+    def get_in_flight(self, ifrom: OptJid, jid: JID, node: Optional[str]) -> Optional[Future]:
+        return self.in_flight_discos.get((ifrom, jid, node), None)
+
