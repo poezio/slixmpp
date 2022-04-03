@@ -40,7 +40,7 @@ NodesType = Dict[
     NodeType
 ]
 InFlightDiscos = Dict[
-    Tuple[OptJid, JID, Optional[str]],
+    Tuple[str, OptJid, JID, Optional[str]],
     Future
 ]
 
@@ -482,14 +482,16 @@ class StaticDisco:
             return None
         return self.get_node(jid, node, ifrom)['info']
 
-    def del_in_flight(self, ifrom: OptJid, jid: JID, node: Optional[str]) -> None:
-        self.in_flight_discos.pop((ifrom, jid, node), None)
+    def del_in_flight(self, jid: JID, node: Optional[str], ifrom: OptJid, dtype: str) -> None:
+        """Remove an entry from the in-flight dict"""
+        self.in_flight_discos.pop((dtype, ifrom, jid, node), None)
 
-    def set_in_flight(self, ifrom: OptJid, jid: JID, node: Optional[str],
-                      future: Future) -> None:
-        if not (ifrom, jid, node) in self.in_flight_discos:
-            self.in_flight_discos[(ifrom, jid, node)] = future
+    def set_in_flight(self, jid: JID, node: Optional[str], ifrom: OptJid,
+                      args: Tuple[str, Future]) -> None:
+        """Add an entry to the in-flight dict"""
+        dtype, future = args
+        self.in_flight_discos.setdefault((dtype, ifrom, jid, node), future)
 
-    def get_in_flight(self, ifrom: OptJid, jid: JID, node: Optional[str]) -> Optional[Future]:
-        return self.in_flight_discos.get((ifrom, jid, node), None)
-
+    def get_in_flight(self, jid: JID, node: Optional[str], ifrom: OptJid, dtype: str) -> Optional[Future]:
+        """Get an entry from the in-flight dict"""
+        return self.in_flight_discos.get((dtype, ifrom, jid, node), None)

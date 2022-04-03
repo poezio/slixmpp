@@ -31,8 +31,7 @@ class TestDisco(SlixIntegration):
         self.assertNotIn('urn:xmpp:fake:0', info['disco_info']['features'])
 
     async def test_inflight_dedup(self):
-        """Check that doing 15 of the same disco request will generate only
-        one outgoing stanza"""
+        """Check that doing 10 times a request will generate only 1 stanza"""
         infos = []
         for _ in range(10):
             infos.append(self.clients[1]['xep_0030'].get_info(self.clients[0].boundjid.full))

@@ -407,7 +407,7 @@ class XEP_0030(BasePlugin):
                 return self._wrap(ifrom, jid, info)
 
         ifrom = ifrom or kwargs.get('dfrom', '')
-        future = self.api['get_in_flight'](ifrom, jid, node)
+        future = await self.api['get_in_flight'](jid, node, ifrom, "info")
         if future is None:
             iq = self.xmpp.Iq()
             # Check dfrom parameter for backwards compatibility
@@ -416,11 +416,11 @@ class XEP_0030(BasePlugin):
             iq['type'] = 'get'
             iq['disco_info']['node'] = node if node else ''
             future = iq.send(**kwargs)
-            self.api['set_in_flight'](ifrom, jid, node, future)
+            self.api['set_in_flight'](jid, node, ifrom, ("info", future))
         try:
             return await future
         finally:
-            self.api['del_in_flight'](ifrom, jid, node)
+            self.api['del_in_flight'](jid, node, ifrom, "info")
 
     def set_info(self, jid: OptJid = None, node: Optional[str] = None,
                  info: Optional[Union[Iq, DiscoInfo]] = None) -> Future:
@@ -464,20 +464,28 @@ class XEP_0030(BasePlugin):
                          the XEP-0059 plugin, if the plugin is loaded.
                          Otherwise the parameter is ignored.
         """
+        ifrom = ifrom or kwargs.get('dfrom', '')
         if local or local is None and jid is None:
             items = await self.api['get_items'](jid, node, ifrom, kwargs)
             return self._wrap(kwargs.get('ifrom', None), jid, items)
+        rsm = kwargs.get('iterator', False) and self.xmpp['xep_0059']
 
-        iq = self.xmpp.Iq()
-        # Check dfrom parameter for backwards compatibility
-        iq['from'] = ifrom or kwargs.get('dfrom', '')
-        iq['to'] = jid
-        iq['type'] = 'get'
-        iq['disco_items']['node'] = node if node else ''
-        if kwargs.get('iterator', False) and self.xmpp['xep_0059']:
-            return self.xmpp['xep_0059'].iterate(iq, 'disco_items')
-        else:
-            return await iq.send(**kwargs)
+        future = await self.api['get_in_flight'](jid, node, ifrom, "items")
+        if future is None or rsm:
+            iq = self.xmpp.Iq()
+            # Check dfrom parameter for backwards compatibility
+            iq['from'] = ifrom
+            iq['to'] = jid
+            iq['type'] = 'get'
+            iq['disco_items']['node'] = node if node else ''
+            if rsm:
+                return self.xmpp['xep_0059'].iterate(iq, 'disco_items')
+            future = iq.send(**kwargs)
+            self.api['set_in_flight'](jid, node, ifrom, ("items", future))
+        try:
+            return await future
+        finally:
+            self.api['del_in_flight'](jid, node, ifrom, "items")
 
     def set_items(self, jid: OptJid = None, node: Optional[str] = None,
                   **kwargs) -> Future:
