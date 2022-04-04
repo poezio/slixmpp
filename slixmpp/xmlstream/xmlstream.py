@@ -82,7 +82,7 @@ class InvalidCABundle(Exception):
         Exception raised when the CA Bundle file hasn't been found.
     """
 
-    def __init__(self, path: Optional[Path]):
+    def __init__(self, path: Union[Path, List[Path], None]):
         self.path = path
 
 
@@ -794,7 +794,7 @@ class XMLStream(asyncio.BaseProtocol):
                         ca_cert = bundle
                         break
             if ca_cert is None:
-                raise InvalidCABundle(ca_cert)
+                raise InvalidCABundle(self.ca_certs)
 
             self.ssl_context.verify_mode = ssl.CERT_REQUIRED
             self.ssl_context.load_verify_locations(cafile=ca_cert)
