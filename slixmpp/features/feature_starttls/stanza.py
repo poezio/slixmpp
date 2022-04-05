@@ -3,8 +3,9 @@
 # Copyright (C) 2011  Nathanael C. Fritz
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
-from slixmpp.xmlstream import StanzaBase, ElementBase
 from typing import Set, ClassVar
+from slixmpp.xmlstream import StanzaBase, ElementBase
+from slixmpp.xmlstream.xmlstream import InvalidCABundle
 
 
 class STARTTLS(StanzaBase):
@@ -35,6 +36,12 @@ class Proceed(StanzaBase):
     name = 'proceed'
     namespace = 'urn:ietf:params:xml:ns:xmpp-tls'
     interfaces: ClassVar[Set[str]] = set()
+
+    def exception(self, e: Exception) -> None:
+        log.exception('Error handling {%s}%s stanza',
+                      self.namespace, self.name)
+        if isinstance(e, InvalidCABundle):
+            raise e
 
 
 class Failure(StanzaBase):
