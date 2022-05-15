@@ -1,4 +1,3 @@
-
 # slixmpp: The Slick XMPP Library
 # Copyright (C) 2016 Emmanuel Gil Peyrot
 # This file is part of slixmpp.
@@ -68,11 +67,11 @@ class XEP_0333(BasePlugin):
         :param JID mto: recipient of the marker
         :param str id: Identifier of the marked message
         :param str marker: Marker to send (one of
-            displayed, retrieved, or acknowledged)
+            displayed, received, or acknowledged)
         :param str thread: Message thread
         :param str mfrom: Use a specific JID to send the message
         """
-        if marker not in ('displayed', 'retrieved', 'acknowledged'):
+        if marker not in ('displayed', 'received', 'acknowledged'):
             raise ValueError('Invalid marker: %s' % marker)
         msg = self.xmpp.make_message(mto=mto, mfrom=mfrom)
         if thread:
