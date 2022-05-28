@@ -140,7 +140,7 @@ class BaseXMPP(XMLStream):
         self.use_presence_ids = True
 
         #: XEP-0359 <origin-id/> tag that gets added to <message/> stanzas.
-        self.use_origin_id = True
+        self.use_origin_id = False
 
         #: The API registry is a way to process callbacks based on
         #: JID+node combinations. Each callback in the registry is

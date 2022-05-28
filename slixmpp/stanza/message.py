@@ -64,9 +64,9 @@ class Message(RootStanza):
             if self.stream:
                 use_ids = getattr(self.stream, 'use_message_ids', None)
                 if use_ids:
-                    self['id'] = self.stream.new_id()
+                    self.set_id(self.stream.new_id())
             else:
-                del self['origin_id']
+                self.del_origin_id()
 
     def get_type(self):
         """
@@ -96,8 +96,8 @@ class Message(RootStanza):
         self.xml.attrib['id'] = value
 
         if self.stream:
-            use_orig_ids = getattr(self.stream, 'use_origin_id', None)
-            if not use_orig_ids:
+            if not getattr(self.stream, 'use_origin_id', False):
+                self.del_origin_id()
                 return None
 
         sub = self.xml.find(ORIGIN_NAME)
