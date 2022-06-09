@@ -8,7 +8,7 @@ import ssl
 from typing import Dict
 
 from slixmpp.stanza import StreamFeatures, Iq
-from slixmpp.xmlstream import register_stanza_plugin, JID
+from slixmpp.xmlstream import register_stanza_plugin, JID, StanzaBase
 from slixmpp.xmlstream.handler import CoroutineCallback
 from slixmpp.xmlstream.matcher import StanzaPath
 from slixmpp.plugins import BasePlugin
@@ -27,16 +27,17 @@ class XEP_0077(BasePlugin):
 
     ::
 
-        user_register           -- After succesful validation and add to the user store
+        user_register           -- After successful validation and add to the user store
                                    in api["user_validate"]
-        user_unregister         -- After succesful user removal in api["user_remove"]
+        user_unregister         -- After successful user removal in api["user_remove"]
+        user_modify             -- After successful user modify in api["user_modify"]
 
     Config:
 
     ::
 
-        form_fields are only form_instructions are only used for component registration
-        in case api["make_registration_form"] is not overriden.
+        form_fields and form_instructions are only used if api["make_registration_form"] is
+        not overridden; if overridden, form_fields MUST be None
 
     API:
 
@@ -52,6 +53,8 @@ class XEP_0077(BasePlugin):
         user_validate((self, jid, node, ifrom, registration)
             Add the user to the user store or raise ValueError(msg) if any problem is encountered
             msg is sent back to the XMPP client as an error message.
+        user_modify(jid, node, ifrom, iq)
+            Modify the user in the user store or raise ValueError(msg) (similarly to user_validate)
     """
 
     name = 'xep_0077'
@@ -83,6 +86,7 @@ class XEP_0077(BasePlugin):
             self._user_store = {}
             self.api.register(self._user_get, "user_get")
             self.api.register(self._user_remove, "user_remove")
+            self.api.register(self._user_modify, "user_modify")
             self.api.register(self._make_registration_form, "make_registration_form")
             self.api.register(self._user_validate, "user_validate")
         else:
@@ -134,11 +138,18 @@ class XEP_0077(BasePlugin):
     def _user_validate(self, jid, node, ifrom, registration):
         self._user_store[ifrom.bare] = {key: registration[key] for key in self.form_fields}
 
-    async def _handle_registration(self, iq: Iq):
+    def _user_modify(self, _jid, _node, ifrom, registration):
+        self._user_store[ifrom.bare] = {
+            key: registration[key] for key in self.form_fields
+        }
+
+    async def _handle_registration(self, iq: StanzaBase):
         if iq["type"] == "get":
             await self._send_form(iq)
         elif iq["type"] == "set":
-            if iq["register"]["remove"]:
+            form_dict = iq["register"]["form"].get_values() or iq["register"]
+
+            if form_dict.get("remove"):
                 try:
                     await self.api["user_remove"](None, None, iq["from"], iq)
                 except KeyError:
@@ -155,33 +166,37 @@ class XEP_0077(BasePlugin):
                     self.xmpp.event("user_unregister", iq)
                 return
 
+            if self.form_fields is not None:
+                for field in self.form_fields:
+                    if not iq["register"][field]:
+                        # Incomplete Registration
+                        _send_error(
+                            iq,
+                            "406",
+                            "modify",
+                            "not-acceptable",
+                            "Please fill in all fields.",
+                        )
+                        return
 
-            for field in self.form_fields:
-                if not iq["register"][field]:
-                    # Incomplete Registration
-                    _send_error(
-                        iq,
-                        "406",
-                        "modify",
-                        "not-acceptable",
-                        "Please fill in all fields.",
-                    )
-                    return
+            user = await self.api["user_get"](None, None, iq["from"], iq)
 
             try:
-                await self.api["user_validate"](None, None, iq["from"], iq["register"])
+                if user is None:
+                    await self.api["user_validate"](None, None, iq["from"], form_dict)
+                else:
+                    await self.api["user_modify"](None, None, iq["from"], form_dict)
             except ValueError as e:
-                _send_error(
-                    iq,
-                    "406",
-                    "modify",
-                    "not-acceptable",
-                    e.args,
-                )
-            else:
-                reply = iq.reply()
-                reply.send()
+                _send_error(iq, "406", "modify", "not-acceptable", "\n".join(e.args))
+                return
+
+            reply = iq.reply()
+            reply.send()
+
+            if user is None:
                 self.xmpp.event("user_register", iq)
+            else:
+                self.xmpp.event("user_modify", iq)
 
     async def _send_form(self, iq):
         reply = await self.api["make_registration_form"](None, None, iq["from"], iq)

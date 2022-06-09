@@ -170,6 +170,7 @@ class TestStreamGateway(SlixTest):
             <query xmlns='jabber:iq:register'>
                 <username>RomeoMyRomeo</username>
                 <password>ILoveJuliet</password>
+            <x xmlns="jabber:x:data" type="form" /></query>
             </query>
             <error code='406' type='modify' xmlns="jabber:client">
                 <not-acceptable
