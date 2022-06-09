@@ -60,7 +60,7 @@ class StaticCaps(object):
             return False
 
         if node in (None, ''):
-            info = self.caps.get_caps(jid)
+            info = await self.caps.get_caps(jid)
             if info and feature in info['features']:
                 return True
 
@@ -134,7 +134,7 @@ class StaticCaps(object):
     def get_verstring(self, jid, node, ifrom, data):
         return self.jid_vers.get(jid, None)
 
-    def get_caps(self, jid, node, ifrom, data):
+    async def get_caps(self, jid, node, ifrom, data):
         verstring = data.get('verstring', None)
         if verstring is None:
             return None
