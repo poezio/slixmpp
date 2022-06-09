@@ -5,6 +5,7 @@
 # See the file LICENSE for copying permission.
 import logging
 import ssl
+from typing import Dict
 
 from slixmpp.stanza import StreamFeatures, Iq
 from slixmpp.xmlstream import register_stanza_plugin, JID
@@ -64,6 +65,7 @@ class XEP_0077(BasePlugin):
         "form_fields": {"username", "password"},
         "form_instructions": "Enter your credentials",
     }
+    _user_store: Dict[str, Dict[str, str]]
 
     def plugin_init(self):
         register_stanza_plugin(StreamFeatures, RegisterFeature)
