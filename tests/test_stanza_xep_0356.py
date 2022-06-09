@@ -13,7 +13,7 @@ class TestPermissions(SlixTest):
     def testAdvertisePermission(self):
         xmlstring = """
             <message from='capulet.net' to='pubub.capulet.lit'>
-                <privilege xmlns='urn:xmpp:privilege:1'>
+                <privilege xmlns='urn:xmpp:privilege:2'>
                     <perm access='roster' type='both'/>
                     <perm access='message' type='outgoing'/>
                     <perm access='presence' type='managed_entity'/>

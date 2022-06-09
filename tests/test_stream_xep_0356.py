@@ -31,7 +31,7 @@ class TestPermissions(SlixTest):
         self.recv(
             """
             <message from='capulet.net' to='pubub.capulet.lit' id='54321'>
-                <privilege xmlns='urn:xmpp:privilege:1'>
+                <privilege xmlns='urn:xmpp:privilege:2'>
                     <perm access='roster' type='both'/>
                     <perm access='message' type='outgoing'/>
                 </privilege>
@@ -95,7 +95,7 @@ class TestPermissions(SlixTest):
     def testMakeOutgoingMessage(self):
         xmlstring = """
         <message xmlns="jabber:component:accept" from='pubsub.capulet.lit' to='capulet.net'>
-            <privilege xmlns='urn:xmpp:privilege:1'>
+            <privilege xmlns='urn:xmpp:privilege:2'>
                 <forwarded xmlns='urn:xmpp:forward:0'>
                     <message from="juliet@capulet.lit" to="romeo@montague.lit" xmlns="jabber:client">
                         <body>I do not hate you</body>
