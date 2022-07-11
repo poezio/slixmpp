@@ -800,6 +800,8 @@ class XMLStream(asyncio.BaseProtocol):
 
             self.ssl_context.verify_mode = ssl.CERT_REQUIRED
             self.ssl_context.load_verify_locations(cafile=ca_cert)
+        else:
+            self.ssl_context.set_default_verify_paths()
 
         return self.ssl_context
 
