@@ -35,7 +35,8 @@ class XEP_0077(BasePlugin):
     ::
 
         form_fields are only form_instructions are only used for component registration
-        in case api["make_registration_form"] is not overriden.
+        in case api["make_registration_form"] is not overriden (e.g., if you want to use
+        data form as per https://xmpp.org/extensions/xep-0077.html#extensibility)
 
     API:
 
@@ -136,6 +137,12 @@ class XEP_0077(BasePlugin):
         if iq["type"] == "get":
             await self._send_form(iq)
         elif iq["type"] == "set":
+            form = iq["register"]["form"]
+            if form:
+                # https://xmpp.org/extensions/xep-0077.html#extensibility
+                await self.handle_data_form(iq)
+                return
+
             if iq["register"]["remove"]:
                 try:
                     await self.api["user_remove"](None, None, iq["from"], iq)
@@ -180,6 +187,45 @@ class XEP_0077(BasePlugin):
                 reply = iq.reply()
                 reply.send()
                 self.xmpp.event("user_register", iq)
+
+    async def handle_data_form(self, iq: Iq):
+        form = iq["register"]["form"].get_values()
+        try:
+            remove = form["remove"]
+        except KeyError:
+            pass
+        else:
+            if remove:
+                try:
+                    await self.api["user_remove"](None, None, iq["from"], iq)
+                except KeyError:
+                    _send_error(
+                        iq,
+                        "404",
+                        "cancel",
+                        "item-not-found",
+                        "User not found",
+                    )
+                else:
+                    reply = iq.reply()
+                    reply.send()
+                    self.xmpp.event("user_unregister", iq)
+                return
+
+        try:
+            await self.api["user_validate"](None, None, iq["from"], iq)
+        except ValueError as e:
+            _send_error(
+                iq,
+                "406",
+                "modify",
+                "not-acceptable",
+                e.args,
+            )
+        else:
+            reply = iq.reply()
+            reply.send()
+            self.xmpp.event("user_register", iq)
 
     async def _send_form(self, iq):
         reply = await self.api["make_registration_form"](None, None, iq["from"], iq)
