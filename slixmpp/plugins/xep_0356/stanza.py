@@ -7,7 +7,7 @@ from slixmpp.plugins.xep_0297 import Forwarded
 
 
 class Privilege(ElementBase):
-    namespace = "urn:xmpp:privilege:1"
+    namespace = "urn:xmpp:privilege:2"
     name = "privilege"
     plugin_attrib = "privilege"
 
@@ -24,7 +24,10 @@ class Privilege(ElementBase):
 
     def presence(self):
         return self.permission("presence")
-    
+
+    def iq(self):
+        return self.permission("iq")
+
     def add_perm(self, access, type):
         # This should only be needed for servers, so maybe out of scope for slixmpp
         perm = Perm()
@@ -34,7 +37,7 @@ class Privilege(ElementBase):
 
 
 class Perm(ElementBase):
-    namespace = "urn:xmpp:privilege:1"
+    namespace = "urn:xmpp:privilege:2"
     name = "perm"
     plugin_attrib = "perm"
     plugin_multi_attrib = "perms"
