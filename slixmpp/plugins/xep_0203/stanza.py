@@ -30,6 +30,10 @@ class Delay(ElementBase):
 
     def set_stamp(self, value):
         if isinstance(value, dt.datetime):
+            if value.tzinfo is None:
+                raise ValueError(f'Datetime provided without timezone information: {value}')
+            if value.tzinfo != dt.timezone.utc:
+                value = value.astimezone(dt.timezone.utc)
             value = xep_0082.format_datetime(value)
         self._set_attr('stamp', value)
 
