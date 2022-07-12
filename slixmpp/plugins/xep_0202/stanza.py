@@ -8,7 +8,6 @@ import datetime as dt
 
 from slixmpp.xmlstream import ElementBase
 from slixmpp.plugins import xep_0082
-from slixmpp.thirdparty import tzutc, tzoffset
 
 
 class EntityTime(ElementBase):
@@ -87,7 +86,7 @@ class EntityTime(ElementBase):
                       seconds (positive or negative) to offset.
         """
         time = xep_0082.time(offset=value)
-        if xep_0082.parse(time).tzinfo == tzutc():
+        if xep_0082.parse(time).tzinfo == dt.timezone.utc:
             self._set_sub_text('tzo', 'Z')
         else:
             self._set_sub_text('tzo', time[-6:])
@@ -111,6 +110,6 @@ class EntityTime(ElementBase):
         date = value
         if not isinstance(value, dt.datetime):
             date = xep_0082.parse(value)
-        date = date.astimezone(tzutc())
+        date = date.astimezone(dt.timezone.utc)
         value = xep_0082.format_datetime(date)
         self._set_sub_text('utc', value)
