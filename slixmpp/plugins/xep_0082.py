@@ -6,7 +6,6 @@
 import datetime as dt
 
 from slixmpp.plugins import BasePlugin, register_plugin
-from slixmpp.thirdparty import tzutc, tzoffset, parse_iso
 
 
 # =====================================================================
@@ -21,7 +20,10 @@ def parse(time_str):
     Arguments:
         time_str -- A formatted timestamp string.
     """
-    return parse_iso(time_str)
+    try:
+        return dt.datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S.%f%z')
+    except ValueError:
+        return dt.datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S%z')
 
 
 def format_date(time_obj):
@@ -52,7 +54,7 @@ def format_time(time_obj):
     if isinstance(time_obj, dt.datetime):
         time_obj = time_obj.timetz()
     timestamp = time_obj.isoformat()
-    if time_obj.tzinfo == tzutc():
+    if time_obj.tzinfo == dt.timezone.utc:
         timestamp = timestamp[:-6]
         return '%sZ' % timestamp
     return timestamp
@@ -69,7 +71,7 @@ def format_datetime(time_obj):
         time_obj -- A datetime object.
     """
     timestamp = time_obj.isoformat('T')
-    if time_obj.tzinfo == tzutc():
+    if time_obj.tzinfo == dt.timezone.utc:
         timestamp = timestamp[:-6]
         return '%sZ' % timestamp
     return timestamp
@@ -128,9 +130,9 @@ def time(hour=None, min=None, sec=None, micro=None, offset=None, obj=False):
     if micro is None:
         micro = now.microsecond
     if offset in (None, 0):
-        offset = tzutc()
+        offset = dt.timezone.utc
     elif not isinstance(offset, dt.tzinfo):
-        offset = tzoffset(None, offset)
+        offset = dt.timezone(dt.timedelta(seconds=offset))
     value = dt.time(hour, min, sec, micro, offset)
     if obj:
         return value
@@ -175,9 +177,9 @@ def datetime(year=None, month=None, day=None, hour=None,
     if micro is None:
         micro = now.microsecond
     if offset in (None, 0):
-        offset = tzutc()
+        offset = dt.timezone.utc
     elif not isinstance(offset, dt.tzinfo):
-        offset = tzoffset(None, offset)
+        offset = dt.timezone(dt.timedelta(seconds=offset))
 
     value = dt.datetime(year, month, day, hour,
                        min, sec, micro, offset)
