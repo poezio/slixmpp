@@ -11,7 +11,7 @@ from asyncio import Future
 from mimetypes import guess_type
 from typing import (
     Optional,
-    IO, Union,
+    IO,
 )
 
 from pathlib import Path
@@ -137,7 +137,7 @@ class XEP_0363(BasePlugin):
         request['content-type'] = content_type or self.default_content_type
         return iq.send(**iqkwargs)
 
-    async def upload_file(self, filename: Union[Path, str], size: Optional[int] = None,
+    async def upload_file(self, filename: Path, size: Optional[int] = None,
                           content_type: Optional[str] = None, *,
                           input_file: Optional[IO[bytes]]=None,
                           domain: Optional[JID] = None,
@@ -146,10 +146,9 @@ class XEP_0363(BasePlugin):
         process.
 
         :param filename: Path to the file to upload (or only the name if
-                         ``input_file`` is provided)
+                         ``input_file`` is provided.
         :param size: size of the file in bytes.
         :param content_type: Type of the file that will be uploaded.
-           If not provided, will be inferred from ``filename``
         :param input_file: Binary file stream on the file.
         :param domain: Domain to query to find an HTTP upload service.
         :raises .UploadServiceNotFound: If slixmpp is unable to find an
