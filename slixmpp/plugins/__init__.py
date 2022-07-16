@@ -1,4 +1,3 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2010 Nathanael C. Fritz
 # This file is part of Slixmpp.
@@ -93,6 +92,7 @@ __all__ = [
     'xep_0335',  # JSON Containers
     'xep_0352',  # Client State Indication
     'xep_0353',  # Jingle Message Initiation
+    'xep_0356',  # Privileged entity
     'xep_0359',  # Unique and Stable Stanza IDs
     'xep_0363',  # HTTP File Upload
     'xep_0369',  # MIX-CORE

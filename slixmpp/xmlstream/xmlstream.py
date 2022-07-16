@@ -493,16 +493,11 @@ class XMLStream(asyncio.BaseProtocol):
         except Socket.gaierror as e:
             self.event('connection_failed',
                        'No DNS record available for %s' % self.default_domain)
+            self.reschedule_connection_attempt()
         except OSError as e:
             log.debug('Connection failed: %s', e)
             self.event("connection_failed", e)
-            if self._current_connection_attempt is None:
-                return
-            self._connect_loop_wait = self._connect_loop_wait * 2 + 1
-            self._current_connection_attempt = asyncio.ensure_future(
-                self._connect_routine(),
-                loop=self.loop,
-            )
+            self.reschedule_connection_attempt()
 
     def process(self, *, forever: bool = True, timeout: Optional[int] = None) -> None:
         """Process all the available XMPP events (receiving or sending data on the
@@ -637,6 +632,20 @@ class XMLStream(asyncio.BaseProtocol):
             self.event('session_end')
         self._set_disconnected_future()
         self.event("disconnected", self.disconnect_reason or exception)
+
+    def reschedule_connection_attempt(self) -> None:
+        """
+        Increase the exponential back-off and initate another background
+        _connect_routine call to connect to the server.
+        """
+        # abort if there is no ongoing connection attempt
+        if self._current_connection_attempt is None:
+            return
+        self._connect_loop_wait = min(300, self._connect_loop_wait * 2 + 1)
+        self._current_connection_attempt = asyncio.ensure_future(
+            self._connect_routine(),
+            loop=self.loop,
+        )
 
     def cancel_connection_attempt(self) -> None:
         """
@@ -800,6 +809,8 @@ class XMLStream(asyncio.BaseProtocol):
 
             self.ssl_context.verify_mode = ssl.CERT_REQUIRED
             self.ssl_context.load_verify_locations(cafile=ca_cert)
+        else:
+            self.ssl_context.set_default_verify_paths()
 
         return self.ssl_context
 
