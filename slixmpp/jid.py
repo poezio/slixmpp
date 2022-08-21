@@ -368,7 +368,7 @@ class JID:
         return self._node
 
     @node.setter
-    def node(self, value: str):
+    def node(self, value: Optional[str]):
         self._node = _validate_node(value)
         self._update_bare_full()
 
@@ -386,7 +386,7 @@ class JID:
         return self._resource
 
     @resource.setter
-    def resource(self, value: str):
+    def resource(self, value: Optional[str]):
         self._resource = _validate_resource(value)
         self._update_bare_full()
 
