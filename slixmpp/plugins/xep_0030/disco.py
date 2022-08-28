@@ -385,6 +385,8 @@ class XEP_0030(BasePlugin):
                 local = True
 
         ifrom = kwargs.pop('ifrom', None)
+        if self.xmpp.is_component and ifrom is None:
+            ifrom = self.xmpp.boundjid
         if local:
             log.debug("Looking up local disco#info data "
                       "for %s, node %s.", jid, node)
