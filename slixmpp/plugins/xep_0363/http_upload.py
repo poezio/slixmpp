@@ -101,12 +101,17 @@ class XEP_0363(BasePlugin):
 
         :param domain: Domain to disco to find a service.
         """
+        if domain is None and self.xmpp.is_component:
+            domain = self.xmpp.server_host
+
         results = await self.xmpp['xep_0030'].get_info_from_domain(
             domain=domain, **iqkwargs
         )
 
         candidates = []
         for info in results:
+            if not info['disco_info']:
+                continue
             for identity in info['disco_info']['identities']:
                 if identity[0] == 'store' and identity[1] == 'file':
                     candidates.append(info)
