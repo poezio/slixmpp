@@ -27,6 +27,7 @@ class TestHTTPUpload(SlixIntegration):
             'toto.txt',
             input_file=BytesIO(self.data),
             size=len(self.data),
+            timeout_callback=lambda x: print("HTTP upload working"),
         )
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
