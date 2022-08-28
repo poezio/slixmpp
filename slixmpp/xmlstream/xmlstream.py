@@ -574,7 +574,7 @@ class XMLStream(asyncio.BaseProtocol):
                                                        stream=self,
                                                        top_level=True,
                                                        open_only=True))
-                        self.start_stream_handler(self.xml_root)
+                        self.start_stream_handler(self.xml_root)  # type:ignore
                     self.xml_depth += 1
                 if event == 'end':
                     self.xml_depth -= 1
@@ -1267,7 +1267,7 @@ class XMLStream(asyncio.BaseProtocol):
                             already_run_filters.add(filter)
                             if iscoroutinefunction(filter):
                                 filter = cast(AsyncFilter, filter)
-                                task = asyncio.create_task(filter(data))
+                                task = asyncio.create_task(filter(data))  # type:ignore
                                 completed, pending = await wait(
                                     {task},
                                     timeout=1,
