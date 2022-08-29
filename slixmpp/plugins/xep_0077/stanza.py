@@ -1,11 +1,12 @@
-
 # Slixmpp: The Slick XMPP Library
 # Copyright (C) 2012 Nathanael C. Fritz, Lance J.T. Stout
 # This file is part of Slixmpp.
 # See the file LICENSE for copying permission.
 from __future__ import unicode_literals
 
-from slixmpp.xmlstream import ElementBase, ET
+from typing import Set, ClassVar
+
+from slixmpp.xmlstream import ElementBase
 
 
 class Register(ElementBase):
@@ -67,4 +68,4 @@ class RegisterFeature(ElementBase):
     name = 'register'
     namespace = 'http://jabber.org/features/iq-register'
     plugin_attrib = name
-    interfaces = set()
+    interfaces: ClassVar[Set[str]] = set()
