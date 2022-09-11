@@ -23,6 +23,7 @@ __all__ = [
     'xep_0049',  # Private XML Storage
     'xep_0050',  # Ad-hoc Commands
     'xep_0054',  # vcard-temp
+    'xep_0055',  # Jabber Search
     'xep_0059',  # Result Set Management
     'xep_0060',  # Pubsub (Client)
     'xep_0065',  # SOCKS5 Bytestreams
