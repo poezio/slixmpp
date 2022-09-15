@@ -104,9 +104,7 @@ class XEP_0363(BasePlugin):
         if domain is None and self.xmpp.is_component:
             domain = self.xmpp.server_host
 
-        results = await self.xmpp['xep_0030'].get_info_from_domain(
-            domain=domain, **iqkwargs
-        )
+        results = await self.xmpp['xep_0030'].get_info_from_domain(domain=domain)
 
         candidates = []
         for info in results:
