@@ -104,9 +104,7 @@ class XEP_0363(BasePlugin):
         if domain is None and self.xmpp.is_component:
             domain = self.xmpp.server_host
 
-        results = await self.xmpp['xep_0030'].get_info_from_domain(
-            domain=domain, **iqkwargs
-        )
+        results = await self.xmpp['xep_0030'].get_info_from_domain(domain=domain)
 
         candidates = []
         for info in results:
@@ -130,6 +128,8 @@ class XEP_0363(BasePlugin):
         :param size: size of the file in bytes.
         :param content_type: Type of the file that will be uploaded.
         """
+        if self.xmpp.is_component and ifrom is None:
+            ifrom = self.xmpp.boundjid
         iq = self.xmpp.make_iq_get(ito=jid, ifrom=ifrom)
         request = iq['http_upload_request']
         request['filename'] = str(filename)
