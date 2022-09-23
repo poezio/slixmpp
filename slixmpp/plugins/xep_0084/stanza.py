@@ -80,16 +80,16 @@ class Info(ElementBase):
         self._set_int('bytes', value)
 
     def get_height(self) -> int:
-        self._get_int('height')
+        return self._get_int('height')
 
     def set_height(self, value: int):
         self._set_int('height', value)
 
     def get_width(self) -> int:
-        self._get_int(self, 'width')
+        return self._get_int('width')
 
     def set_width(self, value: int):
-        self._set_int('with', value)
+        self._set_int('width', value)
 
 
 class Pointer(ElementBase):
