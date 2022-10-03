@@ -5,7 +5,6 @@
 # See the file LICENSE for copying permission.
 import logging
 from os import getenv
-logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 # Use defusedxml if wanted
 # Since enabling it can have adverse consequences for the programs using
