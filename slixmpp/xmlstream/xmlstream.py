@@ -1334,13 +1334,18 @@ class XMLStream(asyncio.BaseProtocol):
 
             passthrough = False
             if isinstance(data, Iq):
+                if "plugins" in vars(data) and isinstance(vars(data)["plugins"], dict):
+                    plugings_elt = vars(data)["plugins"]
+                    for keydict in plugings_elt:
+                        if isinstance(keydict, tuple) and "register" in ','.join([str(i) for i in keydict]):
+                            if "<class 'slixmpp.plugins.xep_0077.stanza.Register'>" in str(type(plugings_elt[keydict])):
+                                passthrough = True
                 if data.get_plugin('bind', check=True):
                     passthrough = True
                 elif data.get_plugin('session', check=True):
                     passthrough = True
             elif isinstance(data, Handshake):
                 passthrough = True
-
             if isinstance(data, (RootStanza, str)) and not passthrough:
                 self.__queued_stanzas.append((data, use_filters))
                 log.debug('NOT SENT: %s %s', type(data), data)
