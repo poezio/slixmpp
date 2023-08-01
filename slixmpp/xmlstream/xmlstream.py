@@ -525,7 +525,7 @@ class XMLStream(asyncio.BaseProtocol):
             tasks: List[Awaitable] = [asyncio.sleep(timeout)]
             if not forever:
                 tasks.append(self.disconnected)
-            self.loop.run_until_complete(asyncio.wait(tasks))
+            self.loop.run_until_complete(asyncio.gather(*tasks))
 
     def init_parser(self) -> None:
         """init the XML parser. The parser must always be reset for each new
